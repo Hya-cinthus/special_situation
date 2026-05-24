@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Special Situations — SpaceX / Baron Partners</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Plotly.js via CDN (the one external dependency; charts only) -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="sit-title">Special Situations</h1>
+    <span class="sub" id="sit-subtitle"></span>
+    <select id="situation-select" title="Select situation"></select>
+  </header>
+  <div class="disclaimer" id="disclaimer"></div>
+
+  <main>
+    <div id="loading" class="loading">Loading situation data…</div>
+    <div id="error" class="error" style="display:none"></div>
+
+    <div id="content" style="display:none">
+      <!-- KPI row -->
+      <div class="kpis" id="kpis"></div>
+
+      <!-- Main weight time series -->
+      <section class="card">
+        <h2>Estimated SpaceX weight in Baron Partners Fund (2017 → today)</h2>
+        <p class="desc">
+          Solid markers = measured filing anchors (NPORT-P). Dashed line = reconstruction
+          between filings (shares-outstanding interpolated, SpaceX mark held flat). The shaded
+          band marks the sparse, low-confidence early era. Use the range buttons / slider to
+          collapse the soft 2017–2020 history and inspect the dense recent period.
+        </p>
+        <div id="chart-weight" class="chart" style="height:460px"></div>
+      </section>
+
+      <!-- Secondary charts -->
+      <div class="grid-2">
+        <section class="card">
+          <h2>Reconstructed fund AUM</h2>
+          <p class="desc">NAV/share (measured) × shares-outstanding (interpolated between filings). Diamonds = filed net assets.</p>
+          <div id="chart-aum" class="chart" style="height:320px"></div>
+        </section>
+        <section class="card">
+          <h2>SpaceX fair value held by the fund (step function)</h2>
+          <p class="desc">Baron's own SpaceX mark from each NPORT-P (valUSD, all tranches summed). Re-marks appear as steps, not daily wiggle.</p>
+          <div id="chart-mark" class="chart" style="height:320px"></div>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2>What moved the weight? Daily change decomposition</h2>
+        <p class="desc">
+          First-order attribution of the daily change in SpaceX weight into three channels:
+          <b style="color:var(--spacex)">mark</b> (SpaceX re-marks),
+          <b style="color:var(--accent)">public-drift</b> (public holdings' price moves), and
+          <b style="color:var(--good)">flow</b> (net creations/redemptions). Cumulative since first filing.
+        </p>
+        <div id="chart-decomp" class="chart" style="height:340px"></div>
+      </section>
+
+      <!-- Scenario panel -->
+      <section class="card">
+        <h2>Scenario lab — your exposure now and under the IPO</h2>
+        <p class="desc">
+          You bought on <b id="entry-date-txt"></b>. Here is your effective SpaceX exposure per dollar,
+          now and under each IPO outcome. All math runs in your browser — sliders are instant.
+        </p>
+        <div class="scenario-grid">
+          <div class="controls">
+            <label>IPO valuation (whole company)</label>
+            <div class="rowval"><span id="ipo-val-lo"></span><b id="ipo-val-txt"></b><span id="ipo-val-hi"></span></div>
+            <input type="range" id="ipo-slider" />
+            <label>Net flow shock (+ inflows dilute · − redemptions concentrate)</label>
+            <div class="rowval"><span>−$3B</span><b id="flow-txt">$0</b><span>+$3B</span></div>
+            <input type="range" id="flow-slider" min="-3000000000" max="3000000000" step="50000000" value="0" />
+            <div class="btn-row">
+              <button data-ipo="status">Status quo ($1.25T)</button>
+              <button data-ipo="1750000000000">IPO $1.75T</button>
+              <button data-ipo="2000000000000">IPO $2.0T</button>
+              <button data-ipo="2400000000000">IPO $2.4T</button>
+              <button id="flow-reset">Reset flow</button>
+            </div>
+            <p class="desc" id="scenario-explain" style="margin-top:14px"></p>
+          </div>
+          <div class="scenario-out" id="scenario-out"></div>
+        </div>
+      </section>
+
+      <!-- Data quality -->
+      <div class="grid-2">
+        <section class="card">
+          <h2>Model quality — anchor-to-anchor reconstruction residual</h2>
+          <p class="desc">Predicted weight (holding the prior quarter's SpaceX mark &amp; shares flat) vs the next filing's measured weight. Large bars = a big between-filing re-mark we can't see daily (surfaced, not smoothed away).</p>
+          <div id="chart-resid" class="chart" style="height:300px"></div>
+        </section>
+        <section class="card">
+          <h2>Filing anchors — provenance</h2>
+          <p class="desc">Every measured quarterly anchor from SEC NPORT-P. <a id="edgar-link" target="_blank" rel="noopener">Browse on EDGAR ↗</a></p>
+          <div class="scroll-y">
+            <table class="data" id="anchor-table">
+              <thead><tr><th>Report date</th><th>SpaceX $</th><th>Wt (filed)</th><th>Net assets</th><th>Tranches</th><th>Conf.</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2>SpaceX valuation marks — provenance &amp; confidence</h2>
+        <div class="scroll-y" style="max-height:280px">
+          <table class="data" id="marks-table">
+            <thead><tr><th>Date</th><th>Whole-co val</th><th>Per share</th><th>Basis</th><th>Conf.</th><th>Source</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Data gaps &amp; TODOs</h2>
+        <div class="gaps" id="gaps"></div>
+      </section>
+
+      <p class="desc" id="footer-meta" style="text-align:center;margin-top:30px"></p>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
