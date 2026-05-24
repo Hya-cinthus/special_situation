@@ -1,0 +1,9 @@
+# The offline pipeline (build.py) runs on the Python STANDARD LIBRARY ONLY.
+# Nothing here is required to run `python build.py` or the dashboard.
+#
+# These are OPTIONAL conveniences for interactive exploration / future work.
+# Install with:  pip install -r requirements.txt
+#
+# pandas        # nicer dataframes if you want to poke at processed/*.csv
+# requests      # the pipeline uses urllib; requests is just friendlier
+# pytest        # the tests also run under stdlib `unittest`; pytest is optional

@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Large raw downloads — keep processed/ committed, raw/ is reproducible
+situations/*/data/raw/*
+!situations/*/data/raw/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
