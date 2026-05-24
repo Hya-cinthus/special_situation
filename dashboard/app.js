@@ -216,20 +216,20 @@ function renderWeightChart() {
 function renderAumChart() {
   const s = DATA.series.filter((p) => p.total_nav_usd != null);
   const line = {
-    x: s.map((p) => p.date), y: s.map((p) => p.total_nav_usd),
+    x: s.map((p) => p.date), y: s.map((p) => p.total_nav_usd / 1e9),
     type: "scattergl", mode: "lines", name: "Reconstructed AUM",
     line: { color: ACC, width: 1.4 },
-    hovertemplate: "%{x}<br>AUM %{y:$.3s}<extra></extra>",
+    hovertemplate: "%{x}<br>AUM $%{y:.2f}B<extra></extra>",
   };
   const a = DATA.anchors;
   const diamonds = {
-    x: a.map((d) => d.report_date), y: a.map((d) => d.net_assets_usd),
+    x: a.map((d) => d.report_date), y: a.map((d) => d.net_assets_usd / 1e9),
     type: "scatter", mode: "markers", name: "Filed net assets",
     marker: { color: GOOD, symbol: "diamond", size: 6 },
-    hovertemplate: "%{x}<br>filed net assets %{y:$.3s}<extra></extra>",
+    hovertemplate: "%{x}<br>filed net assets $%{y:.2f}B<extra></extra>",
   };
   Plotly.newPlot("chart-aum", [line, diamonds], baseLayout({
-    yaxis: { title: "USD", tickformat: "$.2s", gridcolor: GRID, color: TEXT, rangemode: "tozero" },
+    yaxis: { title: "USD (billions)", tickprefix: "$", ticksuffix: "B", tickformat: ".0f", gridcolor: GRID, color: TEXT, rangemode: "tozero" },
     xaxis: { gridcolor: GRID, color: TEXT, type: "date" },
     legend: { orientation: "h", y: 1.1, font: { color: TEXT } }, margin: { t: 30, r: 12, b: 30, l: 52 },
   }), plotConfig());
@@ -239,20 +239,20 @@ function renderAumChart() {
 function renderMarkChart() {
   const s = DATA.series.filter((p) => p.spacex_value_usd != null);
   const step = {
-    x: s.map((p) => p.date), y: s.map((p) => p.spacex_value_usd),
+    x: s.map((p) => p.date), y: s.map((p) => p.spacex_value_usd / 1e9),
     type: "scattergl", mode: "lines", name: "SpaceX $ held",
     line: { color: SPX, width: 1.6, shape: "hv" },
-    hovertemplate: "%{x}<br>SpaceX value %{y:$.3s}<extra></extra>",
+    hovertemplate: "%{x}<br>SpaceX value $%{y:.2f}B<extra></extra>",
   };
   const a = DATA.anchors;
   const dots = {
-    x: a.map((d) => d.report_date), y: a.map((d) => d.spacex_value_usd),
+    x: a.map((d) => d.report_date), y: a.map((d) => d.spacex_value_usd / 1e9),
     type: "scatter", mode: "markers", name: "Filing mark",
     marker: { color: SPX, size: 6 },
-    hovertemplate: "%{x}<br>filed SpaceX value %{y:$.3s}<extra></extra>",
+    hovertemplate: "%{x}<br>filed SpaceX value $%{y:.2f}B<extra></extra>",
   };
   Plotly.newPlot("chart-mark", [step, dots], baseLayout({
-    yaxis: { title: "USD", tickformat: "$.2s", gridcolor: GRID, color: TEXT, rangemode: "tozero" },
+    yaxis: { title: "USD (billions)", tickprefix: "$", ticksuffix: "B", tickformat: ".1f", gridcolor: GRID, color: TEXT, rangemode: "tozero" },
     xaxis: { gridcolor: GRID, color: TEXT, type: "date" },
     legend: { orientation: "h", y: 1.1, font: { color: TEXT } }, margin: { t: 30, r: 12, b: 30, l: 52 },
   }), plotConfig());
