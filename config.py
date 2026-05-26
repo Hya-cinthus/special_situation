@@ -62,12 +62,16 @@ class SpacexBaron:
 
     # --- Key dated events (annotated on the timeline) ----------------------
     # (date, label, kind)  kind in {init, mark, corporate, filing, ipo, lockup}
+    # All values web-verified 2026-05-24 (see data/spacex_marks.csv for sources).
     EVENTS = [
         ("2017-01-01", "Baron initiates SpaceX (~$20B val, ~4% wt)", "init"),
-        ("2021-02-01", "SpaceX tender ~$74B", "mark"),
-        ("2022-07-01", "SpaceX tender ~$127B", "mark"),
-        ("2023-06-01", "SpaceX tender ~$150B", "mark"),
-        ("2024-12-01", "SpaceX tender ~$350B", "mark"),
+        ("2021-02-18", "Series J, ~$74B (Sequoia-led)", "mark"),
+        ("2022-12-13", "Tender ~$140B ($77/sh)", "mark"),
+        ("2023-06-23", "Tender ~$150B (>$80/sh)", "mark"),
+        ("2023-12-06", "Tender ~$175B", "mark"),
+        ("2024-12-10", "Tender ~$350B ($185/sh)", "mark"),
+        ("2025-07-01", "Secondary ~$400B ($212/sh)", "mark"),
+        ("2025-12-13", "Secondary ~$800B ($421/sh)", "mark"),
         ("2026-02-02", "SpaceX + xAI merger, $1.25T combined", "corporate"),
         ("2026-05-04", "SpaceX 5-for-1 stock split", "corporate"),
         ("2026-05-20", "SpaceX files S-1; user entry", "filing"),

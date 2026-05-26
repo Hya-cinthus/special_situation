@@ -124,6 +124,21 @@ The reconstruction is **pinned to the measured filing values at every anchor**,
 so by construction the reconstructed weight at a filing equals the filed weight
 (enforced by `tests/test_engine.py`).
 
+**Marks are independently cross-validated.** Every SpaceX valuation mark in
+[`spacex_marks.csv`](data/spacex_marks.csv) is tied to a dated primary source
+(Bloomberg / CNBC / Fortune). As an external check, the publicly-reported
+per-share tender prices reconcile with the fund's own NPORT-P marks:
+
+| NPORT SpaceX value step | ratio | Reported tender price step | ratio |
+|---|---|---|---|
+| 2024-09 $0.83B → 2024-12 $1.37B | ×1.65 | $112 → $185/sh | ×1.65 |
+| 2025-09 $1.57B → 2025-12 $3.11B | ×1.98 | $212 ($400B) → $421 ($800B) | ×1.99 |
+| 2025-12 → 2026-03 ($526.59/sh) | — | $421 → $526.59 (SpaceX $0.8T→$1.0T + xAI) | ×1.25 |
+
+The marks are **display / cross-check only** — they do not feed the
+reconstruction (which uses the filing values), but the agreement is strong
+evidence Baron is marking to the reported transaction prices.
+
 ## 6. Model limitations (read before trusting a number)
 
 - **Daily weight is reconstructed, not observed.** Between quarterly filings we

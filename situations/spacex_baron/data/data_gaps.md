@@ -75,4 +75,12 @@ Legend for "enters model as": how the missing value is currently handled.
 - **SpaceX share count & fair value 2019-Q3 → present:** RESOLVED — parsed
   directly from Baron Partners NPORT-P (`ingest/edgar.py`), summing all SpaceX
   tranches. These are `measured`, `high` confidence.
+- **External SpaceX valuation marks (2017–2026):** RESOLVED (2026-05-24) — every
+  mark in `spacex_marks.csv` was web-verified to a dated primary source
+  (Bloomberg / CNBC / Fortune), replacing earlier loosely-attributed figures.
+  As an independent check, the publicly-reported per-share tender prices
+  RECONCILE with the NPORT-P marks: e.g. 2024-09→2024-12 fund SpaceX value rose
+  ×1.65 vs the $112→$185 tender price (×1.65); 2025-09→2025-12 rose ×1.98 vs
+  $212→$421 (×1.99). The marks are display/cross-check only — they do NOT feed
+  the reconstruction, which uses the filing values directly.
 - **Daily BPTRX NAV/share:** RESOLVED — Yahoo Finance chart API (no key).
