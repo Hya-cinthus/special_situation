@@ -81,26 +81,28 @@ class SpacexBaron:
     # Leverage reference (for the 33%-of-investments vs 37.5%-of-net-assets
     # reconciliation, NOT for AUM): 3/31 NPORT gross $11.77B / net $10.36B = ~1.136.
     LEVERAGE_RATIO_LAST = 11767988975.60 / 10360633779.17  # ~1.1358 (3/31 NPORT-P)
-    # Post-filing net AUM (all share classes). Morningstar's "Total Assets" = total
-    # net assets across share classes (fund AUM), NOT leveraged-gross — so we do
-    # NOT divide by leverage. Two Morningstar datapoints, same field, different
-    # dates: the PDF report is a lagged 4/30 month-end snapshot; the live website
-    # is current and reflects May inflows (the user reads $15.6B). The jump implies
-    # very large net inflows (~$3-5B since the filing) — the SpaceX-IPO-frenzy
-    # dilution story; flagged on the dashboard. $15.6B is from the live site (which
-    # blocks automated access), so it carries med confidence pending an as-of date.
+    # Morningstar's "Total Assets" = GROSS (leveraged) total assets, NOT net AUM.
+    # Evidence: it tracks the NPORT gross total-assets line ($11.77B at 3/31 ->
+    # $12.0B Morningstar at 4/30, +2%), not net ($10.36B, which would be +16%); and
+    # the fact sheet's "SpaceX 33% of total investments" = $3.89B / $11.77B gross.
+    # So we divide each reported Total Assets by the leverage ratio (~1.136) to get
+    # the NET AUM weight denominator. Two datapoints, same gross field, different
+    # dates (4/30 PDF is lagged; 5/26 website is current, NAV-dated).
+    _LEV = 11767988975.60 / 10360633779.17  # ~1.1358 (3/31 NPORT-P gross/net)
     AUM_DATAPOINTS = [
-        {"date": "2026-04-30", "total_net_assets_usd": 11.999e9,
+        {"date": "2026-04-30", "total_net_assets_usd": 12.0e9 / _LEV,
+         "reported_gross_total_assets_usd": 12.0e9,
          "source": "Morningstar Managed Investment Report (BPTRX): 'Total Assets' "
-                   "$12.0B (net, all classes), data through 2026-04-30 — a lagged "
-                   "month-end snapshot. Matches Bloomberg ~$12.27B / stockanalysis $12.0B.",
+                   "$12.0B (GROSS/levered), data through 2026-04-30 (lagged). "
+                   "Net = $12.0B / 1.136 = ~$10.6B.",
          "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
          "confidence": "med"},
-        {"date": "2026-05-26", "total_net_assets_usd": 15.6e9,
+        {"date": "2026-05-26", "total_net_assets_usd": 15.6e9 / _LEV,
+         "reported_gross_total_assets_usd": 15.6e9,
          "source": "Morningstar website quote page (BPTRX), NAV as of 2026-05-26: "
-                   "'Total Assets' 15.6B — the only fund-size field shown (no separate "
-                   "'Net Assets'), so it is the net fund AUM (all classes). NAV 249.68 "
-                   "matches our feed. Same field as the lagged PDF's $12.0B (4/30).",
+                   "'Total Assets' $15.6B = GROSS/levered (it tracks the NPORT gross "
+                   "line, not net AUM). Net = $15.6B / 1.136 = ~$13.7B. NAV 249.68 "
+                   "matches our feed.",
          "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
          "confidence": "high"},
     ]
