@@ -342,9 +342,9 @@ function renderWeightAssumptions() {
       h: "Denominator — net AUM ≈ " + usd(k.total_nav_usd),
       n: "No holdings filing exists after 3/31. AUM is anchored to the latest reported figure ("
         + (ov ? aumLink + ", " + ov.date : "reported") + ") and drifted by daily NAV. "
-        + "Morningstar's Managed Investment Report shows <b>Total Assets $12.0B</b> (net, all share "
-        + "classes, data through 4/30) — consistent with Bloomberg (~$12.3B) and stockanalysis ($12.0B). "
-        + "(Note: $12.0B is fund-level; the BPTRX retail class alone is ~$4.16B.)" },
+        + "Morningstar's <b>Total Assets</b> (net AUM, all share classes) reads <b>$15.6B now</b>, up from "
+        + "$12.0B at 4/30 (the downloadable PDF is a lagged month-end snapshot). The jump implies very large "
+        + "May net inflows. ($12.0B fund-level vs $4.16B for the BPTRX retail class alone.)" },
     { b: "ASSUMED", hot: true,
       h: "New inflows are deployed into PUBLIC stocks + cash — not SpaceX",
       n: "This is the key assumption. Daily creations bring cash that <b>cannot</b> buy private SpaceX shares, "

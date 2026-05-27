@@ -81,18 +81,27 @@ class SpacexBaron:
     # Leverage reference (for the 33%-of-investments vs 37.5%-of-net-assets
     # reconciliation, NOT for AUM): 3/31 NPORT gross $11.77B / net $10.36B = ~1.136.
     LEVERAGE_RATIO_LAST = 11767988975.60 / 10360633779.17  # ~1.1358 (3/31 NPORT-P)
-    # Post-filing net AUM (all share classes), from the Morningstar Managed
-    # Investment Report the user downloaded. Morningstar's "Total Assets" = total
-    # net assets across share classes (fund AUM), NOT leveraged-gross. $12.0B at
-    # 4/30 lines up with Bloomberg (~$12.27B) and stockanalysis.com ($12.0B).
+    # Post-filing net AUM (all share classes). Morningstar's "Total Assets" = total
+    # net assets across share classes (fund AUM), NOT leveraged-gross — so we do
+    # NOT divide by leverage. Two Morningstar datapoints, same field, different
+    # dates: the PDF report is a lagged 4/30 month-end snapshot; the live website
+    # is current and reflects May inflows (the user reads $15.6B). The jump implies
+    # very large net inflows (~$3-5B since the filing) — the SpaceX-IPO-frenzy
+    # dilution story; flagged on the dashboard. $15.6B is from the live site (which
+    # blocks automated access), so it carries med confidence pending an as-of date.
     AUM_DATAPOINTS = [
         {"date": "2026-04-30", "total_net_assets_usd": 11.999e9,
-         "source": "Morningstar Managed Investment Report (BPTRX, report dated "
-                   "2026-05-27): 'Total Assets' $11,999M ($12.0B), all share classes, "
-                   "data through 2026-04-30. Matches Bloomberg ~$12.27B and "
-                   "stockanalysis.com $12.0B.",
+         "source": "Morningstar Managed Investment Report (BPTRX): 'Total Assets' "
+                   "$12.0B (net, all classes), data through 2026-04-30 — a lagged "
+                   "month-end snapshot. Matches Bloomberg ~$12.27B / stockanalysis $12.0B.",
          "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
-         "confidence": "high"},
+         "confidence": "med"},
+        {"date": "2026-05-27", "total_net_assets_usd": 15.6e9,
+         "source": "Morningstar website 'Total Assets' $15.6B (net, all classes), "
+                   "current (~2026-05-27). Same field as the PDF's $12.0B, later date; "
+                   "implies very large May net inflows.",
+         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
+         "confidence": "med"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
