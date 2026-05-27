@@ -90,12 +90,12 @@ class SpacexBaron:
                    "Dividend.com ~$12.0B and stockanalysis.com $12.0B",
          "source_url": "https://www.dividend.com/funds/bptrx-baron-partners-retail/",
          "confidence": "med"},
-        # Morningstar shows ~daily "Total Assets" $15.6B (2026-05-27). Interpreted
-        # as GROSS (the fund is levered) -> net = 15.6 / 1.1358 = ~$13.74B.
+        # Morningstar shows ~daily "Total Assets" $15.6B (2026-05-27). Label CONFIRMED
+        # as "Total Assets" = GROSS (the fund is levered) -> net = 15.6 / 1.1358 = ~$13.74B.
         {"date": "2026-05-27", "total_net_assets_usd": 15.6e9 / (11767988975.60 / 10360633779.17),
          "reported_gross_total_assets_usd": 15.6e9,
-         "source": "Morningstar 'Total Assets' $15.6B (~daily), interpreted as GROSS "
-                   "and divided by 1.136 leverage -> ~$13.74B net",
+         "source": "Morningstar 'Total Assets' $15.6B (~daily, confirmed gross); "
+                   "net = $15.6B / 1.136 leverage = ~$13.74B",
          "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
          "confidence": "med"},
     ]

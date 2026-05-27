@@ -342,8 +342,9 @@ function renderWeightAssumptions() {
       h: "Denominator — net AUM trued-up to " + usd(k.total_nav_usd),
       n: "No holdings filing exists after 3/31. AUM is anchored to the latest reported figure ("
         + (ov ? aumLink + ", " + ov.date : "reported") + ") and drifted by daily NAV. "
-        + "Morningstar reports <b>$15.6B total assets</b>; since the fund is levered we read that as GROSS and "
-        + "divide by ~1.136 → ~$13.7B net. (If it is actually net AUM, the weight would be ~25% instead.)" },
+        + "Morningstar's label is <b>Total Assets = $15.6B</b> (gross, confirmed). The fund is levered, so "
+        + "net assets = gross ÷ ~1.136 ≈ <b>$13.7B</b> — the weight denominator. "
+        + "(The 1.136 leverage ratio is the last filed one, 3/31; if leverage has shifted since, net moves a bit.)" },
     { b: "ASSUMED", hot: true,
       h: "New inflows are deployed into PUBLIC stocks + cash — not SpaceX",
       n: "This is the key assumption. Daily creations bring cash that <b>cannot</b> buy private SpaceX shares, "
