@@ -116,8 +116,22 @@ def _series_name(xml: str):
 
 
 def _parse_baron_partners(xml: str, rec: dict):
-    """Extract the Baron Partners anchor from one NPORT-P XML, or None."""
+    """Extract the Baron Partners anchor from one NPORT-P XML, or None.
+
+    Identity is keyed on the SEC **seriesId** (S000000588), not the series name —
+    a string match alone is brittle and could collide with a renamed/legacy
+    series. The name and registrant CIK are kept as secondary corroboration. A
+    same-trust sibling that also holds SpaceX (Baron Focused Growth, S000022521)
+    fails the seriesId gate and is rejected.
+    """
+    series_id = _tag(xml, "seriesId")
+    if series_id != CFG.EDGAR_SERIES_ID:
+        return None
+    # Defense in depth: secondary identifiers must also agree.
+    reg_cik = (_tag(xml, "regCik") or "").lstrip("0")
     if (_series_name(xml) or "").strip().lower() != CFG.EDGAR_SERIES_NAME.lower():
+        return None
+    if reg_cik and reg_cik != CFG.EDGAR_CIK.lstrip("0"):
         return None
 
     rep_date = _tag(xml, "repPdDate")
@@ -153,6 +167,9 @@ def _parse_baron_partners(xml: str, rec: dict):
         "report_date": rep_date,
         "filing_date": rec["filing_date"],
         "accession": rec["accession"],
+        "series_id": series_id,
+        "series_name": _series_name(xml),
+        "reg_cik": reg_cik,
         "net_assets_usd": float(net_assets) if net_assets else None,
         "total_assets_usd": float(tot_assets) if tot_assets else None,
         "spacex_value_usd": round(spacex_value, 2),
@@ -208,19 +225,29 @@ def fetch_anchors(limit_filings: int | None = None, verbose: bool = True) -> lis
             print(f"  . {fdate}: no Baron Partners NPORT-P in batch")
 
     anchors = sorted(anchors_by_period.values(), key=lambda a: a["report_date"])
+
+    # Forensic post-condition: every accepted anchor MUST be the canonical series.
+    offenders = [a for a in anchors if a.get("series_id") != CFG.EDGAR_SERIES_ID]
+    if offenders:
+        raise RuntimeError(
+            f"identity check failed: {len(offenders)} anchor(s) not seriesId "
+            f"{CFG.EDGAR_SERIES_ID}: {[a['accession'] for a in offenders]}")
+    if verbose and anchors:
+        print(f"  identity OK: all {len(anchors)} anchors are seriesId "
+              f"{CFG.EDGAR_SERIES_ID} ({CFG.EDGAR_SERIES_NAME})")
     return anchors
 
 
 def write_anchors_csv(anchors: list[dict]) -> str:
     os.makedirs(_PROCESSED, exist_ok=True)
     path = os.path.join(_PROCESSED, "anchors_quarterly.csv")
-    cols = ["report_date", "filing_date", "accession", "net_assets_usd",
-            "total_assets_usd", "spacex_value_usd", "spacex_balance_units",
-            "spacex_pct_of_net_assets", "spacex_n_tranches",
+    cols = ["report_date", "filing_date", "accession", "series_id", "series_name",
+            "reg_cik", "net_assets_usd", "total_assets_usd", "spacex_value_usd",
+            "spacex_balance_units", "spacex_pct_of_net_assets", "spacex_n_tranches",
             "spacex_liquidity_buckets", "source", "confidence"]
     import csv
     with open(path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=cols)
+        w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         for a in anchors:
             w.writerow(a)

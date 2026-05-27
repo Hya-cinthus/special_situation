@@ -47,8 +47,19 @@ class SpacexBaron:
     SHARE_CLASSES = {"BPTRX": "Retail", "BPTIX": "Institutional", "BPTUX": "R6"}
 
     # SEC EDGAR registrant: Baron Partners Fund is a series of "Baron Select Funds".
-    EDGAR_CIK = "0001217673"          # Baron Select Funds (verified via EDGAR)
-    EDGAR_SERIES_NAME = "Baron Partners Fund"  # match in NPORT-P <seriesName>
+    # Identity forensically verified (see tests/test_identity.py): the SEC official
+    # mutual-fund ticker master maps BPTRX/BPTIX/BPTUX -> CIK 1217673, seriesId
+    # S000000588. The seriesId is the PRIMARY identity key — a filing must carry it
+    # to be accepted, so a same-trust sibling that also holds SpaceX (Baron Focused
+    # Growth, seriesId S000022521) can never contaminate the data.
+    EDGAR_CIK = "0001217673"          # Baron Select Funds (trust / registrant)
+    EDGAR_SERIES_ID = "S000000588"    # Baron Partners Fund — PRIMARY identity key
+    EDGAR_SERIES_NAME = "Baron Partners Fund"  # secondary check in NPORT-P <seriesName>
+    EDGAR_CLASS_IDS = {              # for traceability; all map to S000000588
+        "BPTRX": "C000001642",       # Retail
+        "BPTIX": "C000077805",       # Institutional
+        "BPTUX": "C000174760",       # R6
+    }
 
     # The private holding we are tracking, as it appears in NPORT-P.
     HOLDING_NAME_MATCH = "Space Exploration"   # substring match (case-insensitive)
