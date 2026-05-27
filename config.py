@@ -96,12 +96,13 @@ class SpacexBaron:
                    "month-end snapshot. Matches Bloomberg ~$12.27B / stockanalysis $12.0B.",
          "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
          "confidence": "med"},
-        {"date": "2026-05-27", "total_net_assets_usd": 15.6e9,
-         "source": "Morningstar website 'Total Assets' $15.6B (net, all classes), "
-                   "current (~2026-05-27). Same field as the PDF's $12.0B, later date; "
-                   "implies very large May net inflows.",
+        {"date": "2026-05-26", "total_net_assets_usd": 15.6e9,
+         "source": "Morningstar website quote page (BPTRX), NAV as of 2026-05-26: "
+                   "'Total Assets' 15.6B — the only fund-size field shown (no separate "
+                   "'Net Assets'), so it is the net fund AUM (all classes). NAV 249.68 "
+                   "matches our feed. Same field as the lagged PDF's $12.0B (4/30).",
          "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
-         "confidence": "med"},
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
