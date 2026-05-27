@@ -98,6 +98,7 @@ function render() {
 
   renderKpis();
   renderMarkChain();
+  renderWeightAssumptions();
   renderWeightChart();
   renderAumChart();
   renderMarkChart();
@@ -310,6 +311,69 @@ function renderMarkChain() {
       transaction, never to a hoped-for future IPO price. That ~$0.5T gap between the carried mark
       and the IPO target, multiplied by SpaceX's ~31% weight and the fund's leverage, is precisely
       this situation's thesis. Adjust the IPO valuation yourself in the Scenario Lab below.
+    </div>`;
+}
+
+/* ------------- how the current weight estimate is built ---------------- */
+function renderWeightAssumptions() {
+  const el = document.getElementById("weight-assumptions-body");
+  if (!el) return;
+  const k = DATA.kpis, la = DATA.anchors[DATA.anchors.length - 1];
+  const filingUrl = secFilingUrl(la.accession);
+  const ov = (DATA.aum_overrides || [])[(DATA.aum_overrides || []).length - 1];
+  const wt = document.getElementById("wa-weight");
+  if (wt) wt.textContent = pct(k.spacex_weight, 0);
+
+  const badge = (b) => `<span class="badge ${b.toLowerCase()}">${b}</span>`;
+  const aumLink = ov && ov.source_url
+    ? `<a href="${ov.source_url}" target="_blank" rel="noopener">Morningstar ↗</a>` : "reported source";
+
+  const items = [
+    { b: "MEASURED",
+      h: "Numerator — SpaceX dollars held = " + usd(k.spacex_value_usd),
+      n: "Sum of valUSD across all SpaceX line items in the 2026-03-31 NPORT-P. Hard SEC data. "
+        + `<a href="${filingUrl}" target="_blank" rel="noopener">filing ↗</a>` },
+    { b: "ASSUMED",
+      h: "SpaceX $ held flat since the filing",
+      n: "No new shares (a private holding can't be bought with daily cash) and no re-mark (no observable "
+        + "SpaceX transaction since the $1.25T xAI merger). So the numerator is frozen at " + usd(k.spacex_value_usd)
+        + " until the next filing, tender, or the IPO." },
+    { b: "SOURCED",
+      h: "Denominator — net AUM trued-up to " + usd(k.total_nav_usd),
+      n: "No holdings filing exists after 3/31. AUM is anchored to the latest reported figure ("
+        + (ov ? aumLink + ", " + ov.date : "reported") + ") and drifted by daily NAV. "
+        + "Morningstar reports <b>$15.6B total assets</b>; since the fund is levered we read that as GROSS and "
+        + "divide by ~1.136 → ~$13.7B net. (If it is actually net AUM, the weight would be ~25% instead.)" },
+    { b: "ASSUMED", hot: true,
+      h: "New inflows are deployed into PUBLIC stocks + cash — not SpaceX",
+      n: "This is the key assumption. Daily creations bring cash that <b>cannot</b> buy private SpaceX shares, "
+        + "so it lands in the public book (Tesla, Arch, MSCI, …) and/or pays down leverage. SpaceX dollars stay "
+        + "fixed while the denominator grows → the weight gets <b>diluted</b>. Baron's filings support this: the "
+        + "SpaceX share count was flat in 24 of 26 quarter-over-quarter transitions." },
+    { b: "ASSUMED",
+      h: "Shares outstanding interpolated between known AUM points",
+      n: "Daily share creations/redemptions aren't separately observable for free, so shares are interpolated "
+        + "linearly between the filing and each reported-AUM datapoint. Net flows are inferred from the change "
+        + "in total net assets, not measured tick-by-tick." },
+    { b: "NOTE",
+      h: "Weight is % of NET assets (the per-$1 lens) — leverage already included",
+      n: "Per $1 of your net capital. The fund runs ~113% long / −13% cash, so this is higher than the fact "
+        + "sheet's 33% (% of gross investments): 33% × 1.136 ≈ 37.5% at the filing." },
+  ];
+
+  el.innerHTML = items.map((it) => `
+    <div class="chain-step asm ${it.hot ? "hot" : ""}">
+      <div class="chain-date">${badge(it.b)}</div>
+      <div class="chain-body">
+        <div class="chain-title">${it.h}</div>
+        <div class="chain-note">${it.n}</div>
+      </div>
+    </div>`).join("") + `
+    <div class="mark-callout">
+      <b>Net result.</b> Estimated SpaceX weight = ${usd(k.spacex_value_usd)} (measured, frozen) ÷
+      ${usd(k.total_nav_usd)} (sourced net AUM) ≈ <b>${pct(k.spacex_weight)}</b> of net assets today —
+      down from <b>${pct(la.spacex_weight_measured)}</b> filed on ${la.report_date}, as inflows diluted it.
+      <span class="conf">Confidence: MED — numerator measured; denominator is a sourced, leverage-adjusted estimate.</span>
     </div>`;
 }
 

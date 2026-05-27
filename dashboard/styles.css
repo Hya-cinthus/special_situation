@@ -140,6 +140,15 @@ a:hover { text-decoration: underline; }
 .chain-note { color: var(--muted); font-size: .8rem; margin-top: 4px; line-height: 1.5; }
 .chain-src { margin-top: 5px; font-size: .76rem; }
 .mark-callout { margin-top: 14px; padding: 12px 14px; background: var(--panel-2); border-left: 3px solid var(--spacex); border-radius: 6px; font-size: .84rem; line-height: 1.6; }
+.mark-callout .conf { display:block; margin-top:6px; color:var(--muted); font-size:.76rem; }
+/* assumptions card */
+#weight-assumptions { border-color: #3a5d86; }
+.chain-step.asm { grid-template-columns: 92px 1fr; }
+.badge { display:inline-block; padding:2px 7px; border-radius:5px; font-size:.64rem; font-weight:700; letter-spacing:.4px; }
+.badge.measured { background:#102a44; color:var(--accent); }
+.badge.sourced  { background:#133a1d; color:var(--good); }
+.badge.assumed  { background:#3a3115; color:var(--warn); }
+.badge.note     { background:#2a2f38; color:var(--muted); }
 .gaps { font-size: .82rem; }
 .gaps h1, .gaps h2, .gaps h3 { color: var(--text); }
 .gaps h1 { font-size: 1.05rem; } .gaps h2 { font-size: .95rem; margin-top: 16px; } .gaps h3 { font-size: .85rem; }

@@ -78,11 +78,25 @@ class SpacexBaron:
     # AFTER the last filing: AUM = the sourced figure; SpaceX $ is carried forward
     # (no new mark; private shares can't be added). Tagged external_aum / not SEC.
     # ADD rows here as fresher AUM prints appear; keep the source + date honest.
+    # NOTE on net vs gross: the fund is LEVERED (~113.6% long at 3/31: gross total
+    # assets $11.77B vs net assets $10.36B = ratio 1.1358). The weight denominator
+    # is NET assets. Where a source reports GROSS "total assets", we divide by the
+    # last-known leverage ratio to get net. This ratio is itself an assumption
+    # (leverage may have shifted since 3/31) — see the dashboard assumptions card.
+    LEVERAGE_RATIO_LAST = 11767988975.60 / 10360633779.17  # ~1.1358 (3/31 NPORT-P)
     AUM_DATAPOINTS = [
         {"date": "2026-05-12", "total_net_assets_usd": 12.27e9,
-         "source": "Bloomberg (latest, all share classes); corroborated by "
-                   "Dividend.com ~$12.0B as of 2026-05-12",
+         "source": "Bloomberg (all share classes, net); corroborated by "
+                   "Dividend.com ~$12.0B and stockanalysis.com $12.0B",
          "source_url": "https://www.dividend.com/funds/bptrx-baron-partners-retail/",
+         "confidence": "med"},
+        # Morningstar shows ~daily "Total Assets" $15.6B (2026-05-27). Interpreted
+        # as GROSS (the fund is levered) -> net = 15.6 / 1.1358 = ~$13.74B.
+        {"date": "2026-05-27", "total_net_assets_usd": 15.6e9 / (11767988975.60 / 10360633779.17),
+         "reported_gross_total_assets_usd": 15.6e9,
+         "source": "Morningstar 'Total Assets' $15.6B (~daily), interpreted as GROSS "
+                   "and divided by 1.136 leverage -> ~$13.74B net",
+         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
          "confidence": "med"},
     ]
 
