@@ -144,6 +144,8 @@ function renderKpis() {
   const S_MERGER = { label: "📰 source", url: mk125.source_url || "#" };
   const S_IPO = { label: "📰 S-1 / source", url: mkIpo.source_url || "#" };
   const S_AUM = ov ? { label: "📊 reported AUM", url: ov.source_url || "#" } : null;
+  const S_FACT = { label: "📄 Baron fact sheet",
+    url: "https://www.baroncapitalgroup.com/sites/default/files/2026-04/baron-partners-fund-fact-sheet-bptix-3.31.26.pdf" };
 
   const cards = [
     { label: "SpaceX weight — NOW (est.)", value: pct(k.spacex_weight), cls: "spx", hl: true,
@@ -154,18 +156,21 @@ function renderKpis() {
               : "NAV × shares interpolated between filings") + ". "
         + (impliedInflow && impliedInflow > 0
             ? "It has fallen from " + pct(la.spacex_weight_measured) + " (filed " + la.report_date + ") because "
-              + "~" + usd(impliedInflow) + " of net inflows since then diluted SpaceX — your dilution thesis, live. "
+              + "~" + usd(impliedInflow) + " of net inflows since then went into <b>public holdings</b> (new cash "
+              + "can't buy private SpaceX), diluting the SpaceX weight — your dilution thesis, live. "
             : "")
         + "<span class='conf'>Confidence: MED — SpaceX $ measured; AUM post-filing is a sourced estimate.</span>",
       sources: ov ? [S_EDGAR, S_AUM, S_YAHOO] : [S_EDGAR, S_YAHOO] },
 
     { label: "SpaceX weight — last FILED", value: pct(la.spacex_weight_measured), cls: "spx", hl: true,
-      note: la.report_date + " · NPORT-P measured",
+      note: la.report_date + " · % of net assets",
       tip: "<b>Hard regulatory data — no reconstruction.</b> Sum of the pctVal of all "
         + la.spacex_n_tranches + " SpaceX line items in Baron Partners' NPORT-P "
-        + "(seriesId S000000588, verified). This is the ground truth the estimate above is pinned to. "
+        + "(seriesId S000000588, verified). <b>This is % of NET ASSETS.</b> Baron's fact sheet shows "
+        + "SpaceX at 33.0% of total long investments — the gap is leverage: the fund runs ~113% long / "
+        + "−13% cash, so 33.0% × 1.13 ≈ 37.5%. Both are correct under their own denominator. "
         + "<span class='conf'>Confidence: HIGH — straight from the SEC filing.</span>",
-      sources: [S_EDGAR] },
+      sources: [S_EDGAR, S_FACT] },
 
     { label: "SpaceX $ held by fund", value: usd(k.spacex_value_usd), cls: "spx",
       note: la.report_date + " · " + la.spacex_n_tranches + " tranches summed",
