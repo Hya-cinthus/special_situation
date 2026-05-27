@@ -97,6 +97,7 @@ function render() {
     " · " + DATA.series.length + " daily points · " + DATA.anchors.length + " filing anchors.";
 
   renderKpis();
+  renderMarkChain();
   renderWeightChart();
   renderAumChart();
   renderMarkChart();
@@ -256,6 +257,60 @@ function renderKpis() {
        ${src}
      </div>`;
   }).join("");
+}
+
+/* ----------------- how the SpaceX mark is set (explainer) -------------- */
+function renderMarkChain() {
+  const el = document.getElementById("mark-chain");
+  if (!el) return;
+  const byDate = (d) => (DATA.marks || []).find((m) => m.date === d) || {};
+  const la = DATA.anchors[DATA.anchors.length - 1];
+  const filingUrl = secFilingUrl(la.accession);
+  const link = (m, label) => m.source_url
+    ? `<a href="${m.source_url}" target="_blank" rel="noopener">${label} ↗</a>` : label;
+
+  const steps = [
+    { d: "2025-12-13", t: "Last tender before the merger", v: "$800B · $421/sh",
+      note: "Insider secondary sale; sets the pre-merger per-share basis.",
+      link: link(byDate("2025-12-13"), "Bloomberg / CNBC") },
+    { d: "2026-02-02", t: "SpaceX × xAI merger — the standing whole-company mark",
+      v: "$1.25T combined",
+      note: "$1.0T SpaceX + $0.25T xAI, all-stock. This is the most recent observable transaction, so it anchors the fund's fair-value mark.",
+      link: link(byDate("2026-02-02"), "CNBC / Bloomberg") },
+    { d: "2026-03-31", t: "What the fund actually carries — MEASURED, in the SEC filing",
+      v: "$526.59 / share", hot: true,
+      note: "valUSD ÷ balance for the SpaceX line items in Baron Partners' NPORT-P. "
+        + "$526.59 × ~1.9B shares ≈ $1.0T SpaceX standalone; + $0.25T xAI = the $1.25T combined mark. "
+        + "This $526.59 is the price baked into today's NAV.",
+      link: `<a href="${filingUrl}" target="_blank" rel="noopener">SEC NPORT-P · acc ${la.accession} ↗</a>` },
+    { d: "2026-05-04", t: "5-for-1 split (cosmetic only)", v: "$526.59 → $105.32",
+      note: "Per-share figure divided by 5; the fund's SpaceX dollar value and weight are unchanged.",
+      link: link(byDate("2026-05-04"), "Bloomberg") },
+    { d: "2026-06-12", t: "IPO target — NOT in the NAV yet", v: "$1.75T (target)", forward: true,
+      note: "S-1 / press target, unrealized as of today. NAV only steps up to a public mark once SpaceX actually trades.",
+      link: link(byDate("2026-06-12"), "S-1 / CNBC") },
+  ];
+
+  const rows = steps.map((s) => `
+    <div class="chain-step ${s.hot ? "hot" : ""} ${s.forward ? "fwd" : ""}">
+      <div class="chain-date">${s.d}</div>
+      <div class="chain-body">
+        <div class="chain-head"><span class="chain-title">${s.t}</span>
+          <span class="chain-val ${s.hot ? "spx" : ""}">${s.v}</span></div>
+        <div class="chain-note">${s.note}</div>
+        <div class="chain-src">${s.link}</div>
+      </div>
+    </div>`).join("");
+
+  el.innerHTML = rows + `
+    <div class="mark-callout">
+      <b>Bottom line.</b> Today's NAV embeds SpaceX at the <b>$1.25T</b> private mark
+      (<b>$526.59/share</b>, verified in the 3/31 SEC filing). It does <b>not</b> reflect the
+      <b>$1.75T</b> IPO target — open-end funds mark a private holding to its last observable
+      transaction, never to a hoped-for future IPO price. That ~$0.5T gap between the carried mark
+      and the IPO target, multiplied by SpaceX's ~31% weight and the fund's leverage, is precisely
+      this situation's thesis. Adjust the IPO valuation yourself in the Scenario Lab below.
+    </div>`;
 }
 
 /* ------------------------- main weight chart --------------------------- */
