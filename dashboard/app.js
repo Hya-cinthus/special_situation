@@ -339,12 +339,12 @@ function renderWeightAssumptions() {
         + "SpaceX transaction since the $1.25T xAI merger). So the numerator is frozen at " + usd(k.spacex_value_usd)
         + " until the next filing, tender, or the IPO." },
     { b: "SOURCED",
-      h: "Denominator — net AUM trued-up to " + usd(k.total_nav_usd),
+      h: "Denominator — net AUM ≈ " + usd(k.total_nav_usd),
       n: "No holdings filing exists after 3/31. AUM is anchored to the latest reported figure ("
         + (ov ? aumLink + ", " + ov.date : "reported") + ") and drifted by daily NAV. "
-        + "Morningstar's label is <b>Total Assets = $15.6B</b> (gross, confirmed). The fund is levered, so "
-        + "net assets = gross ÷ ~1.136 ≈ <b>$13.7B</b> — the weight denominator. "
-        + "(The 1.136 leverage ratio is the last filed one, 3/31; if leverage has shifted since, net moves a bit.)" },
+        + "Morningstar's Managed Investment Report shows <b>Total Assets $12.0B</b> (net, all share "
+        + "classes, data through 4/30) — consistent with Bloomberg (~$12.3B) and stockanalysis ($12.0B). "
+        + "(Note: $12.0B is fund-level; the BPTRX retail class alone is ~$4.16B.)" },
     { b: "ASSUMED", hot: true,
       h: "New inflows are deployed into PUBLIC stocks + cash — not SpaceX",
       n: "This is the key assumption. Daily creations bring cash that <b>cannot</b> buy private SpaceX shares, "

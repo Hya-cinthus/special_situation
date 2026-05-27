@@ -78,26 +78,21 @@ class SpacexBaron:
     # AFTER the last filing: AUM = the sourced figure; SpaceX $ is carried forward
     # (no new mark; private shares can't be added). Tagged external_aum / not SEC.
     # ADD rows here as fresher AUM prints appear; keep the source + date honest.
-    # NOTE on net vs gross: the fund is LEVERED (~113.6% long at 3/31: gross total
-    # assets $11.77B vs net assets $10.36B = ratio 1.1358). The weight denominator
-    # is NET assets. Where a source reports GROSS "total assets", we divide by the
-    # last-known leverage ratio to get net. This ratio is itself an assumption
-    # (leverage may have shifted since 3/31) — see the dashboard assumptions card.
+    # Leverage reference (for the 33%-of-investments vs 37.5%-of-net-assets
+    # reconciliation, NOT for AUM): 3/31 NPORT gross $11.77B / net $10.36B = ~1.136.
     LEVERAGE_RATIO_LAST = 11767988975.60 / 10360633779.17  # ~1.1358 (3/31 NPORT-P)
+    # Post-filing net AUM (all share classes), from the Morningstar Managed
+    # Investment Report the user downloaded. Morningstar's "Total Assets" = total
+    # net assets across share classes (fund AUM), NOT leveraged-gross. $12.0B at
+    # 4/30 lines up with Bloomberg (~$12.27B) and stockanalysis.com ($12.0B).
     AUM_DATAPOINTS = [
-        {"date": "2026-05-12", "total_net_assets_usd": 12.27e9,
-         "source": "Bloomberg (all share classes, net); corroborated by "
-                   "Dividend.com ~$12.0B and stockanalysis.com $12.0B",
-         "source_url": "https://www.dividend.com/funds/bptrx-baron-partners-retail/",
-         "confidence": "med"},
-        # Morningstar shows ~daily "Total Assets" $15.6B (2026-05-27). Label CONFIRMED
-        # as "Total Assets" = GROSS (the fund is levered) -> net = 15.6 / 1.1358 = ~$13.74B.
-        {"date": "2026-05-27", "total_net_assets_usd": 15.6e9 / (11767988975.60 / 10360633779.17),
-         "reported_gross_total_assets_usd": 15.6e9,
-         "source": "Morningstar 'Total Assets' $15.6B (~daily, confirmed gross); "
-                   "net = $15.6B / 1.136 leverage = ~$13.74B",
+        {"date": "2026-04-30", "total_net_assets_usd": 11.999e9,
+         "source": "Morningstar Managed Investment Report (BPTRX, report dated "
+                   "2026-05-27): 'Total Assets' $11,999M ($12.0B), all share classes, "
+                   "data through 2026-04-30. Matches Bloomberg ~$12.27B and "
+                   "stockanalysis.com $12.0B.",
          "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
-         "confidence": "med"},
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
