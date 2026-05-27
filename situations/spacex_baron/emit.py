@@ -75,6 +75,7 @@ def build_payload() -> dict:
     anchors_out = [{
         "report_date": a["report_date"], "filing_date": a["filing_date"],
         "accession": a["accession"], "net_assets_usd": a["net_assets_usd"],
+        "total_assets_usd": a.get("total_assets_usd"),
         "spacex_value_usd": a["spacex_value_usd"],
         "spacex_pct_of_net_assets": a["spacex_pct_of_net_assets"],
         "spacex_balance_units": a["spacex_balance_units"],

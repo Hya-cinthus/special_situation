@@ -172,6 +172,20 @@ function renderKpis() {
         + "<span class='conf'>Confidence: HIGH — straight from the SEC filing.</span>",
       sources: [S_EDGAR, S_FACT] },
 
+    { label: "Fund leverage (long exposure)",
+      value: la.total_assets_usd ? (la.total_assets_usd / la.net_assets_usd * 100).toFixed(0) + "% long" : "–",
+      note: la.total_assets_usd
+        ? "−" + ((la.total_assets_usd / la.net_assets_usd - 1) * 100).toFixed(0) + "% cash · levered, " + la.report_date : "",
+      tip: "Baron Partners is a <b>levered</b>, non-diversified fund. Per the fact sheet it runs ~113% long "
+        + "/ −13% cash: <b>$1 of your net capital controls ~$"
+        + (la.total_assets_usd ? (la.total_assets_usd / la.net_assets_usd).toFixed(2) : "1.13")
+        + " of long positions</b> (total assets " + usd(la.total_assets_usd) + " vs net assets "
+        + usd(la.net_assets_usd) + ", " + la.report_date + "). This is why your SpaceX exposure per $1 "
+        + "(net-assets basis, " + pct(la.spacex_weight_measured) + ") is higher than the fact sheet's 33% "
+        + "(% of gross investments). All per-$1 figures here use the net-assets basis — i.e. per actual dollar invested. "
+        + "<span class='conf'>Confidence: HIGH — totAssets/netAssets from NPORT-P, matches fact sheet.</span>",
+      sources: [S_EDGAR, S_FACT] },
+
     { label: "SpaceX $ held by fund", value: usd(k.spacex_value_usd), cls: "spx",
       note: la.report_date + " · " + la.spacex_n_tranches + " tranches summed",
       tip: "Sum of valUSD across all " + la.spacex_n_tranches + " SpaceX holdings (common / preferred / "
