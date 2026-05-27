@@ -108,31 +108,123 @@ function render() {
   initScenario();
 }
 
-/* -------------------------------- KPIs --------------------------------- */
+/* -------------------------------- KPIs --------------------------------- *
+ * The current-situation highlights. Every card carries (a) an ⓘ tooltip that
+ * states exactly how the number is derived + its confidence, and (b) clickable
+ * source links that jump straight to the primary source (EDGAR filing, Yahoo,
+ * the dated news mark).                                                       */
+function secFilingUrl(accession) {
+  const nod = (accession || "").replace(/-/g, "");
+  const cik = String(parseInt(DATA.meta.edgar_cik, 10));
+  return `https://www.sec.gov/Archives/edgar/data/${cik}/${nod}/`;
+}
+const YAHOO = "https://finance.yahoo.com/quote/BPTRX";
+
 function renderKpis() {
   const k = DATA.kpis, ipo = DATA.meta.ipo;
   const today = new Date().toISOString().slice(0, 10);
   const dToIpo = daysBetween(today, ipo.first_trade_date);
+
+  const la = DATA.anchors[DATA.anchors.length - 1];           // latest measured filing
+  const filingUrl = secFilingUrl(la.accession);
+  const lastNavPt = [...DATA.series].reverse().find((p) => p.nav_per_share != null);
+  const navTxt = lastNavPt ? "$" + lastNavPt.nav_per_share.toFixed(2) : "–";
+  const mk125 = DATA.marks.find((m) => m.date === "2026-02-02") || {};
+  const mkIpo = DATA.marks.find((m) => m.date === "2026-06-12") || {};
+  const ipo175 = (DATA.scenario_table || []).find(
+    (r) => Math.round(r.ipo_valuation_usd) === 1750000000000) || {};
+  const markAge = daysBetween("2026-02-02", today);
+
+  const S_EDGAR = { label: "📄 NPORT-P " + la.report_date, url: filingUrl };
+  const S_YAHOO = { label: "📈 Yahoo NAV", url: YAHOO };
+  const S_MERGER = { label: "📰 source", url: mk125.source_url || "#" };
+  const S_IPO = { label: "📰 S-1 / source", url: mkIpo.source_url || "#" };
+
   const cards = [
-    { label: "Est. SpaceX weight (now)", value: pct(k.spacex_weight), cls: "spx",
-      note: "as of " + k.as_of, hl: true },
-    { label: "Your exposure per $1 (entry)", value: "$" + (k.entry_weight || 0).toFixed(2),
-      note: "bought " + k.entry_date + " · " + pct(k.entry_weight) + " of NAV", hl: true },
-    { label: "Last private mark", value: usd(k.last_private_mark_usd),
-      note: "SpaceX+xAI combined entity" },
-    { label: "Reconstructed fund AUM", value: usd(k.total_nav_usd),
-      note: "NAV × est. shares" },
+    { label: "SpaceX weight — NOW (est.)", value: pct(k.spacex_weight), cls: "spx", hl: true,
+      note: "as of " + k.as_of + " · reconstructed",
+      tip: "<b>Reconstructed</b>, not directly observable. = SpaceX $ value ÷ reconstructed total AUM. "
+        + "SpaceX $ is taken from the latest NPORT-P filing (held at the $1.25T private mark) and carried "
+        + "flat to today; AUM = daily NAV/share (Yahoo) × shares-outstanding interpolated between filings. "
+        + "<span class='conf'>Confidence: MED — numerator measured, denominator interpolated.</span>",
+      sources: [S_EDGAR, S_YAHOO] },
+
+    { label: "SpaceX weight — last FILED", value: pct(la.spacex_weight_measured), cls: "spx", hl: true,
+      note: la.report_date + " · NPORT-P measured",
+      tip: "<b>Hard regulatory data — no reconstruction.</b> Sum of the pctVal of all "
+        + la.spacex_n_tranches + " SpaceX line items in Baron Partners' NPORT-P "
+        + "(seriesId S000000588, verified). This is the ground truth the estimate above is pinned to. "
+        + "<span class='conf'>Confidence: HIGH — straight from the SEC filing.</span>",
+      sources: [S_EDGAR] },
+
     { label: "SpaceX $ held by fund", value: usd(k.spacex_value_usd), cls: "spx",
-      note: "all tranches, last filing" },
-    { label: "Days to projected IPO", value: dToIpo >= 0 ? dToIpo : "—",
-      note: ipo.ticker + " · " + ipo.first_trade_date },
+      note: la.report_date + " · " + la.spacex_n_tranches + " tranches summed",
+      tip: "Sum of valUSD across all " + la.spacex_n_tranches + " SpaceX holdings (common / preferred / "
+        + "rounds) in the latest NPORT-P. SpaceX's legal name in the filing is "
+        + "“Space Exploration Technologies”. "
+        + "<span class='conf'>Confidence: HIGH — measured.</span>",
+      sources: [S_EDGAR] },
+
+    { label: "Reconstructed fund AUM", value: usd(k.total_nav_usd),
+      note: "NAV × est. shares",
+      tip: "Daily NAV/share (Yahoo, measured) × estimated shares-outstanding. Shares are derived as "
+        + "net-assets ÷ NAV at each filing, then linearly interpolated between filings. "
+        + "Latest filed net assets = " + usd(la.net_assets_usd) + " (" + la.report_date + "). "
+        + "<span class='conf'>Confidence: MED — shares interpolated between filings.</span>",
+      sources: [S_YAHOO, S_EDGAR] },
+
+    { label: "BPTRX NAV / share (latest)", value: navTxt,
+      note: lastNavPt ? "as of " + lastNavPt.date + " · measured close" : "",
+      tip: "A mutual fund's daily closing price IS its NAV per share. Pulled from the Yahoo Finance "
+        + "chart API (no key). This is the actual price basis you transact at. "
+        + "<span class='conf'>Confidence: HIGH — measured.</span>",
+      sources: [S_YAHOO] },
+
+    { label: "Last private mark", value: usd(k.last_private_mark_usd),
+      note: "SpaceX+xAI combined · " + markAge + " days old",
+      tip: "On 2026-02-02 SpaceX merged with xAI; combined entity $1.25T ($1.0T SpaceX + $0.25T xAI). "
+        + "Reconciles with Baron's 2026-03-31 filing mark of $526.59/share ($421 × 1.25). The fund's NAV "
+        + "still carries SpaceX here — i.e. the <b>stale mark</b> ahead of the IPO. "
+        + "<span class='conf'>Confidence: HIGH — dated primary news (Bloomberg/CNBC).</span>",
+      sources: [S_MERGER, S_EDGAR] },
+
+    { label: "Your exposure per $1 (entry)", value: "$" + (k.entry_weight || 0).toFixed(2), cls: "spx", hl: true,
+      note: "bought " + k.entry_date + " · " + pct(k.entry_weight) + " of NAV",
+      tip: "On your 2026-05-20 entry, SpaceX was " + pct(k.entry_weight) + " of fund NAV — so roughly "
+        + "$" + (k.entry_weight || 0).toFixed(2) + " of every $1 you invested is SpaceX exposure, at the "
+        + "stale $1.25T mark. "
+        + "<span class='conf'>Confidence: MED — same basis as the reconstructed weight.</span>",
+      sources: [S_EDGAR, S_YAHOO] },
+
+    { label: "IF IPO @ $1.75T", value: pct(ipo175.spacex_weight, 0) + " / " + signPct(ipo175.nav_stepup_pct, 0),
+      cls: "spx", small: true, note: "SpaceX weight / NAV step-up",
+      tip: "Re-marking SpaceX $1.25T → $1.75T (×1.40): weight " + pct(k.spacex_weight) + " → "
+        + pct(ipo175.spacex_weight) + ", per-share NAV step-up " + signPct(ipo175.nav_stepup_pct) + ". "
+        + "$1.75T is the S-1 / press target, <b>not yet realized</b>. Adjust it live in the Scenario Lab below. "
+        + "<span class='conf'>Confidence: scenario — forward, user-adjustable.</span>",
+      sources: [S_IPO] },
+
+    { label: "Days to projected IPO", value: dToIpo >= 0 ? dToIpo : "traded",
+      note: ipo.ticker + " · " + ipo.first_trade_date,
+      tip: "Calendar days from today to SpaceX's projected first trading day (" + ipo.first_trade_date
+        + ", Nasdaq: " + ipo.ticker + "). Dates are S-1 / press targets and may move; re-verify. "
+        + "<span class='conf'>Confidence: MED — announced target, not final.</span>",
+      sources: [S_IPO] },
   ];
-  document.getElementById("kpis").innerHTML = cards.map((c) =>
-    `<div class="kpi ${c.hl ? "hl" : ""}">
+
+  document.getElementById("kpis").innerHTML = cards.map((c) => {
+    const tip = c.tip ? `<span class="info">i<span class="tip">${c.tip}</span></span>` : "";
+    const src = (c.sources || []).length
+      ? `<div class="src">${c.sources.map((s) =>
+          `<a href="${s.url}" target="_blank" rel="noopener">${s.label} ↗</a>`).join("")}</div>` : "";
+    return `<div class="kpi ${c.hl ? "hl" : ""}">
+       ${tip}
        <div class="label">${c.label}</div>
-       <div class="value ${c.cls || ""}">${c.value}</div>
+       <div class="value ${c.cls || ""} ${c.small ? "small" : ""}">${c.value}</div>
        <div class="note">${c.note}</div>
-     </div>`).join("");
+       ${src}
+     </div>`;
+  }).join("");
 }
 
 /* ------------------------- main weight chart --------------------------- */

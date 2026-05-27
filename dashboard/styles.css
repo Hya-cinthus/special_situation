@@ -48,13 +48,36 @@ main { padding: 18px 22px 60px; max-width: 1500px; margin: 0 auto; }
 .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 12px; margin-bottom: 22px; }
 .kpi {
   background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
-  padding: 13px 15px; position: relative; overflow: hidden;
+  padding: 13px 15px; position: relative; overflow: visible;
 }
-.kpi .label { color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .6px; }
-.kpi .value { font-size: 1.55rem; font-weight: 680; margin-top: 4px; }
+.kpi:hover { z-index: 60; }
+.kpi .label { color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .6px; padding-right: 20px; }
+.kpi .value { font-size: 1.5rem; font-weight: 680; margin-top: 4px; }
 .kpi .value.spx { color: var(--spacex); }
+.kpi .value.small { font-size: 1.15rem; }
 .kpi .note { color: var(--muted); font-size: .72rem; margin-top: 3px; }
 .kpi.hl { border-color: #3a5d86; box-shadow: inset 0 0 0 1px #1d3350; }
+
+/* info badge + derivation tooltip */
+.kpi .info {
+  position: absolute; top: 9px; right: 10px; width: 16px; height: 16px;
+  border-radius: 50%; border: 1px solid var(--border); color: var(--muted);
+  font: italic 700 .7rem/15px Georgia, serif; text-align: center; cursor: help; user-select: none;
+}
+.kpi .info:hover { color: var(--accent); border-color: var(--accent); }
+.kpi .tip {
+  display: none; position: absolute; top: 22px; right: 0; width: 280px;
+  max-width: calc(100vw - 32px); background: #0b0e14; border: 1px solid var(--border);
+  border-radius: 8px; padding: 11px 13px; font: 400 .76rem/1.55 -apple-system, "Segoe UI", sans-serif;
+  color: var(--text); text-transform: none; letter-spacing: 0; z-index: 70;
+  box-shadow: 0 10px 28px rgba(0,0,0,.55); white-space: normal;
+}
+.kpi .info:hover .tip { display: block; }
+.kpi .tip b { color: var(--accent); }
+.kpi .tip .conf { display: inline-block; margin-top: 6px; color: var(--muted); font-size: .72rem; }
+.kpi .src { margin-top: 9px; display: flex; gap: 4px 10px; flex-wrap: wrap; font-size: .7rem; }
+.kpi .src a { color: var(--muted); white-space: nowrap; }
+.kpi .src a:hover { color: var(--accent); }
 
 section.card {
   background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
