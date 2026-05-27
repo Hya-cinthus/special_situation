@@ -122,6 +122,35 @@ function secFilingUrl(accession) {
 }
 const YAHOO = "https://finance.yahoo.com/quote/BPTRX";
 
+/* Rich hover text for a measured quarterly NPORT-P anchor (used on both the
+ * weight chart and the SpaceX-value step chart). Says exactly what the mark is. */
+function _monthsBetween(aISO, bISO) {
+  return Math.abs(Date.parse(bISO) - Date.parse(aISO)) / 2.629746e9;
+}
+function anchorHover(a, prev) {
+  const lines = [
+    "<b>" + a.report_date + " · NPORT-P (measured)</b>",
+    "SpaceX fair value: <b>" + usd(a.spacex_value_usd) + "</b> · " + a.spacex_n_tranches + " tranches summed",
+    "Filed weight: <b>" + pct(a.spacex_weight_measured) + "</b> of net assets",
+  ];
+  // nearest reported whole-company valuation, if within ~12 months
+  const near = (DATA.marks || [])
+    .filter((m) => m.date <= a.report_date)
+    .sort((x, y) => (x.date < y.date ? 1 : -1))[0];
+  if (near && _monthsBetween(near.date, a.report_date) <= 12) {
+    lines.push("Carried near the ≈ " + usd(near.whole_company_valuation_usd) + " valuation"
+      + (near.per_share_usd ? " ($" + near.per_share_usd + "/sh)" : "") + " — mark " + near.date);
+  }
+  if (prev && prev.spacex_value_usd) {
+    lines.push("Δ vs prior filing (" + prev.report_date + "): value "
+      + signPct(a.spacex_value_usd / prev.spacex_value_usd - 1));
+  }
+  lines.push("Fund: net " + usd(a.net_assets_usd)
+    + (a.total_assets_usd ? " · gross " + usd(a.total_assets_usd) : ""));
+  lines.push("Source: SEC NPORT-P · acc " + a.accession);
+  return lines.join("<br>");
+}
+
 function renderKpis() {
   const k = DATA.kpis, ipo = DATA.meta.ipo;
   const today = new Date().toISOString().slice(0, 10);
@@ -385,15 +414,11 @@ function renderWeightChart() {
   const x = s.map((p) => p.date);
   const y = s.map((p) => p.spacex_weight);
 
-  // measured anchor markers
-  const anchorDates = new Set(DATA.anchors.map((a) => a.report_date));
-  const ax = [], ay = [], atext = [];
-  s.forEach((p) => {
-    if (p.source === "measured" && p.spacex_weight != null) {
-      ax.push(p.date); ay.push(p.spacex_weight);
-      atext.push("Filed " + p.date + "<br>" + pct(p.spacex_weight, 1) + " of net assets");
-    }
-  });
+  // measured anchor markers (rich hover from DATA.anchors so we have prior-filing context)
+  const A = DATA.anchors;
+  const ax = A.map((a) => a.report_date);
+  const ay = A.map((a) => a.spacex_weight_measured);
+  const atext = A.map((a, i) => anchorHover(a, A[i - 1]));
 
   const reconLine = {
     x, y, type: "scattergl", mode: "lines", name: "Reconstructed (interpolated)",
@@ -507,8 +532,9 @@ function renderMarkChart() {
   const dots = {
     x: a.map((d) => d.report_date), y: a.map((d) => d.spacex_value_usd / 1e9),
     type: "scatter", mode: "markers", name: "Filing mark",
-    marker: { color: SPX, size: 6 },
-    hovertemplate: "%{x}<br>filed SpaceX value $%{y:.2f}B<extra></extra>",
+    marker: { color: SPX, size: 7, line: { color: "#fff", width: 0.6 } },
+    text: a.map((d, i) => anchorHover(d, a[i - 1])),
+    hovertemplate: "%{text}<extra></extra>",
   };
   Plotly.newPlot("chart-mark", [step, dots], baseLayout({
     yaxis: { title: "USD (billions)", tickprefix: "$", ticksuffix: "B", tickformat: ".1f", gridcolor: GRID, color: TEXT, rangemode: "tozero" },
