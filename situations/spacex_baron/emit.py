@@ -57,7 +57,8 @@ def build_payload() -> dict:
     marks = baron_site.read_external_marks()
 
     recon = R.reconstruct_daily(anchors, nav, marks, CFG.DENSITY_ERAS,
-                                CFG.WINDOW_START, CFG.ENTRY_DATE)
+                                CFG.WINDOW_START, CFG.ENTRY_DATE,
+                                aum_overrides=getattr(CFG, "AUM_DATAPOINTS", None))
     state = R.current_state(recon, CFG.ENTRY_DATE)
 
     spacex_value = state["spacex_value_usd"] or 0.0
@@ -118,6 +119,13 @@ def build_payload() -> dict:
         "series": recon["series"],
         "anchors": anchors_out,
         "residuals": recon["residuals"],
+        "aum_overrides": [{
+            "date": o["report_date"], "net_assets_usd": o["net_assets_usd"],
+            "spacex_value_usd": o["spacex_value_usd"],
+            "spacex_weight": o["spacex_weight_measured"],
+            "source": o.get("ov_source", ""), "source_url": o.get("ov_source_url", ""),
+            "confidence": o["confidence"],
+        } for o in recon.get("aum_overrides", [])],
         "events": [{"date": d, "label": l, "kind": k} for d, l, k in CFG.EVENTS],
         "density_eras": [{"start": s, "end": e, "label": l, "confidence": c}
                          for s, e, l, c in CFG.DENSITY_ERAS],

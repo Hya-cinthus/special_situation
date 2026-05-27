@@ -134,20 +134,30 @@ function renderKpis() {
   const ipo175 = (DATA.scenario_table || []).find(
     (r) => Math.round(r.ipo_valuation_usd) === 1750000000000) || {};
   const markAge = daysBetween("2026-02-02", today);
+  const ov = (DATA.aum_overrides || [])[ (DATA.aum_overrides || []).length - 1 ];  // latest reported AUM
+  // implied net inflows since last filing = current AUM − filed net assets grown by NAV
+  const impliedInflow = (ov && lastNavPt)
+    ? k.total_nav_usd - la.net_assets_usd * (lastNavPt.nav_per_share / la.nav_at_report) : null;
 
   const S_EDGAR = { label: "📄 NPORT-P " + la.report_date, url: filingUrl };
   const S_YAHOO = { label: "📈 Yahoo NAV", url: YAHOO };
   const S_MERGER = { label: "📰 source", url: mk125.source_url || "#" };
   const S_IPO = { label: "📰 S-1 / source", url: mkIpo.source_url || "#" };
+  const S_AUM = ov ? { label: "📊 reported AUM", url: ov.source_url || "#" } : null;
 
   const cards = [
     { label: "SpaceX weight — NOW (est.)", value: pct(k.spacex_weight), cls: "spx", hl: true,
-      note: "as of " + k.as_of + " · reconstructed",
-      tip: "<b>Reconstructed</b>, not directly observable. = SpaceX $ value ÷ reconstructed total AUM. "
-        + "SpaceX $ is taken from the latest NPORT-P filing (held at the $1.25T private mark) and carried "
-        + "flat to today; AUM = daily NAV/share (Yahoo) × shares-outstanding interpolated between filings. "
-        + "<span class='conf'>Confidence: MED — numerator measured, denominator interpolated.</span>",
-      sources: [S_EDGAR, S_YAHOO] },
+      note: "as of " + k.as_of + " · vs " + pct(la.spacex_weight_measured) + " filed " + la.report_date,
+      tip: "<b>Reconstructed</b>, not directly observable. = SpaceX $ ÷ total AUM. SpaceX $ is carried "
+        + "from the last filing at the $1.25T mark (can't add private shares, no new mark). AUM is "
+        + (ov ? "trued-up to reported " + usd(ov.net_assets_usd) + " (" + ov.date + ") then drifted by NAV"
+              : "NAV × shares interpolated between filings") + ". "
+        + (impliedInflow && impliedInflow > 0
+            ? "It has fallen from " + pct(la.spacex_weight_measured) + " (filed " + la.report_date + ") because "
+              + "~" + usd(impliedInflow) + " of net inflows since then diluted SpaceX — your dilution thesis, live. "
+            : "")
+        + "<span class='conf'>Confidence: MED — SpaceX $ measured; AUM post-filing is a sourced estimate.</span>",
+      sources: ov ? [S_EDGAR, S_AUM, S_YAHOO] : [S_EDGAR, S_YAHOO] },
 
     { label: "SpaceX weight — last FILED", value: pct(la.spacex_weight_measured), cls: "spx", hl: true,
       note: la.report_date + " · NPORT-P measured",
@@ -166,12 +176,14 @@ function renderKpis() {
       sources: [S_EDGAR] },
 
     { label: "Reconstructed fund AUM", value: usd(k.total_nav_usd),
-      note: "NAV × est. shares",
-      tip: "Daily NAV/share (Yahoo, measured) × estimated shares-outstanding. Shares are derived as "
-        + "net-assets ÷ NAV at each filing, then linearly interpolated between filings. "
-        + "Latest filed net assets = " + usd(la.net_assets_usd) + " (" + la.report_date + "). "
-        + "<span class='conf'>Confidence: MED — shares interpolated between filings.</span>",
-      sources: [S_YAHOO, S_EDGAR] },
+      note: ov ? "trued-up to reported " + ov.date + " + NAV drift" : "NAV × est. shares",
+      tip: "Latest filed net assets = " + usd(la.net_assets_usd) + " (" + la.report_date + ", NPORT-P). "
+        + (ov ? "No public holdings filing exists after that (next is 2026-06-30), so AUM is trued-up to a "
+              + "reported figure of " + usd(ov.net_assets_usd) + " (" + ov.date + ", " + ov.source + "), "
+              + "then drifted daily by NAV. "
+            : "")
+        + "<span class='conf'>Confidence: MED — post-filing AUM is a manually-sourced datapoint, not SEC.</span>",
+      sources: ov ? [S_AUM, S_EDGAR, S_YAHOO] : [S_YAHOO, S_EDGAR] },
 
     { label: "BPTRX NAV / share (latest)", value: navTxt,
       note: lastNavPt ? "as of " + lastNavPt.date + " · measured close" : "",
@@ -253,6 +265,14 @@ function renderWeightChart() {
     marker: { color: SPX, size: 7, line: { color: "#fff", width: 0.7 } },
     text: atext, hovertemplate: "%{text}<extra></extra>",
   };
+  // reported-AUM true-up point(s): not SEC — distinct hollow amber diamond
+  const ovr = DATA.aum_overrides || [];
+  const ovMarkers = {
+    x: ovr.map((o) => o.date), y: ovr.map((o) => o.spacex_weight),
+    type: "scatter", mode: "markers", name: "Reported-AUM true-up (not SEC)",
+    marker: { color: "#d29922", symbol: "diamond-open", size: 10, line: { width: 1.6 } },
+    hovertemplate: "%{x}<br>reported-AUM weight %{y:.1%}<br>(SpaceX $ carried, AUM sourced)<extra></extra>",
+  };
 
   const shapes = [], annotations = [];
   // low-confidence era shading
@@ -301,7 +321,7 @@ function renderWeightChart() {
   const start2y = new Date(Date.parse(last) - 730 * 86400000).toISOString().slice(0, 10);
   layout.xaxis.range = [start2y, last];
 
-  Plotly.newPlot("chart-weight", [reconLine, anchorMarkers], layout, plotConfig());
+  Plotly.newPlot("chart-weight", [reconLine, anchorMarkers, ovMarkers], layout, plotConfig());
 }
 
 /* ----------------------------- AUM chart ------------------------------- */
@@ -316,11 +336,18 @@ function renderAumChart() {
   const a = DATA.anchors;
   const diamonds = {
     x: a.map((d) => d.report_date), y: a.map((d) => d.net_assets_usd / 1e9),
-    type: "scatter", mode: "markers", name: "Filed net assets",
+    type: "scatter", mode: "markers", name: "Filed net assets (NPORT-P)",
     marker: { color: GOOD, symbol: "diamond", size: 6 },
     hovertemplate: "%{x}<br>filed net assets $%{y:.2f}B<extra></extra>",
   };
-  Plotly.newPlot("chart-aum", [line, diamonds], baseLayout({
+  const ovr = DATA.aum_overrides || [];
+  const ovDiamonds = {
+    x: ovr.map((o) => o.date), y: ovr.map((o) => o.net_assets_usd / 1e9),
+    type: "scatter", mode: "markers", name: "Reported AUM (not SEC)",
+    marker: { color: "#d29922", symbol: "diamond-open", size: 9, line: { width: 1.6 } },
+    hovertemplate: "%{x}<br>reported AUM $%{y:.2f}B (sourced, post-filing)<extra></extra>",
+  };
+  Plotly.newPlot("chart-aum", [line, diamonds, ovDiamonds], baseLayout({
     yaxis: { title: "USD (billions)", tickprefix: "$", ticksuffix: "B", tickformat: ".0f", gridcolor: GRID, color: TEXT, rangemode: "tozero" },
     xaxis: { gridcolor: GRID, color: TEXT, type: "date" },
     legend: { orientation: "h", y: 1.1, font: { color: TEXT } }, margin: { t: 30, r: 12, b: 30, l: 52 },

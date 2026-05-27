@@ -71,6 +71,21 @@ class SpacexBaron:
     # --- The user's assumed entry --------------------------------------------
     ENTRY_DATE = "2026-05-20"   # day the user bought; SpaceX S-1 also filed this day
 
+    # --- Post-filing AUM true-up (manually-sourced) ------------------------
+    # The last PUBLIC holdings filing is 2026-03-31; the next is 2026-06-30
+    # (~Aug 2026). Fund AUM in between is in NO SEC filing, but reported total
+    # net assets move with net flows. Each datapoint trues up the reconstruction
+    # AFTER the last filing: AUM = the sourced figure; SpaceX $ is carried forward
+    # (no new mark; private shares can't be added). Tagged external_aum / not SEC.
+    # ADD rows here as fresher AUM prints appear; keep the source + date honest.
+    AUM_DATAPOINTS = [
+        {"date": "2026-05-12", "total_net_assets_usd": 12.27e9,
+         "source": "Bloomberg (latest, all share classes); corroborated by "
+                   "Dividend.com ~$12.0B as of 2026-05-12",
+         "source_url": "https://www.dividend.com/funds/bptrx-baron-partners-retail/",
+         "confidence": "med"},
+    ]
+
     # --- Key dated events (annotated on the timeline) ----------------------
     # (date, label, kind)  kind in {init, mark, corporate, filing, ipo, lockup}
     # All values web-verified 2026-05-24 (see data/spacex_marks.csv for sources).

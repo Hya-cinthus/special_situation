@@ -77,7 +77,8 @@ def reconstruct_daily(anchors: list[dict],
                       external_marks: list[dict],
                       density_eras,
                       window_start: str,
-                      entry_date: str) -> dict:
+                      entry_date: str,
+                      aum_overrides: list[dict] | None = None) -> dict:
     """Return the full reconstructed daily series + anchor/quality metadata.
 
     anchors: measured quarterly rows from NPORT-P (edgar.fetch_anchors), each with
@@ -142,19 +143,49 @@ def reconstruct_daily(anchors: list[dict],
                 "mark_contrib": None, "drift_contrib": None, "flow_contrib": None,
             })
 
+    # ---- AUM true-up anchors (post-filing, manually-sourced) ----
+    # No public holdings filing exists after the last NPORT-P, but reported total
+    # net assets (e.g. Bloomberg / aggregators) move with net flows. Each override
+    # becomes a pseudo-anchor: AUM is the sourced figure; SpaceX $ is CARRIED
+    # FORWARD from the last filing (no new mark; private shares can't be added).
+    # These are NOT measured filings — tagged source="external_aum" — so they
+    # never enter the NPORT anchor table, residuals, or measured markers.
+    override_anchors = []
+    for ov in sorted(aum_overrides or [], key=lambda o: o["date"]):
+        if ov["date"] <= enriched[-1]["report_date"]:
+            continue  # only forward-fill strictly after the last filing
+        nav_at = _nearest_prior_nav(navmap, nav_dates, ov["date"])
+        if not nav_at or not ov.get("total_net_assets_usd"):
+            continue
+        carried = (override_anchors[-1] if override_anchors else enriched[-1])["spacex_value_usd"]
+        na = float(ov["total_net_assets_usd"])
+        override_anchors.append({
+            "report_date": ov["date"], "filing_date": None, "accession": None,
+            "net_assets_usd": na, "spacex_value_usd": carried,
+            "spacex_pct_of_net_assets": carried / na * 100,
+            "spacex_balance_units": enriched[-1].get("spacex_balance_units"),
+            "nav_at_report": nav_at, "shares_outstanding": na / nav_at,
+            "spacex_weight_measured": carried / na,
+            "is_override": True, "source": "external_aum",
+            "confidence": ov.get("confidence", "med"),
+            "ov_source": ov.get("source", ""), "ov_source_url": ov.get("source_url", ""),
+        })
+
     # ---- regime 2: anchored era — full reconstruction ----
-    # Walk segment by segment between consecutive anchors; final open segment
-    # runs to the last NAV day with shares held flat (flows unobservable).
+    # Walk segment by segment between consecutive anchors; the final open segment
+    # runs to the last NAV day with shares held flat (flows unobservable beyond
+    # the last anchor — whether that anchor is an NPORT filing or an AUM true-up).
+    seg_anchors = enriched + override_anchors
     segments = []
-    for i in range(len(enriched)):
-        seg_start = _d(enriched[i]["report_date"])
-        if i + 1 < len(enriched):
-            seg_end = _d(enriched[i + 1]["report_date"])
-            nxt = enriched[i + 1]
+    for i in range(len(seg_anchors)):
+        seg_start = _d(seg_anchors[i]["report_date"])
+        if i + 1 < len(seg_anchors):
+            seg_end = _d(seg_anchors[i + 1]["report_date"])
+            nxt = seg_anchors[i + 1]
         else:
             seg_end = last_data_day
             nxt = None
-        segments.append((enriched[i], nxt, seg_start, seg_end))
+        segments.append((seg_anchors[i], nxt, seg_start, seg_end))
 
     prev_point = None
     for cur_anchor, nxt_anchor, seg_start, seg_end in segments:
@@ -184,8 +215,12 @@ def reconstruct_daily(anchors: list[dict],
             weight = spacex_value / total_nav if total_nav else None
 
             is_anchor_day = (iso == cur_anchor["report_date"])
-            source = "measured" if is_anchor_day else "interpolated"
-            confidence = "high" if is_anchor_day else _confidence_for(iso, density_eras)
+            if is_anchor_day and cur_anchor.get("is_override"):
+                source, confidence = "external_aum", cur_anchor.get("confidence", "med")
+            elif is_anchor_day:
+                source, confidence = "measured", "high"
+            else:
+                source, confidence = "interpolated", _confidence_for(iso, density_eras)
 
             pt = {
                 "date": iso,
@@ -238,6 +273,7 @@ def reconstruct_daily(anchors: list[dict],
         "series": series,
         "anchors": enriched,
         "residuals": residuals,
+        "aum_overrides": override_anchors,
         "last_data_day": nav_dates[-1],
     }
 

@@ -34,6 +34,18 @@ Legend for "enters model as": how the missing value is currently handled.
   the primary source of between-anchor reconstruction error and is labeled
   `interpolated` on every affected point. Net flows are inferred from the change
   in derived shares across anchors.
+- **Post-last-filing true-up:** the most recent PUBLIC holdings filing is
+  2026-03-31; the next is the 2026-06-30 report (filed ~Aug 2026). Monthly NPORT
+  reports for Apr/May exist but are **non-public** until the quarter-end filing,
+  so fund AUM between is in NO SEC filing. To avoid understating dilution, a
+  manually-sourced **reported total net assets** datapoint (`config.AUM_DATAPOINTS`)
+  trues up the open segment: AUM = the sourced figure (Bloomberg ~$12.27B /
+  Dividend.com ~$12.0B, 2026-05-12, all classes); SpaceX $ is **carried forward**
+  from the 3/31 filing (no new mark, private shares can't be added). These points
+  are tagged `external_aum`, drawn as a distinct amber hollow diamond, and never
+  enter the NPORT anchor table or residuals. This is why the current weight
+  (~31%) sits below the 2026-03-31 filed weight (37.5%): ~$1.7–1.9B of net
+  inflows since the filing have diluted SpaceX.
 
 ### 3. Full public-holdings book at daily resolution — `confidence: med`
 - **Missing:** daily prices for every public holding (Tesla, CoStar, Arch
