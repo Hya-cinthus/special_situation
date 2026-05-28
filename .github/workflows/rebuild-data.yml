@@ -1,0 +1,50 @@
+name: Rebuild dashboard JSON
+
+# Triggered when the Morningstar AUM log (or any spacex_baron input) changes —
+# regenerates dashboard/data/spacex_baron.json and commits if it differs. The
+# Vercel deploy then picks up the fresh JSON automatically.
+# `[skip ci]` in the commit message + GITHUB_TOKEN pushes not retriggering
+# workflows together prevent any loop.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "situations/spacex_baron/data/morningstar_aum_log.jsonl"
+      - "situations/spacex_baron/data/spacex_marks.csv"
+      - "situations/spacex_baron/data/processed/**"
+      - "situations/spacex_baron/engine/**"
+      - "situations/spacex_baron/emit.py"
+      - "situations/spacex_baron/ingest/morningstar_log.py"
+      - "config.py"
+      - "build.py"
+  workflow_dispatch:
+
+concurrency:
+  group: rebuild-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Rebuild dashboard JSON from cached CSVs + the AUM log
+        run: python build.py spacex_baron --no-fetch
+      - name: Commit if dashboard JSON changed
+        run: |
+          if [ -n "$(git status --porcelain dashboard/data/spacex_baron.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add dashboard/data/spacex_baron.json
+            git commit -m "auto: rebuild dashboard JSON [skip ci]"
+            git push
+          else
+            echo "no JSON change — skipping commit"
+          fi
