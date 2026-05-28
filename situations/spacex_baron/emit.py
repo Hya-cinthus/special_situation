@@ -20,7 +20,7 @@ if _REPO_ROOT not in sys.path:
 from config import SpacexBaron as CFG, DASHBOARD_DATA_DIR
 from situations.spacex_baron.engine import reconstruct as R
 from situations.spacex_baron.engine import scenarios as Scn
-from situations.spacex_baron.ingest import baron_site
+from situations.spacex_baron.ingest import baron_site, morningstar_log
 
 _SIT = os.path.join(_REPO_ROOT, "situations", "spacex_baron")
 _PROCESSED = os.path.join(_SIT, "data", "processed")
@@ -58,7 +58,7 @@ def build_payload() -> dict:
 
     recon = R.reconstruct_daily(anchors, nav, marks, CFG.DENSITY_ERAS,
                                 CFG.WINDOW_START, CFG.ENTRY_DATE,
-                                aum_overrides=getattr(CFG, "AUM_DATAPOINTS", None))
+                                aum_overrides=morningstar_log.resolve_aum_datapoints())
     state = R.current_state(recon, CFG.ENTRY_DATE)
 
     spacex_value = state["spacex_value_usd"] or 0.0

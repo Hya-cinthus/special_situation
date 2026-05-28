@@ -81,34 +81,29 @@ class SpacexBaron:
     # Leverage reference (for the 33%-of-investments vs 37.5%-of-net-assets
     # reconciliation, NOT for AUM): 3/31 NPORT gross $11.77B / net $10.36B = ~1.136.
     LEVERAGE_RATIO_LAST = 11767988975.60 / 10360633779.17  # ~1.1358 (3/31 NPORT-P)
-    # WORKING ASSUMPTION (pending end-of-May data): treat Morningstar "Total Assets"
-    # as GROSS (leveraged) total assets and divide by the leverage ratio (~1.136)
-    # to get the NET AUM weight denominator.
-    # HONEST CAVEAT: Morningstar's own glossary defines "Total Assets" as the NET
-    # assets of all share classes (i.e. net, not gross). The numbers don't fully
-    # disambiguate yet, so per the user we assume gross for now and will revisit at
-    # the 5/31 month-end (a fresh month-end print should settle net vs gross).
-    _LEV = 11767988975.60 / 10360633779.17  # ~1.1358 (3/31 NPORT-P gross/net)
-    AUM_DATAPOINTS = [
-        {"date": "2026-04-30", "total_net_assets_usd": 12.0e9 / _LEV,
-         "reported_gross_total_assets_usd": 12.0e9,
-         "source": "Morningstar 'Total Assets' $12.0B (4/30, lagged month-end), "
-                   "assumed GROSS -> net = $12.0B / 1.136 = ~$10.6B (working assumption).",
-         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
-         "confidence": "med"},
-        {"date": "2026-05-26", "total_net_assets_usd": 15.6e9 / _LEV,
-         "reported_gross_total_assets_usd": 15.6e9,
-         "source": "Morningstar website 'Total Assets' $15.6B (as of 5/26), assumed "
-                   "GROSS -> net = $15.6B / 1.136 = ~$13.7B (working assumption).",
-         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
-         "confidence": "med"},
-        {"date": "2026-05-27", "total_net_assets_usd": 15.9e9 / _LEV,
-         "reported_gross_total_assets_usd": 15.9e9,
-         "source": "Morningstar website 'Total Assets' $15.9B (as of 5/27 close), "
-                   "assumed GROSS -> net = $15.9B / 1.136 = ~$14.0B (working "
-                   "assumption; revisit at 5/31 month-end to confirm net vs gross).",
-         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote",
-         "confidence": "med"},
+    # --- Net-vs-gross switch + leverage (the one place that controls it) -----
+    # WORKING ASSUMPTION (pending 5/31 month-end): Morningstar "Total Assets" is
+    # GROSS (leveraged), so net = reported / LEVERAGE_RATIO. Flip ASSUME_..._GROSS
+    # to False once confirmed net (Morningstar's glossary says net), and rebuild.
+    LEVERAGE_RATIO = 11767988975.60 / 10360633779.17   # ~1.1358 (3/31 NPORT-P gross/net)
+    ASSUME_TOTAL_ASSETS_GROSS = True
+
+    # Daily Morningstar "Total Assets" prints feed the AUM true-up. The cowork
+    # browser scraper APPENDS one JSON line per day to this log, which is the live
+    # source of truth; AUM_REPORTED below is just a committed fallback/seed. Values
+    # are stored as REPORTED (gross-or-net per the page); the switch above converts
+    # to the net weight-denominator. See ingest/morningstar_log.py.
+    MORNINGSTAR_AUM_LOG = "situations/spacex_baron/data/morningstar_aum_log.jsonl"
+    AUM_REPORTED = [
+        {"date": "2026-04-30", "reported_total_assets_usd": 12.0e9, "confidence": "med",
+         "source": "Morningstar 'Total Assets' $12.0B (4/30 month-end, lagged)",
+         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote"},
+        {"date": "2026-05-26", "reported_total_assets_usd": 15.6e9, "confidence": "med",
+         "source": "Morningstar website 'Total Assets' $15.6B (5/26)",
+         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote"},
+        {"date": "2026-05-27", "reported_total_assets_usd": 15.9e9, "confidence": "med",
+         "source": "Morningstar website 'Total Assets' $15.9B (5/27 close)",
+         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
