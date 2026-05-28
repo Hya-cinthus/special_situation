@@ -371,10 +371,12 @@ function renderWeightAssumptions() {
       h: "Denominator — net AUM ≈ " + usd(k.total_nav_usd),
       n: "No holdings filing exists after 3/31. AUM is anchored to the latest reported figure ("
         + (ov ? aumLink + ", " + ov.date : "reported") + ") and drifted by daily NAV. "
-        + "Morningstar's <b>Total Assets is the GROSS/levered</b> figure (it tracks the NPORT gross line, "
-        + "not net AUM): <b>$15.6B</b> now (NAV-dated 5/26), up from $12.0B at 4/30 (lagged). "
-        + "Net AUM = $15.6B ÷ ~1.136 leverage = <b>~$13.7B</b> — the weight denominator. "
-        + "Confirmed gross because SpaceX's “33% of total investments” = $3.89B ÷ $11.77B gross." },
+        + "<b>Working assumption (pending the 5/31 month-end):</b> we treat Morningstar's "
+        + "<b>Total Assets</b> ($15.9B at 5/27, $15.6B at 5/26, $12.0B at 4/30) as GROSS/levered and "
+        + "divide by ~1.136 → net ≈ <b>" + usd(ov ? ov.net_assets_usd : 0) + "</b>, the weight denominator. "
+        + "<b>Honest caveat:</b> Morningstar's glossary actually defines Total Assets as the NET assets of "
+        + "all share classes — if that holds, net = $15.9B and the weight is ~24%. A fresh month-end print "
+        + "should settle net-vs-gross." },
     { b: "ASSUMED", hot: true,
       h: "New inflows are deployed into PUBLIC stocks + cash — not SpaceX",
       n: "This is the key assumption. Daily creations bring cash that <b>cannot</b> buy private SpaceX shares, "
