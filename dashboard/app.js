@@ -514,7 +514,21 @@ function renderAumChart() {
     marker: { color: "#d29922", symbol: "diamond-open", size: 9, line: { width: 1.6 } },
     hovertemplate: "%{x}<br>reported AUM $%{y:.2f}B (sourced, post-filing)<extra></extra>",
   };
-  Plotly.newPlot("chart-aum", [line, diamonds, ovDiamonds], baseLayout({
+  // dashed extrapolation of AUM to the IPO date (trend, low confidence)
+  const traces = [line, diamonds, ovDiamonds];
+  const proj = DATA.aum_projection;
+  if (proj && proj.points && proj.points.length) {
+    const g = (proj.daily_growth_pct * 100).toFixed(2);
+    traces.push({
+      x: proj.points.map((p) => p.date), y: proj.points.map((p) => p.total_nav_usd / 1e9),
+      type: "scatter", mode: "lines",
+      name: "AUM trend → IPO (extrapolated)",
+      line: { color: "#d29922", width: 1.6, dash: "dash" },
+      hovertemplate: "%{x}<br>projected AUM $%{y:.2f}B<br>(trend +" + g + "%/day, SpaceX wt %{customdata:.1%})<extra></extra>",
+      customdata: proj.points.map((p) => p.spacex_weight),
+    });
+  }
+  Plotly.newPlot("chart-aum", traces, baseLayout({
     yaxis: { title: "USD (billions)", tickprefix: "$", ticksuffix: "B", tickformat: ".0f", gridcolor: GRID, color: TEXT, rangemode: "tozero" },
     xaxis: { gridcolor: GRID, color: TEXT, type: "date" },
     legend: { orientation: "h", y: 1.1, font: { color: TEXT } }, margin: { t: 30, r: 12, b: 30, l: 52 },

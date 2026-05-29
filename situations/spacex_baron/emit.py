@@ -51,6 +51,73 @@ def _load_nav_csv():
                 for r in csv.DictReader(f)]
 
 
+def _project_aum(recon: dict, cur_val: float, spacex_value: float) -> dict:
+    """Extrapolate net AUM from the last measured point to the IPO date.
+
+    Fits a log-linear trend (constant % daily growth) to the reconstruction's
+    daily net-AUM series over the recent inflow window, then projects forward to
+    CFG.IPO_FIRST_TRADE_DATE. SpaceX $ is held flat (private mark unchanged), so
+    the projected SpaceX weight = spacex_value / projected_AUM. This is an
+    EXTRAPOLATION (dashed, low confidence), not a forecast — flagged as such.
+    """
+    from datetime import date, timedelta
+    import math
+
+    series = [p for p in recon["series"] if p.get("total_nav_usd")]
+    if len(series) < 5:
+        return {"points": [], "method": "insufficient data"}
+
+    last = series[-1]
+    last_d = date.fromisoformat(last["date"])
+    ipo_d = date.fromisoformat(CFG.IPO_FIRST_TRADE_DATE)
+    if ipo_d <= last_d:
+        return {"points": [], "method": "IPO date already passed"}
+
+    # Fit log-linear growth over the recent inflow window (last ~45 calendar days),
+    # which captures the post-filing surge rather than the whole flat history.
+    window_start = last_d - timedelta(days=45)
+    fit = [(date.fromisoformat(p["date"]), p["total_nav_usd"])
+           for p in series if date.fromisoformat(p["date"]) >= window_start]
+    if len(fit) < 5:
+        fit = [(date.fromisoformat(p["date"]), p["total_nav_usd"]) for p in series[-30:]]
+
+    x0 = fit[0][0]
+    xs = [(d - x0).days for d, _ in fit]
+    ys = [math.log(v) for _, v in fit]
+    n = len(xs)
+    mx = sum(xs) / n
+    my = sum(ys) / n
+    denom = sum((x - mx) ** 2 for x in xs) or 1.0
+    slope = sum((xs[i] - mx) * (ys[i] - my) for i in range(n)) / denom  # daily log-growth
+    daily_growth = math.exp(slope) - 1.0
+
+    # Anchor the projection at the last MEASURED AUM (continuity), grow by slope.
+    pts = []
+    cur = last_d
+    base = last["total_nav_usd"]
+    while cur <= ipo_d:
+        days = (cur - last_d).days
+        aum = base * math.exp(slope * days)
+        wt = spacex_value / aum if aum else None
+        pts.append({"date": cur.isoformat(),
+                    "total_nav_usd": round(aum, 2),
+                    "spacex_weight": round(wt, 6) if wt else None})
+        cur += timedelta(days=1)
+
+    return {
+        "points": pts,
+        "from_date": last["date"],
+        "from_aum_usd": base,
+        "to_date": CFG.IPO_FIRST_TRADE_DATE,
+        "to_aum_usd": pts[-1]["total_nav_usd"] if pts else None,
+        "to_spacex_weight": pts[-1]["spacex_weight"] if pts else None,
+        "daily_growth_pct": daily_growth,
+        "fit_window_days": (last_d - fit[0][0]).days,
+        "method": "log-linear fit to recent net-AUM trend; SpaceX $ held flat",
+        "confidence": "low",
+    }
+
+
 def build_payload() -> dict:
     anchors = _load_anchors_csv()
     nav = _load_nav_csv()
@@ -87,6 +154,8 @@ def build_payload() -> dict:
                       f"&CIK={CFG.EDGAR_CIK}&type=NPORT-P"),
         "source": a["source"], "confidence": a["confidence"],
     } for a in recon["anchors"]]
+
+    aum_projection = _project_aum(recon, cur_val, spacex_value)
 
     payload = {
         "meta": {
@@ -127,6 +196,7 @@ def build_payload() -> dict:
             "source": o.get("ov_source", ""), "source_url": o.get("ov_source_url", ""),
             "confidence": o["confidence"],
         } for o in recon.get("aum_overrides", [])],
+        "aum_projection": aum_projection,
         "events": [{"date": d, "label": l, "kind": k} for d, l, k in CFG.EVENTS],
         "density_eras": [{"start": s, "end": e, "label": l, "confidence": c}
                          for s, e, l, c in CFG.DENSITY_ERAS],
