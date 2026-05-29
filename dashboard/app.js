@@ -93,6 +93,7 @@ function render() {
   renderKpis();
   renderMarkChain();
   renderWeightAssumptions();
+  renderMtmCheck();
   renderWeightChart();
   renderAumChart();
   renderMarkChart();
@@ -402,6 +403,51 @@ function renderWeightAssumptions() {
       down from <b>${pct(la.spacex_weight_measured)}</b> filed on ${la.report_date}, as inflows diluted it.
       <span class="conf">Confidence: MED — numerator measured; denominator is a sourced, leverage-adjusted estimate.</span>
     </div>`;
+}
+
+/* ----------------- NAV freshness / mark-to-market check ---------------- */
+function renderMtmCheck() {
+  const el = document.getElementById("mtm-check-body");
+  if (!el) return;
+  const la = DATA.anchors[DATA.anchors.length - 1];
+  const today = new Date().toISOString().slice(0, 10);
+  const markDate = "2026-02-02";                 // last observable SpaceX transaction (xAI merger)
+  const markAge = daysBetween(markDate, today);
+  const filingAge = daysBetween(la.report_date, today);
+  const ipo = DATA.meta.ipo;
+  const ipo175 = (DATA.scenario_table || []).find(
+    (r) => Math.round(r.ipo_valuation_usd) === 1750000000000) || {};
+
+  const rows = [
+    { b: "FRESH", color: GOOD,
+      h: "SpaceX is re-marked every quarter (not stale)",
+      n: "Baron carries SpaceX in NPORT-P at the latest observable transaction. The 2026-03-31 filing "
+        + "marks it at $526.59/share ($1.25T, the Feb xAI merger). This is genuine mark-to-market — "
+        + "contrast VCX, whose sponsor NAV sat at a stale mark while its holdings re-rated." },
+    { b: "GAP: " + markAge + "d", color: WARN,
+      h: "No new observable SpaceX transaction since " + markDate,
+      n: "The standing $1.25T mark is " + markAge + " days old. Private holdings only re-mark on a real "
+        + "transaction (tender / round / merger) — none has printed since the xAI merger, so the NAV "
+        + "correctly still carries $1.25T. The next mark IS the IPO." },
+    { b: "GAP: filing", color: MUTED,
+      h: "Holdings filing is " + filingAge + "d old (next ~2026-06-30 report)",
+      n: "Between filings we true-up AUM from reported figures (see the assumptions card); the SpaceX "
+        + "$ value itself is held flat because it can't be added to and hasn't re-marked." },
+    { b: "PENDING", color: SPX,
+      h: "The real MTM event is the IPO re-rate (not yet in NAV)",
+      n: "When SpaceX trades (~" + ipo.first_trade_date + ", " + ipo.ticker + "), the mark jumps from $1.25T "
+        + "to the public price. At $1.75T that's a weight step to " + pct(ipo175.spacex_weight)
+        + " and a NAV step-up of " + signPct(ipo175.nav_stepup_pct) + ". Model it in the Scenario Lab below." },
+  ];
+  el.innerHTML = rows.map((r) =>
+    `<div class="chain-step asm"><div class="chain-date"><span class="badge" style="background:${r.color}22;color:${r.color}">${r.b}</span></div>
+     <div class="chain-body"><div class="chain-title">${r.h}</div><div class="chain-note">${r.n}</div></div></div>`).join("")
+    + `<div class="mark-callout">
+        <b>Bottom line.</b> SpaceX's NAV mark is current-as-of-last-transaction ($1.25T) and re-marked each
+        quarter — it is <b>not</b> the stale-NAV problem VCX has. The only "unmarked" upside is the pending
+        IPO re-rate, which is a scenario, not a gap. <span class="conf">SpaceX mark: measured (filing).
+        IPO re-rate: scenario / forward.</span>
+       </div>`;
 }
 
 /* ------------------------- main weight chart --------------------------- */
