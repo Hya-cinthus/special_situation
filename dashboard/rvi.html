@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Special Situations — OpenAI via RVI</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="sit-title">Special Situations</h1>
+    <span class="sub" id="sit-subtitle"></span>
+    <nav class="sitnav">
+      <a href="index.html">SpaceX · Baron</a>
+      <a href="vcx.html">OpenAI/Anthropic · VCX</a>
+      <a href="dxyz.html">Pre-IPO tech · DXYZ</a>
+      <a href="rvi.html" class="active">OpenAI · RVI</a>
+    </nav>
+  </header>
+  <div class="disclaimer" id="disclaimer"></div>
+
+  <main>
+    <div id="loading" class="loading">Loading situation data…</div>
+    <div id="error" class="error" style="display:none"></div>
+
+    <div id="content" style="display:none">
+      <div class="kpis" id="kpis"></div>
+
+      <section class="card" id="thesis">
+        <h2>The setup — the cleanest-disclosure closed-end case</h2>
+        <div id="thesis-body"></div>
+      </section>
+
+      <section class="card">
+        <h2>Market price vs NAV — and the premium you pay</h2>
+        <p class="desc">
+          RVI is a closed-end fund. Blue = price. Green step = sponsor NAV. Amber dash = mark-to-market NAV.
+          Right axis: shaded = MTM premium, dotted = stale-NAV premium. Watch the May spike — the premium
+          briefly hit ~+190% on OpenAI-stake hype, then faded.
+        </p>
+        <div id="chart-premium" class="chart" style="height:440px"></div>
+      </section>
+
+      <section class="card" id="holding-marks-card">
+        <h2>Mark-to-market — what each holding was marked at vs now</h2>
+        <p class="desc">
+          Re-mark each disclosed holding by its valuation move since the base date. RVI's marks are recent
+          (3/31), so most haven't re-rated yet — the NAV is fairly fresh. <b>Estimate, low confidence.</b>
+        </p>
+        <div id="holding-marks"></div>
+      </section>
+
+      <section class="card">
+        <h2>What's inside — and what you actually pay for it</h2>
+        <p class="desc">RVI names its holdings directly in the SEC filing (rare for this set). OpenAI was added after the 3/31 report, so it's sponsor-disclosed for now.</p>
+        <div id="lookthrough"></div>
+      </section>
+
+      <section class="card">
+        <h2>Scenario lab — the two-way bet</h2>
+        <p class="desc">Return = the underlying re-rate (NAV) <b>×</b> the wrapper premium. Adjust both.</p>
+        <div class="scenario-grid">
+          <div class="controls">
+            <label>Underlying NAV change (e.g. <span id="hn-label">OpenAI</span> re-rate)</label>
+            <div class="rowval"><span>−50%</span><b id="navc-txt">0%</b><span>+100%</span></div>
+            <input type="range" id="navc-slider" min="-0.5" max="1.0" step="0.05" value="0" />
+            <label>Premium-to-NAV the price reverts to</label>
+            <div class="rowval"><span>0%</span><b id="prem-txt"></b><span>current</span></div>
+            <input type="range" id="prem-slider" />
+            <div class="btn-row">
+              <button id="b-hold">Premium holds</button>
+              <button id="b-half">Premium halves</button>
+              <button id="b-zero">Premium → 0 (par)</button>
+            </div>
+            <p class="desc" id="scenario-explain" style="margin-top:14px"></p>
+          </div>
+          <div class="scenario-out" id="scenario-out"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Risk cards</h2>
+        <div id="risk-cards"></div>
+      </section>
+
+      <section class="card">
+        <h2>SEC filing reality check</h2>
+        <p class="desc">Latest NPORT-P holdings (named directly). <a id="edgar-link" target="_blank" rel="noopener">Browse on EDGAR ↗</a></p>
+        <div class="scroll-y"><table class="data" id="nport-table">
+          <thead><tr><th>Holding (as filed)</th><th>% of fund</th><th>Value</th></tr></thead><tbody></tbody>
+        </table></div>
+      </section>
+
+      <p class="desc" id="footer-meta" style="text-align:center;margin-top:30px"></p>
+    </div>
+  </main>
+
+  <script>window.SITUATION_FILE = "data/rvi_robinhood.json";</script>
+  <script src="vcx_app.js"></script>
+</body>
+</html>
