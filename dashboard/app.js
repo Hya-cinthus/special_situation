@@ -9,6 +9,7 @@ const SITUATIONS = [
 ];
 
 const SPX = "#ff7a45", ACC = "#4da3ff", GOOD = "#3fb950", MUTED = "#8b97a7", LOW = "#6e7681";
+const WARN = "#d29922", BAD = "#f85149";
 const PLOT_BG = "#161b22", GRID = "#2a3343", TEXT = "#e6edf3";
 
 let DATA = null;
