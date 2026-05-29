@@ -1,0 +1,74 @@
+[
+  {
+    "report_date": "2026-03-31",
+    "filing_date": "2026-05-29",
+    "accession": "0000894189-26-016653",
+    "net_assets_usd": 655315944.51,
+    "total_assets_usd": 664641474.57,
+    "n_holdings": 12,
+    "top_holdings": [
+      {
+        "name": "First American Government Obligations Fund Class X",
+        "valUSD": 347052770.8,
+        "pctVal": 52.959610354
+      },
+      {
+        "name": "Revolut Group Holdings Ltd (Ordinary Shares)",
+        "valUSD": 50248749.58,
+        "pctVal": 7.6678661646
+      },
+      {
+        "name": "Databricks, Inc. (Series L Preferred Stock)",
+        "valUSD": 49999830.0,
+        "pctVal": 7.6298814974
+      },
+      {
+        "name": "Mercor.io Corporation (Series C Preferred Stock)",
+        "valUSD": 49999308.3,
+        "pctVal": 7.629801887
+      },
+      {
+        "name": "Databricks, Inc. (Series K Preferred Stock)",
+        "valUSD": 31666540.0,
+        "pctVal": 4.8322553824
+      },
+      {
+        "name": "Airwallex (Cayman) Limited (Series G Preferred Stock)",
+        "valUSD": 25000001.7,
+        "pctVal": 3.814953979
+      },
+      {
+        "name": "Boom Technology Inc (Series B-1 Preferred Stock)",
+        "valUSD": 24999999.48,
+        "pctVal": 3.8149536402
+      },
+      {
+        "name": "Oura Inc. (Series E Preferred Stock)",
+        "valUSD": 24999994.03,
+        "pctVal": 3.8149528086
+      },
+      {
+        "name": "Eleven Labs Inc. (Series D-1 Preferred Stock)",
+        "valUSD": 19999971.34,
+        "pctVal": 3.0519586022
+      },
+      {
+        "name": "Ramp Business Corporation (Series E-3 Preferred Stock)",
+        "valUSD": 14613750.0,
+        "pctVal": 2.2300311968
+      },
+      {
+        "name": "Stripe Global Holdings Inc. (Class B Common Stock)",
+        "valUSD": 14577645.0,
+        "pctVal": 2.2245216406
+      },
+      {
+        "name": "Ramp Business Corporation (Class A Common Stock)",
+        "valUSD": 10386180.0,
+        "pctVal": 1.5849118409
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  }
+]

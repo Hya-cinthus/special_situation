@@ -24,7 +24,10 @@ SEC_USER_AGENT = "special-situations-research weipeng_shao@berkeley.edu"
 DASHBOARD_DATA_DIR = "dashboard/data"
 
 # Situations the build pipeline knows about. Each maps to situations/<key>/.
-SITUATIONS = ["spacex_baron", "vcx_fundrise", "dxyz_destiny"]
+SITUATIONS = ["spacex_baron", "vcx_fundrise", "dxyz_destiny", "rvi_robinhood"]
+# NOTE: agix_kraneshares pulled pending verified holdings data — the KraneShares
+# trust files NPORT for 100+ ETFs and the Anthropic line must be confirmed from
+# the correct series before publishing. Do not re-add until verified.
 
 
 # ---------------------------------------------------------------------------
@@ -363,6 +366,70 @@ class DxyzDestiny:
 
     HEADLINE_NAME = "SpaceX"
     PREMIUM_SCENARIOS = [0.0, 0.25, 0.50, 1.0]
+
+
+# ---------------------------------------------------------------------------
+# Situation: OpenAI exposure via Robinhood Ventures Fund I (RVI)
+# ---------------------------------------------------------------------------
+# A third closed-end-fund premium case, but the CLEANEST holdings disclosure of
+# the three: RVI's NPORT names its positions directly (Databricks, Revolut,
+# Stripe, Ramp, ElevenLabs...) rather than via codenamed SPVs. Two honest
+# wrinkles: (1) it's ~53% cash at 3/31, which dampens both NAV moves and the
+# economic exposure; (2) its headline OpenAI stake ($75M, bought 2026-04-17) is
+# NOT in the 3/31 filing — it post-dates the report period, so OpenAI look-through
+# is sponsor-disclosed until the next NPORT.
+
+class RviRobinhood:
+    KEY = "rvi_robinhood"
+    TITLE = "OpenAI exposure via Robinhood Ventures Fund I (RVI)"
+    WINDOW_START = "2026-03-06"          # NYSE listing
+    PRIMARY_TICKER = "RVI"
+    PRICE_TICKER = "RVI"
+    EDGAR_CIK = "0002085091"
+    EDGAR_SERIES_ID = None               # single-series
+    LISTING_DATE = "2026-03-06"
+    LOCKUP_EXPIRY_DATE = None            # CEF; no single dated lockup
+
+    # Sponsor/press-disclosed look-through. OpenAI added 2026-04-17 ($75M) — NOT in
+    # the 3/31 NPORT yet. Databricks/Ramp ARE named in the filing. Weights approximate
+    # (OpenAI $75M / ~$655M net ~ 11%, but cash-heavy book so economic weight is fluid).
+    LOOKTHROUGH = [
+        {"name": "OpenAI", "weight": 0.11, "as_of": "2026-04-17", "confidence": "low",
+         "source": "RVI bought ~$75M OpenAI on 2026-04-17 (post 3/31 NPORT); ~11% of ~$655M net assets",
+         "source_url": "https://robinhood.com/us/en/newsroom/rvi-openai/"},
+        {"name": "Databricks", "weight": 0.124, "as_of": "2026-03-31", "confidence": "med",
+         "source": "RVI NPORT 3/31: Databricks Series L+K = ~12.4% (named directly)",
+         "source_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0002085091&type=NPORT-P"},
+        {"name": "Ramp", "weight": 0.038, "as_of": "2026-03-31", "confidence": "med",
+         "source": "RVI NPORT 3/31: Ramp Series E-3 + Class A = ~3.8%",
+         "source_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0002085091&type=NPORT-P"},
+    ]
+
+    @staticmethod
+    def valuation_timeline():
+        return VcxFundrise.VALUATION_TIMELINE
+
+    UNDERLYING_MARKS = {
+        "OpenAI": {"current_valuation_usd": 852e9, "ipo_target_usd": 852e9,
+                   "source_url": "https://www.cnbc.com/2026/03/31/openai-funding-round-ipo.html"},
+    }
+
+    NAV_LOG = "situations/rvi_robinhood/data/rvi_nav_log.jsonl"
+    NAV_REPORTED = [
+        {"date": "2026-03-31", "nav_per_share": 25.59, "confidence": "med",
+         "source": "RVI NPORT net assets $655.3M / ~25.6M shares (approx NAV/share)",
+         "source_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0002085091&type=NPORT-P"},
+    ]
+    NAV_MTM_BASE_DATE = "2026-03-31"
+    NAV_MTM_BASE_NAV = 25.59
+    NAV_MTM_OTHER_WEIGHT_FLAT = True
+
+    EVENTS = [
+        ("2026-03-06", "NYSE listing (RVI)", "listing"),
+        ("2026-04-17", "Buys ~$75M OpenAI (post-NPORT)", "mark"),
+    ]
+    HEADLINE_NAME = "OpenAI"
+    PREMIUM_SCENARIOS = [0.0, 0.10, 0.25, 0.50]
 
 
 def situation_dir(key: str) -> str:

@@ -80,8 +80,24 @@ def build_dxyz_destiny(do_fetch: bool = True):
     print(f"[dxyz_destiny] Wrote {path} ({os.path.getsize(path)/1024:.0f} KB)")
 
 
+def build_rvi_robinhood(do_fetch: bool = True):
+    from situations.rvi_robinhood.ingest import price, edgar
+    from situations.rvi_robinhood import emit
+    if do_fetch:
+        print("[rvi_robinhood] Ingesting RVI daily price (Yahoo)...")
+        rows = price.fetch_price(); price.write_price_csv(rows)
+        print(f"[rvi_robinhood]   {len(rows)} price rows.")
+        print("[rvi_robinhood] Ingesting EDGAR NPORT-P...")
+        anchors = edgar.fetch_anchors(verbose=False); edgar.write_anchors(anchors)
+        print(f"[rvi_robinhood]   {len(anchors)} NPORT anchors.")
+    else:
+        print("[rvi_robinhood] --no-fetch: rebuilding JSON from cached data.")
+    path = emit.write_json()
+    print(f"[rvi_robinhood] Wrote {path} ({os.path.getsize(path)/1024:.0f} KB)")
+
+
 BUILDERS = {"spacex_baron": build_spacex_baron, "vcx_fundrise": build_vcx_fundrise,
-            "dxyz_destiny": build_dxyz_destiny}
+            "dxyz_destiny": build_dxyz_destiny, "rvi_robinhood": build_rvi_robinhood}
 
 
 def main(argv):
