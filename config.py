@@ -24,7 +24,7 @@ SEC_USER_AGENT = "special-situations-research weipeng_shao@berkeley.edu"
 DASHBOARD_DATA_DIR = "dashboard/data"
 
 # Situations the build pipeline knows about. Each maps to situations/<key>/.
-SITUATIONS = ["spacex_baron", "vcx_fundrise"]
+SITUATIONS = ["spacex_baron", "vcx_fundrise", "dxyz_destiny"]
 
 
 # ---------------------------------------------------------------------------
@@ -281,6 +281,88 @@ class VcxFundrise:
     # Headline scenario name + premium normalization targets for the lab.
     HEADLINE_NAME = "Anthropic"
     PREMIUM_SCENARIOS = [0.0, 0.25, 0.50, 1.0]   # premium-to-NAV the price could revert to
+
+
+# ---------------------------------------------------------------------------
+# Situation: Pre-IPO tech (SpaceX/OpenAI/Anthropic) via Destiny Tech100 (DXYZ)
+# ---------------------------------------------------------------------------
+# A second closed-end-fund premium case, and a useful CONTRAST to VCX: DXYZ
+# publishes NAV quarterly (so the premium is more measurable as a tradeable
+# signal) and trades at a far MORE MODEST premium (~+120% vs VCX's stale +1000%).
+# Same three opacities (wrapper premium, NAV staleness, SPV look-through) but the
+# magnitudes make it the "measurable premium signal" case rather than the
+# "extreme dislocation" case.
+
+class DxyzDestiny:
+    KEY = "dxyz_destiny"
+    TITLE = "Pre-IPO tech (SpaceX/OpenAI/Anthropic) via Destiny Tech100 (DXYZ)"
+
+    WINDOW_START = "2025-06-01"     # ~1y of liquid trading history
+    PRIMARY_TICKER = "DXYZ"
+    PRICE_TICKER = "DXYZ"
+    EDGAR_CIK = "0001843974"        # Destiny Tech100 Inc.
+    EDGAR_SERIES_ID = None
+    LISTING_DATE = "2024-03-26"
+    LOCKUP_EXPIRY_DATE = None       # no single dated lockup like VCX; ATM-offering overhang instead
+
+    # Sponsor-disclosed look-through (Destiny holdings page; SPV-held). Weights are
+    # of total assets, web-verified 2026-05-29; flagged med / not-SEC-verifiable.
+    # Sponsor/press-disclosed look-through, held via SPVs (see NPORT codenames like
+    # "DXYZ SpaceX I LLC", "DXYZ OAI I LLC"). The fund is ALSO ~46% cash/Treasuries
+    # at the base date (NPORT 12/31), which heavily dampens the mark-to-market uplift.
+    # Anthropic weight is the most uncertain: sources span ~6% (early) to ~18.1%
+    # (a May-12 filing reference). We use 10% and FLAG the sensitivity.
+    LOOKTHROUGH = [
+        {"name": "SpaceX", "weight": 0.162, "as_of": "2026-03-31", "confidence": "med",
+         "source": "Destiny disclosure: SpaceX largest holding ~16.2% (NPORT SPVs 'DXYZ SpaceX I' + 'MWAM VC SpaceX-II')",
+         "source_url": "https://www.destiny.xyz/holdings"},
+        {"name": "Anthropic", "weight": 0.10, "as_of": "2026-05-12", "confidence": "low",
+         "source": "Sponsor/press disclosed; sources span ~6% to ~18.1% (May-12 filing). Added via ~$100M Magnitude ANC III SPV in Feb-2026. Using 10% (uncertain).",
+         "source_url": "https://www.destiny.xyz/holdings"},
+        {"name": "OpenAI", "weight": 0.058, "as_of": "2026-03-31", "confidence": "low",
+         "source": "Sponsor/press disclosed ~5.8% (SPV 'DXYZ OAI I LLC')",
+         "source_url": "https://www.destiny.xyz/holdings"},
+    ]
+
+    # Reuse the SpaceX/OpenAI/Anthropic valuation timelines from VcxFundrise so the
+    # mark-to-market is consistent across situations.
+    @staticmethod
+    def valuation_timeline():
+        return VcxFundrise.VALUATION_TIMELINE
+
+    UNDERLYING_MARKS = {
+        "SpaceX": {"current_valuation_usd": 1.25e12, "ipo_target_usd": 1.75e12,
+                   "source_url": "https://www.cnbc.com/2026/05/20/spacex-ipo-live-updates.html"},
+    }
+
+    NAV_LOG = "situations/dxyz_destiny/data/dxyz_nav_log.jsonl"
+    NAV_REPORTED = [
+        {"date": "2025-12-31", "nav_per_share": 19.97, "confidence": "high",
+         "source": "Destiny reported NAV $19.97 (12/31/2025); ~= NPORT net assets",
+         "source_url": "https://www.cefconnect.com/fund/DXYZ"},
+        {"date": "2026-03-31", "nav_per_share": 24.56, "confidence": "high",
+         "source": "Destiny reported NAV $24.56 (3/31/2026)",
+         "source_url": "https://www.cefconnect.com/fund/DXYZ"},
+    ]
+
+    # mark-to-market base: use the FRESHEST reported NAV (3/31, $24.56), not the
+    # 12/31 NPORT — because DXYZ raised hundreds of millions via ATM offerings
+    # between those dates, moving NAV/share for reasons unrelated to holding marks.
+    # From the 3/31 base to now, only Anthropic re-rated (Series G $380B -> Series
+    # H $965B); SpaceX and OpenAI are flat (no new round since their 3/31 marks).
+    NAV_MTM_BASE_DATE = "2026-03-31"
+    NAV_MTM_BASE_NAV = 24.56
+    NAV_MTM_OTHER_WEIGHT_FLAT = True
+
+    EVENTS = [
+        ("2024-03-26", "NYSE listing (DXYZ)", "listing"),
+        ("2026-02-11", "Adds ~$100M Anthropic SPV", "mark"),
+        ("2026-05-20", "SpaceX files S-1 (largest holding)", "ipo"),
+        ("2026-06-12", "Projected SpaceX IPO (SPCX)", "ipo"),
+    ]
+
+    HEADLINE_NAME = "SpaceX"
+    PREMIUM_SCENARIOS = [0.0, 0.25, 0.50, 1.0]
 
 
 def situation_dir(key: str) -> str:

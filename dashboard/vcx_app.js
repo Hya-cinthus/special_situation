@@ -112,9 +112,18 @@ function renderKpis() {
 
 function renderThesis() {
   const k = DATA.kpis, m = DATA.meta;
-  document.getElementById("thesis-body").innerHTML = `
-    <div class="mark-callout" style="border-left-color:${SPX}">
-      <b>Baron/SpaceX:</b> an <b>open-end</b> fund priced <b>at NAV</b> carrying a <b>stale-low</b>
+  let body;
+  if (m.key === "dxyz_destiny") {
+    body = `<b>VCX</b> was the extreme case (~+1,000% stale premium). <b>DXYZ</b> is the
+      <b>measurable</b> case: it publishes NAV quarterly and trades at a far more modest
+      <b>${signPct(k.premium, 0)}</b> premium to its stale NAV. Marking the NAV to market barely moves it —
+      to <b>~${signPct(k.premium_mtm, 0)}</b> — for two honest reasons: the fund is <b>~46% cash/Treasuries</b>
+      (which doesn't re-rate), and from the 3/31 NAV base only Anthropic has had a new round (SpaceX/OpenAI
+      flat). So here the premium is a <b>sentiment signal</b>, not a stale-mark illusion — it has swung from
+      ${DATA.premium_stats ? signPct(DATA.premium_stats.min, 0) + " to " + signPct(DATA.premium_stats.max, 0) : "widely"}.
+      Same three opacities (wrapper premium, NAV staleness, SPV look-through) but smaller magnitudes.`;
+  } else {
+    body = `<b>Baron/SpaceX:</b> an <b>open-end</b> fund priced <b>at NAV</b> carrying a <b>stale-low</b>
       private mark → you bought the underlying <em>cheap</em> before a re-rate. <br>
       <b>VCX:</b> a <b>closed-end</b> fund. Against the sponsor's stale NAV it looks like a
       <b>${signPct(k.premium, 0)}</b> premium; but once you <b>mark the NAV to market</b> (Anthropic alone
@@ -122,8 +131,10 @@ function renderThesis() {
       Even with stale-low marks, <b>you overpay through the wrapper</b>; the edge isn't the underlying, it's
       whether that premium holds or collapses. Three stacked opacities: (1) the wrapper premium,
       (2) NAV staleness (${k.nav_age_days}d old, and visibly sticky), and (3) SPV look-through
-      (OpenAI/Anthropic weights are sponsor-disclosed, not in the filings).
-    </div>`;
+      (OpenAI/Anthropic weights are sponsor-disclosed, not in the filings).`;
+  }
+  document.getElementById("thesis-body").innerHTML =
+    `<div class="mark-callout" style="border-left-color:${SPX}">${body}</div>`;
 }
 
 function renderPremiumChart() {

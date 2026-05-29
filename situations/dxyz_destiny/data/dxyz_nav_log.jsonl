@@ -1,0 +1,4 @@
+# DXYZ NAV-per-share log (Destiny publishes NAV ~quarterly). cowork/bookmarklet appends one JSON line.
+# Schema: {"as_of_date_iso":"YYYY-MM-DD","nav_per_share":<num>,"captured_at":"<ISO>","source":"...","notes":"..."}
+{"as_of_date_iso":"2025-12-31","nav_per_share":19.97,"captured_at":"2026-05-29T00:00:00Z","source":"seed: Destiny reported NAV (12/31/2025)","notes":"manual seed"}
+{"as_of_date_iso":"2026-03-31","nav_per_share":24.56,"captured_at":"2026-05-29T00:00:00Z","source":"seed: Destiny reported NAV (3/31/2026)","notes":"manual seed"}

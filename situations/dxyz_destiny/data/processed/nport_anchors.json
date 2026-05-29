@@ -1,0 +1,785 @@
+[
+  {
+    "report_date": "2023-12-31",
+    "filing_date": "2024-02-29",
+    "accession": "0001145549-24-013732",
+    "net_assets_usd": 52623533.38,
+    "total_assets_usd": 53461960.52,
+    "n_holdings": 29,
+    "top_holdings": [
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 13108095.0,
+        "pctVal": 24.9091882625
+      },
+      {
+        "name": "First American Treasury Obliga",
+        "valUSD": 4833833.02,
+        "pctVal": 9.1856869152
+      },
+      {
+        "name": "Space Exploration Technologies Corp., Class A and Class C",
+        "valUSD": 4415413.38,
+        "pctVal": 8.3905680527
+      },
+      {
+        "name": "Axiom Space, Inc. Preferred Shares",
+        "valUSD": 3634866.81,
+        "pctVal": 6.9073028292
+      },
+      {
+        "name": "Boom Technology, Inc.",
+        "valUSD": 2450000.0,
+        "pctVal": 4.655711699
+      },
+      {
+        "name": "Epic Games, Inc.",
+        "valUSD": 2141618.0,
+        "pctVal": 4.0696963173
+      },
+      {
+        "name": "Brex Inc.",
+        "valUSD": 2122938.0,
+        "pctVal": 4.034198891
+      },
+      {
+        "name": "Superhuman Labs, Inc.",
+        "valUSD": 2099957.7,
+        "pctVal": 3.9905296454
+      },
+      {
+        "name": "OpenAI, Inc.",
+        "valUSD": 2000008.0,
+        "pctVal": 3.8005961811
+      },
+      {
+        "name": "Revolut Group Holdings Ltd",
+        "valUSD": 1804000.0,
+        "pctVal": 3.4281240429
+      },
+      {
+        "name": "ClassDojo, Inc.",
+        "valUSD": 1592040.0,
+        "pctVal": 3.0253384707
+      },
+      {
+        "name": "Axiom Space, Inc. Preferred Shares Series C",
+        "valUSD": 1499929.47,
+        "pctVal": 2.8503017066
+      },
+      {
+        "name": "Relativity Space, LLC",
+        "valUSD": 1447388.82,
+        "pctVal": 2.7504592091
+      },
+      {
+        "name": "Stripe, Inc.",
+        "valUSD": 1394711.5,
+        "pctVal": 2.6503569989
+      },
+      {
+        "name": "CElegans Labs, Inc.",
+        "valUSD": 1251499.52,
+        "pctVal": 2.3782126353
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-03-31",
+    "filing_date": "2024-05-28",
+    "accession": "0001145549-24-032089",
+    "net_assets_usd": 55117866.81,
+    "total_assets_usd": 56001878.18,
+    "n_holdings": 29,
+    "top_holdings": [
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 14527012.5,
+        "pctVal": 26.3562676511
+      },
+      {
+        "name": "Space Exploration Technologies Corp., Class A and Class C",
+        "valUSD": 4860914.73,
+        "pctVal": 8.8191271022
+      },
+      {
+        "name": "First American Treasury Obliga",
+        "valUSD": 4072174.86,
+        "pctVal": 7.3881213038
+      },
+      {
+        "name": "Axiom Space, Inc. Preferred Shares",
+        "valUSD": 3634866.81,
+        "pctVal": 6.5947160519
+      },
+      {
+        "name": "Boom Technology, Inc.",
+        "valUSD": 2416000.0,
+        "pctVal": 4.3833336445
+      },
+      {
+        "name": "Revolut Group Holdings Ltd",
+        "valUSD": 2234500.0,
+        "pctVal": 4.054039333
+      },
+      {
+        "name": "Brex Inc.",
+        "valUSD": 2122938.0,
+        "pctVal": 3.8516330962
+      },
+      {
+        "name": "Epic Games, Inc.",
+        "valUSD": 2121834.0,
+        "pctVal": 3.849630116
+      },
+      {
+        "name": "Superhuman Labs, Inc.",
+        "valUSD": 2099957.7,
+        "pctVal": 3.8099400821
+      },
+      {
+        "name": "OpenAI, Inc.",
+        "valUSD": 2000008.0,
+        "pctVal": 3.6286019684
+      },
+      {
+        "name": "Maplebear Inc",
+        "valUSD": 1647509.49,
+        "pctVal": 2.9890661329
+      },
+      {
+        "name": "ClassDojo, Inc.",
+        "valUSD": 1592040.0,
+        "pctVal": 2.8884281852
+      },
+      {
+        "name": "Axiom Space, Inc. Preferred Shares Series C",
+        "valUSD": 1499929.47,
+        "pctVal": 2.7213126284
+      },
+      {
+        "name": "Relativity Space, LLC",
+        "valUSD": 1447388.82,
+        "pctVal": 2.6259884567
+      },
+      {
+        "name": "Stripe, Inc.",
+        "valUSD": 1346618.0,
+        "pctVal": 2.4431605901
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-06-30",
+    "filing_date": "2024-08-29",
+    "accession": "0001145549-24-055426",
+    "net_assets_usd": 56000039.06,
+    "total_assets_usd": 56705693.88,
+    "n_holdings": 28,
+    "top_holdings": [
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 15135120.0,
+        "pctVal": 27.0269811487
+      },
+      {
+        "name": "Space Exploration Technologies Corp., Class A and Class C",
+        "valUSD": 5051843.88,
+        "pctVal": 9.0211434935
+      },
+      {
+        "name": "Axiom Space, Inc. Preferred Shares",
+        "valUSD": 3634866.81,
+        "pctVal": 6.4908290619
+      },
+      {
+        "name": "First American Treasury Obliga",
+        "valUSD": 3078971.56,
+        "pctVal": 5.498159665
+      },
+      {
+        "name": "Revolut Group Holdings Ltd",
+        "valUSD": 2665000.0,
+        "pctVal": 4.7589252521
+      },
+      {
+        "name": "Epic Games, Inc.",
+        "valUSD": 2558021.74,
+        "pctVal": 4.5678927782
+      },
+      {
+        "name": "Boom Technology, Inc.",
+        "valUSD": 2547500.0,
+        "pctVal": 4.5491039699
+      },
+      {
+        "name": "Brex Inc.",
+        "valUSD": 2477645.82,
+        "pctVal": 4.4243644497
+      },
+      {
+        "name": "Superhuman Labs, Inc.",
+        "valUSD": 2099957.7,
+        "pctVal": 3.7499218487
+      },
+      {
+        "name": "OpenAI, Inc.",
+        "valUSD": 2000008.0,
+        "pctVal": 3.5714403661
+      },
+      {
+        "name": "ClassDojo, Inc.",
+        "valUSD": 1592040.0,
+        "pctVal": 2.8429265885
+      },
+      {
+        "name": "Axiom Space, Inc. Preferred Shares Series C",
+        "valUSD": 1499929.47,
+        "pctVal": 2.6784436139
+      },
+      {
+        "name": "Relativity Space, LLC",
+        "valUSD": 1447388.82,
+        "pctVal": 2.5846210901
+      },
+      {
+        "name": "Maplebear Inc",
+        "valUSD": 1419977.34,
+        "pctVal": 2.5356720528
+      },
+      {
+        "name": "Stripe, Inc.",
+        "valUSD": 1350053.25,
+        "pctVal": 2.4108076935
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-09-30",
+    "filing_date": "2024-11-26",
+    "accession": "0001145549-24-075269",
+    "net_assets_usd": 57852998.98,
+    "total_assets_usd": 58517310.5,
+    "n_holdings": 28,
+    "top_holdings": [
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 15316200.9,
+        "pctVal": 26.4743421604
+      },
+      {
+        "name": "Revolut Group Holdings Ltd",
+        "valUSD": 7096444.0,
+        "pctVal": 12.266337312
+      },
+      {
+        "name": "Space Exploration Technologies Corp., Class A and Class C",
+        "valUSD": 5108886.91,
+        "pctVal": 8.8308073913
+      },
+      {
+        "name": "OpenAI, Inc.",
+        "valUSD": 2943832.0,
+        "pctVal": 5.0884691406
+      },
+      {
+        "name": "Axiom Space Holdings, Inc Preferred Shares",
+        "valUSD": 2434433.38,
+        "pctVal": 4.2079640173
+      },
+      {
+        "name": "Boom Technology, Inc.",
+        "valUSD": 2365000.0,
+        "pctVal": 4.0879471103
+      },
+      {
+        "name": "Superhuman Labs, Inc.",
+        "valUSD": 2331449.1,
+        "pctVal": 4.0299537467
+      },
+      {
+        "name": "Epic Games, Inc.",
+        "valUSD": 2126780.0,
+        "pctVal": 3.6761793468
+      },
+      {
+        "name": "First American Treasury Obliga",
+        "valUSD": 1972377.16,
+        "pctVal": 3.4092911254
+      },
+      {
+        "name": "Maplebear Inc",
+        "valUSD": 1799933.94,
+        "pctVal": 3.1112197669
+      },
+      {
+        "name": "ClassDojo, Inc.",
+        "valUSD": 1592040.0,
+        "pctVal": 2.7518711702
+      },
+      {
+        "name": "Stripe, Inc.",
+        "valUSD": 1543408.75,
+        "pctVal": 2.6678111372
+      },
+      {
+        "name": "Chime Financial Inc. - Series A Preferred Stock",
+        "valUSD": 1518300.0,
+        "pctVal": 2.6244101892
+      },
+      {
+        "name": "Relativity Space, LLC",
+        "valUSD": 1447388.82,
+        "pctVal": 2.501838877
+      },
+      {
+        "name": "Brex Inc.",
+        "valUSD": 1383447.93,
+        "pctVal": 2.3913158426
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-12-31",
+    "filing_date": "2025-03-03",
+    "accession": "0001145549-25-015737",
+    "net_assets_usd": 72864220.9,
+    "total_assets_usd": 74224657.0,
+    "n_holdings": 29,
+    "top_holdings": [
+      {
+        "name": "DXYZ SpaceX I LLC (economic exposure to Space Exploration Technologies Corp., 99% Class A Common Stock and 1% Series J Preferred Stock)",
+        "valUSD": 27202676.0,
+        "pctVal": 37.3333793513
+      },
+      {
+        "name": "MWAM VC SpaceX-II, LLC (economic exposure to Space Exploration Technologies Corp., 55% Class A Common Stock and 45% Class C Common Stock)",
+        "valUSD": 8840727.0,
+        "pctVal": 12.1331524455
+      },
+      {
+        "name": "Revolut Group Holdings Ltd",
+        "valUSD": 6645280.0,
+        "pctVal": 9.1200865362
+      },
+      {
+        "name": "Axiom Space, Inc. Series C-1 Preferred Stock",
+        "valUSD": 3227550.0,
+        "pctVal": 4.4295402601
+      },
+      {
+        "name": "DXYZ OAI I LLC (economic exposure to OpenAI Global LLC, Profit Participation Units)",
+        "valUSD": 3089900.0,
+        "pctVal": 4.2406272404
+      },
+      {
+        "name": "Superhuman Labs, Inc.",
+        "valUSD": 2790023.0,
+        "pctVal": 3.8290713406
+      },
+      {
+        "name": "MWLSV Epic Games-II, LLC (invested in Epic Games, Inc., Common Stock)",
+        "valUSD": 2244445.0,
+        "pctVal": 3.0803115333
+      },
+      {
+        "name": "Celadon Technology Fund VIII, LLC - Series B (economic exposure to Space Exploration Technologies Corp., Common Stock)",
+        "valUSD": 1831830.0,
+        "pctVal": 2.5140322333
+      },
+      {
+        "name": "Maplebear, Inc.",
+        "valUSD": 1829977.0,
+        "pctVal": 2.5114891471
+      },
+      {
+        "name": "Fund FG-RTA, a series of Forge Investments LLC (economic exposure to Stripe, Inc., Common Stock)",
+        "valUSD": 1711736.0,
+        "pctVal": 2.3492133435
+      },
+      {
+        "name": "ClassDojo, Inc.",
+        "valUSD": 1592040.0,
+        "pctVal": 2.184940675
+      },
+      {
+        "name": "Chime Financial Inc. - Series A Preferred Stock",
+        "valUSD": 1525529.0,
+        "pctVal": 2.0936599351
+      },
+      {
+        "name": "First American Treasury Obligations Fund, Class X",
+        "valUSD": 1510377.0,
+        "pctVal": 2.0728650926
+      },
+      {
+        "name": "Klarna Bank AB",
+        "valUSD": 1421112.0,
+        "pctVal": 1.950356406
+      },
+      {
+        "name": "Axiom Space, Inc. Series C Preferred Stock",
+        "valUSD": 1331850.0,
+        "pctVal": 1.8278518367
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-03-31",
+    "filing_date": "2025-05-30",
+    "accession": "0001145549-25-038259",
+    "net_assets_usd": 68652004.29,
+    "total_assets_usd": 70065217.75,
+    "n_holdings": 29,
+    "top_holdings": [
+      {
+        "name": "DXYZ SpaceX I LLC (economic exposure to Space Exploration Technologies Corp., 99% Class A Common Stock and 1% Series J Preferred Stock)",
+        "valUSD": 26583757.2,
+        "pctVal": 38.7224779159
+      },
+      {
+        "name": "MWAM VC SpaceX-II, LLC (economic exposure to Space Exploration Technologies Corp., 55% Class A Common Stock and 45% Class C Common Stock)",
+        "valUSD": 7917830.75,
+        "pctVal": 11.53328418
+      },
+      {
+        "name": "Revolut Group Holdings Ltd.",
+        "valUSD": 6200020.0,
+        "pctVal": 9.0310837449
+      },
+      {
+        "name": "DXYZ OAI I LLC (economic exposure to OpenAI Global LLC, Profit Participation Units)",
+        "valUSD": 3606756.0,
+        "pctVal": 5.2536790984
+      },
+      {
+        "name": "Axiom Space, Inc. Series C-1 Preferred Stock",
+        "valUSD": 3202590.0,
+        "pctVal": 4.6649621276
+      },
+      {
+        "name": "MWLSV Epic Games-II, LLC (invested in Epic Games, Inc., Common Stock)",
+        "valUSD": 2308149.82,
+        "pctVal": 3.3621011417
+      },
+      {
+        "name": "Fund FG-RTA, a series of Forge Investments LLC (economic exposure to Stripe, Inc., Common Stock)",
+        "valUSD": 1894295.0,
+        "pctVal": 2.7592712253
+      },
+      {
+        "name": "Celadon Technology Fund VIII, LLC - Series B (economic exposure to Space Exploration Technologies Corp., Common Stock)",
+        "valUSD": 1790152.0,
+        "pctVal": 2.6075742704
+      },
+      {
+        "name": "Maplebear Inc",
+        "valUSD": 1762380.09,
+        "pctVal": 2.5671211033
+      },
+      {
+        "name": "Chime Financial Inc. - Series A Preferred Stock",
+        "valUSD": 1658080.0,
+        "pctVal": 2.4151953277
+      },
+      {
+        "name": "ClassDojo, Inc.",
+        "valUSD": 1592040.0,
+        "pctVal": 2.3190000299
+      },
+      {
+        "name": "Klarna Bank AB",
+        "valUSD": 1538623.08,
+        "pctVal": 2.2411917844
+      },
+      {
+        "name": "Axiom Space, Inc. Series C Preferred Stock",
+        "valUSD": 1321550.36,
+        "pctVal": 1.9249989475
+      },
+      {
+        "name": "CElegans Labs, Inc.",
+        "valUSD": 1251499.52,
+        "pctVal": 1.822961373
+      },
+      {
+        "name": "G Squared Special Situations Fund, LLC - Series H-1 (invested in Brex, Inc., Common Stock)",
+        "valUSD": 1204177.61,
+        "pctVal": 1.7540312515
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-06-30",
+    "filing_date": "2025-08-29",
+    "accession": "0001145549-25-057324",
+    "net_assets_usd": 75297129.01,
+    "total_assets_usd": 77599001.32,
+    "n_holdings": 28,
+    "top_holdings": [
+      {
+        "name": "DXYZ SpaceX I LLC (Space Exploration Tech Corp 99% Class A Common Stock &amp; 1% Series J Pref Stock)",
+        "valUSD": 29263484.25,
+        "pctVal": 38.8640106665
+      },
+      {
+        "name": "MWAM VC SpaceX-II, LLC (Space Exploration Tech Corp 55% Class A Com Stock &amp; 45% Class C Com Stock)",
+        "valUSD": 8682828.2,
+        "pctVal": 11.5314200079
+      },
+      {
+        "name": "Revolut Group Holdings Ltd.",
+        "valUSD": 7120388.0,
+        "pctVal": 9.4563871075
+      },
+      {
+        "name": "DXYZ OAI I LLC (economic exposure to OpenAI Global LLC, Profit Participation Units)",
+        "valUSD": 5337549.44,
+        "pctVal": 7.0886493419
+      },
+      {
+        "name": "Axiom Space, Inc. Series C-1 Preferred Stock",
+        "valUSD": 3202590.28,
+        "pctVal": 4.2532701075
+      },
+      {
+        "name": "MWLSV Epic Games-II, LLC (invested in Epic Games, Inc., Common Stock)",
+        "valUSD": 2239400.42,
+        "pctVal": 2.9740847353
+      },
+      {
+        "name": "Chime Financial Inc.",
+        "valUSD": 2079227.5,
+        "pctVal": 2.7613635836
+      },
+      {
+        "name": "Celadon Technology Fund VIII, LLC - Series B (economic exposure to Space Exploration Technologies Corp., Common Stock)",
+        "valUSD": 1970605.0,
+        "pctVal": 2.6171050954
+      },
+      {
+        "name": "Superhuman Labs, Inc.",
+        "valUSD": 1965472.22,
+        "pctVal": 2.6102883946
+      },
+      {
+        "name": "Fund FG-RTA, a series of Forge Investments LLC (economic exposure to Stripe, Inc., Common Stock)",
+        "valUSD": 1780441.0,
+        "pctVal": 2.3645536336
+      },
+      {
+        "name": "First American Treasury Obligations, Class X, 4.21%",
+        "valUSD": 1762266.39,
+        "pctVal": 2.340416445
+      },
+      {
+        "name": "ClassDojo, Inc.",
+        "valUSD": 1592040.0,
+        "pctVal": 2.1143435625
+      },
+      {
+        "name": "G Squared Special Situations Fund, LLC - Series H-1 (invested in Brex, Inc., Common Stock)",
+        "valUSD": 1363397.96,
+        "pctVal": 1.8106904977
+      },
+      {
+        "name": "Axiom Space, Inc. Series C Preferred Stock",
+        "valUSD": 1321550.36,
+        "pctVal": 1.7551138767
+      },
+      {
+        "name": "CElegans Labs, Inc.",
+        "valUSD": 1251499.52,
+        "pctVal": 1.6620813256
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-09-30",
+    "filing_date": "2025-11-12",
+    "accession": "0000894189-25-013417",
+    "net_assets_usd": 157594183.15,
+    "total_assets_usd": 159022824.99,
+    "n_holdings": 30,
+    "top_holdings": [
+      {
+        "name": "First American Treasury Obligations, Class X, 4.02%",
+        "valUSD": 64387929.19,
+        "pctVal": 40.8567930002
+      },
+      {
+        "name": "DXYZ SpaceX I LLC (Space Exploration Tech Corp 99% Class A Common Stock &amp; 1% Series J Pref Stock)",
+        "valUSD": 28548620.1,
+        "pctVal": 18.1152752782
+      },
+      {
+        "name": "Revolut Group Holdings Ltd.",
+        "valUSD": 9718886.0,
+        "pctVal": 6.1670334563
+      },
+      {
+        "name": "DXYZ OAI I LLC (economic exposure to OpenAI Global LLC, Profit Participation Units)",
+        "valUSD": 8650484.04,
+        "pctVal": 5.4890884087
+      },
+      {
+        "name": "MWAM VC SpaceX-II, LLC (Space Exploration Tech Corp 55% Class A Com Stock &amp; 45% Class C Com Stock)",
+        "valUSD": 8478400.31,
+        "pctVal": 5.3798941944
+      },
+      {
+        "name": "Lemonade 18, LLC (invested in Monzo Bank Ltd. F Ordinary Shares)",
+        "valUSD": 6201580.51,
+        "pctVal": 3.9351582565
+      },
+      {
+        "name": "Payward, Inc. - Series C Preferred Stock",
+        "valUSD": 4999990.38,
+        "pctVal": 3.1726998294
+      },
+      {
+        "name": "Axiom Space, Inc. Series C-1 Preferred Stock",
+        "valUSD": 3202590.28,
+        "pctVal": 2.0321754369
+      },
+      {
+        "name": "Fund FG-RTA, a series of Forge Investments LLC (economic exposure to Stripe, Inc., Common Stock)",
+        "valUSD": 2319775.25,
+        "pctVal": 1.4719929401
+      },
+      {
+        "name": "MWLSV Epic Games-II, LLC (invested in Epic Games, Inc., Common Stock)",
+        "valUSD": 2197606.72,
+        "pctVal": 1.3944719761
+      },
+      {
+        "name": "Superhuman Platform, Inc.",
+        "valUSD": 1779176.76,
+        "pctVal": 1.1289609327
+      },
+      {
+        "name": "ClassDojo, Inc.",
+        "valUSD": 1592040.0,
+        "pctVal": 1.0102149509
+      },
+      {
+        "name": "Klarna Bank AB",
+        "valUSD": 1353264.6,
+        "pctVal": 0.8587021253
+      },
+      {
+        "name": "Axiom Space, Inc. Series C Preferred Stock",
+        "valUSD": 1321550.36,
+        "pctVal": 0.8385781338
+      },
+      {
+        "name": "G Squared Special Situations Fund, LLC - Series H-1 (invested in Brex, Inc., Common Stock)",
+        "valUSD": 1284377.49,
+        "pctVal": 0.8149904167
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-12-31",
+    "filing_date": "2026-03-02",
+    "accession": "0000894189-26-007429",
+    "net_assets_usd": 438044192.0,
+    "total_assets_usd": 441367407.0,
+    "n_holdings": 39,
+    "top_holdings": [
+      {
+        "name": "First American Treasury Obligations, Class X, 3.59%",
+        "valUSD": 200873325.52,
+        "pctVal": 45.8568631176
+      },
+      {
+        "name": "DXYZ SpaceX I LLC (economic exposure to Space Exploration Technologies Corp., 96% Common units &amp; stock eq.;3% Series E, 1% Series C preferred shares)",
+        "valUSD": 54499945.5,
+        "pctVal": 12.441654631
+      },
+      {
+        "name": "Snowpoint Growth 2.5, LLC (invested in Shield AI Inc. Series F1 Preferred Stock)",
+        "valUSD": 17871883.68,
+        "pctVal": 4.0799270956
+      },
+      {
+        "name": "MWAM VC SpaceX-II, LLC (economic exposure to Space Exploration Technologies Corp., 55% Class A Common Stock and 45% Class C Common Stock)",
+        "valUSD": 15885804.19,
+        "pctVal": 3.6265300351
+      },
+      {
+        "name": "Beast Industries Co. - Series C Preferred Stock",
+        "valUSD": 14999990.28,
+        "pctVal": 3.4243098194
+      },
+      {
+        "name": "SP21Z Opportunities LLC (invested in OpenEvidence Inc. Common Stock)",
+        "valUSD": 14999943.0,
+        "pctVal": 3.424299026
+      },
+      {
+        "name": "Snowpoint Growth 2.6, LLC (invested in X.AI Corp. Series E Preferred Stock)",
+        "valUSD": 14999938.8,
+        "pctVal": 3.4242980672
+      },
+      {
+        "name": "Revolut Group Holdings Ltd.",
+        "valUSD": 12438334.0,
+        "pctVal": 2.8395157902
+      },
+      {
+        "name": "MCTC Investments Holdings (Delaware) LLC (invested in Databricks, Inc. Series L Preferred Stock)",
+        "valUSD": 10000080.0,
+        "pctVal": 2.2828929552
+      },
+      {
+        "name": "Skild AI, Inc. - Series C Preferred Stock",
+        "valUSD": 9999953.63,
+        "pctVal": 2.2828641066
+      },
+      {
+        "name": "DXYZ OAI I LLC (economic exposure to OpenAI Global LLC, Profit Participation Units)",
+        "valUSD": 9028126.0,
+        "pctVal": 2.0610080364
+      },
+      {
+        "name": "DA-1125 Gaingels Fund II (invested in Databricks, Inc. Series L Preferred Stock)",
+        "valUSD": 7500060.0,
+        "pctVal": 1.7121697164
+      },
+      {
+        "name": "Payward, Inc. - Series C Preferred Stock",
+        "valUSD": 6307190.82,
+        "pctVal": 1.4398526302
+      },
+      {
+        "name": "Lemonade 18, LLC (invested in Monzo Bank Holding Group Limited F Ordinary Shares)",
+        "valUSD": 6201580.51,
+        "pctVal": 1.4157431198
+      },
+      {
+        "name": "Redwood Materials, Inc.",
+        "valUSD": 5016000.0,
+        "pctVal": 1.1450899456
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  }
+]
