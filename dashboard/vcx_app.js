@@ -57,7 +57,7 @@ function render() {
     `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${m.edgar_cik}&type=NPORT-P`;
   document.getElementById("footer-meta").textContent =
     "Generated " + m.generated_at + " · CIK " + m.edgar_cik + " · " + DATA.series.length + " trading days.";
-  renderKpis(); renderThesis(); renderPremiumChart(); renderLookthrough();
+  renderKpis(); renderThesis(); renderPremiumChart(); renderHoldingMarks(); renderLookthrough();
   renderNport(); renderRisks(); initScenario();
 }
 
@@ -66,30 +66,36 @@ function renderKpis() {
   const today = new Date().toISOString().slice(0, 10);
   const dLock = daysBetween(today, m.lockup_expiry);
   const anth = (k.lookthrough || []).find((l) => l.name === m.headline_name) || {};
+  const mtmMult = k.nav_mtm ? k.price / k.nav_mtm : null;
   const cards = [
-    { label: "Premium to NAV (now)", value: signPct(k.premium, 0), cls: "spx", hl: true,
-      note: "price " + usd(k.price) + " vs NAV " + usd(k.nav),
-      tip: "VCX market price ÷ NAV per share − 1. You pay <b>" + (k.price_multiple || 0).toFixed(1)
-        + "×</b> the value of the underlying holdings. Closed-end funds have no redemption to close this gap. "
-        + "<span class='conf'>price: measured (Yahoo). NAV: sponsor-published, " + k.nav_age_days
-        + " days old (carried forward).</span>" },
-    { label: "You pay per $1 of NAV", value: "$" + (k.price_multiple || 0).toFixed(2), cls: "spx", hl: true,
-      note: "every $1 of holdings costs you this",
-      tip: "The inverse lens on the premium: $1 of the fund's net asset value costs you $"
-        + (k.price_multiple || 0).toFixed(2) + " at today's price." },
-    { label: "Effective $ for $1 of " + m.headline_name + " NAV",
-      value: anth.weight ? "$" + (k.price_multiple * 1).toFixed(2) : "–", cls: "spx",
-      note: m.headline_name + " is " + pct(anth.weight, 1) + " of NAV (sponsor-disclosed)",
-      tip: m.headline_name + " is " + pct(anth.weight) + " of NAV = " + usd(anth.nav_value_per_share)
-        + "/share of value, but you pay " + usd(anth.price_paid_per_share) + "/share for it through the premium. "
-        + "<span class='conf'>weight is sponsor-disclosed, not SEC-verifiable.</span>" },
+    { label: "Premium — MARK-TO-MARKET", value: signPct(k.premium_mtm, 0), cls: "spx", hl: true,
+      note: "vs est. current NAV " + usd(k.nav_mtm),
+      tip: "The apples-to-apples premium: price ÷ <b>re-marked</b> NAV − 1. We re-mark each disclosed "
+        + "holding by how much its whole-company valuation has moved since " + (k.mtm_base_date || "the base date")
+        + " (e.g. Anthropic ~5.3×). Est. current NAV ≈ <b>" + usd(k.nav_mtm) + "</b>, so you pay ~<b>"
+        + (mtmMult || 0).toFixed(1) + "×</b> the underlying — about half the headline stale-NAV figure. "
+        + "<span class='conf'>estimate / low: weights sponsor-disclosed; "
+        + pct(k.mtm_disclosed_weight, 0) + " of NAV re-marked, rest held flat (conservative).</span>" },
+    { label: "Premium — vs STALE NAV", value: signPct(k.premium, 0), cls: "spx", hl: true,
+      note: "vs sponsor NAV " + usd(k.nav) + " (" + k.nav_age_days + "d old)",
+      tip: "Price ÷ the sponsor's last-published NAV ($" + (k.nav || 0).toFixed(2) + ", " + k.nav_age_days
+        + " days old). This OVERSTATES the premium because the NAV is stale — the underlying privates "
+        + "(esp. Anthropic) have re-rated hugely since. Use the mark-to-market figure instead. "
+        + "<span class='conf'>price: measured. NAV: sponsor-published, stale.</span>" },
+    { label: "Est. current NAV (mark-to-market)", value: usd(k.nav_mtm), cls: "spx",
+      note: "vs sponsor's stale " + usd(k.nav),
+      tip: "Sponsor NAV (" + usd(k.nav) + ") re-marked by each holding's valuation move since "
+        + (k.mtm_base_date || "base") + ". " + pct(k.mtm_disclosed_weight, 0) + " of the book is re-marked "
+        + "from disclosed weights; the rest is held flat (conservative). "
+        + "<span class='conf'>estimate / low confidence.</span>" },
     { label: "VCX price", value: usd(k.price),
       note: "as of " + k.as_of + " · measured",
       tip: "NYSE close from Yahoo Finance. <span class='conf'>measured / high.</span>" },
-    { label: "NAV per share", value: usd(k.nav),
+    { label: "Sponsor NAV (stale)", value: usd(k.nav),
       note: k.nav_age_days + " days old · sponsor-published",
-      tip: "Fundrise-published NAV, carried forward (not daily). Underlying privates are themselves "
-        + "marked periodically. <span class='conf'>med confidence; " + k.nav_age_days + "d stale.</span>" },
+      tip: "Fundrise-published NAV, carried forward (not daily) and visibly sticky: it rose only ~4% "
+        + "12/31→3/31 even as Anthropic doubled. That's why we mark-to-market. "
+        + "<span class='conf'>med confidence; " + k.nav_age_days + "d stale.</span>" },
     { label: "Days to lockup expiry", value: dLock >= 0 ? dLock : "passed",
       note: m.lockup_expiry + " · premium-compression risk",
       tip: "~6-month post-listing lockup. When restricted pre-listing holders can sell, supply jumps "
@@ -110,11 +116,13 @@ function renderThesis() {
     <div class="mark-callout" style="border-left-color:${SPX}">
       <b>Baron/SpaceX:</b> an <b>open-end</b> fund priced <b>at NAV</b> carrying a <b>stale-low</b>
       private mark → you bought the underlying <em>cheap</em> before a re-rate. <br>
-      <b>VCX:</b> a <b>closed-end</b> fund trading at a <b>${signPct(k.premium, 0)} premium</b> to NAV →
-      even if the underlying marks are stale-low, <b>you massively overpay through the wrapper</b>.
-      The edge here isn't the underlying — it's whether that premium holds or collapses. There are three
-      stacked opacities: (1) the wrapper premium, (2) NAV staleness (${k.nav_age_days}d old), and
-      (3) SPV look-through (OpenAI/Anthropic weights are sponsor-disclosed, not in the filings).
+      <b>VCX:</b> a <b>closed-end</b> fund. Against the sponsor's stale NAV it looks like a
+      <b>${signPct(k.premium, 0)}</b> premium; but once you <b>mark the NAV to market</b> (Anthropic alone
+      is up ~5× since it was struck) the real premium is <b>~${signPct(k.premium_mtm, 0)}</b> — still large.
+      Even with stale-low marks, <b>you overpay through the wrapper</b>; the edge isn't the underlying, it's
+      whether that premium holds or collapses. Three stacked opacities: (1) the wrapper premium,
+      (2) NAV staleness (${k.nav_age_days}d old, and visibly sticky), and (3) SPV look-through
+      (OpenAI/Anthropic weights are sponsor-disclosed, not in the filings).
     </div>`;
 }
 
@@ -130,11 +138,24 @@ function renderPremiumChart() {
     type: "scatter", mode: "lines", line: { color: GOOD, width: 1.6, shape: "hv" },
     hovertemplate: "%{x}<br>NAV $%{y:.2f}<extra></extra>", yaxis: "y",
   };
+  const mtm = DATA.mtm_series || [];
+  const navMtmTrace = {
+    x: mtm.map((p) => p.date), y: mtm.map((p) => p.nav_mtm),
+    name: "Est. NAV (mark-to-market)", type: "scatter", mode: "lines",
+    line: { color: WARN, width: 1.6, dash: "dash" },
+    hovertemplate: "%{x}<br>est. MTM NAV $%{y:.2f}<extra></extra>", yaxis: "y",
+  };
   const premTrace = {
     x: s.map((p) => p.date), y: s.map((p) => p.premium == null ? null : p.premium * 100),
-    name: "Premium to NAV (%)", type: "scatter", mode: "lines",
-    line: { color: SPX, width: 1.4 }, fill: "tozeroy", fillcolor: "rgba(255,122,69,0.10)",
-    hovertemplate: "%{x}<br>premium %{y:.0f}%<extra></extra>", yaxis: "y2",
+    name: "Premium vs stale NAV (%)", type: "scatter", mode: "lines",
+    line: { color: SPX, width: 1.2, dash: "dot" },
+    hovertemplate: "%{x}<br>stale premium %{y:.0f}%<extra></extra>", yaxis: "y2",
+  };
+  const premMtmTrace = {
+    x: mtm.map((p) => p.date), y: mtm.map((p) => p.premium_mtm == null ? null : p.premium_mtm * 100),
+    name: "Premium vs MTM NAV (%)", type: "scatter", mode: "lines",
+    line: { color: SPX, width: 1.8 }, fill: "tozeroy", fillcolor: "rgba(255,122,69,0.10)",
+    hovertemplate: "%{x}<br>true (MTM) premium %{y:.0f}%<extra></extra>", yaxis: "y2",
   };
   const shapes = [], ann = [];
   const kc = { listing: GOOD, mark: ACC, ipo: SPX, lockup: WARN, corporate: "#bb86fc" };
@@ -145,7 +166,7 @@ function renderPremiumChart() {
       showarrow: false, font: { color: kc[ev.kind] || MUTED, size: 9 }, xanchor: "left",
       bgcolor: "rgba(14,17,23,0.7)" });
   });
-  Plotly.newPlot("chart-premium", [priceTrace, navTrace, premTrace], {
+  Plotly.newPlot("chart-premium", [priceTrace, navTrace, navMtmTrace, premMtmTrace, premTrace], {
     paper_bgcolor: PLOT_BG, plot_bgcolor: PLOT_BG, font: { color: TEXT, size: 11 },
     hovermode: "x unified", hoverlabel: { bgcolor: "#0e1117", bordercolor: GRID },
     shapes, annotations: ann,
@@ -157,6 +178,34 @@ function renderPremiumChart() {
     legend: { orientation: "h", y: 1.12, font: { color: TEXT } },
     margin: { t: 40, r: 56, b: 30, l: 56 },
   }, { responsive: true, displayModeBar: false, displaylogo: false });
+}
+
+function renderHoldingMarks() {
+  const el = document.getElementById("holding-marks");
+  if (!el) return;
+  const k = DATA.kpis, hm = DATA.holding_marks || [];
+  if (!hm.length) { el.innerHTML = "<p class='desc'>no valuation timeline available</p>"; return; }
+  const rows = hm.map((h) => `<tr>
+      <td>${h.name}</td>
+      <td>${pct(h.weight, 1)}</td>
+      <td>${usd(h.base_valuation_usd)}<br><span class="sub2">${h.base_round}</span></td>
+      <td>${usd(h.cur_valuation_usd)}<br><span class="sub2">${h.cur_round}</span></td>
+      <td class="${h.growth_mult >= 1.5 ? "spxcell" : ""}">${h.growth_mult.toFixed(2)}×</td>
+      <td>${pill(h.confidence)}</td>
+    </tr>`).join("");
+  el.innerHTML = `
+    <table class="data">
+      <thead><tr><th>Holding</th><th>% of NAV</th><th>Marked at (${k.mtm_base_date})</th>
+        <th>Now</th><th>Growth</th><th>Conf.</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="mark-callout" style="border-left-color:${WARN}">
+      Re-marking these (${pct(k.mtm_disclosed_weight, 0)} of NAV; the rest held flat) lifts estimated NAV
+      from the sponsor's stale <b>${usd(k.nav)}</b> to <b>${usd(k.nav_mtm)}</b>. That cuts the premium from
+      <b>${signPct(k.premium, 0)}</b> (stale) to <b>${signPct(k.premium_mtm, 0)}</b> (mark-to-market) — still
+      large, but roughly half. <span class="conf">Estimate: weights are sponsor-disclosed; base-date marks
+      assume last-round fair value; "other/cash" held flat (conservative — understates NAV).</span>
+    </div>`;
 }
 
 function renderLookthrough() {

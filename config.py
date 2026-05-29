@@ -222,6 +222,53 @@ class VcxFundrise:
          "source_url": "https://www.crowdfundedwealth.com/articles/fundrise-vcx-review"},
     ]
 
+    # --- Underlying private-company valuation timelines (web-verified 2026-05-29) -
+    # Each entry: (date, whole_company_valuation_usd, round_label, source_url).
+    # Used to MARK-TO-MARKET the fund's NAV: the sponsor NAV is stale/sticky, so
+    # we re-mark each holding by how much its whole-company valuation has moved
+    # since the NAV base date. Step function (jumps only on a new observable round).
+    VALUATION_TIMELINE = {
+        "Anthropic": [
+            ("2024-01-01", 18e9, "early 2024", "https://sacra.com/c/anthropic/"),
+            ("2025-03-01", 61.5e9, "Series E ~$61.5B", "https://sacra.com/c/anthropic/"),
+            ("2025-09-01", 183e9, "Series F $183B", "https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation"),
+            ("2026-02-12", 380e9, "Series G $380B", "https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation"),
+            ("2026-05-28", 965e9, "Series H ~$965B", "https://www.cnbc.com/2026/05/28/anthropic-open-ai-startup-value.html"),
+        ],
+        "OpenAI": [
+            ("2024-10-02", 157e9, "$6.6B round $157B", "https://techcrunch.com/2024/10/02/openai-raises-6-6-billion-in-funding-at-157-billion-valuation/"),
+            ("2025-03-31", 300e9, "$40B SoftBank $300B", "https://apnews.com/article/openai-chatgpt-funding-softbank-d3fb52f922acf226d9b285b87a5e8a13"),
+            ("2025-10-01", 500e9, "employee tender $500B", "https://www.reuters.com/technology/openai-500-billion-valuation/"),
+            ("2026-03-31", 852e9, "$122B round $852B", "https://techcrunch.com/2026/03/31/openai-not-yet-public-raises-3b-from-retail-investors-in-monster-122b-fund-raise/"),
+        ],
+        "Databricks": [
+            ("2024-12-01", 62e9, "Series J $62B", "https://www.databricks.com/company/newsroom/press-releases/databricks-raising-10b-series-j-investment-62b-valuation"),
+            ("2025-08-01", 100e9, "Series K >$100B", "https://www.databricks.com/company/newsroom/press-releases/databricks-raising-series-k-investment-100-billion-valuation"),
+            ("2025-12-16", 134e9, "Series L $134B", "https://www.cnbc.com/2025/12/16/databricks-funding-valuation.html"),
+        ],
+        "Anduril": [
+            ("2025-06-05", 30.5e9, "Series G $30.5B", "https://www.cnbc.com/2025/06/05/anduril-valuation-founders-fund.html"),
+            ("2026-05-13", 61e9, "Series H $61B", "https://techcrunch.com/2026/05/13/anduril-raises-5b-doubles-valuation-to-61b/"),
+        ],
+        "Ramp": [
+            ("2025-07-01", 22.5e9, "Series E-2 $22.5B", "https://www.prnewswire.com/news-releases/ramp-raises-500-million-at-22-5-billion-valuation-to-accelerate-ai-and-build-the-future-of-finance-302516953.html"),
+            ("2025-11-17", 32e9, "$300M round $32B", "https://news.crunchbase.com/venture/fintech-unicorn-ramp-300m-raise-lightspeed/"),
+        ],
+        "SpaceX": [
+            ("2025-12-13", 800e9, "secondary $800B", "https://www.cnbc.com/2025/12/13/musk-spacex-insider-share-sale-sets-800-billion-valuation.html"),
+            ("2026-02-02", 1250e9, "SpaceX+xAI $1.25T", "https://www.cnbc.com/2026/02/03/musk-xai-spacex-biggest-merger-ever.html"),
+        ],
+    }
+
+    # Base date for the mark-to-market: the cleanest full NPORT snapshot (NAV +
+    # per-holding $). At this date each holding is assumed marked at its last
+    # observable round (see VALUATION_TIMELINE); NAV re-marks forward from here.
+    NAV_MTM_BASE_DATE = "2025-12-31"
+    NAV_MTM_BASE_NAV = 18.26
+    # Weight of holdings NOT individually re-marked (cash + many small names),
+    # held flat -> makes the MTM NAV estimate CONSERVATIVE (understates it).
+    NAV_MTM_OTHER_WEIGHT_FLAT = True
+
     # (date, label, kind) kind in {listing, mark, ipo, lockup, corporate}
     EVENTS = [
         ("2026-03-19", "NYSE direct listing (VCX)", "listing"),

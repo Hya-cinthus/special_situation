@@ -35,12 +35,25 @@
       <section class="card">
         <h2>Market price vs NAV — and the premium you pay</h2>
         <p class="desc">
-          VCX is a closed-end fund: no creation/redemption to tether price to NAV. Solid line = market
-          price (measured). Stepped line = sponsor-published NAV (carried forward between prints — it
-          does not move daily). The shaded area is the <b>premium you pay over NAV</b>. Lockup expiry
-          (9/19) is the premium-compression catalyst.
+          VCX is a closed-end fund: no creation/redemption to tether price to NAV. Blue = market price.
+          Green step = sponsor-published NAV (stale/sticky). Amber dash = our <b>mark-to-market NAV</b>
+          (each holding re-marked by its valuation move). Right axis: the <b>shaded</b> line is the true
+          (MTM) premium; the dotted line is the misleading stale-NAV premium. Lockup expiry (9/19) is the
+          compression catalyst.
         </p>
         <div id="chart-premium" class="chart" style="height:440px"></div>
+      </section>
+
+      <!-- Per-holding valuation marks (the apples-to-apples fix) -->
+      <section class="card" id="holding-marks-card">
+        <h2>Mark-to-market — what each holding was marked at vs now</h2>
+        <p class="desc">
+          The sponsor NAV is stale, so comparing today's price to it overstates the premium. Here we
+          re-mark each disclosed holding by how much its whole-company valuation has actually moved since
+          the base date, and rebuild an estimated current NAV. Each valuation links to its funding-round
+          source. <b>Estimate, low confidence</b> — weights are sponsor-disclosed.
+        </p>
+        <div id="holding-marks"></div>
       </section>
 
       <!-- Look-through -->

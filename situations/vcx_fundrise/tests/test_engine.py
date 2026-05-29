@@ -8,6 +8,7 @@ if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 from situations.vcx_fundrise.engine import premium as P
 from situations.vcx_fundrise.engine import scenarios as S
+from situations.vcx_fundrise.engine import nav_markto as M
 
 
 class TestPremium(unittest.TestCase):
@@ -62,6 +63,45 @@ class TestScenarios(unittest.TestCase):
     def test_grid_shape(self):
         g = S.scenario_grid(100.0, 20.0, [0.0, 0.2], [0.0, 1.0, 4.0])
         self.assertEqual(len(g), 6)
+
+
+class TestMarkToMarket(unittest.TestCase):
+    def setUp(self):
+        self.tl = {
+            "Anthropic": [("2025-09-01", 183e9, "F", "u"), ("2026-02-12", 380e9, "G", "u"),
+                          ("2026-05-28", 965e9, "H", "u")],
+            "OpenAI": [("2025-10-01", 500e9, "tender", "u"), ("2026-03-31", 852e9, "round", "u")],
+        }
+        self.lt = [{"name": "Anthropic", "weight": 0.2, "confidence": "med"},
+                   {"name": "OpenAI", "weight": 0.1, "confidence": "med"}]
+
+    def test_valuation_step_lookup(self):
+        self.assertEqual(M.valuation_at(self.tl["Anthropic"], "2026-01-01"), 183e9)
+        self.assertEqual(M.valuation_at(self.tl["Anthropic"], "2026-03-01"), 380e9)
+        self.assertEqual(M.valuation_at(self.tl["Anthropic"], "2026-06-01"), 965e9)
+        self.assertIsNone(M.valuation_at(self.tl["Anthropic"], "2025-01-01"))
+
+    def test_nav_mtm_remarks_up(self):
+        # base 12/31/2025: Anthropic $183B, OpenAI $500B; NAV0=$18.26
+        # as of 6/1/2026: Anthropic $965B (5.27x), OpenAI $852B (1.70x)
+        nav = M.nav_mtm_at(self.lt, self.tl, "2025-12-31", 18.26, "2026-06-01")
+        # mult = .2*965/183 + .1*852/500 + .7(other flat) = 1.0546+0.1704+0.7 = 1.925
+        self.assertAlmostEqual(nav, 18.26 * (0.2*965/183 + 0.1*852/500 + 0.7), places=2)
+        self.assertGreater(nav, 18.26)   # re-marked up
+
+    def test_holding_marks_growth(self):
+        rows = M.holding_marks(self.lt, self.tl, "2025-12-31", "2026-06-01")
+        anth = next(r for r in rows if r["name"] == "Anthropic")
+        self.assertAlmostEqual(anth["growth_mult"], 965e9/183e9, places=3)
+        self.assertEqual(anth["base_valuation_usd"], 183e9)
+        self.assertEqual(anth["cur_valuation_usd"], 965e9)
+
+    def test_mtm_premium_lower_than_stale(self):
+        price = [{"date": "2026-06-01", "price": 219.59}]
+        s = M.build_mtm_series(price, self.lt, self.tl, "2025-12-31", 18.26)
+        mtm_prem = s[0]["premium_mtm"]
+        stale_prem = 219.59 / 18.26 - 1
+        self.assertLess(mtm_prem, stale_prem)   # re-marking NAV up shrinks the premium
 
 
 if __name__ == "__main__":

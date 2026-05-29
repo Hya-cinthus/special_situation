@@ -12,6 +12,7 @@ if _REPO_ROOT not in sys.path:
 from config import VcxFundrise as CFG, DASHBOARD_DATA_DIR
 from situations.vcx_fundrise.engine import premium as P
 from situations.vcx_fundrise.engine import scenarios as S
+from situations.vcx_fundrise.engine import nav_markto as M
 from situations.vcx_fundrise.ingest import nav_log
 
 _SIT = os.path.join(_REPO_ROOT, "situations", "vcx_fundrise")
@@ -43,6 +44,17 @@ def build_payload() -> dict:
     state = P.current_state(series, CFG.LOOKTHROUGH)
     stats = P.premium_stats(series)
     nport = _load_nport()
+
+    # --- Mark-to-market NAV: re-mark holdings by their valuation moves ---------
+    mtm_series = M.build_mtm_series(price, CFG.LOOKTHROUGH, CFG.VALUATION_TIMELINE,
+                                    CFG.NAV_MTM_BASE_DATE, CFG.NAV_MTM_BASE_NAV,
+                                    other_flat=CFG.NAV_MTM_OTHER_WEIGHT_FLAT)
+    as_of = price[-1]["date"] if price else CFG.NAV_MTM_BASE_DATE
+    holding_marks = M.holding_marks(CFG.LOOKTHROUGH, CFG.VALUATION_TIMELINE,
+                                    CFG.NAV_MTM_BASE_DATE, as_of)
+    mtm_last = mtm_series[-1] if mtm_series else {}
+    disclosed_w = sum(h["weight"] for h in CFG.LOOKTHROUGH
+                      if h["name"] in CFG.VALUATION_TIMELINE)
 
     # scenario base: headline name (Anthropic) re-rate × premium normalization
     hn = CFG.HEADLINE_NAME
@@ -79,8 +91,15 @@ def build_payload() -> dict:
             "price_multiple": state.get("price_multiple"),
             "nav_age_days": state.get("nav_age_days"),
             "lookthrough": state.get("lookthrough", []),
+            "nav_mtm": mtm_last.get("nav_mtm"),
+            "premium_mtm": mtm_last.get("premium_mtm"),
+            "mtm_base_date": CFG.NAV_MTM_BASE_DATE,
+            "mtm_base_nav": CFG.NAV_MTM_BASE_NAV,
+            "mtm_disclosed_weight": round(disclosed_w, 4),
         },
         "series": series,
+        "mtm_series": mtm_series,
+        "holding_marks": holding_marks,
         "premium_stats": stats,
         "nav_anchors": nav_anchors,
         "lookthrough": CFG.LOOKTHROUGH,

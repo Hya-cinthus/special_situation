@@ -157,6 +157,7 @@ a:hover { text-decoration: underline; }
 .badge.assumed  { background:#3a3115; color:var(--warn); }
 .badge.note     { background:#2a2f38; color:var(--muted); }
 td.spxcell { color: var(--spacex); font-weight: 600; }
+.sub2 { color: var(--muted); font-size: .7rem; }
 .gaps { font-size: .82rem; }
 .gaps h1, .gaps h2, .gaps h3 { color: var(--text); }
 .gaps h1 { font-size: 1.05rem; } .gaps h2 { font-size: .95rem; margin-top: 16px; } .gaps h3 { font-size: .85rem; }
