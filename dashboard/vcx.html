@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Special Situations — OpenAI/Anthropic via VCX</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="sit-title">Special Situations</h1>
+    <span class="sub" id="sit-subtitle"></span>
+    <nav class="sitnav">
+      <a href="index.html">SpaceX · Baron (BPTRX)</a>
+      <a href="vcx.html" class="active">OpenAI/Anthropic · VCX</a>
+    </nav>
+  </header>
+  <div class="disclaimer" id="disclaimer"></div>
+
+  <main>
+    <div id="loading" class="loading">Loading situation data…</div>
+    <div id="error" class="error" style="display:none"></div>
+
+    <div id="content" style="display:none">
+      <div class="kpis" id="kpis"></div>
+
+      <!-- The premium thesis up front -->
+      <section class="card" id="thesis">
+        <h2>The setup — this is the <em>mirror image</em> of the Baron/SpaceX trade</h2>
+        <div id="thesis-body"></div>
+      </section>
+
+      <!-- Main chart: price vs NAV + premium -->
+      <section class="card">
+        <h2>Market price vs NAV — and the premium you pay</h2>
+        <p class="desc">
+          VCX is a closed-end fund: no creation/redemption to tether price to NAV. Solid line = market
+          price (measured). Stepped line = sponsor-published NAV (carried forward between prints — it
+          does not move daily). The shaded area is the <b>premium you pay over NAV</b>. Lockup expiry
+          (9/19) is the premium-compression catalyst.
+        </p>
+        <div id="chart-premium" class="chart" style="height:440px"></div>
+      </section>
+
+      <!-- Look-through -->
+      <section class="card">
+        <h2>What's inside — and what you actually pay for it</h2>
+        <p class="desc">
+          Sponsor-disclosed look-through (Fundrise). <b>Not SEC-verifiable</b>: in the NPORT-P these sit
+          inside codenamed SPVs (see the filing panel below). For each $1 of a name's NAV value, the
+          premium means you pay several dollars.
+        </p>
+        <div id="lookthrough"></div>
+      </section>
+
+      <!-- Scenario lab -->
+      <section class="card">
+        <h2>Scenario lab — the two-way bet</h2>
+        <p class="desc">
+          Your return owns two independent moving parts: the underlying AI re-rate (NAV) <b>and</b> the
+          wrapper premium. You can be right on the AI and still lose if the premium collapses. Adjust both.
+        </p>
+        <div class="scenario-grid">
+          <div class="controls">
+            <label>Underlying NAV change (e.g. <span id="hn-label">Anthropic</span> re-rate)</label>
+            <div class="rowval"><span>−50%</span><b id="navc-txt">0%</b><span>+100%</span></div>
+            <input type="range" id="navc-slider" min="-0.5" max="1.0" step="0.05" value="0" />
+            <label>Premium-to-NAV the price reverts to</label>
+            <div class="rowval"><span>0%</span><b id="prem-txt"></b><span>current</span></div>
+            <input type="range" id="prem-slider" />
+            <div class="btn-row">
+              <button id="b-hold">Premium holds (status quo)</button>
+              <button id="b-half">Premium halves</button>
+              <button id="b-zero">Premium → 0 (par)</button>
+            </div>
+            <p class="desc" id="scenario-explain" style="margin-top:14px"></p>
+          </div>
+          <div class="scenario-out" id="scenario-out"></div>
+        </div>
+      </section>
+
+      <!-- Risk cards -->
+      <section class="card">
+        <h2>Risk cards</h2>
+        <div id="risk-cards"></div>
+      </section>
+
+      <!-- Filing panel -->
+      <section class="card">
+        <h2>SEC filing reality check — the SPV opacity</h2>
+        <p class="desc">Latest NPORT-P top holdings (verbatim names). Notice OpenAI/Anthropic are <b>not</b> here — they're inside the codenamed SPVs. <a id="edgar-link" target="_blank" rel="noopener">Browse on EDGAR ↗</a></p>
+        <div class="scroll-y"><table class="data" id="nport-table">
+          <thead><tr><th>Holding (as filed)</th><th>% of fund</th><th>Value</th></tr></thead><tbody></tbody>
+        </table></div>
+      </section>
+
+      <p class="desc" id="footer-meta" style="text-align:center;margin-top:30px"></p>
+    </div>
+  </main>
+
+  <script src="vcx_app.js"></script>
+</body>
+</html>

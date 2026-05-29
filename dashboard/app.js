@@ -53,12 +53,6 @@ function combined(base, ipoVal, flow) {
 
 /* ------------------------------ bootstrap ------------------------------ */
 async function boot() {
-  const sel = document.getElementById("situation-select");
-  SITUATIONS.forEach((s) => {
-    const o = document.createElement("option");
-    o.value = s.file; o.textContent = s.key; sel.appendChild(o);
-  });
-  sel.onchange = () => load(sel.value);
   await load(SITUATIONS[0].file);
 }
 

@@ -36,6 +36,13 @@ header.topbar select {
   margin-left: auto; background: var(--panel-2); color: var(--text);
   border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; font-size: .85rem;
 }
+header.topbar .sitnav { margin-left: auto; display: flex; gap: 8px; }
+header.topbar .sitnav a {
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: 7px;
+  padding: 6px 12px; font-size: .82rem; color: var(--muted); white-space: nowrap;
+}
+header.topbar .sitnav a:hover { border-color: var(--accent); text-decoration: none; }
+header.topbar .sitnav a.active { color: var(--text); border-color: #3a5d86; background: #16263a; }
 
 .disclaimer {
   background: #1d1a0e; border-bottom: 1px solid #3a3115; color: #d8c98a;
@@ -149,6 +156,7 @@ a:hover { text-decoration: underline; }
 .badge.sourced  { background:#133a1d; color:var(--good); }
 .badge.assumed  { background:#3a3115; color:var(--warn); }
 .badge.note     { background:#2a2f38; color:var(--muted); }
+td.spxcell { color: var(--spacex); font-weight: 600; }
 .gaps { font-size: .82rem; }
 .gaps h1, .gaps h2, .gaps h3 { color: var(--text); }
 .gaps h1 { font-size: 1.05rem; } .gaps h2 { font-size: .95rem; margin-top: 16px; } .gaps h3 { font-size: .85rem; }

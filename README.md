@@ -15,6 +15,7 @@ single shared, zero-dependency dashboard.
 | Key | Title | Status |
 |-----|-------|--------|
 | [`spacex_baron`](situations/spacex_baron/) | SpaceX exposure via Baron Partners Fund (BPTRX), and its effective SpaceX weight over time | active |
+| [`vcx_fundrise`](situations/vcx_fundrise/) | OpenAI / Anthropic exposure via Fundrise Innovation Fund (VCX) — the premium-to-NAV trap | active |
 
 ## How to run
 

@@ -41,7 +41,28 @@ def build_spacex_baron(do_fetch: bool = True):
     print(f"[spacex_baron] Wrote {path} ({os.path.getsize(path)/1024:.0f} KB)")
 
 
-BUILDERS = {"spacex_baron": build_spacex_baron}
+def build_vcx_fundrise(do_fetch: bool = True):
+    from situations.vcx_fundrise.ingest import price, edgar
+    from situations.vcx_fundrise import emit
+
+    if do_fetch:
+        print("[vcx_fundrise] Ingesting VCX daily price (Yahoo)...")
+        rows = price.fetch_price()
+        price.write_price_csv(rows)
+        print(f"[vcx_fundrise]   {len(rows)} price rows.")
+
+        print("[vcx_fundrise] Ingesting EDGAR NPORT-P (net assets + holdings)...")
+        anchors = edgar.fetch_anchors(verbose=False)
+        edgar.write_anchors(anchors)
+        print(f"[vcx_fundrise]   {len(anchors)} NPORT anchors.")
+    else:
+        print("[vcx_fundrise] --no-fetch: rebuilding JSON from cached data.")
+
+    path = emit.write_json()
+    print(f"[vcx_fundrise] Wrote {path} ({os.path.getsize(path)/1024:.0f} KB)")
+
+
+BUILDERS = {"spacex_baron": build_spacex_baron, "vcx_fundrise": build_vcx_fundrise}
 
 
 def main(argv):

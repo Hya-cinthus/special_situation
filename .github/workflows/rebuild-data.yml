@@ -10,14 +10,10 @@ on:
   push:
     branches: [main]
     paths:
-      - "situations/spacex_baron/data/morningstar_aum_log.jsonl"
-      - "situations/spacex_baron/data/spacex_marks.csv"
-      - "situations/spacex_baron/data/processed/**"
-      - "situations/spacex_baron/engine/**"
-      - "situations/spacex_baron/emit.py"
-      - "situations/spacex_baron/ingest/morningstar_log.py"
+      - "situations/**"
       - "config.py"
       - "build.py"
+      - "!situations/**/data/raw/**"
   workflow_dispatch:
 
 concurrency:
@@ -35,12 +31,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Rebuild dashboard JSON (fetch fresh NAV so the series auto-extends)
-        run: python build.py spacex_baron
-      - name: Commit refreshed JSON + NAV if changed
+      - name: Rebuild dashboard JSON (fetch fresh prices so series auto-extend)
+        run: python build.py
+      - name: Commit refreshed JSON + price/NAV if changed
         run: |
-          git add dashboard/data/spacex_baron.json situations/spacex_baron/data/processed/nav_daily.csv
-          if [ -n "$(git status --porcelain dashboard/data/spacex_baron.json situations/spacex_baron/data/processed/nav_daily.csv)" ]; then
+          git add dashboard/data/*.json situations/spacex_baron/data/processed/nav_daily.csv situations/vcx_fundrise/data/processed/price_daily.csv
+          if [ -n "$(git status --porcelain dashboard/data/ situations/spacex_baron/data/processed/nav_daily.csv situations/vcx_fundrise/data/processed/price_daily.csv)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "auto: rebuild dashboard JSON + NAV [skip ci]"

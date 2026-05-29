@@ -1,0 +1,6 @@
+# VCX NAV-per-share log. Fundrise publishes NAV periodically (not daily). The
+# cowork agent / bookmarklet appends one JSON line per observation; nav_log.py
+# merges these with config.NAV_REPORTED (log wins on date collision).
+# Schema: {"as_of_date_iso":"YYYY-MM-DD","nav_per_share":<num>,"captured_at":"<ISO>","source":"...","notes":"..."}
+{"as_of_date_iso":"2025-12-31","nav_per_share":18.26,"captured_at":"2026-05-29T00:00:00Z","source":"seed: VCX NPORT-P net assets / units (2025-12-31)","notes":"manual seed"}
+{"as_of_date_iso":"2026-03-31","nav_per_share":18.97,"captured_at":"2026-05-29T00:00:00Z","source":"seed: Fundrise-reported NAV ~$18.97 (late Apr 2026)","notes":"manual seed"}

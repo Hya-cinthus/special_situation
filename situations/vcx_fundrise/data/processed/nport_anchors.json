@@ -1,0 +1,1085 @@
+[
+  {
+    "report_date": "2022-09-30",
+    "filing_date": "2022-11-29",
+    "accession": "0001752724-22-274513",
+    "net_assets_usd": 34781175.64,
+    "total_assets_usd": 35670397.06,
+    "n_holdings": 1,
+    "top_holdings": [
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 5000001.44,
+        "pctVal": 14.3755964196
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2022-12-31",
+    "filing_date": "2023-03-01",
+    "accession": "0001752724-23-050012",
+    "net_assets_usd": 34896250.61,
+    "total_assets_usd": 35104006.17,
+    "n_holdings": 2,
+    "top_holdings": [
+      {
+        "name": "Allspring Government Money Market Fund, Select Class Shares",
+        "valUSD": 30591167.86,
+        "pctVal": 87.66319396856
+      },
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 5000001.44,
+        "pctVal": 14.32819100217
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2023-03-31",
+    "filing_date": "2023-05-26",
+    "accession": "0001752724-23-119339",
+    "net_assets_usd": 73131935.59,
+    "total_assets_usd": 73827206.97,
+    "n_holdings": 19,
+    "top_holdings": [
+      {
+        "name": "Allspring Government Money Market Fund",
+        "valUSD": 39086919.52,
+        "pctVal": 53.4471284052
+      },
+      {
+        "name": "Northern Institutional U.S. Government Select Portfolio",
+        "valUSD": 5542578.73,
+        "pctVal": 7.57887602083
+      },
+      {
+        "name": "Vanta Series B-1 Preferred Stock",
+        "valUSD": 5000001.44,
+        "pctVal": 6.836960350716
+      },
+      {
+        "name": "ROBLOX CORP",
+        "valUSD": 3004662.5,
+        "pctVal": 4.108550492694
+      },
+      {
+        "name": "ZI TECH LLC/ZI FIN CORP",
+        "valUSD": 2600625.0,
+        "pctVal": 3.556072978267
+      },
+      {
+        "name": "ELASTIC NV",
+        "valUSD": 1923345.0,
+        "pctVal": 2.629965943719
+      },
+      {
+        "name": "TWILIO INC",
+        "valUSD": 1727260.0,
+        "pctVal": 2.361840946865
+      },
+      {
+        "name": "BLOCK INC",
+        "valUSD": 1644430.0,
+        "pctVal": 2.248579894314
+      },
+      {
+        "name": "CONFLUENT INC",
+        "valUSD": 1589758.28,
+        "pctVal": 2.173822239455
+      },
+      {
+        "name": "UNITY SOFTWARE INC",
+        "valUSD": 1559000.0,
+        "pctVal": 2.131763623405
+      },
+      {
+        "name": "IMMUTA INC",
+        "valUSD": 1021600.0,
+        "pctVal": 1.396927336543
+      },
+      {
+        "name": "UBER TECHNOLOGIES INC",
+        "valUSD": 998510.0,
+        "pctVal": 1.365354262736
+      },
+      {
+        "name": "MATCH GROUP HLD II LLC",
+        "valUSD": 941396.53,
+        "pctVal": 1.287257779252
+      },
+      {
+        "name": "BLOCK INC",
+        "valUSD": 912990.0,
+        "pctVal": 1.248414926576
+      },
+      {
+        "name": "SPLUNK INC",
+        "valUSD": 859500.0,
+        "pctVal": 1.175273145809
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2023-06-30",
+    "filing_date": "2023-08-23",
+    "accession": "0001752724-23-185959",
+    "net_assets_usd": 71971977.51,
+    "total_assets_usd": 72205957.31,
+    "n_holdings": 21,
+    "top_holdings": [
+      {
+        "name": "Allspring Government Money Market Fund",
+        "valUSD": 33988516.18,
+        "pctVal": 47.22465236595
+      },
+      {
+        "name": "SERVICETITAN INC",
+        "valUSD": 9999990.0,
+        "pctVal": 13.89428267218
+      },
+      {
+        "name": "Vanta Series B-1 Preferred Stock",
+        "valUSD": 5000001.44,
+        "pctVal": 6.947150284018
+      },
+      {
+        "name": "INSPECTIFY INC",
+        "valUSD": 4000000.0,
+        "pctVal": 5.557718626592
+      },
+      {
+        "name": "ROBLOX CORP",
+        "valUSD": 2953772.5,
+        "pctVal": 4.104059110491
+      },
+      {
+        "name": "ZI TECH LLC/ZI FIN CORP",
+        "valUSD": 2582973.6,
+        "pctVal": 3.588860122178
+      },
+      {
+        "name": "ELASTIC NV",
+        "valUSD": 1943098.88,
+        "pctVal": 2.699799209671
+      },
+      {
+        "name": "TWILIO INC",
+        "valUSD": 1703301.54,
+        "pctVal": 2.36661767389
+      },
+      {
+        "name": "BLOCK INC",
+        "valUSD": 1659074.0,
+        "pctVal": 2.305166618173
+      },
+      {
+        "name": "UNITY SOFTWARE INC",
+        "valUSD": 1607000.0,
+        "pctVal": 2.232813458233
+      },
+      {
+        "name": "IMMUTA INC",
+        "valUSD": 1021600.0,
+        "pctVal": 1.419441337231
+      },
+      {
+        "name": "UBER TECHNOLOGIES INC",
+        "valUSD": 996280.0,
+        "pctVal": 1.384260978325
+      },
+      {
+        "name": "MATCH GROUP HLD II LLC",
+        "valUSD": 938559.17,
+        "pctVal": 1.304061945316
+      },
+      {
+        "name": "BLOCK INC",
+        "valUSD": 911492.7,
+        "pctVal": 1.266454989198
+      },
+      {
+        "name": "SPLUNK INC",
+        "valUSD": 867500.0,
+        "pctVal": 1.205330227142
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2023-09-30",
+    "filing_date": "2023-11-16",
+    "accession": "0001752724-23-253678",
+    "net_assets_usd": 112582190.0,
+    "total_assets_usd": 113754024.0,
+    "n_holdings": 26,
+    "top_holdings": [
+      {
+        "name": "DBH1, LP",
+        "valUSD": 28072737.0,
+        "pctVal": 24.93532680435
+      },
+      {
+        "name": "Allspring Government Money Market Fund",
+        "valUSD": 18831098.69,
+        "pctVal": 16.72653435681
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 13.323615396
+      },
+      {
+        "name": "ServiceTitan, Inc.",
+        "valUSD": 9999990.0,
+        "pctVal": 8.882390722724
+      },
+      {
+        "name": "CANVA INC",
+        "valUSD": 6219700.87,
+        "pctVal": 5.524586855167
+      },
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 5000001.44,
+        "pctVal": 4.441201081627
+      },
+      {
+        "name": "Inspectify, Inc.",
+        "valUSD": 4000000.0,
+        "pctVal": 3.552959842049
+      },
+      {
+        "name": "ROBLOX CORP",
+        "valUSD": 2812735.8,
+        "pctVal": 2.498384335923
+      },
+      {
+        "name": "ZI TECH LLC/ZI FIN CORP",
+        "valUSD": 2503155.0,
+        "pctVal": 2.223402298356
+      },
+      {
+        "name": "Jetty National, Inc.",
+        "valUSD": 1999995.87,
+        "pctVal": 1.776476252593
+      },
+      {
+        "name": "ELASTIC NV",
+        "valUSD": 1918688.63,
+        "pctVal": 1.704255912946
+      },
+      {
+        "name": "TWILIO INC",
+        "valUSD": 1676156.8,
+        "pctVal": 1.488829449844
+      },
+      {
+        "name": "AI-LLM, LLC",
+        "valUSD": 1597050.0,
+        "pctVal": 1.418563628936
+      },
+      {
+        "name": "UNITY SOFTWARE INC",
+        "valUSD": 1593000.0,
+        "pctVal": 1.414966257096
+      },
+      {
+        "name": "BLOCK INC",
+        "valUSD": 1573422.4,
+        "pctVal": 1.397576650445
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2023-12-31",
+    "filing_date": "2024-02-26",
+    "accession": "0001752724-24-037631",
+    "net_assets_usd": 121588890.02,
+    "total_assets_usd": 121879809.87,
+    "n_holdings": 27,
+    "top_holdings": [
+      {
+        "name": "DBH1, LP",
+        "valUSD": 28066578.0,
+        "pctVal": 23.08317642786
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 12.33666825771
+      },
+      {
+        "name": "ServiceTitan, Inc.",
+        "valUSD": 9999990.0,
+        "pctVal": 8.224427411382
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 8874000.0,
+        "pctVal": 7.298364183224
+      },
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 7072032.5,
+        "pctVal": 5.816347611066
+      },
+      {
+        "name": "Canva, Inc.",
+        "valUSD": 6219700.87,
+        "pctVal": 5.115352947935
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 6021234.94,
+        "pctVal": 4.952125921216
+      },
+      {
+        "name": "Allspring Government Money Market Fund",
+        "valUSD": 5537227.45,
+        "pctVal": 4.55405707634
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 5250000.0,
+        "pctVal": 4.317828708804
+      },
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 5000001.44,
+        "pctVal": 4.112219002227
+      },
+      {
+        "name": "Inspectify, Inc.",
+        "valUSD": 4000000.0,
+        "pctVal": 3.289774254327
+      },
+      {
+        "name": "ZI TECH LLC/ZI FIN CORP",
+        "valUSD": 2722859.7,
+        "pctVal": 2.239398434801
+      },
+      {
+        "name": "ELASTIC NV",
+        "valUSD": 2068440.3,
+        "pctVal": 1.701175411388
+      },
+      {
+        "name": "Jetty National, Inc.",
+        "valUSD": 1999995.87,
+        "pctVal": 1.644883730471
+      },
+      {
+        "name": "TWILIO INC",
+        "valUSD": 1826753.2,
+        "pctVal": 1.502401411592
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-03-31",
+    "filing_date": "2024-05-21",
+    "accession": "0001752724-24-109704",
+    "net_assets_usd": 127702338.35,
+    "total_assets_usd": 128951258.74,
+    "n_holdings": 27,
+    "top_holdings": [
+      {
+        "name": "DBH1 LP",
+        "valUSD": 29191660.0,
+        "pctVal": 22.85914289211
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 11.74607935438
+      },
+      {
+        "name": "ServiceTitan, Inc.",
+        "valUSD": 9999990.0,
+        "pctVal": 7.830702342029
+      },
+      {
+        "name": "Allspring Government Money Market Fund",
+        "valUSD": 9943949.43,
+        "pctVal": 7.786818595871
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 9355032.0,
+        "pctVal": 7.32565442487
+      },
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 7072032.5,
+        "pctVal": 5.537903683969
+      },
+      {
+        "name": "Canva, Inc.",
+        "valUSD": 6219700.87,
+        "pctVal": 4.87046748741
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 6021234.94,
+        "pctVal": 4.715054569711
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 5250000.0,
+        "pctVal": 4.111122840688
+      },
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 5000001.44,
+        "pctVal": 3.915356213992
+      },
+      {
+        "name": "Inspectify, Inc.",
+        "valUSD": 4000000.0,
+        "pctVal": 3.132284069095
+      },
+      {
+        "name": "ZI TECH LLC/ZI FIN CORP",
+        "valUSD": 2703731.7,
+        "pctVal": 2.117213932754
+      },
+      {
+        "name": "ELASTIC NV",
+        "valUSD": 2026979.1,
+        "pctVal": 1.58726858583
+      },
+      {
+        "name": "Jetty National, Inc.",
+        "valUSD": 1999995.87,
+        "pctVal": 1.566138800464
+      },
+      {
+        "name": "TWILIO INC",
+        "valUSD": 1800746.4,
+        "pctVal": 1.4101123153
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-06-30",
+    "filing_date": "2024-08-27",
+    "accession": "0001752724-24-192907",
+    "net_assets_usd": 143672804.03,
+    "total_assets_usd": 144836998.48,
+    "n_holdings": 30,
+    "top_holdings": [
+      {
+        "name": "DBH1 LP",
+        "valUSD": 29193195.0,
+        "pctVal": 20.31922130085
+      },
+      {
+        "name": "ServiceTitan, Inc.",
+        "valUSD": 21329210.0,
+        "pctVal": 14.84568366574
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 10.44040178743
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 9355032.0,
+        "pctVal": 6.51134504067
+      },
+      {
+        "name": "Allspring Government Money Market Fund",
+        "valUSD": 7944743.78,
+        "pctVal": 5.529747841728
+      },
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 7072032.5,
+        "pctVal": 4.922318143469
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 6802556.0,
+        "pctVal": 4.734755506393
+      },
+      {
+        "name": "Canva, Inc.",
+        "valUSD": 6219700.87,
+        "pctVal": 4.329073210474
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 5250000.0,
+        "pctVal": 3.654136240637
+      },
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 5000001.44,
+        "pctVal": 3.480130755265
+      },
+      {
+        "name": "Visual Layer, Inc.",
+        "valUSD": 5000000.0,
+        "pctVal": 3.480129752987
+      },
+      {
+        "name": "Inspectify, Inc.",
+        "valUSD": 4000000.0,
+        "pctVal": 2.78410380239
+      },
+      {
+        "name": "ZI TECH LLC/ZI FIN CORP",
+        "valUSD": 2727302.4,
+        "pctVal": 1.898273245527
+      },
+      {
+        "name": "ELASTIC NV",
+        "valUSD": 2056763.7,
+        "pctVal": 1.431560909447
+      },
+      {
+        "name": "Jetty National, Inc.",
+        "valUSD": 1999995.87,
+        "pctVal": 1.392049026607
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-09-30",
+    "filing_date": "2024-11-19",
+    "accession": "0001752724-24-257197",
+    "net_assets_usd": 156487557.41,
+    "total_assets_usd": 159119142.86,
+    "n_holdings": 25,
+    "top_holdings": [
+      {
+        "name": "DBH1 LP",
+        "valUSD": 28050428.0,
+        "pctVal": 17.92502130153
+      },
+      {
+        "name": "Quiet OA Access, LP",
+        "valUSD": 25500000.0,
+        "pctVal": 16.29522527033
+      },
+      {
+        "name": "ServiceTitan, Inc.",
+        "valUSD": 21329210.0,
+        "pctVal": 13.62997183483
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 9.585438132119
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 8989251.0,
+        "pctVal": 5.744387061041
+      },
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 7072032.5,
+        "pctVal": 4.519229910063
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 6802556.0,
+        "pctVal": 4.347026762119
+      },
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 6453347.44,
+        "pctVal": 4.123872560098
+      },
+      {
+        "name": "Canva, Inc.",
+        "valUSD": 6219700.87,
+        "pctVal": 3.974565756499
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 5250000.0,
+        "pctVal": 3.354899320362
+      },
+      {
+        "name": "Visual Layer, Inc.",
+        "valUSD": 5000000.0,
+        "pctVal": 3.195142209869
+      },
+      {
+        "name": "Inspectify, Inc.",
+        "valUSD": 4999965.01,
+        "pctVal": 3.195119850263
+      },
+      {
+        "name": "AI-LLM, LLC",
+        "valUSD": 3140990.0,
+        "pctVal": 2.007181945955
+      },
+      {
+        "name": "Allspring Government Money Market Fund",
+        "valUSD": 2790826.74,
+        "pctVal": 1.783417663481
+      },
+      {
+        "name": "Jetty National, Inc.",
+        "valUSD": 1999995.87,
+        "pctVal": 1.27805424476
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-12-31",
+    "filing_date": "2025-02-25",
+    "accession": "0001752724-25-037940",
+    "net_assets_usd": 189877114.28,
+    "total_assets_usd": 197097600.55,
+    "n_holdings": 25,
+    "top_holdings": [
+      {
+        "name": "DBH1 LP",
+        "valUSD": 35329635.0,
+        "pctVal": 18.60657885705
+      },
+      {
+        "name": "ServiceTitan, Inc.",
+        "valUSD": 30263942.52,
+        "pctVal": 15.93869942397
+      },
+      {
+        "name": "Quiet OA Access LP",
+        "valUSD": 25500000.0,
+        "pctVal": 13.42973854258
+      },
+      {
+        "name": "Allspring Government Money Market Fund",
+        "valUSD": 19189687.69,
+        "pctVal": 10.10637209374
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 7.899855681333
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 11322000.0,
+        "pctVal": 5.962803912905
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 7726950.0,
+        "pctVal": 4.069447773787
+      },
+      {
+        "name": "Canva, Inc.",
+        "valUSD": 7463680.0,
+        "pctVal": 3.930794939822
+      },
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 7072032.5,
+        "pctVal": 3.724531272142
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 6802556.0,
+        "pctVal": 3.582609745147
+      },
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 6453347.44,
+        "pctVal": 3.398696817397
+      },
+      {
+        "name": "Visual Layer, Inc.",
+        "valUSD": 5000000.0,
+        "pctVal": 2.633282067172
+      },
+      {
+        "name": "Inspectify, Inc.",
+        "valUSD": 4999965.01,
+        "pctVal": 2.633263639464
+      },
+      {
+        "name": "AI-LLM, LLC",
+        "valUSD": 3140990.0,
+        "pctVal": 1.654222528033
+      },
+      {
+        "name": "Theory Ventures, LP",
+        "valUSD": 2222406.12,
+        "pctVal": 1.170444436354
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-03-31",
+    "filing_date": "2025-05-22",
+    "accession": "0001752724-25-115447",
+    "net_assets_usd": 211665858.37,
+    "total_assets_usd": 218483902.09,
+    "n_holdings": 31,
+    "top_holdings": [
+      {
+        "name": "DBH1 LP",
+        "valUSD": 35292246.0,
+        "pctVal": 16.67356571899
+      },
+      {
+        "name": "ServiceTitan, Inc.",
+        "valUSD": 27980981.56,
+        "pctVal": 13.21941184821
+      },
+      {
+        "name": "Quiet OA Access LP",
+        "valUSD": 25500000.0,
+        "pctVal": 12.04729009976
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 7.086649739127
+      },
+      {
+        "name": "Allspring Government Money Market Fund",
+        "valUSD": 13387797.3,
+        "pctVal": 6.324967759607
+      },
+      {
+        "name": "SWCH Commercial Mortgage Trust 2025-DATA (E Class)",
+        "valUSD": 12357166.25,
+        "pctVal": 5.83805359313
+      },
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 12204478.0,
+        "pctVal": 5.765917136558
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 11322000.0,
+        "pctVal": 5.348996804297
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 7726950.0,
+        "pctVal": 3.650541499467
+      },
+      {
+        "name": "Canva, Inc.",
+        "valUSD": 7463680.0,
+        "pctVal": 3.526161496935
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 6802556.0,
+        "pctVal": 3.213818256938
+      },
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 6453347.44,
+        "pctVal": 3.048837204873
+      },
+      {
+        "name": "Visual Layer, Inc.",
+        "valUSD": 5000000.0,
+        "pctVal": 2.362213745052
+      },
+      {
+        "name": "Ramp Business Corp. - Preferred",
+        "valUSD": 4999988.0,
+        "pctVal": 2.362208075739
+      },
+      {
+        "name": "Inspectify, Inc.",
+        "valUSD": 4999965.01,
+        "pctVal": 2.36219721428
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-06-30",
+    "filing_date": "2025-08-22",
+    "accession": "0001867090-25-000011",
+    "net_assets_usd": 252593416.98,
+    "total_assets_usd": 276948643.76,
+    "n_holdings": 32,
+    "top_holdings": [
+      {
+        "name": "JP Morgan U.S. Treasury Plus Money Market Fund, Capital Shares",
+        "valUSD": 53497053.02,
+        "pctVal": 21.17911609083
+      },
+      {
+        "name": "Quiet OA Access LP",
+        "valUSD": 35807532.0,
+        "pctVal": 14.17595613856
+      },
+      {
+        "name": "DBH1 LP",
+        "valUSD": 35284783.0,
+        "pctVal": 13.96900339758
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 5.938404167194
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 12793560.0,
+        "pctVal": 5.064882589957
+      },
+      {
+        "name": "ServiceTitan, Inc.",
+        "valUSD": 12775427.28,
+        "pctVal": 5.057703970571
+      },
+      {
+        "name": "SWCH Commercial Mortgage Trust 2025-DATA (E Class)",
+        "valUSD": 12417137.5,
+        "pctVal": 4.915859505943
+      },
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 12204478.0,
+        "pctVal": 4.831669069572
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 11322000.0,
+        "pctVal": 4.482302086636
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 10248000.0,
+        "pctVal": 4.057112858492
+      },
+      {
+        "name": "VDCM Commercial Mortgage Trust 2025-AZ (D Class)",
+        "valUSD": 9080507.81,
+        "pctVal": 3.59491071405
+      },
+      {
+        "name": "Canva, Inc.",
+        "valUSD": 7463680.0,
+        "pctVal": 2.954819681856
+      },
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 6453347.44,
+        "pctVal": 2.5548359562
+      },
+      {
+        "name": "Ramp Business Corp.",
+        "valUSD": 6333318.0,
+        "pctVal": 2.507317124777
+      },
+      {
+        "name": "BX Trust 2025-VLT6 (E Class)",
+        "valUSD": 5000184.0,
+        "pctVal": 1.979538524709
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-09-30",
+    "filing_date": "2025-11-24",
+    "accession": "0001867090-25-000032",
+    "net_assets_usd": 361660064.74,
+    "total_assets_usd": 370533440.71,
+    "n_holdings": 39,
+    "top_holdings": [
+      {
+        "name": "DBH1 LP",
+        "valUSD": 57291300.0,
+        "pctVal": 15.84120161046
+      },
+      {
+        "name": "Quiet OA Access LP",
+        "valUSD": 35807532.0,
+        "pctVal": 9.900880824578
+      },
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 30675213.0,
+        "pctVal": 8.481780542193
+      },
+      {
+        "name": "JP Morgan U.S. Treasury Plus Money Market Fund, Capital Shares",
+        "valUSD": 26629554.67,
+        "pctVal": 7.36314491597
+      },
+      {
+        "name": "HOF Capital AG Follow On, LLC",
+        "valUSD": 19600000.0,
+        "pctVal": 5.419453766367
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 18360000.0,
+        "pctVal": 5.076590364822
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 4.147546124779
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 12793560.0,
+        "pctVal": 3.537454435063
+      },
+      {
+        "name": "SWITCH Data Centers - SWCH 2025-DATA E",
+        "valUSD": 12484377.5,
+        "pctVal": 3.451964625669
+      },
+      {
+        "name": "Epic Games, Inc.",
+        "valUSD": 12179210.01,
+        "pctVal": 3.367584977555
+      },
+      {
+        "name": "ServiceTitan, Inc.",
+        "valUSD": 12018532.68,
+        "pctVal": 3.323157255042
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 10248000.0,
+        "pctVal": 2.833600112129
+      },
+      {
+        "name": "Vanta, Inc.",
+        "valUSD": 10115608.02,
+        "pctVal": 2.796993366484
+      },
+      {
+        "name": "QTS Data Centers - BX 2025-VLT6 E",
+        "valUSD": 10008198.0,
+        "pctVal": 2.767294201308
+      },
+      {
+        "name": "Canva, Inc.",
+        "valUSD": 9598642.34,
+        "pctVal": 2.654050937833
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-12-31",
+    "filing_date": "2026-03-02",
+    "accession": "0001867090-26-000014",
+    "net_assets_usd": 437436130.67,
+    "total_assets_usd": 466233234.83,
+    "n_holdings": 54,
+    "top_holdings": [
+      {
+        "name": "DBH1 LP",
+        "valUSD": 72568980.0,
+        "pctVal": 16.58961729769
+      },
+      {
+        "name": "Quiet OA Access LP",
+        "valUSD": 40998905.01,
+        "pctVal": 9.372546558329
+      },
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 30675213.0,
+        "pctVal": 7.012500991405
+      },
+      {
+        "name": "JP Morgan U.S. Treasury Plus Money Market Fund, Capital Shares",
+        "valUSD": 26583774.91,
+        "pctVal": 6.077178597314
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 23256000.0,
+        "pctVal": 5.316433273214
+      },
+      {
+        "name": "HOF Capital AG Follow On, LLC",
+        "valUSD": 19600000.0,
+        "pctVal": 4.480654117431
+      },
+      {
+        "name": "Epic Games, Inc.",
+        "valUSD": 19179610.0,
+        "pctVal": 4.384550944757
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 3.429076143533
+      },
+      {
+        "name": "Flock Group, Inc.",
+        "valUSD": 13960757.95,
+        "pctVal": 3.19149630567
+      },
+      {
+        "name": "Ramp Business Corp.",
+        "valUSD": 13365000.0,
+        "pctVal": 3.055303177524
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 12793560.0,
+        "pctVal": 2.924669249521
+      },
+      {
+        "name": "ServiceTitan, Inc.",
+        "valUSD": 12694374.0,
+        "pctVal": 2.901994853638
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 12506666.0,
+        "pctVal": 2.859083903481
+      },
+      {
+        "name": "SWITCH Data Centers - SWCH 2025-DATA E",
+        "valUSD": 12450627.5,
+        "pctVal": 2.84627323329
+      },
+      {
+        "name": "Ramp Business Corp.",
+        "valUSD": 11999970.0,
+        "pctVal": 2.743250764773
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  }
+]

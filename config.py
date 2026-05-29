@@ -24,7 +24,7 @@ SEC_USER_AGENT = "special-situations-research weipeng_shao@berkeley.edu"
 DASHBOARD_DATA_DIR = "dashboard/data"
 
 # Situations the build pipeline knows about. Each maps to situations/<key>/.
-SITUATIONS = ["spacex_baron"]
+SITUATIONS = ["spacex_baron", "vcx_fundrise"]
 
 
 # ---------------------------------------------------------------------------
@@ -147,6 +147,93 @@ class SpacexBaron:
     CURRENT_SPACEX_VALUATION_USD = 1.25e12
     IPO_VALUATION_SCENARIOS_USD = [1.75e12, 2.0e12, 2.4e12]
     DEFAULT_NET_FLOW_SHOCK_USD = 0.0    # slider default; +inflow dilutes, -outflow concentrates
+
+
+# ---------------------------------------------------------------------------
+# Situation: OpenAI / Anthropic exposure via Fundrise Innovation Fund (VCX)
+# ---------------------------------------------------------------------------
+# Structurally the MIRROR IMAGE of the Baron case. Baron is an open-end fund
+# priced AT NAV carrying a stale-LOW private mark -> you buy cheap before a
+# re-rate. VCX is a closed-end fund trading at a HUGE PREMIUM to NAV -> even if
+# the underlying marks are stale-low, you OVERPAY through the wrapper. The thesis
+# here is the premium-to-NAV gap (and its compression risk, esp. at lockup),
+# not the underlying mark. Three stacked opacities: wrapper premium, NAV
+# staleness, and SPV look-through (OpenAI/Anthropic held via codenamed SPVs,
+# so their weights are SPONSOR-DISCLOSED, not SEC-verifiable).
+
+class VcxFundrise:
+    KEY = "vcx_fundrise"
+    TITLE = "OpenAI / Anthropic exposure via Fundrise Innovation Fund (VCX)"
+
+    WINDOW_START = "2026-03-19"   # NYSE direct-listing date
+
+    PRIMARY_TICKER = "VCX"
+    PRICE_TICKER = "VCX"          # Yahoo chart API
+    EDGAR_CIK = "0001867090"      # Fundrise Innovation Fund, LLC
+    EDGAR_SERIES_ID = None        # single-series LLC; NPORT filed at entity level
+
+    LISTING_DATE = "2026-03-19"
+    LOCKUP_EXPIRY_DATE = "2026-09-19"   # ~6mo; restricted pre-listing holders can sell -> premium-compression catalyst
+
+    # --- Sponsor-disclosed look-through (NOT SEC-verifiable; SPV codenames) ---
+    # Source: Fundrise VCX disclosures / press (web-verified 2026-05-29). In the
+    # NPORT-P these sit inside codenamed SPVs (DBH1 LP, Quiet OA Access LP, etc.),
+    # so treat as sponsor-disclosed with explicit low/med confidence.
+    LOOKTHROUGH = [
+        {"name": "Anthropic", "weight": 0.207, "as_of": "2026-02-15", "confidence": "med",
+         "source": "Fundrise VCX disclosure / Motley Fool, Investing.com (Anthropic ~20.7%, largest position)",
+         "source_url": "https://www.investing.com/analysis/how-to-invest-in-anthropic-via-etfs-and-term-trusts-200674883"},
+        {"name": "Databricks", "weight": 0.177, "as_of": "2026-02-15", "confidence": "med",
+         "source": "Fundrise VCX disclosure", "source_url": "https://fundrise.com/vcx"},
+        {"name": "OpenAI", "weight": 0.099, "as_of": "2026-02-15", "confidence": "med",
+         "source": "Fundrise VCX participated in OpenAI's $122B round; ~9.9% disclosed",
+         "source_url": "https://fundrise.com/vcx/newsroom/vcx-participates-in-openai-122-billion-funding-round"},
+        {"name": "Anduril", "weight": 0.069, "as_of": "2026-02-15", "confidence": "med",
+         "source": "Fundrise VCX disclosure", "source_url": "https://fundrise.com/vcx"},
+        {"name": "Ramp", "weight": 0.051, "as_of": "2026-02-15", "confidence": "med",
+         "source": "Fundrise VCX disclosure", "source_url": "https://fundrise.com/vcx"},
+        {"name": "SpaceX", "weight": 0.050, "as_of": "2026-02-15", "confidence": "med",
+         "source": "Fundrise VCX disclosure", "source_url": "https://fundrise.com/vcx"},
+    ]
+
+    # --- Underlying private valuation marks (whole-company, web-verified) -----
+    # For the IPO/re-rate scenario on the two headline names.
+    UNDERLYING_MARKS = {
+        "Anthropic": {"current_valuation_usd": 965e9, "current_basis": "Series H ~$965B (May 2026)",
+                      "ipo_target_usd": 450e9, "ipo_window": "Oct 2026 (target $400-500B)",
+                      "source_url": "https://www.cnbc.com/2026/05/28/anthropic-open-ai-startup-value.html",
+                      "note": "Series H ($965B) is ABOVE the reported $400-500B IPO target -> re-rate could be DOWN."},
+        "OpenAI": {"current_valuation_usd": 852e9, "current_basis": "$122B round ~$852B (Mar 2026)",
+                   "ipo_target_usd": 852e9, "ipo_window": "late 2026 / 2027 (unconfirmed)",
+                   "source_url": "https://techcrunch.com/2026/03/31/openai-not-yet-public-raises-3b-from-retail-investors-in-monster-122b-fund-raise/",
+                   "note": "Last primary ~$852B; no firm IPO date."},
+    }
+
+    # --- NAV log (sponsor-published NAV; cowork/bookmarklet appends) ----------
+    NAV_LOG = "situations/vcx_fundrise/data/vcx_nav_log.jsonl"
+    # Committed seed NAV prints (web-verified). NAV is published periodically by
+    # Fundrise; price is daily (Yahoo). Premium = price/NAV - 1.
+    NAV_REPORTED = [
+        {"date": "2025-12-31", "nav_per_share": 18.26, "confidence": "high",
+         "source": "VCX NPORT-P net assets / units (2025-12-31)",
+         "source_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001867090&type=NPORT-P"},
+        {"date": "2026-03-31", "nav_per_share": 18.97, "confidence": "med",
+         "source": "Fundrise-reported NAV ~$18.97 (late Apr 2026 disclosure)",
+         "source_url": "https://www.crowdfundedwealth.com/articles/fundrise-vcx-review"},
+    ]
+
+    # (date, label, kind) kind in {listing, mark, ipo, lockup, corporate}
+    EVENTS = [
+        ("2026-03-19", "NYSE direct listing (VCX)", "listing"),
+        ("2026-02-11", "DXYZ/peers add Anthropic SPVs; AI pre-IPO frenzy", "mark"),
+        ("2026-05-28", "Anthropic Series H ~$965B (tops OpenAI)", "mark"),
+        ("2026-09-19", "~6-month lockup expiry (premium-compression risk)", "lockup"),
+        ("2026-10-15", "Anthropic IPO target window (~$400-500B)", "ipo"),
+    ]
+
+    # Headline scenario name + premium normalization targets for the lab.
+    HEADLINE_NAME = "Anthropic"
+    PREMIUM_SCENARIOS = [0.0, 0.25, 0.50, 1.0]   # premium-to-NAV the price could revert to
 
 
 def situation_dir(key: str) -> str:
