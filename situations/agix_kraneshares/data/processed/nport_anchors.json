@@ -1,0 +1,366 @@
+[
+  {
+    "report_date": "2025-06-30",
+    "filing_date": "2025-08-28",
+    "accession": "0001752724-25-211482",
+    "series_id": "S000085506",
+    "series_name": "KraneShares Artificial Intelligence and Technology ETF",
+    "net_assets_usd": 28341039.59,
+    "total_assets_usd": 28363099.66,
+    "n_holdings": 45,
+    "anthropic_value_usd": 999966.21,
+    "anthropic_pct": 3.5283,
+    "top_holdings": [
+      {
+        "name": "META PLATFORMS, INC.",
+        "valUSD": 2212055.73,
+        "pctVal": 7.805132634515
+      },
+      {
+        "name": "MICROSOFT CORPORATION",
+        "valUSD": 1494717.05,
+        "pctVal": 5.2740374793
+      },
+      {
+        "name": "AMAZON.COM, INC.",
+        "valUSD": 1427131.95,
+        "pctVal": 5.035566692844
+      },
+      {
+        "name": "NVIDIA CORPORATION",
+        "valUSD": 1280034.98,
+        "pctVal": 4.516542083557
+      },
+      {
+        "name": "ANTHROPIC, PBC SERIES E-1 PREFERRED STOCK",
+        "valUSD": 999966.21,
+        "pctVal": 3.528332850404
+      },
+      {
+        "name": "Nebius Group N.V.",
+        "valUSD": 961856.72,
+        "pctVal": 3.393865341267
+      },
+      {
+        "name": "APPLE INC.",
+        "valUSD": 883051.68,
+        "pctVal": 3.115805534217
+      },
+      {
+        "name": "ALPHABET INC.",
+        "valUSD": 876215.56,
+        "pctVal": 3.091684612406
+      },
+      {
+        "name": "SERVICENOW, INC.",
+        "valUSD": 784425.04,
+        "pctVal": 2.767806161481
+      },
+      {
+        "name": "BROADCOM INC.",
+        "valUSD": 775679.1,
+        "pctVal": 2.736946531325
+      },
+      {
+        "name": "SALESFORCE, INC.",
+        "valUSD": 774712.29,
+        "pctVal": 2.733535188572
+      },
+      {
+        "name": "TESLA, INC.",
+        "valUSD": 762066.34,
+        "pctVal": 2.688914560032
+      },
+      {
+        "name": "ORACLE CORPORATION",
+        "valUSD": 756022.54,
+        "pctVal": 2.66758930137
+      },
+      {
+        "name": "PALANTIR TECHNOLOGIES INC.",
+        "valUSD": 727812.48,
+        "pctVal": 2.568051456576
+      },
+      {
+        "name": "Taiwan Semiconductor Manufacturing Co., Ltd.",
+        "valUSD": 653156.24,
+        "pctVal": 2.304630491502
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-09-30",
+    "filing_date": "2025-11-26",
+    "accession": "0002048251-25-002516",
+    "series_id": "S000085506",
+    "series_name": "KraneShares Artificial Intelligence and Technology ETF",
+    "net_assets_usd": 89719453.01,
+    "total_assets_usd": 89782784.89,
+    "n_holdings": 51,
+    "anthropic_value_usd": 2975660.1,
+    "anthropic_pct": 3.3166,
+    "top_holdings": [
+      {
+        "name": "MICROSOFT CORPORATION",
+        "valUSD": 4492698.3,
+        "pctVal": 5.007496311306
+      },
+      {
+        "name": "META PLATFORMS, INC.",
+        "valUSD": 4487061.8,
+        "pctVal": 5.001213950223
+      },
+      {
+        "name": "ALPHABET INC.",
+        "valUSD": 3438163.3,
+        "pctVal": 3.832126907435
+      },
+      {
+        "name": "AMAZON.COM, INC.",
+        "valUSD": 3322094.1,
+        "pctVal": 3.70275786192
+      },
+      {
+        "name": "NVIDIA CORPORATION",
+        "valUSD": 3310488.94,
+        "pctVal": 3.689822919039
+      },
+      {
+        "name": "Nebius Group N.V.",
+        "valUSD": 3116053.85,
+        "pctVal": 3.473108390053
+      },
+      {
+        "name": "ANTHROPIC, PBC SERIES E-1 PREFERRED STOCK",
+        "valUSD": 2975660.1,
+        "pctVal": 3.316627554191
+      },
+      {
+        "name": "TESLA, INC.",
+        "valUSD": 2793286.32,
+        "pctVal": 3.113356386255
+      },
+      {
+        "name": "APPLOVIN CORPORATION",
+        "valUSD": 2491896.72,
+        "pctVal": 2.777431912923
+      },
+      {
+        "name": "SERVICENOW, INC.",
+        "valUSD": 2460828.72,
+        "pctVal": 2.742803971091
+      },
+      {
+        "name": "APPLE INC.",
+        "valUSD": 2386137.73,
+        "pctVal": 2.659554477816
+      },
+      {
+        "name": "TEMPUS AI, INC",
+        "valUSD": 2185465.38,
+        "pctVal": 2.435887989371
+      },
+      {
+        "name": "ORACLE CORPORATION",
+        "valUSD": 2106206.36,
+        "pctVal": 2.347547036165
+      },
+      {
+        "name": "NETFLIX, INC.",
+        "valUSD": 2083722.96,
+        "pctVal": 2.322487364883
+      },
+      {
+        "name": "PALANTIR TECHNOLOGIES INC.",
+        "valUSD": 2066818.6,
+        "pctVal": 2.303646010603
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-12-31",
+    "filing_date": "2026-02-27",
+    "accession": "0002048251-26-001564",
+    "series_id": "S000085506",
+    "series_name": "KraneShares Artificial Intelligence and Technology ETF",
+    "net_assets_usd": 92643517.68,
+    "total_assets_usd": 92727598.1,
+    "n_holdings": 53,
+    "anthropic_value_usd": 3886722.0,
+    "anthropic_pct": 4.1954,
+    "top_holdings": [
+      {
+        "name": "XAI HOLDINGS CORP PRIVATE COMPANY",
+        "valUSD": 6096036.1,
+        "pctVal": 6.580099992593
+      },
+      {
+        "name": "META PLATFORMS, INC.",
+        "valUSD": 5514391.86,
+        "pctVal": 5.95226951447
+      },
+      {
+        "name": "MICROSOFT CORPORATION",
+        "valUSD": 4498633.24,
+        "pctVal": 4.855853223901
+      },
+      {
+        "name": "ANTHROPIC, PBC SERIES E-1 PREFERRED STOCK",
+        "valUSD": 3886722.0,
+        "pctVal": 4.195352354198
+      },
+      {
+        "name": "ALPHABET INC.",
+        "valUSD": 3838006.0,
+        "pctVal": 4.142767995119
+      },
+      {
+        "name": "NVIDIA CORPORATION",
+        "valUSD": 3195304.5,
+        "pctVal": 3.449031923676
+      },
+      {
+        "name": "AMAZON.COM, INC.",
+        "valUSD": 2701286.46,
+        "pctVal": 2.915785721058
+      },
+      {
+        "name": "TESLA, INC.",
+        "valUSD": 2602979.36,
+        "pctVal": 2.809672414416
+      },
+      {
+        "name": "SERVICENOW, INC.",
+        "valUSD": 2287586.27,
+        "pctVal": 2.469235114648
+      },
+      {
+        "name": "APPLE INC.",
+        "valUSD": 2267856.12,
+        "pctVal": 2.447938265722
+      },
+      {
+        "name": "PALANTIR TECHNOLOGIES INC.",
+        "valUSD": 2224185.75,
+        "pctVal": 2.400800191636
+      },
+      {
+        "name": "SALESFORCE, INC.",
+        "valUSD": 2186567.14,
+        "pctVal": 2.360194425639
+      },
+      {
+        "name": "SHOPIFY INC.",
+        "valUSD": 2092385.92,
+        "pctVal": 2.258534620012
+      },
+      {
+        "name": "BROADCOM INC.",
+        "valUSD": 1961002.6,
+        "pctVal": 2.116718631921
+      },
+      {
+        "name": "Taiwan Semiconductor Manufacturing Co., Ltd.",
+        "valUSD": 1923903.18,
+        "pctVal": 2.0766732829
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2026-03-31",
+    "filing_date": "2026-05-29",
+    "accession": "0002048251-26-004683",
+    "series_id": "S000085506",
+    "series_name": "KraneShares Artificial Intelligence and Technology ETF",
+    "net_assets_usd": 171473295.64,
+    "total_assets_usd": 201279513.57,
+    "n_holdings": 57,
+    "anthropic_value_usd": 4724685.0,
+    "anthropic_pct": 2.7553,
+    "top_holdings": [
+      {
+        "name": "NVIDIA CORPORATION",
+        "valUSD": 9043686.4,
+        "pctVal": 5.274107764853
+      },
+      {
+        "name": "MICROSOFT CORPORATION",
+        "valUSD": 6909963.39,
+        "pctVal": 4.029760648274
+      },
+      {
+        "name": "META PLATFORMS, INC.",
+        "valUSD": 6302584.08,
+        "pctVal": 3.675548461628
+      },
+      {
+        "name": "SPACEX CLASS A COMMON PRIVATE COMPANY",
+        "valUSD": 6096332.43,
+        "pctVal": 3.555266379669
+      },
+      {
+        "name": "ALPHABET INC.",
+        "valUSD": 5800085.2,
+        "pctVal": 3.382500568588
+      },
+      {
+        "name": "APPLE INC.",
+        "valUSD": 5687433.9,
+        "pctVal": 3.316804449796
+      },
+      {
+        "name": "BROADCOM INC.",
+        "valUSD": 5339357.01,
+        "pctVal": 3.113812556101
+      },
+      {
+        "name": "Taiwan Semiconductor Manufacturing Company Limited",
+        "valUSD": 4954644.98,
+        "pctVal": 2.889455737995
+      },
+      {
+        "name": "AMAZON.COM, INC.",
+        "valUSD": 4839153.45,
+        "pctVal": 2.822103250502
+      },
+      {
+        "name": "ANTHROPIC, PBC SERIES E-1 PREFERRED STOCK",
+        "valUSD": 4724685.0,
+        "pctVal": 2.755347404017
+      },
+      {
+        "name": "TESLA, INC.",
+        "valUSD": 3925308.25,
+        "pctVal": 2.289165922512
+      },
+      {
+        "name": "PALANTIR TECHNOLOGIES INC.",
+        "valUSD": 3625110.96,
+        "pctVal": 2.114096510753
+      },
+      {
+        "name": "NETFLIX, INC.",
+        "valUSD": 3565530.45,
+        "pctVal": 2.079350278241
+      },
+      {
+        "name": "ORACLE CORPORATION",
+        "valUSD": 3436048.27,
+        "pctVal": 2.003838706881
+      },
+      {
+        "name": "CLOUDFLARE, INC.",
+        "valUSD": 3353644.02,
+        "pctVal": 1.955782098596
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  }
+]

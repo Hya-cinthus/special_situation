@@ -24,10 +24,7 @@ SEC_USER_AGENT = "special-situations-research weipeng_shao@berkeley.edu"
 DASHBOARD_DATA_DIR = "dashboard/data"
 
 # Situations the build pipeline knows about. Each maps to situations/<key>/.
-SITUATIONS = ["spacex_baron", "vcx_fundrise", "dxyz_destiny", "rvi_robinhood"]
-# NOTE: agix_kraneshares pulled pending verified holdings data — the KraneShares
-# trust files NPORT for 100+ ETFs and the Anthropic line must be confirmed from
-# the correct series before publishing. Do not re-add until verified.
+SITUATIONS = ["spacex_baron", "vcx_fundrise", "dxyz_destiny", "rvi_robinhood", "agix_kraneshares"]
 
 
 # ---------------------------------------------------------------------------
@@ -430,6 +427,65 @@ class RviRobinhood:
     ]
     HEADLINE_NAME = "OpenAI"
     PREMIUM_SCENARIOS = [0.0, 0.10, 0.25, 0.50]
+
+
+# ---------------------------------------------------------------------------
+# Situation: Anthropic exposure via KraneShares AI & Technology ETF (AGIX)
+# ---------------------------------------------------------------------------
+# The CONTROL case, and structurally different: AGIX is an ETF, so create/redeem
+# keeps price ~ NAV (no premium-to-NAV play). Anthropic is a DIRECT, SEC-named
+# holding (its title is "ANTHROPIC, PBC SERIES E-1 PREFERRED STOCK"; the NPORT
+# <name> field is "N/A", so the parser must read <title>). All numbers below are
+# SEC-VERIFIED from the AGIX series (S000085506) NPORT-P, not web-scraped.
+#
+# Verified Anthropic concentration history (NPORT, seriesId S000085506):
+#   2025-06-30  net $28.3M  Anthropic $1.00M = 3.53%
+#   2025-09-30  net $89.7M  Anthropic $2.98M = 3.32%
+#   2025-12-31  net $92.6M  Anthropic $3.89M = 4.20%
+#   2026-03-31  net $171.5M Anthropic $4.72M = 2.76%   <- diluted as fund grew
+# So this is the at-NAV, low-concentration, INFLOW-DILUTED case (a clean parallel
+# to the Baron dilution story, opposite to the CEF premium traps).
+
+class AgixKraneshares:
+    KEY = "agix_kraneshares"
+    TITLE = "Anthropic exposure via KraneShares AI & Technology ETF (AGIX)"
+    WINDOW_START = "2025-02-01"
+    PRIMARY_TICKER = "AGIX"
+    PRICE_TICKER = "AGIX"
+    EDGAR_CIK = "0001547576"             # Krane Shares Trust (multi-series!)
+    EDGAR_SERIES_ID = "S000085506"       # AGIX — REQUIRED to filter the right series
+    LISTING_DATE = "2025-01-23"
+    LOCKUP_EXPIRY_DATE = None
+    IS_ETF = True
+
+    # Anthropic identified by NPORT <title> (name is "N/A"). SEC-verified, high conf.
+    HOLDING_TITLE_MATCH = "anthropic"
+    LOOKTHROUGH = [
+        {"name": "Anthropic", "weight": 0.0276, "as_of": "2026-03-31", "confidence": "high",
+         "source": "AGIX NPORT 3/31 (seriesId S000085506): 'ANTHROPIC, PBC SERIES E-1 PREFERRED' "
+                   "$4.72M = 2.76% — DIRECT named holding (in <title>)",
+         "source_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001547576&type=NPORT-P"},
+    ]
+
+    @staticmethod
+    def valuation_timeline():
+        return VcxFundrise.VALUATION_TIMELINE
+
+    UNDERLYING_MARKS = {
+        "Anthropic": {"current_valuation_usd": 965e9, "ipo_target_usd": 450e9,
+                      "source_url": "https://www.cnbc.com/2026/05/28/anthropic-open-ai-startup-value.html"},
+    }
+
+    EXPENSE_RATIO = 0.0099
+    # AGIX entered Anthropic ~Feb-2025 (~$18B valuation); flag approx.
+    ANTHROPIC_COST_BASIS_VALUATION = 18e9
+
+    EVENTS = [
+        ("2025-02-01", "AGIX adds direct Anthropic stake (~$18B val)", "mark"),
+        ("2026-05-28", "Anthropic Series H ~$965B", "mark"),
+        ("2026-10-15", "Anthropic IPO target (~$400-500B)", "ipo"),
+    ]
+    HEADLINE_NAME = "Anthropic"
 
 
 def situation_dir(key: str) -> str:

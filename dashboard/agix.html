@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Special Situations — Anthropic via AGIX</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="sit-title">Special Situations</h1>
+    <span class="sub" id="sit-subtitle"></span>
+    <nav class="sitnav">
+      <a href="index.html">SpaceX · Baron</a>
+      <a href="vcx.html">OpenAI/Anthropic · VCX</a>
+      <a href="dxyz.html">Pre-IPO tech · DXYZ</a>
+      <a href="rvi.html">OpenAI · RVI</a>
+      <a href="agix.html" class="active">Anthropic · AGIX</a>
+    </nav>
+  </header>
+  <div class="disclaimer" id="disclaimer"></div>
+
+  <main>
+    <div id="loading" class="loading">Loading situation data…</div>
+    <div id="error" class="error" style="display:none"></div>
+
+    <div id="content" style="display:none">
+      <div class="kpis" id="kpis"></div>
+
+      <section class="card" id="thesis">
+        <h2>The setup — the clean, at-NAV control case</h2>
+        <div id="thesis-body"></div>
+      </section>
+
+      <section class="card">
+        <h2>Anthropic concentration over time — the real story</h2>
+        <p class="desc">
+          Since AGIX trades at NAV, the question isn't premium — it's <b>how much Anthropic you own</b>.
+          Bars = fund net assets (growing on inflows). Orange line = Anthropic % of the fund, straight from
+          each quarter's SEC NPORT (direct, named holding). The amber diamond is the estimated weight
+          <em>now</em> after Anthropic's Series H re-rate. Note the weight <b>fell</b> as assets grew — the
+          same inflow dilution as the Baron case.
+        </p>
+        <div id="chart-conc" class="chart" style="height:420px"></div>
+      </section>
+
+      <section class="card" id="holding-marks-card">
+        <h2>Mark-to-market — the Anthropic sleeve</h2>
+        <p class="desc">How far Anthropic has re-rated since AGIX's last filing mark. Each valuation links to its funding-round source. <b>Estimate, low confidence.</b></p>
+        <div id="holding-marks"></div>
+      </section>
+
+      <section class="card">
+        <h2>AGIX price</h2>
+        <p class="desc">For an ETF, price ≈ NAV (create/redeem arbitrage). Shown for completeness — there's no premium to track.</p>
+        <div id="chart-price" class="chart" style="height:300px"></div>
+      </section>
+
+      <section class="card">
+        <h2>SEC filing — Anthropic is a direct, named holding</h2>
+        <p class="desc">Latest NPORT-P (seriesId S000085506). Unlike the CEFs, Anthropic appears by name (in the title field). <a id="edgar-link" target="_blank" rel="noopener">Browse on EDGAR ↗</a></p>
+        <div class="scroll-y"><table class="data" id="nport-table">
+          <thead><tr><th>Holding (as filed)</th><th>% of fund</th><th>Value</th></tr></thead><tbody></tbody>
+        </table></div>
+      </section>
+
+      <p class="desc" id="footer-meta" style="text-align:center;margin-top:30px"></p>
+    </div>
+  </main>
+
+  <script src="agix_app.js"></script>
+</body>
+</html>
