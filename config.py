@@ -27,6 +27,138 @@ DASHBOARD_DATA_DIR = "dashboard/data"
 SITUATIONS = ["spacex_baron", "vcx_fundrise", "dxyz_destiny", "rvi_robinhood", "agix_kraneshares"]
 
 
+# ===========================================================================
+# CROSS-VEHICLE OVERVIEW: normalized private-company + vehicle registries
+# ===========================================================================
+# These power the one-page research memo (dashboard/overview.html). They are
+# CURATED, web-verified scenario inputs — every number carries a source +
+# confidence. bear/base/bull are WHOLE-COMPANY valuations (USD). `current` is
+# the mark the vehicles are presently carrying (what scenarios scale FROM).
+# Ranges, not false precision: where reports conflict we widen bear..bull.
+
+PRIVATE_COMPANIES = {
+    "SpaceX": {
+        "sector": "Space / satellite (Starlink)",
+        "current": 1.25e12,            # SpaceX+xAI combined mark carried in funds
+        "bear": 0.90e12, "base": 1.25e12, "bull": 2.0e12,
+        "last_confirmed": {"val": 1.25e12, "date": "2026-02-02",
+                           "source_type": "merger (press)", "confidence": "high"},
+        "rumored_range": "IPO targeted ~$1.75T–$2.0T (S-1 filed 2026-05-20, SPCX)",
+        "source_url": "https://www.cnbc.com/2026/05/20/spacex-ipo-live-updates.html",
+        "notes": "Mid-IPO. Bull = IPO upper range; bear = post-hype markdown. xAI portion adds uncertainty.",
+    },
+    "OpenAI": {
+        "sector": "AI foundation models",
+        "current": 852e9,
+        "bear": 500e9, "base": 852e9, "bull": 1.10e12,
+        "last_confirmed": {"val": 852e9, "date": "2026-03-31",
+                           "source_type": "funding round", "confidence": "high"},
+        "rumored_range": "$852B last round; secondary chatter $1T+; no firm IPO date",
+        "source_url": "https://www.cnbc.com/2026/03/31/openai-funding-round-ipo.html",
+        "notes": "Heavy losses ($4.9B+); bull on revenue scale, bear on AI-capex sentiment turn.",
+    },
+    "Anthropic": {
+        "sector": "AI foundation models (Claude)",
+        "current": 965e9,
+        "bear": 500e9, "base": 965e9, "bull": 1.30e12,
+        "last_confirmed": {"val": 965e9, "date": "2026-05-28",
+                           "source_type": "funding round (Series H)", "confidence": "high"},
+        "rumored_range": "Series H ~$965B; IPO TARGET only $400–500B (Oct-2026) — could re-rate DOWN",
+        "source_url": "https://www.cnbc.com/2026/05/28/anthropic-open-ai-startup-value.html",
+        "notes": "KEY ASYMMETRY: latest private mark ($965B) is ABOVE the reported IPO target ($400-500B). "
+                 "Bear reflects an IPO at/below target.",
+    },
+    "Databricks": {
+        "sector": "Data / AI infrastructure",
+        "current": 134e9, "bear": 100e9, "base": 134e9, "bull": 200e9,
+        "last_confirmed": {"val": 134e9, "date": "2025-12-16",
+                           "source_type": "funding round (Series L)", "confidence": "high"},
+        "rumored_range": "$134B Series L (Dec-2025); 2026 IPO candidate",
+        "source_url": "https://www.cnbc.com/2025/12/16/databricks-funding-valuation.html",
+        "notes": "Profitable-ish, ~$5B+ ARR; cleaner story than the AI labs.",
+    },
+    "Anduril": {
+        "sector": "Defense tech",
+        "current": 61e9, "bear": 40e9, "base": 61e9, "bull": 90e9,
+        "last_confirmed": {"val": 61e9, "date": "2026-05-13",
+                           "source_type": "funding round (Series H)", "confidence": "high"},
+        "rumored_range": "$61B Series H (May-2026); secondary chatter higher",
+        "source_url": "https://techcrunch.com/2026/05/13/anduril-raises-5b-doubles-valuation-to-61b/",
+        "notes": "Doubled in ~1yr; defense-budget tailwind.",
+    },
+    "Ramp": {
+        "sector": "Fintech (spend mgmt)",
+        "current": 32e9, "bear": 22e9, "base": 32e9, "bull": 45e9,
+        "last_confirmed": {"val": 32e9, "date": "2025-11-17",
+                           "source_type": "funding round", "confidence": "high"},
+        "rumored_range": "$32B (Nov-2025); in talks at $40B+ (May-2026)",
+        "source_url": "https://news.crunchbase.com/venture/fintech-unicorn-ramp-300m-raise-lightspeed/",
+        "notes": "Fast revenue growth; bull on the rumored $40B+ round.",
+    },
+}
+
+# Curated per-vehicle research metadata (type, structure risk, data-quality
+# rationale, the one key risk, and how clean the exposure is). Numbers come from
+# the emitted per-vehicle JSON; these are the qualitative judgments.
+VEHICLE_META = {
+    "spacex_baron": {
+        "ticker": "BPTRX", "name": "Baron Partners Fund", "type": "Open-end mutual fund",
+        "headline": "SpaceX", "buyable": "Mutual fund (buy at NAV daily)",
+        "fee": "1.05% (+ ~0.95% interest on leverage)", "liquidity": "Daily at NAV",
+        "data_confidence": "high",
+        "confidence_reasons": "SEC NPORT-P quarterly, SpaceX re-marked each filing; only between-filing AUM is estimated.",
+        "structure_note": "Levered (~113% long). At NAV — no wrapper premium.",
+        "key_risk": "Stale $1.25T SpaceX mark + flow dilution; leverage cuts both ways.",
+        "reason_buy": "Cleanest large SpaceX exposure at NAV; IPO re-rate not yet in NAV.",
+        "reason_avoid": "Diluted by heavy inflows (37%→~27%); not a pure-play.",
+    },
+    "vcx_fundrise": {
+        "ticker": "VCX", "name": "Fundrise Innovation Fund", "type": "Closed-end fund",
+        "headline": "Anthropic", "buyable": "NYSE (or at NAV via Fundrise platform)",
+        "fee": "~1.85% all-in", "liquidity": "Exchange (no redemption); 9/19 lockup",
+        "data_confidence": "low",
+        "confidence_reasons": "OpenAI/Anthropic held via codenamed SPVs; weights sponsor-disclosed, NAV stale & sticky.",
+        "structure_note": "Extreme premium to NAV; lockup-expiry supply shock 2026-09-19.",
+        "key_risk": "~+1,000% stale / ~+480% MTM premium — premium compression dwarfs upside.",
+        "reason_buy": "Highest Anthropic concentration of the set (if premium holds).",
+        "reason_avoid": "You massively overpay through the wrapper; opaque SPVs.",
+    },
+    "dxyz_destiny": {
+        "ticker": "DXYZ", "name": "Destiny Tech100", "type": "Closed-end fund",
+        "headline": "SpaceX", "buyable": "NYSE", "fee": "~2.5%",
+        "liquidity": "Exchange; ATM-offering overhang",
+        "data_confidence": "low",
+        "confidence_reasons": "SpaceX/OpenAI/Anthropic via SPVs; ~46% cash; quarterly NAV.",
+        "structure_note": "Moderate, measurable premium; quarterly-published NAV.",
+        "key_risk": "Sentiment-driven premium (~+110%); ATM issuance caps upside.",
+        "reason_buy": "Most measurable premium signal; diversified pre-IPO basket.",
+        "reason_avoid": "~46% cash dilutes exposure; premium still rich.",
+    },
+    "rvi_robinhood": {
+        "ticker": "RVI", "name": "Robinhood Ventures Fund I", "type": "Closed-end fund",
+        "headline": "OpenAI", "buyable": "NYSE", "fee": "~2.5%",
+        "liquidity": "Exchange (no redemption)",
+        "data_confidence": "med",
+        "confidence_reasons": "NPORT names holdings directly (cleanest CEF), but OpenAI stake post-dates 3/31 filing; ~53% cash.",
+        "structure_note": "Newest CEF; premium spiked ~+190% then faded to ~+90%.",
+        "key_risk": "~53% cash + premium; OpenAI weight not yet in a filing.",
+        "reason_buy": "Cleanest disclosure; direct OpenAI access with modest-ish premium.",
+        "reason_avoid": "Half cash; still a premium; OpenAI weight unconfirmed in SEC data.",
+    },
+    "agix_kraneshares": {
+        "ticker": "AGIX", "name": "KraneShares AI & Technology ETF", "type": "ETF",
+        "headline": "Anthropic", "buyable": "NYSE/Nasdaq (ETF, at NAV)", "fee": "0.99%",
+        "liquidity": "Intraday at NAV (create/redeem)",
+        "data_confidence": "high",
+        "confidence_reasons": "Anthropic is a DIRECT SEC-named holding; ETF trades at NAV.",
+        "structure_note": "At NAV — no premium. Low, falling concentration (4.2%→2.76%).",
+        "key_risk": "Low concentration (~3%) and diluted by inflows; mostly public AI stocks.",
+        "reason_buy": "Clean, liquid, low-fee, SEC-verifiable Anthropic sliver; no premium risk.",
+        "reason_avoid": "Too diluted for a concentrated private-AI bet.",
+    },
+}
+
+
 # ---------------------------------------------------------------------------
 # Situation: SpaceX exposure via Baron Partners Fund
 # ---------------------------------------------------------------------------

@@ -126,6 +126,13 @@ def main(argv):
             print(f"!! unknown situation '{key}' (known: {list(BUILDERS)})")
             continue
         BUILDERS[key](do_fetch=do_fetch)
+    # Cross-vehicle overview memo (reads the per-vehicle JSONs just written).
+    try:
+        import overview
+        p = overview.write_json()
+        print(f"[overview] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[overview] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 

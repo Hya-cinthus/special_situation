@@ -166,3 +166,47 @@ td.spxcell { color: var(--spacex); font-weight: 600; }
 
 .loading { padding: 60px; text-align: center; color: var(--muted); }
 .error { padding: 20px; color: var(--bad); background: #2a1515; border: 1px solid #5a2020; border-radius: 8px; }
+
+/* ===== overview research-memo page ===== */
+.sumrow { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:20px; }
+@media (max-width:900px){ .sumrow{ grid-template-columns:repeat(2,1fr);} }
+.sumtile { display:block; background:var(--panel); border:1px solid var(--border); border-top:3px solid var(--accent);
+  border-radius:10px; padding:12px 14px; color:var(--text); }
+.sumtile:hover { text-decoration:none; border-color:var(--accent); }
+.sumlabel { color:var(--muted); font-size:.7rem; text-transform:uppercase; letter-spacing:.5px; }
+.sumticker { font-size:1.5rem; font-weight:700; margin:3px 0; }
+.sumsub { color:var(--muted); font-size:.74rem; line-height:1.4; }
+.scroll-x { overflow-x:auto; }
+table.cmp th, table.cmp td { text-align:center; vertical-align:top; }
+table.cmp td:first-child, table.cmp th:first-child,
+table.cmp td.risk, table.cmp th:nth-child(9) { text-align:left; }
+table.cmp td.risk { max-width:240px; white-space:normal; color:var(--muted); font-size:.76rem; }
+.dim { color:var(--muted); font-size:.72rem; font-weight:400; }
+.verdict { display:inline-block; padding:2px 8px; border-radius:5px; font-size:.7rem; font-weight:700; letter-spacing:.4px; }
+.cardgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:14px; }
+.vcard { background:var(--panel-2); border:1px solid var(--border); border-left:4px solid var(--accent);
+  border-radius:10px; padding:13px 15px; }
+.vhead { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.vmeta { color:var(--muted); font-size:.74rem; margin:5px 0; }
+.vlt { font-size:.82rem; margin:5px 0 10px; }
+.scrow { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:10px; }
+.sc { background:var(--bg); border:1px solid var(--border); border-radius:7px; padding:6px; text-align:center; }
+.sclab { color:var(--muted); font-size:.66rem; text-transform:uppercase; }
+.scval { font-size:1.1rem; font-weight:700; }
+.vrow { font-size:.8rem; margin:4px 0; line-height:1.45; }
+.vrow .up { color:var(--good); font-weight:600; } .vrow .dn { color:var(--bad); font-weight:600; }
+.vwarn { font-size:.72rem; color:var(--warn); margin-top:8px; line-height:1.4; }
+.ccard { background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:13px 15px; }
+.chead { font-size:1rem; margin-bottom:8px; }
+.crange { font-size:.82rem; }
+.crange .bar { position:relative; display:inline-block; width:90px; height:4px; background:linear-gradient(90deg,var(--bad),var(--warn),var(--good));
+  border-radius:2px; margin:0 6px; vertical-align:middle; }
+.crange .dot { position:absolute; top:-3px; width:10px; height:10px; border-radius:50%; background:#fff; border:2px solid var(--bg); transform:translateX(-50%); }
+.cbase { margin-top:5px; font-size:.8rem; }
+.crum { font-size:.76rem; margin:8px 0 4px; }
+.cnote { font-size:.76rem; color:var(--muted); line-height:1.45; }
+.cvia { font-size:.78rem; margin-top:8px; }
+.viatag { margin-right:8px; white-space:nowrap; }
+.memo { font-size:.9rem; line-height:1.65; }
+.memo p { margin:0 0 12px; }
+#memo-card { border-color:#3a5d86; }

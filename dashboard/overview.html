@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI / Space Private-Exposure Vehicles — Research Memo</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="sit-title">Private-AI / Space Exposure — Research Memo</h1>
+    <span class="sub" id="gen"></span>
+    <nav class="sitnav">
+      <a href="overview.html" class="active">Overview</a>
+      <a href="index.html">BPTRX</a>
+      <a href="vcx.html">VCX</a>
+      <a href="dxyz.html">DXYZ</a>
+      <a href="rvi.html">RVI</a>
+      <a href="agix.html">AGIX</a>
+    </nav>
+  </header>
+  <div class="disclaimer" id="disclaimer"></div>
+
+  <main>
+    <div id="loading" class="loading">Loading…</div>
+    <div id="error" class="error" style="display:none"></div>
+
+    <div id="content" style="display:none">
+      <!-- 1. summary tiles -->
+      <div class="sumrow" id="summary"></div>
+
+      <!-- 2. comparison table -->
+      <section class="card">
+        <h2>Vehicle comparison — price vs fair NAV, scenario return, verdict</h2>
+        <p class="desc">
+          Scenario returns are <b>from the current market price</b>. <b>Bear</b> = underlying marked down +
+          (for CEFs) premium reverts to NAV. <b>Base</b> = underlying flat + premium halves. <b>Bull</b> =
+          underlying re-rates up + premium holds. Premiums apply only to closed-end funds; at-NAV vehicles
+          (mutual fund / ETF) have none. All scenario inputs are labeled estimates.
+        </p>
+        <div class="scroll-x">
+          <table class="data cmp">
+            <thead><tr>
+              <th>Vehicle</th><th>Main exposure</th><th>Price / fair NAV</th><th>Premium</th>
+              <th>Bear</th><th>Base</th><th>Bull</th><th>Data</th><th>Key risk</th><th>Verdict</th>
+            </tr></thead>
+            <tbody id="cmp-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3. vehicle cards -->
+      <section class="card">
+        <h2>Vehicle detail</h2>
+        <div class="cardgrid" id="cards"></div>
+      </section>
+
+      <!-- 4. private-company valuations -->
+      <section class="card">
+        <h2>Underlying private companies — valuation ranges &amp; cleanest access</h2>
+        <p class="desc">bear / base / bull are curated whole-company valuation assumptions (estimates, each with a source + confidence). "Cleanest" = lowest premium to own it; "priciest" = highest.</p>
+        <div class="cardgrid" id="companies"></div>
+      </section>
+
+      <!-- 5. memo -->
+      <section class="card" id="memo-card">
+        <h2>Investment memo</h2>
+        <div class="memo" id="memo"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="overview_app.js"></script>
+</body>
+</html>
