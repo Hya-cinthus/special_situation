@@ -27,16 +27,17 @@ import urllib.request
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 _UA = {"User-Agent": "Mozilla/5.0"}
 
-# IPO stock ticker + date for the events ARK bought (subset of ark_tracker history
-# that are publicly traded with clean Yahoo data).
+# IPO stock ticker + date + the IPO stock's INITIAL WEIGHT IN ARKK (for the
+# contribution decomposition: how much of ARKK's day was THIS stock). Weight from
+# the ark_tracker IPO database (disclosed first-day weights; None where unknown).
 IPO_EVENTS = [
-    {"company": "Circle", "ticker": "CRCL", "ipo_date": "2025-06-05"},
-    {"company": "Coinbase", "ticker": "COIN", "ipo_date": "2021-04-14"},
-    {"company": "Roblox", "ticker": "RBLX", "ipo_date": "2021-03-10"},
-    {"company": "Robinhood", "ticker": "HOOD", "ipo_date": "2021-07-29"},
-    {"company": "Reddit", "ticker": "RDDT", "ipo_date": "2024-03-21"},
-    {"company": "Tempus AI", "ticker": "TEM", "ipo_date": "2024-06-14"},
-    {"company": "UiPath", "ticker": "PATH", "ipo_date": "2021-04-21"},
+    {"company": "Circle", "ticker": "CRCL", "ipo_date": "2025-06-05", "arkk_weight": 0.044},
+    {"company": "Coinbase", "ticker": "COIN", "ipo_date": "2021-04-14", "arkk_weight": 0.04},
+    {"company": "Roblox", "ticker": "RBLX", "ipo_date": "2021-03-10", "arkk_weight": 0.01},
+    {"company": "Robinhood", "ticker": "HOOD", "ipo_date": "2021-07-29", "arkk_weight": None},
+    {"company": "Reddit", "ticker": "RDDT", "ipo_date": "2024-03-21", "arkk_weight": None},
+    {"company": "Tempus AI", "ticker": "TEM", "ipo_date": "2024-06-14", "arkk_weight": 0.05},
+    {"company": "UiPath", "ticker": "PATH", "ipo_date": "2021-04-21", "arkk_weight": None},
 ]
 
 
@@ -123,6 +124,19 @@ def analyze_event(ev):
     if arkk_day is not None and base and base["daily"]:
         z = arkk_day / base["daily"]
 
+    # CONTRIBUTION DECOMPOSITION: how much of ARKK's day was THIS IPO stock?
+    # contribution = weight x stock day-1 return; residual = ARKK total - contribution.
+    # Uses the stock's close-to-close on day 1 (the part ARKK's NAV actually felt,
+    # since ARK buys at/after the open). For a fresh IPO bought day-1 we approximate
+    # the held return by open->close (no prior close).
+    w = ev.get("arkk_weight")
+    stock_held_ret = stock_day1_oc  # open->close = the move while ARKK held it day 1
+    contribution = (w * stock_held_ret) if (w is not None and stock_held_ret is not None) else None
+    residual = (arkk_day - contribution) if (arkk_day is not None and contribution is not None) else None
+    pct_explained = None
+    if contribution is not None and arkk_day not in (None, 0):
+        pct_explained = contribution / arkk_day  # share of ARKK's move from the IPO stock
+
     return {
         "company": ev["company"], "ticker": ev["ticker"], "ipo_date": d0, "ok": True,
         "stock_day1_open_close": stock_day1_oc,
@@ -132,6 +146,10 @@ def analyze_event(ev):
         "arkk_prevol": {k: (v["annual"] if v else None) for k, v in pre_vol.items()},
         "arkk_prevol_daily_21": (base["daily"] if base else None),
         "arkk_z_score": z,
+        "arkk_weight": w,
+        "ipo_contribution": contribution,   # weight x stock return = pp of ARKK's day from the IPO
+        "arkk_residual": residual,          # the rest (market/other holdings)
+        "pct_explained": pct_explained,     # share of ARKK's move attributable to the IPO stock
     }
 
 

@@ -60,45 +60,60 @@ ETFS = {
 }
 
 # --- 2. Historical IPO-participation database (web-verified). The empirical core.
-# Each: company, ipo_date, etfs that bought first day, first-day $ allocation,
-# initial weight in ARKK, source. "first_day"=did ARK buy on debut.
+# Per-event: which ETFs bought, $ allocation, and the INITIAL WEIGHT in EACH ETF
+# (weights dict; None where not disclosed). offer_price = the IPO pricing; the
+# impact engine separately measures the first exchange print (open).
 IPO_HISTORY = [
     {"company": "Circle (CRCL)", "ipo_date": "2025-06-05", "first_day": True,
-     "etfs": ["ARKK", "ARKW", "ARKF"], "alloc_usd": 373.4e6,
-     "arkk_initial_weight": 0.044, "arkw_initial_weight": 0.044,
-     "note": "Bought $373M on NYSE debut across ARKK/ARKW/ARKF; trimmed Coinbase/Robinhood to fund it.",
+     "etfs": ["ARKK", "ARKW", "ARKF"], "alloc_usd": 373.4e6, "offer_price": 31.0,
+     "weights": {"ARKK": 0.044, "ARKW": 0.044, "ARKF": 0.043},
+     "note": "Bought $373M on NYSE debut across ARKK/ARKW/ARKF; trimmed Coinbase/Robinhood to fund it. "
+             "Priced $31 -> closed $83.23 (+168% offer->close); +20.6% open->close.",
      "source_url": "https://www.theblock.co/post/357271/", "confidence": "high"},
     {"company": "Coinbase (COIN)", "ipo_date": "2021-04-14", "first_day": True,
-     "etfs": ["ARKK", "ARKW", "ARKF"], "alloc_usd": 246e6,
-     "arkk_initial_weight": 0.04, "arkw_initial_weight": 0.04,
-     "note": "Bought on direct-listing day across the broad funds; still a top-10 ARKK name.",
-     "source_url": "https://www.theblock.co/post/357271/", "confidence": "high"},
+     "etfs": ["ARKK", "ARKW", "ARKF"], "alloc_usd": 246e6, "offer_price": 250.0,
+     "weights": {"ARKK": 0.04, "ARKW": 0.04, "ARKF": 0.04},
+     "note": "Direct listing (ref price $250); bought across the broad funds. Still a top-10 ARKK name.",
+     "source_url": "https://www.theblock.co/post/357271/", "confidence": "med"},
     {"company": "Roblox (RBLX)", "ipo_date": "2021-03-10", "first_day": True,
-     "etfs": ["ARKK", "ARKW", "ARKF"], "alloc_usd": 27e6,
-     "arkk_initial_weight": 0.01, "arkw_initial_weight": 0.01,
-     "note": "740k shares (~$27M) for ARKK/ARKW/ARKF around the direct listing.",
+     "etfs": ["ARKK", "ARKW", "ARKF"], "alloc_usd": 27e6, "offer_price": 45.0,
+     "weights": {"ARKK": 0.01, "ARKW": 0.01, "ARKF": 0.01},
+     "note": "Direct listing (ref $45); 740k shares (~$27M) for ARKK/ARKW/ARKF.",
      "source_url": "https://cointelegraph.com/news/ark-sell-31m-robinhood-stacks-roblox", "confidence": "med"},
     {"company": "UiPath (PATH)", "ipo_date": "2021-04-21", "first_day": True,
-     "etfs": ["ARKK", "ARKW", "ARKQ"], "alloc_usd": None,
-     "arkk_initial_weight": None, "arkw_initial_weight": None,
-     "note": "Bought 2.7M shares at IPO (incl. ARKQ — robotics fit); fully exited by 2025.",
+     "etfs": ["ARKK", "ARKW", "ARKQ"], "alloc_usd": None, "offer_price": 56.0,
+     "weights": {"ARKK": None, "ARKW": None, "ARKQ": None},
+     "note": "Priced $56; bought 2.7M shares at IPO (incl. ARKQ — robotics fit); fully exited by 2025.",
      "source_url": "https://stockcircle.com/portfolio/cathie-wood/path/transactions", "confidence": "med"},
     {"company": "Robinhood (HOOD)", "ipo_date": "2021-07-29", "first_day": True,
-     "etfs": ["ARKK", "ARKW", "ARKF"], "alloc_usd": None,
-     "arkk_initial_weight": None, "arkw_initial_weight": None,
-     "note": "Bought on IPO day across broad funds; still a top-10 ARKK/ARKW holding.",
+     "etfs": ["ARKK", "ARKW", "ARKF"], "alloc_usd": None, "offer_price": 38.0,
+     "weights": {"ARKK": None, "ARKW": None, "ARKF": None},
+     "note": "Priced $38; bought on IPO day across broad funds. Still a top-10 ARKK/ARKW holding.",
      "source_url": "https://www.coindesk.com/markets/2025/08/20/", "confidence": "med"},
     {"company": "Reddit (RDDT)", "ipo_date": "2024-03-21", "first_day": True,
-     "etfs": ["ARKK", "ARKW"], "alloc_usd": None,
-     "arkk_initial_weight": None, "arkw_initial_weight": None,
-     "note": "Bought around the IPO across ARKK/ARKW (internet fit).",
+     "etfs": ["ARKK", "ARKW"], "alloc_usd": None, "offer_price": 34.0,
+     "weights": {"ARKK": None, "ARKW": None},
+     "note": "Priced $34; bought around the IPO across ARKK/ARKW (internet fit).",
      "source_url": "https://www.benzinga.com/25/01/43073132/", "confidence": "low"},
     {"company": "Tempus AI (TEM)", "ipo_date": "2024-06-14", "first_day": True,
-     "etfs": ["ARKK", "ARKG"], "alloc_usd": 294e6,
-     "arkk_initial_weight": 0.05, "arkw_initial_weight": None,
-     "note": "ARKK + ARKG (genomics fit); grew to ARKK's #3 holding (~5%, ~$294M).",
+     "etfs": ["ARKK", "ARKG"], "alloc_usd": 294e6, "offer_price": 37.0,
+     "weights": {"ARKK": 0.05, "ARKG": None},
+     "note": "Priced $37; ARKK + ARKG (genomics fit); grew to ARKK's #3 holding (~5%, ~$294M).",
      "source_url": "https://www.investing.com/news/company-news/93CH-4069113", "confidence": "high"},
 ]
+
+# --- 2b. ARK position-sizing rubric (from ARK's own help center; web-verified).
+# Used as the SpaceX-allocation GUIDANCE: what weight Cathie Wood typically starts
+# a new high-conviction name at, and the ceiling.
+SIZING_RUBRIC = {
+    "typical_min": 0.01, "median": 0.02, "high_conviction_start": 0.045, "max": 0.10,
+    "top10_share": 0.50,
+    "source": "ARK help center: median position ~2%, max ~10%, top-10 ~50% of fund.",
+    "source_url": "https://helpcenter.ark-funds.com/what-is-the-typical-position-weight-of-a-security-in-an-ark-etf",
+    "note": "High-conviction NEW IPOs (Circle, Tempus) entered at ~4.4–5% — that is the best "
+            "empirical guide for a SpaceX day-1 weight in the broad funds (ARKK/ARKW). A pure-theme "
+            "sector fund (ARKX) could go higher relative to its small size.",
+}
 
 # --- 3. Theme-fit rubric (transparent, 0-100). Each factor scored with reasoning.
 # Empirical weight: ARKK always participates; broad funds (ARKW) usually; sector
@@ -207,6 +222,7 @@ def build_payload():
         "ranking": ranking,
         "ipo_history": IPO_HISTORY,
         "ipo_stats": {"n_ipos": n_ipos, "by_etf": etf_ipo_count},
+        "sizing_rubric": SIZING_RUBRIC,
         "timeline": sorted(TIMELINE, key=lambda x: x["date"], reverse=True),
     }
     # Always carry the IPO-impact block: reuse the committed cache so a no-fetch
