@@ -162,11 +162,29 @@ def build():
     }
 
 
+_CACHE = os.path.join(_REPO_ROOT, "dashboard", "data", "ark_ipo_impact_cache.json")
+
+
+def build_and_cache():
+    """Compute the impact block from live prices and persist it to a committed
+    cache so the tracker JSON always carries it (even on a no-fetch rebuild)."""
+    imp = build()
+    if imp.get("events"):              # only overwrite cache if the fetch worked
+        with open(_CACHE, "w", encoding="utf-8") as f:
+            json.dump(imp, f, separators=(",", ":"), allow_nan=False)
+    return imp
+
+
+def load_cached():
+    if os.path.exists(_CACHE):
+        return json.load(open(_CACHE, encoding="utf-8"))
+    return None
+
+
 def merge_into_tracker():
-    """Build the impact block and merge into the existing ark_tracker.json."""
     path = os.path.join(_REPO_ROOT, "dashboard", "data", "ark_tracker.json")
     payload = json.load(open(path, encoding="utf-8"))
-    payload["ipo_impact"] = build()
+    payload["ipo_impact"] = build_and_cache()
     with open(path, "w", encoding="utf-8") as f:
         json.dump(payload, f, separators=(",", ":"), allow_nan=False)
     return path

@@ -209,6 +209,15 @@ def build_payload():
         "ipo_stats": {"n_ipos": n_ipos, "by_etf": etf_ipo_count},
         "timeline": sorted(TIMELINE, key=lambda x: x["date"], reverse=True),
     }
+    # Always carry the IPO-impact block: reuse the committed cache so a no-fetch
+    # rebuild (e.g. the GitHub Action) never drops it.
+    try:
+        import ark_ipo_impact
+        cached = ark_ipo_impact.load_cached()
+        if cached:
+            payload["ipo_impact"] = cached
+    except Exception:
+        pass
     return payload
 
 
