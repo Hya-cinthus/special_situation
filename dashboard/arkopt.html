@@ -42,7 +42,7 @@
 
         <div class="optctl">
           <div class="optctl-left">
-            <label>Borrow rate (sdiv)</label>
+            <label>Borrow rate (sdiv) — <span class="dim">~2% realistic · 5–15% stress · &gt;50% = what-if</span></label>
             <div class="rowval"><span>0%</span><b id="b-txt">2%</b><span>300%</span></div>
             <input type="range" id="b-slider" min="0" max="3.0" step="0.01" value="0.02" />
             <div class="btn-row" id="b-presets">
@@ -74,6 +74,31 @@
           (or put spreads) is the cleaner expression; if borrow stays put, it's a pure gamma/vol view.</p>
           <p class="dim">Model: Black-Scholes, q = borrow − div, F = S·e^((r−q)T). Calibrated to the screen
           (deltas match: 78c Δ0.63, 80c Δ0.51). Realized inputs from the RiskView panel; not a quote.</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>How bad can ARKK borrow actually get? — and why the ETF wrapper caps it</h2>
+        <div class="memo">
+          <p><b>Realistically ARKK borrow stays low — low-single-digit % — almost all the time.</b> It's a
+          large, liquid ETF on hundreds of millions of shares; even when Michael Burry put on a well-known
+          ARKK short in 2021 it remained borrowable (a "general collateral"–type name, not a special). So the
+          base case is the ~2% on the screen, and a "stress" is more like <b>5–15%</b>, not 300%.</p>
+          <p><b>Why an ETF's borrow is structurally capped — the create/redeem arbitrage.</b> Unlike a single
+          stock with a fixed float, an ETF's share count is <b>elastic</b>. Authorized Participants (APs) can
+          <b>create</b> new ARKK shares any day by delivering the underlying basket (Tesla, etc.) to ARK in
+          kind, or <b>redeem</b> shares back into the basket. If shorting demand makes ARKK hard to borrow,
+          the borrow fee rises → it becomes profitable for an AP/lender to <b>create new shares and lend them
+          out</b> (capturing the fee) → supply of lendable shares goes up → the fee falls back. That feedback
+          loop is the safety valve a single stock doesn't have, which is why ETF borrow rarely runs away.</p>
+          <p><b>So when would borrow genuinely spike?</b> Only if the arbitrage breaks: the <em>underlying
+          basket</em> itself becomes hard to source or halts, creations get suspended, or a violent crowded
+          short overwhelms create capacity short-term. For ARKK (liquid US large/mid-cap basket) that's
+          unlikely — the high end of the toggle (50–300%) is a deliberate <b>stress test / what-if</b>, not a
+          forecast. It's there to show the <em>shape</em> of the borrow→forward→put/call effect, and would be
+          far more realistic for a hard-to-borrow single name (or for SpaceX itself right after IPO).</p>
+          <p class="dim">Mechanism summary: ETF borrow fee is bounded by creation economics; single-stock
+          borrow is bounded only by float. The toggle spans 0–300% so you can price both regimes.</p>
         </div>
       </section>
     </div>
