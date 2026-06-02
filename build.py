@@ -154,6 +154,10 @@ def main(argv):
         import ark_tracker
         p = ark_tracker.write_json()
         print(f"[ark_tracker] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+        if do_fetch:
+            import ark_ipo_impact
+            ark_ipo_impact.merge_into_tracker()
+            print("[ark_tracker] merged IPO-day impact analytics (real price data).")
     except Exception as e:
         print(f"[ark_tracker] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "

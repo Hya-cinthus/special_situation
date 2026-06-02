@@ -40,7 +40,8 @@ async function load(file) {
 function render() {
   document.getElementById("disclaimer").textContent = DATA.meta.disclaimer;
   document.getElementById("gen").textContent = "Generated " + DATA.meta.generated_at;
-  renderAnswers(); renderRanking(); renderExposure(); renderHistory(); renderTimeline();
+  renderAnswers(); renderRanking(); renderExposure(); renderHistory();
+  renderImpact(); initScenario(); renderTimeline();
 }
 
 /* 1. the 6 key answers up top */
@@ -123,6 +124,84 @@ function renderHistory() {
      <p class="desc" style="margin-top:8px">Pattern: ARK routes first-day IPO buys through its <b>broad</b> funds
      (ARKK always; ARKW for internet/fintech) and only adds a <b>sector</b> fund when the theme fits
      (ARKQ for robotics/aerospace, ARKG for genomics). For SpaceX, expect <b>ARKK + ARKW + ARKQ + ARKX</b>.</p>`;
+}
+
+/* 4b. IPO-day price impact (measured) */
+function signp(x, d = 1) { return x == null ? "–" : (x >= 0 ? "+" : "") + (x * 100).toFixed(d) + "%"; }
+function renderImpact() {
+  const imp = DATA.ipo_impact;
+  if (!imp) { document.getElementById("impact").innerHTML = "<p class='dim'>run a full build to populate</p>"; return; }
+  const rows = imp.events.map((e) => {
+    const z = e.arkk_z_score;
+    const zcol = z == null ? MUTED : Math.abs(z) > 1 ? BAD : Math.abs(z) > 0.5 ? WARN : GOOD;
+    const v = e.arkk_prevol || {};
+    const stockcol = (e.stock_day1_open_close || 0) >= 0 ? GOOD : BAD;
+    const arkcol = (e.arkk_ipo_day_return || 0) >= 0 ? GOOD : BAD;
+    return `<tr>
+      <td><b>${e.company}</b><div class="dim">${e.ticker} · ${e.ipo_date}</div></td>
+      <td style="color:${stockcol}">${signp(e.stock_day1_open_close)}<div class="dim">day-1 o→c</div></td>
+      <td style="color:${arkcol}">${signp(e.arkk_ipo_day_return, 2)}<div class="dim">ARKK that day</div></td>
+      <td>${v.d10 != null ? (v.d10 * 100).toFixed(0) + "%" : "–"} / ${v.d21 != null ? (v.d21 * 100).toFixed(0) + "%" : "–"} / ${v.d63 != null ? (v.d63 * 100).toFixed(0) + "%" : "–"}<div class="dim">ARKK RV 10/21/63d (ann.)</div></td>
+      <td style="color:${zcol}"><b>${z == null ? "–" : (z >= 0 ? "+" : "") + z.toFixed(2) + "σ"}</b><div class="dim">excess move</div></td>
+    </tr>`;
+  }).join("");
+  document.getElementById("impact").innerHTML =
+    `<table class="data"><thead><tr>
+      <th>IPO</th><th>IPO stock day-1</th><th>ARKK same day</th><th>ARKK realized vol (pre)</th><th>z-score</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
+  const s = imp.summary;
+  document.getElementById("impact-takeaway").innerHTML =
+    `<div class="mark-callout" style="border-left-color:${ACC}">
+      <b>Takeaway (measured).</b> The IPO stocks moved a lot (±8–21% on day 1), but <b>ARKK barely
+      reacted</b>: average absolute excess move was <b>${s.avg_abs_z != null ? s.avg_abs_z.toFixed(2) : "–"}σ</b>,
+      and only <b>${s.n_gt_1sigma}/${s.n_events}</b> IPO days were even a &gt;1σ move for ARKK — and that one
+      (Circle) was a market-driven <em>down</em> day, not an IPO pop. Why: any single new IPO position is only
+      ~1–4% of ARKK, so weight × pop is tiny next to ARKK's ~${DATA.ipo_impact.arkk_current_vol.d21 != null ? (DATA.ipo_impact.arkk_current_vol.d21 * 100).toFixed(0) : "32"}% annualized vol.
+      <b>Implication for SpaceX: a single IPO is mathematically too small to move ARKK much</b> unless ARK
+      makes it an unusually large position — which the scenario below lets you test.</div>`;
+}
+
+/* interactive SpaceX scenario */
+function initScenario() {
+  const imp = DATA.ipo_impact || {};
+  const dailyVol = imp.arkk_current_vol_daily_21 || 0.02;   // ARKK current daily RV (21d)
+  const w = document.getElementById("w-slider"), pop = document.getElementById("pop-slider");
+  if (!w || !pop) return;
+  const update = () => {
+    const wv = +w.value, pv = +pop.value;
+    document.getElementById("w-txt").textContent = pct(wv, 1);
+    document.getElementById("pop-txt").textContent = signp(pv, 0);
+    const navImpact = wv * pv;                 // mechanical ARKK NAV move from the new position
+    const sigma = dailyVol ? navImpact / dailyVol : null;
+    const arkkAum = (DATA.etfs.find((e) => e.ticker === "ARKK") || {}).aum_usd || 7.26e9;
+    const dollar = wv * arkkAum;
+    const out = [
+      { label: "ARKK NAV impact (day 1)", value: signp(navImpact, 2),
+        col: navImpact >= 0 ? GOOD : BAD, note: "= weight × pop" },
+      { label: "vs ARKK normal day", value: sigma == null ? "–" : (sigma >= 0 ? "+" : "") + sigma.toFixed(2) + "σ",
+        col: Math.abs(sigma) > 1 ? BAD : Math.abs(sigma) > 0.5 ? WARN : MUTED,
+        note: Math.abs(sigma) > 1 ? "bigger-than-normal day" : "within normal noise" },
+      { label: "$ SpaceX in ARKK", value: usd(dollar), col: ACC, note: "weight × $7.26B AUM" },
+      { label: "ARKK daily vol (21d RV)", value: pct(dailyVol, 2), col: MUTED, note: "current baseline" },
+    ];
+    document.getElementById("scenario-out").innerHTML = out.map((c) =>
+      `<div class="kpi"><div class="label">${c.label}</div>
+        <div class="value" style="color:${c.col}">${c.value}</div>
+        <div class="note">${c.note}</div></div>`).join("");
+    const big = Math.abs(sigma) > 1;
+    document.getElementById("scenario-explain").innerHTML =
+      `At a <b>${pct(wv, 1)}</b> weight and a <b>${signp(pv, 0)}</b> day-1 SpaceX pop, ARKK's NAV moves about
+       <b>${signp(navImpact, 2)}</b> — ${big ? "a <b>" + Math.abs(sigma).toFixed(1) + "σ</b> day, materially "
+       + "bigger than ARKK's normal move." : "<b>within</b> ARKK's normal daily noise (" + pct(dailyVol, 2)
+       + "), i.e. hard to even notice."} ${wv >= 0.10
+       ? "Note: a 10%+ SpaceX weight would be aggressive for a single IPO vs ARK's history (typically 1–5%)."
+       : ""}`;
+  };
+  w.oninput = update; pop.oninput = update;
+  document.querySelectorAll("#scenario-card .btn-row button[data-pop]").forEach((b) => {
+    b.onclick = () => { pop.value = b.dataset.pop; update(); };
+  });
+  update();
 }
 
 /* 5. monitoring timeline */

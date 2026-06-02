@@ -55,6 +55,47 @@
         <div id="history"></div>
       </section>
 
+      <!-- IPO-day price impact (real data) -->
+      <section class="card" id="impact-card">
+        <h2>How much did the IPO actually move ARKK? — measured, not assumed</h2>
+        <p class="desc">
+          For each past IPO ARK bought: the IPO stock's day-1 move, ARKK's same-day return, and ARKK's
+          trailing realized volatility <b>before</b> the event. The <b>z-score</b> = ARKK's IPO-day move ÷
+          its normal daily vol — i.e. did ARKK move <em>more than usual</em> because of the IPO?
+          All from real Yahoo prices.
+        </p>
+        <div class="scroll-x" id="impact"></div>
+        <div id="impact-takeaway"></div>
+      </section>
+
+      <!-- interactive SpaceX scenario -->
+      <section class="card" id="scenario-card">
+        <h2>SpaceX-IPO scenario — your assumptions, ARKK's price impact</h2>
+        <p class="desc">
+          A new IPO position bought on day 1 adds <b>weight × day-1 pop</b> to ARKK's NAV. Set ARKK's target
+          SpaceX weight and the assumed first-day SpaceX pop; see the mechanical ARKK move and whether it
+          would be a bigger-than-normal (&gt;1σ) day vs ARKK's current realized vol.
+        </p>
+        <div class="scenario-grid">
+          <div class="controls">
+            <label>ARKK target SpaceX weight</label>
+            <div class="rowval"><span>0%</span><b id="w-txt">5%</b><span>15%</span></div>
+            <input type="range" id="w-slider" min="0" max="0.15" step="0.005" value="0.05" />
+            <label>Assumed SpaceX day-1 pop (open→close)</label>
+            <div class="rowval"><span>−30%</span><b id="pop-txt">+30%</b><span>+100%</span></div>
+            <input type="range" id="pop-slider" min="-0.3" max="1.0" step="0.05" value="0.3" />
+            <div class="btn-row">
+              <button data-pop="0.0">Flat open</button>
+              <button data-pop="0.3">+30% (typical)</button>
+              <button data-pop="0.6">+60% (hot)</button>
+              <button data-pop="-0.15">−15% (dud)</button>
+            </div>
+            <p class="desc" id="scenario-explain" style="margin-top:14px"></p>
+          </div>
+          <div class="scenario-out" id="scenario-out"></div>
+        </div>
+      </section>
+
       <section class="card">
         <h2>Monitoring timeline — SpaceX · ARK · Cathie Wood</h2>
         <p class="desc">Dated, sourced evidence supporting or contradicting the thesis. Each item is labeled confirmed/rumor with a source.</p>
