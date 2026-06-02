@@ -30,12 +30,15 @@ R = 0.0415              # rate shown
 BORROW0 = 0.02          # current sdiv ~2% (Jun-18 row 2.01%)
 DIV = 0.0               # ARKK ~ no dividend; q = borrow - div = borrow
 
-# per-strike calibrated IV from the user's skew read (put~40 / ATM~37.7 / call~36)
-# and matched to the screen deltas (K78 call 0.628, K80 call 0.509).
+# Per the user: which option to use at each strike + its SpiderRock implied vol.
+#   78 -> PUT only,   IV 38.4%  (OTM put)
+#   80 -> CALL + PUT, IV 37.5%  (~ATM, both legs)
+#   83 -> CALL only,  IV 37.3%  (OTM call)
+# Sticky-strike: IV held fixed as spot/borrow move.
 STRIKES = {
-    78: {"iv_call": 0.384, "iv_put": 0.398, "label": "78 (ITM call / OTM put)"},
-    80: {"iv_call": 0.377, "iv_put": 0.377, "label": "80 (~ATM)"},
-    83: {"iv_call": 0.360, "iv_put": 0.405, "label": "83 (OTM call / ITM put)"},
+    78: {"iv": 0.384, "use": ["p"], "label": "78 put"},
+    80: {"iv": 0.375, "use": ["c", "p"], "label": "80 (ATM)"},
+    83: {"iv": 0.373, "use": ["c"], "label": "83 call"},
 }
 
 
@@ -87,11 +90,10 @@ def build_payload():
 
     options = []
     for K, meta in STRIKES.items():
-        for typ, ivkey in (("c", "iv_call"), ("p", "iv_put")):
-            iv = meta[ivkey]
+        iv = meta["iv"]
+        for typ in meta["use"]:          # only the option(s) the user specified
             scen = {f"{int(b*10000)}": _scenario_for(K, typ, iv, b, spot_grid)
                     for b in borrow_levels}
-            # base-case greeks for display
             q0 = BORROW0 - DIV
             p0, d0 = bs(SPOT0, K, T_BUS, R, q0, iv, typ)
             options.append({
@@ -112,10 +114,11 @@ def build_payload():
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "disclaimer": ("Analysis, not investment advice. Black-Scholes calibrated to the RiskView "
                            "ARKK JUN-18-26 screen (2026-06-02): spot 79.80, 12 business days, r 4.15%, "
-                           "borrow (sdiv) 2.0%, per-strike IV from the observed skew (put~40 / ATM~37.7 / "
-                           "call~36). Sticky-strike: each option's IV is held FIXED as spot/borrow move; the "
-                           "borrow axis acts purely through the forward F=S·e^((r−borrow)T). P&L is "
-                           "delta-neutral, hedged at the trade delta. Model output, not a quote."),
+                           "borrow (sdiv) 2.0%. Per the chosen expressions: 78 PUT (IV 38.4%), 80 CALL + "
+                           "PUT (IV 37.5%), 83 CALL (IV 37.3%). Sticky-strike: each option's IV is held "
+                           "FIXED as spot/borrow move; the borrow axis acts purely through the forward "
+                           "F=S·e^((r−borrow)T). P&L is delta-neutral, hedged at the trade delta. "
+                           "Model output, not a quote."),
             "spot0": SPOT0, "t_business_days": 12, "t_years": round(T_BUS, 5),
             "rate": R, "borrow0": BORROW0, "div": DIV,
             "borrow_levels": borrow_levels,
