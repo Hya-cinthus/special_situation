@@ -149,6 +149,13 @@ def main(argv):
         print(f"[overview] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[overview] skipped: {e}")
+    # ARK / SpaceX-IPO tracker (curated model; independent of the per-vehicle JSONs).
+    try:
+        import ark_tracker
+        p = ark_tracker.write_json()
+        print(f"[ark_tracker] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[ark_tracker] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARK / SpaceX-IPO Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="sit-title">ARK / SpaceX-IPO Tracker</h1>
+    <span class="sub" id="gen"></span>
+    <nav class="sitnav">
+      <a href="overview.html">Overview</a>
+      <a href="index.html">SpaceX · Baron</a>
+      <a href="vcx.html">VCX</a>
+      <a href="dxyz.html">DXYZ</a>
+      <a href="rvi.html">RVI</a>
+      <a href="agix.html">AGIX</a>
+      <a href="arkvx.html">ARKVX</a>
+      <a href="ark.html" class="active">ARK IPO Tracker</a>
+    </nav>
+  </header>
+  <div class="disclaimer" id="disclaimer"></div>
+
+  <main>
+    <div id="loading" class="loading">Loading…</div>
+    <div id="error" class="error" style="display:none"></div>
+
+    <div id="content" style="display:none">
+      <section class="card">
+        <h2>If SpaceX IPOs tomorrow — which ARK ETF benefits most?</h2>
+        <p class="desc">
+          ARKK, ARKW, ARKQ, ARKX tracked <b>separately</b> (never aggregated). The ranking is driven by
+          ARK's <b>actual historical IPO behavior</b> + a transparent theme-fit rubric — not speculation.
+          SpaceX is private, so ARK can only buy at/after the IPO.
+        </p>
+        <div class="sumrow" id="answers"></div>
+      </section>
+
+      <section class="card">
+        <h2>Allocation ranking — who is most likely to receive SpaceX shares</h2>
+        <p class="desc">Fit score (0–100) encodes the empirical history (first-day IPO participation) + theme fit. Each score shows its reasoning.</p>
+        <div id="ranking"></div>
+      </section>
+
+      <section class="card">
+        <h2>Dollar exposure vs portfolio weight — the key distinction</h2>
+        <p class="desc">Same target weight, very different dollar buys — because the funds are different sizes.</p>
+        <div class="scroll-x" id="exposure"></div>
+      </section>
+
+      <section class="card">
+        <h2>Historical IPO-participation database — the empirical basis</h2>
+        <div id="history"></div>
+      </section>
+
+      <section class="card">
+        <h2>Monitoring timeline — SpaceX · ARK · Cathie Wood</h2>
+        <p class="desc">Dated, sourced evidence supporting or contradicting the thesis. Each item is labeled confirmed/rumor with a source.</p>
+        <div id="timeline"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="ark_app.js"></script>
+</body>
+</html>

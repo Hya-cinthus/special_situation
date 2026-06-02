@@ -214,3 +214,22 @@ table.cmp td.risk { max-width:240px; white-space:normal; color:var(--muted); fon
 /* arkvx scenario tiles */
 .scrow3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
 .scrow3 .sc { background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; text-align:center; }
+
+/* ===== ARK IPO tracker ===== */
+.arkrow { display:grid; grid-template-columns:48px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+.arkrow:last-child { border-bottom:none; }
+.arkrank { font-size:1.4rem; font-weight:700; color:var(--muted); }
+.arkhead { font-size:1rem; }
+.arkmeta { color:var(--muted); font-size:.78rem; margin:4px 0; }
+.fitbar { height:6px; background:var(--bg); border:1px solid var(--border); border-radius:4px; overflow:hidden; margin:6px 0; }
+.fitbar span { display:block; height:100%; }
+.arkreasons { margin:6px 0 0; padding-left:18px; font-size:.8rem; color:var(--text); }
+.arkreasons li { margin:2px 0; }
+.etftag { font-weight:700; font-size:.78rem; margin-right:4px; }
+.statrow { margin-bottom:10px; }
+.statchip { display:inline-block; background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:3px 9px; margin-right:6px; font-size:.82rem; }
+.tlrow { display:grid; grid-template-columns:90px 92px 1fr; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); font-size:.82rem; }
+.tlrow:last-child { border-bottom:none; }
+.tldate { color:var(--muted); font-variant-numeric:tabular-nums; }
+.tlcat { font-weight:700; }
+.tltext { line-height:1.5; }
