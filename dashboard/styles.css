@@ -233,3 +233,15 @@ table.cmp td.risk { max-width:240px; white-space:normal; color:var(--muted); fon
 .tldate { color:var(--muted); font-variant-numeric:tabular-nums; }
 .tlcat { font-weight:700; }
 .tltext { line-height:1.5; }
+
+/* ===== ARKK options scenario ===== */
+.calibbox { margin-bottom:14px; }
+.calibrow { display:flex; flex-wrap:wrap; gap:6px 20px; font-size:.84rem; padding:8px 12px;
+  background:var(--panel-2); border:1px solid var(--border); border-radius:8px; }
+.optctl { display:grid; grid-template-columns:300px 1fr; gap:20px; }
+@media (max-width:900px){ .optctl{ grid-template-columns:1fr; } }
+.optctl-left label { display:block; font-size:.8rem; color:var(--muted); margin:0 0 4px; }
+.optctl-left input[type=range] { width:100%; accent-color:var(--spacex); }
+.opttoggles { margin-top:14px; display:flex; flex-direction:column; gap:5px; }
+.optchk { display:flex; align-items:center; gap:7px; font-size:.82rem; cursor:pointer; }
+.optchk .dim { margin-left:auto; }
