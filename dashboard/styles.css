@@ -210,3 +210,7 @@ table.cmp td.risk { max-width:240px; white-space:normal; color:var(--muted); fon
 .memo { font-size:.9rem; line-height:1.65; }
 .memo p { margin:0 0 12px; }
 #memo-card { border-color:#3a5d86; }
+
+/* arkvx scenario tiles */
+.scrow3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.scrow3 .sc { background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; text-align:center; }

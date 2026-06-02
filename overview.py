@@ -71,7 +71,8 @@ def _vehicle_record(key):
         return {"key": key, "ticker": meta.get("ticker", key), "missing": True}
     k = d.get("kpis", {})
     is_etf = bool(d["meta"].get("is_etf"))
-    at_nav = is_etf or key == "spacex_baron"   # mutual fund + ETF trade at NAV
+    # at-NAV vehicles: mutual fund (BPTRX), ETF (AGIX), interval fund (ARKVX)
+    at_nav = is_etf or key == "spacex_baron" or bool(d["meta"].get("at_nav"))
 
     price = k.get("price")
     if key == "spacex_baron":
@@ -80,8 +81,8 @@ def _vehicle_record(key):
     nav_mtm = k.get("nav_mtm")
     if key == "spacex_baron":
         nav_mtm = k.get("total_nav_usd")          # already marked; fund-level $
-    if key == "agix_kraneshares":
-        nav_stale = price                          # ETF ~ at NAV
+    if key in ("agix_kraneshares", "arkvx_arkventure"):
+        nav_stale = price                          # at NAV
         nav_mtm = price
 
     premium_stale = k.get("premium")
@@ -118,8 +119,11 @@ def _vehicle_record(key):
     conf = meta.get("data_confidence", "med")
     conf_score = _CONF_SCORE.get(conf, 0.6)
     pm = premium_mtm or 0.0
+    total_priv = sum((h.get("weight") or 0) for h in lt)
     if key == "spacex_baron":
         category, verdict = "opportunity", "Cleanest SpaceX at NAV; stale-mark re-rate optionality"
+    elif at_nav and total_priv >= 0.12:
+        category, verdict = "clean", "At-NAV multi-name private basket; gated liquidity is the catch"
     elif at_nav:
         category, verdict = "clean", "At-NAV, low-fee, verifiable — but low concentration"
     elif pm > 0.8:
@@ -145,7 +149,7 @@ def _vehicle_record(key):
         "key_risk": meta.get("key_risk", ""),
         "reason_buy": meta.get("reason_buy", ""), "reason_avoid": meta.get("reason_avoid", ""),
         "category": category, "verdict": verdict,
-        "as_of": k.get("as_of"), "page": f"{ 'index' if key=='spacex_baron' else {'vcx_fundrise':'vcx','dxyz_destiny':'dxyz','rvi_robinhood':'rvi','agix_kraneshares':'agix'}.get(key,key) }.html",
+        "as_of": k.get("as_of"), "page": f"{ 'index' if key=='spacex_baron' else {'vcx_fundrise':'vcx','dxyz_destiny':'dxyz','rvi_robinhood':'rvi','agix_kraneshares':'agix','arkvx_arkventure':'arkvx'}.get(key,key) }.html",
     }
 
 

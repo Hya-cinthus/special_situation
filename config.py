@@ -24,7 +24,8 @@ SEC_USER_AGENT = "special-situations-research weipeng_shao@berkeley.edu"
 DASHBOARD_DATA_DIR = "dashboard/data"
 
 # Situations the build pipeline knows about. Each maps to situations/<key>/.
-SITUATIONS = ["spacex_baron", "vcx_fundrise", "dxyz_destiny", "rvi_robinhood", "agix_kraneshares"]
+SITUATIONS = ["spacex_baron", "vcx_fundrise", "dxyz_destiny", "rvi_robinhood",
+              "agix_kraneshares", "arkvx_arkventure"]
 
 
 # ===========================================================================
@@ -155,6 +156,17 @@ VEHICLE_META = {
         "key_risk": "Low concentration (~3%) and diluted by inflows; mostly public AI stocks.",
         "reason_buy": "Clean, liquid, low-fee, SEC-verifiable Anthropic sliver; no premium risk.",
         "reason_avoid": "Too diluted for a concentrated private-AI bet.",
+    },
+    "arkvx_arkventure": {
+        "ticker": "ARKVX", "name": "ARK Venture Fund", "type": "Interval fund (active)",
+        "headline": "SpaceX", "buyable": "At NAV (ARK / brokerages); $500 min",
+        "fee": "~2.88%", "liquidity": "Gated — quarterly tenders, ~5% cap",
+        "data_confidence": "high",
+        "confidence_reasons": "Holdings DIRECTLY SEC-named (SpaceX/OpenAI/Anthropic/xAI/Neuralink); transacts at NAV.",
+        "structure_note": "At NAV (no premium), but redemptions are gated -> liquidity discount, not premium.",
+        "key_risk": "Gated redemptions: you may not exit at NAV when you want; high ~2.9% fee.",
+        "reason_buy": "Cleanest SEC-named multi-name private basket (SpaceX ~11-17% + OpenAI + Anthropic), at NAV.",
+        "reason_avoid": "Locked-up liquidity; pricey; diluted by ~84% other holdings/cash.",
     },
 }
 
@@ -618,6 +630,83 @@ class AgixKraneshares:
         ("2026-10-15", "Anthropic IPO target (~$400-500B)", "ipo"),
     ]
     HEADLINE_NAME = "Anthropic"
+
+
+# ---------------------------------------------------------------------------
+# Situation: SpaceX/OpenAI/Anthropic via ARK Venture Fund (ARKVX)
+# ---------------------------------------------------------------------------
+# A NEW STRUCTURE TYPE: an actively-managed, continuously-offered INTERVAL FUND.
+# Methodology differs from the others:
+#   - Like a mutual fund/ETF it transacts AT NAV — there is NO wrapper premium to
+#     exploit/fear (unlike the CEFs VCX/DXYZ/RVI).
+#   - BUT it is NOT freely redeemable: redemptions are gated to periodic tenders
+#     (~quarterly, typically capped ~5% of fund). So the right risk frame is a
+#     LIQUIDITY DISCOUNT, not a premium — you may not get out at NAV when you want.
+#   - Holdings are DIRECTLY SEC-NAMED (no SPV codenames): cleanest disclosure of
+#     the whole set. SpaceX is the top position.
+# So the page emphasizes: look-through to multiple private names, mark-to-market
+# of the (ARK-marked) NAV, and the liquidity/gating risk — not premium math.
+
+class ArkvxArkVenture:
+    KEY = "arkvx_arkventure"
+    TITLE = "SpaceX / OpenAI / Anthropic via ARK Venture Fund (ARKVX)"
+    WINDOW_START = "2025-06-01"
+    PRIMARY_TICKER = "ARKVX"
+    PRICE_TICKER = "ARKVX"
+    EDGAR_CIK = "0001905088"          # ARK Venture Fund (interval fund)
+    EDGAR_SERIES_ID = None            # single-series
+    LISTING_DATE = "2022-09-27"       # fund inception (continuously offered)
+    LOCKUP_EXPIRY_DATE = None
+    IS_ETF = False
+    IS_INTERVAL = True                # transacts at NAV but redemptions are gated
+    AT_NAV = True                     # no wrapper premium
+    REDEMPTION_NOTE = "Quarterly repurchase offers, typically capped ~5% of fund (interval fund)"
+    EXPENSE_RATIO = 0.0288            # ~2.88% net (web; flag approx)
+
+    # DIRECTLY SEC-NAMED look-through (NPORT 2026-01-30), tranches summed.
+    # SEC-verified, high confidence — unusual for this set. ARK's own site shows
+    # SpaceX ~17% at 3/31 (post our NPORT date); we use the SEC-verified 1/30
+    # figure and flag the newer ARK number.
+    LOOKTHROUGH = [
+        {"name": "SpaceX", "weight": 0.1093, "as_of": "2026-01-30", "confidence": "high",
+         "source": "ARKVX NPORT 1/30: 'Space Exploration Technologies' 8.06%+2.87% = 10.9% (SEC-named). "
+                   "ARK's own site shows ~17.0% at 3/31/2026 (newer; growth + SpaceX re-rate).",
+         "source_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001905088&type=NPORT-P"},
+        {"name": "Anthropic", "weight": 0.0249, "as_of": "2026-01-30", "confidence": "high",
+         "source": "ARKVX NPORT 1/30: 'Anthropic, Inc.' 2.49% (SEC-named)",
+         "source_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001905088&type=NPORT-P"},
+        {"name": "OpenAI", "weight": 0.0286, "as_of": "2026-01-30", "confidence": "high",
+         "source": "ARKVX NPORT 1/30: OpenAI Group PBC 1.42%+0.93% + OpenAI Global LLC 0.51% = 2.86% (SEC-named)",
+         "source_url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001905088&type=NPORT-P"},
+    ]
+
+    @staticmethod
+    def valuation_timeline():
+        return VcxFundrise.VALUATION_TIMELINE
+
+    UNDERLYING_MARKS = {
+        "SpaceX": {"current_valuation_usd": 1.25e12, "ipo_target_usd": 1.75e12,
+                   "source_url": "https://www.cnbc.com/2026/05/20/spacex-ipo-live-updates.html"},
+    }
+
+    NAV_LOG = "situations/arkvx_arkventure/data/arkvx_nav_log.jsonl"
+    # ARK publishes ARKVX NAV daily (interval fund priced daily). Seed from NPORT
+    # net assets; price (Yahoo) IS the NAV for an at-NAV vehicle.
+    NAV_REPORTED = [
+        {"date": "2026-01-30", "nav_per_share": None, "confidence": "high",
+         "source": "Interval fund priced daily at NAV; per-share NAV = market price (Yahoo)",
+         "source_url": "https://www.ark-funds.com/funds/arkvx"},
+    ]
+    NAV_MTM_BASE_DATE = "2026-01-30"
+    NAV_MTM_BASE_NAV = None           # at-NAV: price == NAV, handled in emit
+    NAV_MTM_OTHER_WEIGHT_FLAT = True
+
+    EVENTS = [
+        ("2026-04-01", "SpaceX confidential S-1 (ARK is a holder)", "ipo"),
+        ("2026-05-28", "Anthropic Series H ~$965B", "mark"),
+        ("2026-06-12", "Projected SpaceX IPO (SPCX)", "ipo"),
+    ]
+    HEADLINE_NAME = "SpaceX"
 
 
 def situation_dir(key: str) -> str:

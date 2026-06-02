@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Special Situations — SpaceX/OpenAI/Anthropic via ARKVX</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="sit-title">Special Situations</h1>
+    <span class="sub" id="sit-subtitle"></span>
+    <nav class="sitnav">
+      <a href="overview.html">Overview</a>
+      <a href="index.html">SpaceX · Baron</a>
+      <a href="vcx.html">OpenAI/Anthropic · VCX</a>
+      <a href="dxyz.html">Pre-IPO tech · DXYZ</a>
+      <a href="rvi.html">OpenAI · RVI</a>
+      <a href="agix.html">Anthropic · AGIX</a>
+      <a href="arkvx.html" class="active">ARK Venture · ARKVX</a>
+    </nav>
+  </header>
+  <div class="disclaimer" id="disclaimer"></div>
+
+  <main>
+    <div id="loading" class="loading">Loading situation data…</div>
+    <div id="error" class="error" style="display:none"></div>
+
+    <div id="content" style="display:none">
+      <div class="kpis" id="kpis"></div>
+
+      <section class="card" id="thesis">
+        <h2>The setup — an interval fund (at NAV, but gated)</h2>
+        <div id="thesis-body"></div>
+      </section>
+
+      <section class="card">
+        <h2>Private-company concentration over time — SEC-named</h2>
+        <p class="desc">
+          ARKVX trades at NAV, so the question isn't premium — it's <b>how much private exposure you own</b>.
+          Lines = SpaceX / OpenAI / Anthropic as % of the fund, straight from each quarter's SEC NPORT
+          (directly named, no SPVs). Bars = net assets. SpaceX has ranged ~8–17% as the fund grew 10×.
+        </p>
+        <div id="chart-conc" class="chart" style="height:420px"></div>
+      </section>
+
+      <section class="card">
+        <h2>Scenario NAV — bear / base / bull</h2>
+        <div id="scenario"></div>
+      </section>
+
+      <section class="card" id="holding-marks-card">
+        <h2>Mark-to-market — the private sleeve</h2>
+        <p class="desc">How far each named private holding has re-rated since the last filing mark. Each valuation links to its funding-round source. <b>Estimate, low confidence.</b></p>
+        <div id="holding-marks"></div>
+      </section>
+
+      <section class="card">
+        <h2>SEC filing — holdings named directly (no SPVs)</h2>
+        <p class="desc">Latest NPORT-P top holdings. SpaceX/OpenAI/Anthropic appear by name — the cleanest disclosure of the set. <a id="edgar-link" target="_blank" rel="noopener">Browse on EDGAR ↗</a></p>
+        <div class="scroll-y"><table class="data" id="nport-table">
+          <thead><tr><th>Holding (as filed)</th><th>% of fund</th><th>Value</th></tr></thead><tbody></tbody>
+        </table></div>
+      </section>
+
+      <p class="desc" id="footer-meta" style="text-align:center;margin-top:30px"></p>
+    </div>
+  </main>
+
+  <script src="arkvx_app.js"></script>
+</body>
+</html>

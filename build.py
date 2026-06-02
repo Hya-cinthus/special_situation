@@ -112,9 +112,25 @@ def build_agix_kraneshares(do_fetch: bool = True):
     print(f"[agix_kraneshares] Wrote {path} ({os.path.getsize(path)/1024:.0f} KB)")
 
 
+def build_arkvx_arkventure(do_fetch: bool = True):
+    from situations.arkvx_arkventure.ingest import price, edgar
+    from situations.arkvx_arkventure import emit
+    if do_fetch:
+        print("[arkvx_arkventure] Ingesting ARKVX daily NAV (Yahoo)...")
+        rows = price.fetch_price(); price.write_price_csv(rows)
+        print(f"[arkvx_arkventure]   {len(rows)} price rows.")
+        print("[arkvx_arkventure] Ingesting EDGAR NPORT-P (directly-named holdings)...")
+        anchors = edgar.fetch_anchors(verbose=False); edgar.write_anchors(anchors)
+        print(f"[arkvx_arkventure]   {len(anchors)} ARKVX NPORT anchors.")
+    else:
+        print("[arkvx_arkventure] --no-fetch: rebuilding JSON from cached data.")
+    path = emit.write_json()
+    print(f"[arkvx_arkventure] Wrote {path} ({os.path.getsize(path)/1024:.0f} KB)")
+
+
 BUILDERS = {"spacex_baron": build_spacex_baron, "vcx_fundrise": build_vcx_fundrise,
             "dxyz_destiny": build_dxyz_destiny, "rvi_robinhood": build_rvi_robinhood,
-            "agix_kraneshares": build_agix_kraneshares}
+            "agix_kraneshares": build_agix_kraneshares, "arkvx_arkventure": build_arkvx_arkventure}
 
 
 def main(argv):

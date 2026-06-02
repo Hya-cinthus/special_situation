@@ -1,0 +1,1570 @@
+[
+  {
+    "report_date": "2022-10-31",
+    "filing_date": "2022-12-27",
+    "accession": "0001752724-22-291288",
+    "net_assets_usd": 8208477.96,
+    "total_assets_usd": 8964223.34,
+    "n_holdings": 21,
+    "tracked_value_usd": {
+      "SpaceX": 0.0,
+      "OpenAI": 0.0,
+      "Anthropic": 0.0
+    },
+    "tracked_pct": {
+      "SpaceX": 0.0,
+      "OpenAI": 0.0,
+      "Anthropic": 0.0
+    },
+    "top_holdings": [
+      {
+        "name": "Dreyfus Government Cash Management",
+        "valUSD": 3007327.55,
+        "pctVal": 36.63684747226
+      },
+      {
+        "name": "X Holdings I, Inc.",
+        "valUSD": 1000000.0,
+        "pctVal": 12.18252646681
+      },
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 999990.24,
+        "pctVal": 12.18240756536
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 655125.0,
+        "pctVal": 7.981077651574
+      },
+      {
+        "name": "MosaicML",
+        "valUSD": 400000.0,
+        "pctVal": 4.873010586727
+      },
+      {
+        "name": "Critical Ideas, Inc",
+        "valUSD": 400000.0,
+        "pctVal": 4.873010586727
+      },
+      {
+        "name": "Flexport, Inc",
+        "valUSD": 332640.0,
+        "pctVal": 4.052395603922
+      },
+      {
+        "name": "ROBLOX Corp",
+        "valUSD": 275911.58,
+        "pctVal": 3.361300125851
+      },
+      {
+        "name": "Zoom Video Communications Inc",
+        "valUSD": 256744.88,
+        "pctVal": 3.12780129582
+      },
+      {
+        "name": "NVIDIA Corp",
+        "valUSD": 245915.34,
+        "pctVal": 2.995870138146
+      },
+      {
+        "name": "Twilio Inc",
+        "valUSD": 235455.42,
+        "pctVal": 2.868441885905
+      },
+      {
+        "name": "UiPath Inc",
+        "valUSD": 228965.0,
+        "pctVal": 2.789372172475
+      },
+      {
+        "name": "Tesla Inc",
+        "valUSD": 182714.62,
+        "pctVal": 2.225925694024
+      },
+      {
+        "name": "Shopify Inc",
+        "valUSD": 117237.75,
+        "pctVal": 1.428251992285
+      },
+      {
+        "name": "Block Inc",
+        "valUSD": 103200.26,
+        "pctVal": 1.257239898832
+      },
+      {
+        "name": "DraftKings Inc",
+        "valUSD": 101720.4,
+        "pctVal": 1.239211465215
+      },
+      {
+        "name": "Roku Inc",
+        "valUSD": 99916.46,
+        "pctVal": 1.21723491842
+      },
+      {
+        "name": "Coinbase Global Inc",
+        "valUSD": 97718.75,
+        "pctVal": 1.190461258179
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2023-01-31",
+    "filing_date": "2023-03-24",
+    "accession": "0001752724-23-065113",
+    "net_assets_usd": 12746986.8,
+    "total_assets_usd": 13023373.83,
+    "n_holdings": 28,
+    "tracked_value_usd": {
+      "SpaceX": 0.0,
+      "OpenAI": 0.0,
+      "Anthropic": 0.0
+    },
+    "tracked_pct": {
+      "SpaceX": 0.0,
+      "OpenAI": 0.0,
+      "Anthropic": 0.0
+    },
+    "top_holdings": [
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 1031103.33,
+        "pctVal": 8.088996608986
+      },
+      {
+        "name": "REPLIT, INC",
+        "valUSD": 1000000.0,
+        "pctVal": 7.844991257071
+      },
+      {
+        "name": "Dreyfus Government Cash Management",
+        "valUSD": 858725.21,
+        "pctVal": 6.736691764676
+      },
+      {
+        "name": "Tesla Inc",
+        "valUSD": 823141.44,
+        "pctVal": 6.457537400132
+      },
+      {
+        "name": "Twilio Inc",
+        "valUSD": 735373.76,
+        "pctVal": 5.769000717879
+      },
+      {
+        "name": "Coinbase Global Inc",
+        "valUSD": 697900.32,
+        "pctVal": 5.475021908707
+      },
+      {
+        "name": "X Holdings I, Inc.",
+        "valUSD": 689298.89,
+        "pctVal": 5.407543765558
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 665528.39,
+        "pctVal": 5.221064400882
+      },
+      {
+        "name": "Zoom Video Communications Inc",
+        "valUSD": 617775.0,
+        "pctVal": 4.846439473837
+      },
+      {
+        "name": "Roku Inc",
+        "valUSD": 567582.5,
+        "pctVal": 4.452679750166
+      },
+      {
+        "name": "ROBLOX Corp",
+        "valUSD": 538503.12,
+        "pctVal": 4.224552268305
+      },
+      {
+        "name": "Critical Ideas, Inc",
+        "valUSD": 400000.0,
+        "pctVal": 3.137996502828
+      },
+      {
+        "name": "MosaicML",
+        "valUSD": 400000.0,
+        "pctVal": 3.137996502828
+      },
+      {
+        "name": "Unity Software Inc",
+        "valUSD": 384468.48,
+        "pctVal": 3.016151864219
+      },
+      {
+        "name": "NVIDIA Corp",
+        "valUSD": 355964.14,
+        "pctVal": 2.79253556613
+      },
+      {
+        "name": "Block Inc",
+        "valUSD": 352376.64,
+        "pctVal": 2.764391659996
+      },
+      {
+        "name": "DraftKings Inc",
+        "valUSD": 334516.84,
+        "pctVal": 2.624281685143
+      },
+      {
+        "name": "Flexport, Inc",
+        "valUSD": 332640.0,
+        "pctVal": 2.609557891752
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2023-04-28",
+    "filing_date": "2023-06-23",
+    "accession": "0001752724-23-141437",
+    "net_assets_usd": 14755896.87,
+    "total_assets_usd": 15377251.82,
+    "n_holdings": 35,
+    "tracked_value_usd": {
+      "SpaceX": 0.0,
+      "OpenAI": 0.0,
+      "Anthropic": 1049998.46
+    },
+    "tracked_pct": {
+      "SpaceX": 0.0,
+      "OpenAI": 0.0,
+      "Anthropic": 7.1158
+    },
+    "top_holdings": [
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 1049998.46,
+        "pctVal": 7.115788821584
+      },
+      {
+        "name": "Replit, Inc.",
+        "valUSD": 1043117.63,
+        "pctVal": 7.069157769194
+      },
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 1022532.23,
+        "pctVal": 6.929651508197
+      },
+      {
+        "name": "Goldman Sachs Financial Square Treasury Obligations Fund",
+        "valUSD": 988141.19,
+        "pctVal": 6.696585092085
+      },
+      {
+        "name": "Tesla Inc",
+        "valUSD": 780801.12,
+        "pctVal": 5.291451457535
+      },
+      {
+        "name": "Coinbase Global Inc",
+        "valUSD": 769788.69,
+        "pctVal": 5.216820751607
+      },
+      {
+        "name": "Axiom Space Inc.",
+        "valUSD": 500032.8,
+        "pctVal": 3.3886981212
+      },
+      {
+        "name": "Mythical, Inc.",
+        "valUSD": 500000.58,
+        "pctVal": 3.388479767817
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 490042.24,
+        "pctVal": 3.32099257888
+      },
+      {
+        "name": "Block Inc",
+        "valUSD": 462490.32,
+        "pctVal": 3.134274548504
+      },
+      {
+        "name": "X Holdings I, Inc.",
+        "valUSD": 454612.55,
+        "pctVal": 3.080887281912
+      },
+      {
+        "name": "DraftKings Inc",
+        "valUSD": 434059.01,
+        "pctVal": 2.941596934595
+      },
+      {
+        "name": "MosaicML",
+        "valUSD": 400000.0,
+        "pctVal": 2.710780669748
+      },
+      {
+        "name": "Critical Ideas, Inc",
+        "valUSD": 400000.0,
+        "pctVal": 2.710780669748
+      },
+      {
+        "name": "NVIDIA Corp",
+        "valUSD": 378773.85,
+        "pctVal": 2.566932076965
+      },
+      {
+        "name": "Prime Medicine Inc",
+        "valUSD": 370509.39,
+        "pctVal": 2.51092423093
+      },
+      {
+        "name": "Shopify Inc",
+        "valUSD": 366233.55,
+        "pctVal": 2.481947069883
+      },
+      {
+        "name": "ROBLOX Corp",
+        "valUSD": 344465.6,
+        "pctVal": 2.334426724683
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2023-07-31",
+    "filing_date": "2023-09-27",
+    "accession": "0001752724-23-219817",
+    "net_assets_usd": 24770304.47,
+    "total_assets_usd": 26739157.55,
+    "n_holdings": 45,
+    "tracked_value_usd": {
+      "SpaceX": 0.0,
+      "OpenAI": 0.0,
+      "Anthropic": 1216805.48
+    },
+    "tracked_pct": {
+      "SpaceX": 0.0,
+      "OpenAI": 0.0,
+      "Anthropic": 4.9124
+    },
+    "top_holdings": [
+      {
+        "name": "Goldman Sachs Financial Square Treasury Obligations Fund",
+        "valUSD": 2286701.47,
+        "pctVal": 9.23162439432
+      },
+      {
+        "name": "MosaicML",
+        "valUSD": 2000000.0,
+        "pctVal": 8.074184160401
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 1216805.48,
+        "pctVal": 4.912355766452
+      },
+      {
+        "name": "Replit, Inc.",
+        "valUSD": 1202487.45,
+        "pctVal": 4.854552560935
+      },
+      {
+        "name": "Coinbase Global Inc",
+        "valUSD": 1168331.28,
+        "pctVal": 4.716660957538
+      },
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 1147670.29,
+        "pctVal": 4.63325063844
+      },
+      {
+        "name": "Zipline International Inc.",
+        "valUSD": 1104041.26,
+        "pctVal": 4.45711622696
+      },
+      {
+        "name": "Blockdaemon Inc.",
+        "valUSD": 1020000.36,
+        "pctVal": 4.117835375157
+      },
+      {
+        "name": "Tesla Inc",
+        "valUSD": 1001525.35,
+        "pctVal": 4.043250058605
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 804700.67,
+        "pctVal": 3.248650701789
+      },
+      {
+        "name": "Roku Inc",
+        "valUSD": 641543.28,
+        "pctVal": 2.589969294794
+      },
+      {
+        "name": "X Holdings I, Inc.",
+        "valUSD": 553190.0,
+        "pctVal": 2.233278967846
+      },
+      {
+        "name": "Mythical, Inc.",
+        "valUSD": 548568.2,
+        "pctVal": 2.21462033567
+      },
+      {
+        "name": "Axiom Space Inc.",
+        "valUSD": 539815.2,
+        "pctVal": 2.179283668692
+      },
+      {
+        "name": "Block Inc",
+        "valUSD": 529645.81,
+        "pctVal": 2.138228904862
+      },
+      {
+        "name": "Hammerspace, Inc.",
+        "valUSD": 499999.39,
+        "pctVal": 2.018543577474
+      },
+      {
+        "name": "Unity Software Inc",
+        "valUSD": 496401.36,
+        "pctVal": 2.004017999056
+      },
+      {
+        "name": "Critical Ideas, Inc",
+        "valUSD": 490120.0,
+        "pctVal": 1.978659570348
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2023-10-31",
+    "filing_date": "2023-12-27",
+    "accession": "0001752724-23-294340",
+    "net_assets_usd": 22880506.4,
+    "total_assets_usd": 23162225.39,
+    "n_holdings": 51,
+    "tracked_value_usd": {
+      "SpaceX": 0.0,
+      "OpenAI": 0.0,
+      "Anthropic": 1084970.04
+    },
+    "tracked_pct": {
+      "SpaceX": 0.0,
+      "OpenAI": 0.0,
+      "Anthropic": 4.7419
+    },
+    "top_holdings": [
+      {
+        "name": "MosaicML",
+        "valUSD": 2052280.0,
+        "pctVal": 8.969556722748
+      },
+      {
+        "name": "Replit, Inc.",
+        "valUSD": 1092824.25,
+        "pctVal": 4.776224052453
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 1084970.04,
+        "pctVal": 4.741896971301
+      },
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 1083387.04,
+        "pctVal": 4.734978418135
+      },
+      {
+        "name": "Shield AI",
+        "valUSD": 999984.67,
+        "pctVal": 4.370465637945
+      },
+      {
+        "name": "Zipline International Inc.",
+        "valUSD": 985377.97,
+        "pctVal": 4.306626578859
+      },
+      {
+        "name": "Blockdaemon Inc.",
+        "valUSD": 976035.2,
+        "pctVal": 4.265793697642
+      },
+      {
+        "name": "Coinbase Global Inc",
+        "valUSD": 913717.76,
+        "pctVal": 3.993433292193
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 757416.17,
+        "pctVal": 3.310312091693
+      },
+      {
+        "name": "Tesla Inc",
+        "valUSD": 752145.8,
+        "pctVal": 3.287277767593
+      },
+      {
+        "name": "Discord Inc.",
+        "valUSD": 549694.2,
+        "pctVal": 2.402456442135
+      },
+      {
+        "name": "Critical Ideas, Inc.",
+        "valUSD": 500000.0,
+        "pctVal": 2.185266319105
+      },
+      {
+        "name": "Pave Financial Inc.",
+        "valUSD": 500000.0,
+        "pctVal": 2.185266319105
+      },
+      {
+        "name": "Axiom Space Inc.",
+        "valUSD": 489998.4,
+        "pctVal": 2.141553999871
+      },
+      {
+        "name": "Mythical, Inc.",
+        "valUSD": 488153.2,
+        "pctVal": 2.133489493047
+      },
+      {
+        "name": "Hammerspace, Inc.",
+        "valUSD": 470539.52,
+        "pctVal": 2.056508329728
+      },
+      {
+        "name": "Pinterest Inc",
+        "valUSD": 467741.52,
+        "pctVal": 2.044279579406
+      },
+      {
+        "name": "Critical Ideas, Inc",
+        "valUSD": 459720.0,
+        "pctVal": 2.009221264438
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-01-31",
+    "filing_date": "2024-03-21",
+    "accession": "0001752724-24-062091",
+    "net_assets_usd": 43510272.03,
+    "total_assets_usd": 44339253.02,
+    "n_holdings": 56,
+    "tracked_value_usd": {
+      "SpaceX": 2309523.81,
+      "OpenAI": 0.0,
+      "Anthropic": 4359477.32
+    },
+    "tracked_pct": {
+      "SpaceX": 5.308,
+      "OpenAI": 0.0,
+      "Anthropic": 10.0194
+    },
+    "top_holdings": [
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 4359477.32,
+        "pctVal": 10.01942097028
+      },
+      {
+        "name": "Relation Therapeutics, Inc.",
+        "valUSD": 2999998.62,
+        "pctVal": 6.894920394732
+      },
+      {
+        "name": "Blockdaemon Inc.",
+        "valUSD": 2977723.75,
+        "pctVal": 6.843725886031
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 2887163.93,
+        "pctVal": 6.635591540336
+      },
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 2499999.82,
+        "pctVal": 5.745769224968
+      },
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 2309523.81,
+        "pctVal": 5.307996714908
+      },
+      {
+        "name": "MosaicML",
+        "valUSD": 2285400.0,
+        "pctVal": 5.252552772881
+      },
+      {
+        "name": "Shield AI",
+        "valUSD": 1999881.76,
+        "pctVal": 4.59634395901
+      },
+      {
+        "name": "Replit, Inc.",
+        "valUSD": 1266457.65,
+        "pctVal": 2.910709565609
+      },
+      {
+        "name": "TENSTORRENT HOLDINGS INC.",
+        "valUSD": 1000000.0,
+        "pctVal": 2.298307855465
+      },
+      {
+        "name": "Zipline International Inc.",
+        "valUSD": 992592.3,
+        "pctVal": 2.281282680364
+      },
+      {
+        "name": "Goldman Sachs Financial Square Treasury Obligations Fund",
+        "valUSD": 942563.53,
+        "pctVal": 2.166301165274
+      },
+      {
+        "name": "Mythical, Inc.",
+        "valUSD": 937479.72,
+        "pctVal": 2.154617004815
+      },
+      {
+        "name": "Coinbase Global Inc",
+        "valUSD": 737278.2,
+        "pctVal": 1.694492278723
+      },
+      {
+        "name": "Discord Inc.",
+        "valUSD": 647507.4,
+        "pctVal": 1.488171343892
+      },
+      {
+        "name": "Pave Financial Inc.",
+        "valUSD": 645500.0,
+        "pctVal": 1.483557720703
+      },
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 634141.4,
+        "pctVal": 1.457452161096
+      },
+      {
+        "name": "Tesla Inc",
+        "valUSD": 605508.57,
+        "pctVal": 1.391645102982
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-04-30",
+    "filing_date": "2024-06-26",
+    "accession": "0001752724-24-146528",
+    "net_assets_usd": 54652679.84,
+    "total_assets_usd": 54778639.2,
+    "n_holdings": 53,
+    "tracked_value_usd": {
+      "SpaceX": 7309485.44,
+      "OpenAI": 2293578.0,
+      "Anthropic": 2672340.0
+    },
+    "tracked_pct": {
+      "SpaceX": 13.3744,
+      "OpenAI": 4.1966,
+      "Anthropic": 4.8897
+    },
+    "top_holdings": [
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 7309485.44,
+        "pctVal": 13.37443188769
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 3995129.07,
+        "pctVal": 7.310033253073
+      },
+      {
+        "name": "Relation Therapeutics, Inc.",
+        "valUSD": 2999998.62,
+        "pctVal": 5.489206803367
+      },
+      {
+        "name": "Blockdaemon Inc.",
+        "valUSD": 2977723.75,
+        "pctVal": 5.448449661969
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 2672340.0,
+        "pctVal": 4.889677885555
+      },
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 2541000.48,
+        "pctVal": 4.649361179431
+      },
+      {
+        "name": "Discord Inc.",
+        "valUSD": 2500532.48,
+        "pctVal": 4.575315405064
+      },
+      {
+        "name": "Figure AI Inc.",
+        "valUSD": 2499996.62,
+        "pctVal": 4.574334922494
+      },
+      {
+        "name": "OpenAI Global, LLC",
+        "valUSD": 2293578.0,
+        "pctVal": 4.196643251007
+      },
+      {
+        "name": "Shield AI",
+        "valUSD": 2089128.76,
+        "pctVal": 3.822555025876
+      },
+      {
+        "name": "MosaicML",
+        "valUSD": 2066480.0,
+        "pctVal": 3.78111376432
+      },
+      {
+        "name": "Replit, Inc.",
+        "valUSD": 1214164.55,
+        "pctVal": 2.221601124692
+      },
+      {
+        "name": "Zipline International Inc.",
+        "valUSD": 1015230.37,
+        "pctVal": 1.857604005827
+      },
+      {
+        "name": "GAMEFAM, INC.",
+        "valUSD": 1000000.0,
+        "pctVal": 1.829736442801
+      },
+      {
+        "name": "TENSTORRENT HOLDINGS INC.",
+        "valUSD": 1000000.0,
+        "pctVal": 1.829736442801
+      },
+      {
+        "name": "Mythical, Inc.",
+        "valUSD": 975901.02,
+        "pctVal": 1.78564166086
+      },
+      {
+        "name": "Coinbase Global Inc",
+        "valUSD": 888319.08,
+        "pctVal": 1.625389793511
+      },
+      {
+        "name": "Pave Financial Inc.",
+        "valUSD": 677150.0,
+        "pctVal": 1.239006032242
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-07-31",
+    "filing_date": "2024-09-26",
+    "accession": "0001752724-24-219578",
+    "net_assets_usd": 63992954.89,
+    "total_assets_usd": 65147032.87,
+    "n_holdings": 60,
+    "tracked_value_usd": {
+      "SpaceX": 7309485.44,
+      "OpenAI": 1000000.0,
+      "Anthropic": 2672340.0
+    },
+    "tracked_pct": {
+      "SpaceX": 11.4223,
+      "OpenAI": 1.5627,
+      "Anthropic": 4.176
+    },
+    "top_holdings": [
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 7309485.44,
+        "pctVal": 11.42232836812
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 3664071.11,
+        "pctVal": 5.725741398093
+      },
+      {
+        "name": "Relation Therapeutics, Inc.",
+        "valUSD": 3278687.02,
+        "pctVal": 5.123512464201
+      },
+      {
+        "name": "Blockdaemon Inc.",
+        "valUSD": 3158976.5,
+        "pctVal": 4.936444184254
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 2672340.0,
+        "pctVal": 4.17599094243
+      },
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 2669402.1,
+        "pctVal": 4.171399968306
+      },
+      {
+        "name": "Discord Inc.",
+        "valUSD": 2606463.36,
+        "pctVal": 4.073047360417
+      },
+      {
+        "name": "Figure AI Inc.",
+        "valUSD": 2509303.92,
+        "pctVal": 3.921219022177
+      },
+      {
+        "name": "Shield AI",
+        "valUSD": 2103744.44,
+        "pctVal": 3.287462570866
+      },
+      {
+        "name": "MosaicML",
+        "valUSD": 2023507.34,
+        "pctVal": 3.162078299835
+      },
+      {
+        "name": "Zipline International Inc.",
+        "valUSD": 1500173.95,
+        "pctVal": 2.344279854835
+      },
+      {
+        "name": "Hammerspace, Inc.",
+        "valUSD": 1500000.0,
+        "pctVal": 2.344008028037
+      },
+      {
+        "name": "Goldman Sachs Financial Square Treasury Obligations Fund",
+        "valUSD": 1318497.61,
+        "pctVal": 2.060379321858
+      },
+      {
+        "name": "Replit, Inc.",
+        "valUSD": 1271026.95,
+        "pctVal": 1.986198249767
+      },
+      {
+        "name": "Tenstorrent Holdings Inc.",
+        "valUSD": 1213430.19,
+        "pctVal": 1.896193404548
+      },
+      {
+        "name": "CRISPR Therapeutics AG",
+        "valUSD": 1085931.95,
+        "pctVal": 1.696955472468
+      },
+      {
+        "name": "Zipline International Inc.",
+        "valUSD": 1043590.15,
+        "pctVal": 1.630789126387
+      },
+      {
+        "name": "Recursion Pharmaceuticals Inc",
+        "valUSD": 1027632.2,
+        "pctVal": 1.605852084446
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2024-10-31",
+    "filing_date": "2024-12-26",
+    "accession": "0001752724-24-296178",
+    "net_assets_usd": 68830414.24,
+    "total_assets_usd": 68996419.36,
+    "n_holdings": 66,
+    "tracked_value_usd": {
+      "SpaceX": 8439818.24,
+      "OpenAI": 3516669.11,
+      "Anthropic": 2807738.56
+    },
+    "tracked_pct": {
+      "SpaceX": 12.2618,
+      "OpenAI": 5.1092,
+      "Anthropic": 4.0792
+    },
+    "top_holdings": [
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 8439818.24,
+        "pctVal": 12.2617571508
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 3664071.11,
+        "pctVal": 5.323331481376
+      },
+      {
+        "name": "Blockdaemon Inc.",
+        "valUSD": 3480052.8,
+        "pctVal": 5.055981194397
+      },
+      {
+        "name": "Relation Therapeutics, Inc.",
+        "valUSD": 3112910.71,
+        "pctVal": 4.522580234873
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 2807738.56,
+        "pctVal": 4.079212061996
+      },
+      {
+        "name": "Discord Inc.",
+        "valUSD": 2681507.52,
+        "pctVal": 3.895817785797
+      },
+      {
+        "name": "Figure AI Inc.",
+        "valUSD": 2607633.84,
+        "pctVal": 3.788490696725
+      },
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 2581548.36,
+        "pctVal": 3.75059250842
+      },
+      {
+        "name": "MosaicML",
+        "valUSD": 2424120.0,
+        "pctVal": 3.521873327025
+      },
+      {
+        "name": "Shield AI",
+        "valUSD": 2113792.72,
+        "pctVal": 3.071015543549
+      },
+      {
+        "name": "OpenAI Global, LLC",
+        "valUSD": 2000000.0,
+        "pctVal": 2.905692232254
+      },
+      {
+        "name": "Goldman Sachs Financial Square Treasury Obligations Fund",
+        "valUSD": 1558849.46,
+        "pctVal": 2.264768383587
+      },
+      {
+        "name": "OpenAI Global, LLC",
+        "valUSD": 1516669.11,
+        "pctVal": 2.203486825913
+      },
+      {
+        "name": "Zipline International Inc.",
+        "valUSD": 1500173.95,
+        "pctVal": 2.179521896772
+      },
+      {
+        "name": "Hammerspace, Inc.",
+        "valUSD": 1500000.0,
+        "pctVal": 2.17926917419
+      },
+      {
+        "name": "Replit, Inc.",
+        "valUSD": 1320527.7,
+        "pctVal": 1.918523540183
+      },
+      {
+        "name": "Tenstorrent Holdings Inc.",
+        "valUSD": 1213430.19,
+        "pctVal": 1.762927338732
+      },
+      {
+        "name": "Zipline International Inc.",
+        "valUSD": 1043590.15,
+        "pctVal": 1.516175896255
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-01-31",
+    "filing_date": "2025-03-28",
+    "accession": "0001752724-25-073662",
+    "net_assets_usd": 123438277.81,
+    "total_assets_usd": 130158293.6,
+    "n_holdings": 75,
+    "tracked_value_usd": {
+      "SpaceX": 20940801.2,
+      "OpenAI": 3740899.61,
+      "Anthropic": 4996385.02
+    },
+    "tracked_pct": {
+      "SpaceX": 16.9646,
+      "OpenAI": 3.0306,
+      "Anthropic": 4.0477
+    },
+    "top_holdings": [
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 20940801.2,
+        "pctVal": 16.96459280826
+      },
+      {
+        "name": "Goldman Sachs Financial Square Treasury Obligations Fund",
+        "valUSD": 10774711.68,
+        "pctVal": 8.728825345882
+      },
+      {
+        "name": "Lambda, Inc.",
+        "valUSD": 4999995.5,
+        "pctVal": 4.050603741973
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 4996385.02,
+        "pctVal": 4.047678814581
+      },
+      {
+        "name": "Blockdaemon Inc.",
+        "valUSD": 4774598.75,
+        "pctVal": 3.868004993839
+      },
+      {
+        "name": "Hammerspace, Inc.",
+        "valUSD": 4258800.0,
+        "pctVal": 3.450145348394
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 3849186.5,
+        "pctVal": 3.118308654568
+      },
+      {
+        "name": "Archer Aviation Inc",
+        "valUSD": 3091501.35,
+        "pctVal": 2.504491641367
+      },
+      {
+        "name": "Relation Therapeutics, Inc.",
+        "valUSD": 2965553.99,
+        "pctVal": 2.402458979997
+      },
+      {
+        "name": "Discord Inc.",
+        "valUSD": 2952441.6,
+        "pctVal": 2.391836351236
+      },
+      {
+        "name": "Figure AI Inc.",
+        "valUSD": 2728655.28,
+        "pctVal": 2.210542247032
+      },
+      {
+        "name": "MosaicML",
+        "valUSD": 2582800.0,
+        "pctVal": 2.092381752097
+      },
+      {
+        "name": "Lila Sciences Inc.",
+        "valUSD": 2500000.0,
+        "pctVal": 2.02530369376
+      },
+      {
+        "name": "Umoja Biopharma, Inc.",
+        "valUSD": 2499999.92,
+        "pctVal": 2.02530362895
+      },
+      {
+        "name": "Freenome, Inc",
+        "valUSD": 2449767.75,
+        "pctVal": 1.984609469171
+      },
+      {
+        "name": "Shield AI",
+        "valUSD": 2260964.36,
+        "pctVal": 1.831655787907
+      },
+      {
+        "name": "OpenAI Global, LLC",
+        "valUSD": 2127508.31,
+        "pctVal": 1.723540175499
+      },
+      {
+        "name": "Generate Biomedicines, Inc.",
+        "valUSD": 2000000.0,
+        "pctVal": 1.620242955008
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-04-30",
+    "filing_date": "2025-06-25",
+    "accession": "0001752724-25-155355",
+    "net_assets_usd": 143406832.84,
+    "total_assets_usd": 146734497.37,
+    "n_holdings": 84,
+    "tracked_value_usd": {
+      "SpaceX": 20939321.2,
+      "OpenAI": 10835266.12,
+      "Anthropic": 4996385.02
+    },
+    "tracked_pct": {
+      "SpaceX": 14.6013,
+      "OpenAI": 7.5556,
+      "Anthropic": 3.4841
+    },
+    "top_holdings": [
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 13940771.2,
+        "pctVal": 9.721134567941
+      },
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 6998550.0,
+        "pctVal": 4.880206794475
+      },
+      {
+        "name": "X.AI Holdings Corp.",
+        "valUSD": 6014533.49,
+        "pctVal": 4.194035507855
+      },
+      {
+        "name": "Lambda, Inc.",
+        "valUSD": 4999995.5,
+        "pctVal": 3.486581079144
+      },
+      {
+        "name": "OpenAI Global, LLC",
+        "valUSD": 4999990.38,
+        "pctVal": 3.486577508882
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 4996385.02,
+        "pctVal": 3.484063430627
+      },
+      {
+        "name": "Blockdaemon Inc.",
+        "valUSD": 4774598.75,
+        "pctVal": 3.329408128918
+      },
+      {
+        "name": "Hammerspace, Inc.",
+        "valUSD": 3888880.07,
+        "pctVal": 2.711781574828
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 3701699.09,
+        "pctVal": 2.581257124707
+      },
+      {
+        "name": "Shield AI",
+        "valUSD": 3555720.9,
+        "pctVal": 2.479464074049
+      },
+      {
+        "name": "Radiant Industries, Incorporated",
+        "valUSD": 3499982.03,
+        "pctVal": 2.440596421165
+      },
+      {
+        "name": "OpenAI Global, LLC",
+        "valUSD": 3318566.16,
+        "pctVal": 2.314092079351
+      },
+      {
+        "name": "Apptronik, Inc.",
+        "valUSD": 3119987.36,
+        "pctVal": 2.175619737367
+      },
+      {
+        "name": "X.AI Holdings Corp.",
+        "valUSD": 3054332.08,
+        "pctVal": 2.129837204763
+      },
+      {
+        "name": "Discord Inc.",
+        "valUSD": 3053440.0,
+        "pctVal": 2.129215142354
+      },
+      {
+        "name": "Groq, Inc.",
+        "valUSD": 2999998.47,
+        "pctVal": 2.091949463347
+      },
+      {
+        "name": "Relation Therapeutics, Inc.",
+        "valUSD": 2799777.68,
+        "pctVal": 1.952332134078
+      },
+      {
+        "name": "Figure AI Inc.",
+        "valUSD": 2728655.28,
+        "pctVal": 1.902737286614
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-07-31",
+    "filing_date": "2025-09-23",
+    "accession": "0000940400-25-002007",
+    "net_assets_usd": 207402689.17,
+    "total_assets_usd": 207862870.08,
+    "n_holdings": 85,
+    "tracked_value_usd": {
+      "SpaceX": 23995330.24,
+      "OpenAI": 10835266.12,
+      "Anthropic": 5255602.0
+    },
+    "tracked_pct": {
+      "SpaceX": 11.5694,
+      "OpenAI": 5.2243,
+      "Anthropic": 2.534
+    },
+    "top_holdings": [
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 15975370.24,
+        "pctVal": 7.702585874817
+      },
+      {
+        "name": "Neuralink Corp.",
+        "valUSD": 12000012.0,
+        "pctVal": 5.785851691712
+      },
+      {
+        "name": "X.AI Holdings Corp.",
+        "valUSD": 11014552.21,
+        "pctVal": 5.310708484098
+      },
+      {
+        "name": "Goldman Sachs Financial Square Treasury Obligations Fund",
+        "valUSD": 8682049.15,
+        "pctVal": 4.186083210755
+      },
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 8019960.0,
+        "pctVal": 3.866854394267
+      },
+      {
+        "name": "Blockdaemon Inc.",
+        "valUSD": 5878984.2,
+        "pctVal": 2.834574722018
+      },
+      {
+        "name": "Lambda, Inc.",
+        "valUSD": 5812254.05,
+        "pctVal": 2.80240052492
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 5255602.0,
+        "pctVal": 2.534008609547
+      },
+      {
+        "name": "LAMBDA INC",
+        "valUSD": 5149547.62,
+        "pctVal": 2.48287408452
+      },
+      {
+        "name": "Replit, Inc.",
+        "valUSD": 5000000.0,
+        "pctVal": 2.410769127444
+      },
+      {
+        "name": "OpenAI Global, LLC",
+        "valUSD": 4999990.38,
+        "pctVal": 2.410764489124
+      },
+      {
+        "name": "Shield AI",
+        "valUSD": 4165012.06,
+        "pctVal": 2.008176497936
+      },
+      {
+        "name": "Kodiak Robotics, Inc.",
+        "valUSD": 4000000.0,
+        "pctVal": 1.928615301955
+      },
+      {
+        "name": "Hammerspace, Inc.",
+        "valUSD": 3888880.07,
+        "pctVal": 1.875038402618
+      },
+      {
+        "name": "Apptronik, Inc.",
+        "valUSD": 3867542.76,
+        "pctVal": 1.864750536975
+      },
+      {
+        "name": "Perplexity AI, Inc.",
+        "valUSD": 3827928.69,
+        "pctVal": 1.845650461582
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 3672637.5,
+        "pctVal": 1.770776220258
+      },
+      {
+        "name": "Discord Inc.",
+        "valUSD": 3553420.0,
+        "pctVal": 1.713295046568
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2025-10-31",
+    "filing_date": "2025-12-29",
+    "accession": "0000940400-25-014993",
+    "net_assets_usd": 378130413.73,
+    "total_assets_usd": 388637796.71,
+    "n_holdings": 97,
+    "tracked_value_usd": {
+      "SpaceX": 28995138.24,
+      "OpenAI": 16267466.07,
+      "Anthropic": 12557325.66
+    },
+    "tracked_pct": {
+      "SpaceX": 7.668,
+      "OpenAI": 4.3021,
+      "Anthropic": 3.3209
+    },
+    "top_holdings": [
+      {
+        "name": "Goldman Sachs Financial Square Treasury Obligations Fund",
+        "valUSD": 33644800.95,
+        "pctVal": 8.897671207697
+      },
+      {
+        "name": "Figure AI Inc.",
+        "valUSD": 22863597.36,
+        "pctVal": 6.046484633295
+      },
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 20975178.24,
+        "pctVal": 5.547075156714
+      },
+      {
+        "name": "Neuralink Corp.",
+        "valUSD": 13820211.84,
+        "pctVal": 3.65487972884
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 12557325.66,
+        "pctVal": 3.320898082788
+      },
+      {
+        "name": "Iambic Therapeutics, Inc.",
+        "valUSD": 11999997.7,
+        "pctVal": 3.173507674674
+      },
+      {
+        "name": "X.AI Holdings Corp.",
+        "valUSD": 11014552.21,
+        "pctVal": 2.9128977226
+      },
+      {
+        "name": "Manna Drone Delivery Inc.",
+        "valUSD": 10000000.0,
+        "pctVal": 2.644590235775
+      },
+      {
+        "name": "Securitize, Inc.",
+        "valUSD": 10000000.0,
+        "pctVal": 2.644590235775
+      },
+      {
+        "name": "Lambda, Inc.",
+        "valUSD": 8960429.47,
+        "pctVal": 2.369666428471
+      },
+      {
+        "name": "Kodiak AI Inc",
+        "valUSD": 8653963.71,
+        "pctVal": 2.288618792821
+      },
+      {
+        "name": "Apptronik, Inc.",
+        "valUSD": 8264428.67,
+        "pctVal": 2.185602736494
+      },
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 8019960.0,
+        "pctVal": 2.12095079073
+      },
+      {
+        "name": "OpenAI Global, LLC",
+        "valUSD": 7893291.12,
+        "pctVal": 2.087452062408
+      },
+      {
+        "name": "CRISPR Therapeutics AG",
+        "valUSD": 6323747.76,
+        "pctVal": 1.67237215796
+      },
+      {
+        "name": "Groq, Inc.",
+        "valUSD": 6000702.24,
+        "pctVal": 1.586939855169
+      },
+      {
+        "name": "OpenAI Global, LLC",
+        "valUSD": 5881522.92,
+        "pctVal": 1.555421808572
+      },
+      {
+        "name": "Beam Therapeutics Inc",
+        "valUSD": 5850589.3,
+        "pctVal": 1.547241133631
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  },
+  {
+    "report_date": "2026-01-30",
+    "filing_date": "2026-03-31",
+    "accession": "0000940400-26-012609",
+    "net_assets_usd": 554110108.22,
+    "total_assets_usd": 587436947.34,
+    "n_holdings": 105,
+    "tracked_value_usd": {
+      "SpaceX": 60579171.92,
+      "OpenAI": 15815899.44,
+      "Anthropic": 13790877.8
+    },
+    "tracked_pct": {
+      "SpaceX": 10.9327,
+      "OpenAI": 2.8543,
+      "Anthropic": 2.4888
+    },
+    "top_holdings": [
+      {
+        "name": "Goldman Sachs Financial Square Treasury Obligations Fund",
+        "valUSD": 50731930.95,
+        "pctVal": 9.155568576969
+      },
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 44652741.92,
+        "pctVal": 8.058460088995
+      },
+      {
+        "name": "Figure AI Inc.",
+        "valUSD": 22863597.36,
+        "pctVal": 4.12618304933
+      },
+      {
+        "name": "X.AI Holdings Corp.",
+        "valUSD": 22734083.97,
+        "pctVal": 4.102809826557
+      },
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 15926430.0,
+        "pctVal": 2.874235601144
+      },
+      {
+        "name": "Tharimmune Inc",
+        "valUSD": 15902441.37,
+        "pctVal": 2.869906383964
+      },
+      {
+        "name": "Boom Technology, Inc.",
+        "valUSD": 15048908.4,
+        "pctVal": 2.715869675856
+      },
+      {
+        "name": "Zipline International Inc.",
+        "valUSD": 15000006.12,
+        "pctVal": 2.707044303556
+      },
+      {
+        "name": "Neuralink Corp.",
+        "valUSD": 14887214.89,
+        "pctVal": 2.686688921417
+      },
+      {
+        "name": "Epic Games, Inc",
+        "valUSD": 14749680.95,
+        "pctVal": 2.661868233622
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 13790877.8,
+        "pctVal": 2.488833463858
+      },
+      {
+        "name": "Iambic Therapeutics, Inc.",
+        "valUSD": 11999997.7,
+        "pctVal": 2.165634144186
+      },
+      {
+        "name": "Groq, Inc.",
+        "valUSD": 11307293.4,
+        "pctVal": 2.040622113233
+      },
+      {
+        "name": "Tenstorrent Holdings Inc.",
+        "valUSD": 10066547.76,
+        "pctVal": 1.81670531013
+      },
+      {
+        "name": "Manna Drone Delivery Inc.",
+        "valUSD": 10048040.71,
+        "pctVal": 1.813365351207
+      },
+      {
+        "name": "Lucra Inc.",
+        "valUSD": 10000000.42,
+        "pctVal": 1.804695541852
+      },
+      {
+        "name": "Securitize, Inc.",
+        "valUSD": 10000000.0,
+        "pctVal": 1.804695466055
+      },
+      {
+        "name": "Kalshi Inc.",
+        "valUSD": 9999840.46,
+        "pctVal": 1.804666673943
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
+  }
+]
