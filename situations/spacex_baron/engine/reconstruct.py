@@ -169,6 +169,7 @@ def reconstruct_daily(anchors: list[dict],
             "is_override": True, "source": "external_aum",
             "confidence": ov.get("confidence", "med"),
             "ov_source": ov.get("source", ""), "ov_source_url": ov.get("source_url", ""),
+            "reported_total_assets_usd": ov.get("reported_total_assets_usd"),
         })
 
     # ---- regime 2: anchored era — full reconstruction ----

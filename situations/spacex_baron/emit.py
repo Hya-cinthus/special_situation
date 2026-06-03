@@ -191,6 +191,8 @@ def build_payload() -> dict:
         "residuals": recon["residuals"],
         "aum_overrides": [{
             "date": o["report_date"], "net_assets_usd": o["net_assets_usd"],
+            "reported_total_assets_usd": o.get("reported_total_assets_usd"),
+            "leverage_ratio": CFG.LEVERAGE_RATIO,
             "spacex_value_usd": o["spacex_value_usd"],
             "spacex_weight": o["spacex_weight_measured"],
             "source": o.get("ov_source", ""), "source_url": o.get("ov_source_url", ""),
