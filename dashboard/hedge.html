@@ -45,6 +45,17 @@
         <div id="chart" class="chart" style="height:480px"></div>
       </section>
 
+      <section class="card" id="short-card">
+        <h2>Short leg — daily P&amp;L by ticker</h2>
+        <p class="desc">
+          Each public short position's mark-to-market P&amp;L since 5/20 — one line per name
+          (P&amp;L = shares × (close − entry close), Yahoo daily closes). Hover any date to see every
+          ticker, <b>sorted alphabetically</b>. A line going <b>up</b> means that short made money (the
+          stock fell); <b>down</b> means it lost (the stock rose).
+        </p>
+        <div id="short-chart" class="chart" style="height:480px"></div>
+      </section>
+
       <section class="card">
         <h2>How to read it</h2>
         <div class="memo">
@@ -103,6 +114,19 @@
           only as a fixed −13.6% of NAV. SpaceX $ is held at its last NPORT gross LMV; net NAV and shares are
           from the reconstructed daily series.
         </p>
+      </section>
+
+      <section class="card" id="perfect-card">
+        <h2>Perfect hedge size — your shares vs what you'd need</h2>
+        <p class="desc" id="perfect-summary"></p>
+        <p class="desc" style="margin-top:-4px">
+          Date (columns) × ticker (rows). <b>Current</b> = your fixed short since 5/20;
+          each dated column = the share count a perfectly-sized short would hold that day
+          (= current × per-share drift). The last column, <span style="color:#f85149"><b>Δ to add</b></span>,
+          is how many more shares of each name you'd short to be neutral as of the latest date.
+        </p>
+        <div class="scroll-x" id="perfect-table"></div>
+        <p class="desc" style="margin-top:10px">Because the pro-rata assumption keeps the public holdings at constant relative weights, every name scales by the same factor — so the % gap is identical across tickers; only the absolute share counts differ. Dates shown are the trading days from the hedge book.</p>
       </section>
 
       <section class="card">

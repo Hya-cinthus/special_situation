@@ -40,7 +40,7 @@ function render() {
   const m = DATA.meta;
   document.getElementById("disclaimer").textContent = m.disclaimer;
   document.getElementById("gen").textContent = "Generated " + m.generated_at;
-  renderKpis(); renderChart(); renderLegs();
+  renderKpis(); renderChart(); renderShortBreakdown(); renderLegs();
   fetch("data/hedge_drift.json", { cache: "no-store" })
     .then((r) => r.ok ? r.json() : null).then((d) => { if (d) { DRIFT = d; renderDrift(); } })
     .catch(() => {});
@@ -100,6 +100,32 @@ function renderDrift() {
       <td style="color:${MUTED}">${pct(r.fund_public_growth, true)}</td></tr>`).join("") +
     "</tbody></table>";
   renderComposition();
+  renderPerfectHedge();
+}
+
+function renderPerfectHedge() {
+  const el = document.getElementById("perfect-table");
+  if (!el || !DRIFT.perfect_hedge) return;
+  const ph = DRIFT.perfect_hedge;
+  const dshort = (d) => d.slice(5);                 // MM-DD
+  const lastI = ph.dates.length - 1;
+  // summary line
+  const sum = document.getElementById("perfect-summary");
+  if (sum) sum.innerHTML =
+    `As of <b>${ph.as_of}</b>, a perfect hedge is <b style="color:${BAD}">${pct(ph.scale_now - 1, true)}</b> ` +
+    `bigger than your fixed short — you'd <b>add ~${ph.total_delta_shares.toLocaleString()} shares</b> in total ` +
+    `across the ${ph.legs.length} names (every name scales by the same factor under the pro-rata assumption).`;
+  // matrix: rows = ticker, columns = Current + each date's perfect shares + delta-to-add
+  const head = `<tr><th>Ticker</th><th>Current<br>(fixed)</th>` +
+    ph.dates.map((d, i) => `<th${i === lastI ? ` style="color:${TEXT}"` : ""}>${dshort(d)}</th>`).join("") +
+    `<th>Δ to add<br>(as of ${dshort(ph.as_of)})</th></tr>`;
+  const body = ph.legs.map((l) => {
+    const cells = l.perfect_shares.map((s, i) =>
+      `<td style="color:${i === lastI ? ACC : MUTED}">${s.toLocaleString()}</td>`).join("");
+    return `<tr><td><b>${l.ticker}</b></td><td>${l.current_shares.toLocaleString()}</td>${cells}` +
+      `<td style="color:${BAD}">+${l.delta_now.toLocaleString()}</td></tr>`;
+  }).join("");
+  el.innerHTML = `<table class="data"><thead>${head}</thead><tbody>${body}</tbody></table>`;
 }
 
 function renderComposition() {
@@ -192,6 +218,31 @@ function renderChart() {
     yaxis: { title: "P&L ($)", gridcolor: GRID, color: TEXT, tickformat: "$,.0s", zeroline: false },
     legend: { orientation: "h", y: 1.12, font: { color: TEXT } },
     margin: { t: 40, r: 16, b: 36, l: 64 },
+  }, { responsive: true, displayModeBar: false, displaylogo: false });
+}
+
+function renderShortBreakdown() {
+  const el = document.getElementById("short-chart");
+  if (!el || !DATA.short_legs_pnl) return;
+  const dates = DATA.series.map((r) => r.date);
+  const legs = DATA.short_legs_pnl;          // already alphabetical by ticker
+  const n = legs.length;
+  // one line per short ticker; distinct hues; traces in alphabetical order so the
+  // unified hover lists them A->Z (legend traceorder 'normal' keeps that order).
+  const traces = legs.map((lg, i) => ({
+    x: dates, y: lg.pnl, name: lg.ticker, type: "scatter", mode: "lines",
+    line: { width: 1.4, color: `hsl(${Math.round((360 * i) / n)},65%,62%)` },
+    hovertemplate: lg.ticker + "  %{y:$,.0f}<extra></extra>",
+  }));
+  Plotly.newPlot("short-chart", traces, {
+    paper_bgcolor: PLOT_BG, plot_bgcolor: PLOT_BG, font: { color: TEXT, size: 11 },
+    hovermode: "x unified",
+    hoverlabel: { bgcolor: "#0e1117", bordercolor: GRID, font: { size: 10 } },
+    shapes: [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: 0, y1: 0, line: { color: GRID, width: 1 } }],
+    xaxis: { gridcolor: GRID, color: TEXT, type: "date" },
+    yaxis: { title: "Short-leg P&L ($)", gridcolor: GRID, color: TEXT, tickformat: "$,.0s", zeroline: false },
+    legend: { traceorder: "normal", orientation: "h", y: -0.16, font: { color: TEXT, size: 9 } },
+    margin: { t: 16, r: 16, b: 70, l: 64 },
   }, { responsive: true, displayModeBar: false, displaylogo: false });
 }
 

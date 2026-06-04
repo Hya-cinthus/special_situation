@@ -61,6 +61,7 @@ def build_payload():
 
     series = []
     last = {tk: entry_px[tk] for tk in POSITIONS}   # carry-forward for any missing day
+    short_pnl_by_tk = {tk: [] for tk in POSITIONS if POSITIONS[tk] < 0}
     for d in dates:
         longp = shortp = 0.0
         for tk, sh in POSITIONS.items():
@@ -71,8 +72,15 @@ def build_payload():
                 longp += pnl
             else:
                 shortp += pnl
+                short_pnl_by_tk[tk].append(round(pnl, 2))
         series.append({"date": d, "long_pnl": round(longp, 2),
                        "short_pnl": round(shortp, 2), "total_pnl": round(longp + shortp, 2)})
+
+    # per-ticker daily P&L for the SHORT legs, sorted alphabetically by display ticker
+    short_legs_pnl = sorted(
+        ({"ticker": tk.replace("-", "/"), "shares": POSITIONS[tk], "pnl": short_pnl_by_tk[tk]}
+         for tk in short_pnl_by_tk),
+        key=lambda r: r["ticker"])
 
     # gross notional at entry (for context / return scaling)
     long_notional = sum(sh * entry_px[tk] for tk, sh in POSITIONS.items() if sh > 0)
@@ -111,6 +119,7 @@ def build_payload():
         },
         "series": series,
         "legs": legs,
+        "short_legs_pnl": short_legs_pnl,
     }
 
 

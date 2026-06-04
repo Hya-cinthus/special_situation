@@ -108,6 +108,44 @@ def build_payload():
             "source": srt[d].get("source"),
         })
 
+    # ---- Perfect-hedge share table (date x ticker) ----------------------------
+    # Under the pro-rata assumption the public holdings keep their relative weights,
+    # so a perfectly-sized short scales EVERY public name by the same per-share
+    # drift factor: perfect_shares(tk, t) = current_shares(tk) * (1 + hedge_drift_t).
+    # Your actual shares are fixed at entry, so the gap = what you'd need to add.
+    perfect = None
+    try:
+        hb = _load("hedge_book.json")
+        scale_by_date = {r["date"]: 1.0 + r["hedge_drift"] for r in rows}
+        hdates = [d for d in (x["date"] for x in hb["series"]) if d in scale_by_date]
+        short_legs = sorted(
+            ({"ticker": l["ticker"], "shares": abs(l["shares"])}
+             for l in hb["legs"] if l["side"] == "short"),
+            key=lambda r: r["ticker"])
+        legs_out = []
+        for lg in short_legs:
+            cur = lg["shares"]
+            perfect_shares = [round(cur * scale_by_date[d]) for d in hdates]
+            legs_out.append({
+                "ticker": lg["ticker"],
+                "current_shares": cur,                       # fixed since entry
+                "perfect_shares": perfect_shares,            # per date in hdates
+                "perfect_now": perfect_shares[-1] if perfect_shares else cur,
+                "delta_now": (perfect_shares[-1] - cur) if perfect_shares else 0,
+            })
+        perfect = {
+            "as_of": hdates[-1] if hdates else None,
+            "dates": hdates,
+            "scale_now": round(scale_by_date[hdates[-1]], 4) if hdates else None,
+            "note": ("Perfect hedge = current shares x (1 + per-share drift). All public names scale "
+                     "by the SAME factor under the pro-rata assumption; only the magnitude grows. "
+                     "Delta = shares to ADD to each short to be neutral as of " + (hdates[-1] if hdates else "?") + "."),
+            "legs": legs_out,
+            "total_delta_shares": sum(l["delta_now"] for l in legs_out),
+        }
+    except Exception:
+        perfect = None
+
     last = rows[-1] if rows else {}
     return {
         "meta": {
@@ -147,6 +185,7 @@ def build_payload():
             "fund_public_growth": last.get("fund_public_growth"),   # (B) the context
         },
         "series": rows,
+        "perfect_hedge": perfect,
     }
 
 
