@@ -83,6 +83,28 @@
         <p class="desc" style="margin-top:10px">Total assets per day = net NAV (reconstructed daily series) × leverage ratio 1.1358, which reproduces the Morningstar override anchors exactly — so the 5/20 entry is a real reconstructed point, not interpolated by hand. SpaceX held fixed at its last NPORT gross LMV; shares outstanding reconstructed. Pro-rata allocation is a simplification.</p>
       </section>
 
+      <section class="card" id="comp-card">
+        <h2>Fund composition over time — the dilution behind the drift</h2>
+        <p class="desc">
+          Per dollar of your NAV: <span style="color:#ff7a45"><b>SpaceX</b></span> (private, marked flat at
+          $3.89B) plus <span style="color:#4da3ff"><b>public / other holdings</b></span>. Because SpaceX is a
+          fixed dollar amount and the public book grows with inflows, SpaceX's share of NAV
+          <b>falls (30.3% → 25.7%)</b> while the public share <b>rises (83.3% → 87.9%)</b> — that re-weighting
+          is exactly what drifts your hedge. The stack totals more than 100% of NAV: the bit
+          <b>above the dashed line is the fund's borrowings (leverage)</b>.
+        </p>
+        <div class="kpis" id="comp-kpis"></div>
+        <div id="comp-chart" class="chart" style="height:380px"></div>
+        <div class="scroll-y" id="comp-table" style="margin-top:14px"></div>
+        <p class="desc" style="margin-top:10px">
+          <b>On leverage:</b> the ratio (gross Total Assets ÷ net NAV) is <b>assumed constant at 1.1358</b>,
+          taken from the last NPORT filing (gross $11.768B ÷ net $10.361B). We do <b>not</b> have a daily
+          leverage feed, so this is a held-flat assumption, not observed daily variation — borrowings move
+          only as a fixed −13.6% of NAV. SpaceX $ is held at its last NPORT gross LMV; net NAV and shares are
+          from the reconstructed daily series.
+        </p>
+      </section>
+
       <section class="card">
         <h2>Positions (entry 2026-05-20)</h2>
         <div class="scroll-y" id="legs"></div>

@@ -99,6 +99,59 @@ function renderDrift() {
       <td style="color:${r.hedge_drift >= 0 ? BAD : GOOD}">${pct(r.hedge_drift, true)}</td>
       <td style="color:${MUTED}">${pct(r.fund_public_growth, true)}</td></tr>`).join("") +
     "</tbody></table>";
+  renderComposition();
+}
+
+function renderComposition() {
+  if (!document.getElementById("comp-chart")) return;
+  const k = DRIFT.kpis, s = DRIFT.series, L = DRIFT.meta.leverage_ratio;
+  // KPI strip
+  const cards = [
+    { label: "SpaceX (% of NAV)", value: pct(k.spacex_weight_net_entry) + " → " + pct(k.spacex_weight_net_now),
+      cls: "spx", note: "private mark fixed → diluted down" },
+    { label: "Public / other (% of NAV)", value: pct(k.public_weight_net_entry) + " → " + pct(k.public_weight_net_now),
+      cls: "acc", note: "grows as the fund grows" },
+    { label: "Leverage ratio", value: k.leverage_ratio.toFixed(4) + "×",
+      cls: "muted", note: "gross ÷ net — assumed CONSTANT" },
+    { label: "Borrowings (% of NAV)", value: pct(-(L - 1), true),
+      cls: "muted", note: "= −(leverage − 1), held flat" },
+  ];
+  document.getElementById("comp-kpis").innerHTML = cards.map((c) =>
+    `<div class="kpi"><div class="label">${c.label}</div>
+      <div class="value" style="color:${c.cls === "spx" ? SPX : c.cls === "acc" ? ACC : c.cls === "muted" ? MUTED : TEXT}">${c.value}</div>
+      <div class="note">${c.note}</div></div>`).join("");
+  // stacked bars as % of NAV: Public + SpaceX -> total = leverage (~113.6%); 100% line = your equity
+  const x = s.map((r) => r.date);
+  Plotly.newPlot("comp-chart", [
+    { x, y: s.map((r) => r.public_weight_net * 100), name: "Public / other holdings",
+      type: "bar", marker: { color: "rgba(77,163,255,0.78)" },
+      hovertemplate: "public %{y:.1f}% of NAV<extra></extra>" },
+    { x, y: s.map((r) => r.spacex_weight_net * 100), name: "SpaceX (private, fixed mark)",
+      type: "bar", marker: { color: "rgba(255,122,69,0.88)" },
+      hovertemplate: "SpaceX %{y:.1f}% of NAV<extra></extra>" },
+  ], {
+    barmode: "stack",
+    paper_bgcolor: PLOT_BG, plot_bgcolor: PLOT_BG, font: { color: TEXT, size: 11 },
+    hovermode: "x unified", hoverlabel: { bgcolor: "#0e1117", bordercolor: GRID },
+    shapes: [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: 100, y1: 100,
+      line: { color: GOOD, width: 1.5, dash: "dash" } }],
+    annotations: [{ xref: "paper", x: 0.012, y: 100, yanchor: "bottom", showarrow: false,
+      text: "100% = your NAV (equity) · the stack above this = borrowings (leverage)",
+      font: { color: GOOD, size: 10 } }],
+    xaxis: { gridcolor: GRID, color: TEXT, type: "date" },
+    yaxis: { title: "% of NAV", ticksuffix: "%", gridcolor: GRID, color: TEXT, rangemode: "tozero" },
+    legend: { orientation: "h", y: 1.13, font: { color: TEXT } },
+    margin: { t: 44, r: 16, b: 36, l: 52 },
+  }, { responsive: true, displayModeBar: false, displaylogo: false });
+  // composition table ($ and % of NAV, with leverage)
+  document.getElementById("comp-table").innerHTML =
+    `<table class="data"><thead><tr><th>Date</th><th>Total Assets (gross)</th><th>Net NAV</th><th>Leverage ×</th>
+      <th>SpaceX $ (% NAV)</th><th>Public/other $ (% NAV)</th></tr></thead><tbody>` +
+    s.map((r) => `<tr><td>${r.date}</td><td>${usd(r.gross_total_assets)}</td><td>${usd(r.net_nav)}</td>
+      <td style="color:${MUTED}">${r.leverage_ratio.toFixed(4)}</td>
+      <td style="color:${SPX}">${usd(r.spacex_value)} <span style="color:${MUTED}">(${(r.spacex_weight_net * 100).toFixed(1)}%)</span></td>
+      <td style="color:${ACC}">${usd(r.public_total)} <span style="color:${MUTED}">(${(r.public_weight_net * 100).toFixed(1)}%)</span></td></tr>`).join("") +
+    "</tbody></table>";
 }
 
 function renderKpis() {

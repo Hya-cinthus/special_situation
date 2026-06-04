@@ -79,17 +79,28 @@ def build_payload():
 
     rows = []
     for d in dates:
+        net = srt[d]["total_nav_usd"]
+        g = gross(d)
+        pub = pub_total(d)
         ps = pub_ps(d)
         hedge_drift = ps / pub_ps_entry - 1            # (A) YOUR drift
-        fund_growth = pub_total(d) / pub_total_entry - 1  # (B) context
+        fund_growth = pub / pub_total_entry - 1        # (B) context
         rows.append({
             "date": d,
-            "gross_total_assets": round(gross(d), 0),
-            "net_nav": round(srt[d]["total_nav_usd"], 0),
+            "gross_total_assets": round(g, 0),
+            "net_nav": round(net, 0),
+            "leverage_ratio": round(leverage, 4),      # assumed constant (last NPORT gross/net)
             "shares_out": round(shares(d), 0),
-            "public_total": round(pub_total(d), 0),
+            "spacex_value": round(spacex_fixed, 0),    # fixed
+            "public_total": round(pub, 0),
             "public_per_share": round(ps, 2),
-            "spacex_weight_net": round(spacex_fixed / srt[d]["total_nav_usd"], 4),
+            # composition as % of NET NAV (these three sum to 100%: public + spacex − borrowings)
+            "spacex_weight_net": round(spacex_fixed / net, 4),
+            "public_weight_net": round(pub / net, 4),
+            "borrow_weight_net": round(-(leverage - 1), 4),
+            # composition as % of GROSS total assets (spacex + public = 100%)
+            "spacex_pct_gross": round(spacex_fixed / g, 4),
+            "public_pct_gross": round(pub / g, 4),
             "hedge_drift": round(hedge_drift, 4),
             "fund_public_growth": round(fund_growth, 4),
             # dollars of short you'd need to ADD to re-neutralize (None if unknown)
@@ -128,8 +139,11 @@ def build_payload():
             "hedge_drift": last.get("hedge_drift"),                 # (A) the headline
             "underhedge_gap_usd": last.get("underhedge_gap_usd"),
             "public_per_share_now": last.get("public_per_share"),
+            "leverage_ratio": round(leverage, 4),
             "spacex_weight_net_now": last.get("spacex_weight_net"),
             "spacex_weight_net_entry": rows[0]["spacex_weight_net"] if rows else None,
+            "public_weight_net_now": last.get("public_weight_net"),
+            "public_weight_net_entry": rows[0]["public_weight_net"] if rows else None,
             "fund_public_growth": last.get("fund_public_growth"),   # (B) the context
         },
         "series": rows,
