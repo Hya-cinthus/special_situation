@@ -40,13 +40,17 @@ SITUATIONS = ["spacex_baron", "vcx_fundrise", "dxyz_destiny", "rvi_robinhood",
 PRIVATE_COMPANIES = {
     "SpaceX": {
         "sector": "Space / satellite (Starlink)",
-        "current": 1.25e12,            # SpaceX+xAI combined mark carried in funds
-        "bear": 0.90e12, "base": 1.25e12, "bull": 2.0e12,
-        "last_confirmed": {"val": 1.25e12, "date": "2026-02-02",
-                           "source_type": "merger (press)", "confidence": "high"},
-        "rumored_range": "IPO targeted ~$1.75T–$2.0T (S-1 filed 2026-05-20, SPCX)",
-        "source_url": "https://www.cnbc.com/2026/05/20/spacex-ipo-live-updates.html",
-        "notes": "Mid-IPO. Bull = IPO upper range; bear = post-hype markdown. xAI portion adds uncertainty.",
+        # IPO PRICED 2026-06-03: $135/sh, 555.6M shares = $75B raise, $1.77T valuation.
+        # The IPO mark is now CONFIRMED (no longer a target). base = IPO price.
+        "current": 1.77e12,
+        "bear": 1.40e12, "base": 1.77e12, "bull": 2.20e12,
+        "last_confirmed": {"val": 1.77e12, "date": "2026-06-03",
+                           "source_type": "IPO priced ($135/sh)", "confidence": "high"},
+        "rumored_range": "IPO PRICED $135/sh = $1.77T (6/3); 555.6M shares ($75B raise) + 83.3M greenshoe; first trade 6/12 Nasdaq SPCX",
+        "source_url": "https://www.cnbc.com/2026/06/03/spacex-ipo-stock-price-roadshow-musk.html",
+        "notes": "IPO priced $135/sh at $1.77T (6/3/2026), assuming EchoStar spectrum + Cursor deals close. "
+                 "Bull = first-day pop; bear = trades below offer. Funds still carry the stale $1.25T "
+                 "private mark until they re-mark to the public price after 6/12.",
     },
     "OpenAI": {
         "sector": "AI foundation models",
@@ -265,16 +269,20 @@ class SpacexBaron:
         ("2026-02-02", "SpaceX + xAI merger, $1.25T combined", "corporate"),
         ("2026-05-04", "SpaceX 5-for-1 stock split", "corporate"),
         ("2026-05-20", "SpaceX files S-1; user entry", "filing"),
-        ("2026-06-11", "Projected IPO pricing (~$1.75T)", "ipo"),
-        ("2026-06-12", "Projected first trade, Nasdaq: SPCX", "ipo"),
+        ("2026-06-03", "IPO PRICED $135/sh = $1.77T (555.6M sh, $75B)", "ipo"),
+        ("2026-06-12", "First trade, Nasdaq: SPCX", "ipo"),
         ("2026-12-09", "Projected ~180-day lockup expiry", "lockup"),
     ]
 
-    # --- IPO facts (web-verified 2026-05-24; RE-VERIFY at runtime) ----------
+    # --- IPO facts (PRICED 2026-06-03; web-verified) ------------------------
     IPO_TICKER = "SPCX"
     IPO_EXCHANGE = "Nasdaq"
-    IPO_PRICING_DATE = "2026-06-11"
+    IPO_PRICING_DATE = "2026-06-03"
     IPO_FIRST_TRADE_DATE = "2026-06-12"
+    IPO_PRICE_PER_SHARE = 135.0
+    IPO_VALUATION_USD = 1.77e12
+    IPO_SHARES = 555.6e6
+    IPO_RAISE_USD = 75e9
     LOCKUP_EXPIRY_DATE = "2026-12-09"   # ~180 days after first trade
 
     # --- Data-density eras (drives confidence + the "soft estimate" shading) -
@@ -286,10 +294,11 @@ class SpacexBaron:
     ]
 
     # --- Scenario defaults (the frontend recomputes these client-side) ------
-    # Current standing SpaceX mark = combined post-xAI entity. The fund's
-    # 2026-03-31 NPORT marks SpaceX at the $1.25T-era basis ($526.59/sh pre-split).
+    # Funds still carry SpaceX at the stale $1.25T private mark; the IPO PRICED at
+    # $1.77T (6/3), so that is now the confirmed re-rate target. Scenarios: the
+    # confirmed IPO price, plus first-day pop upside.
     CURRENT_SPACEX_VALUATION_USD = 1.25e12
-    IPO_VALUATION_SCENARIOS_USD = [1.75e12, 2.0e12, 2.4e12]
+    IPO_VALUATION_SCENARIOS_USD = [1.77e12, 2.1e12, 2.5e12]   # priced / +20% pop / +40% pop
     DEFAULT_NET_FLOW_SHOCK_USD = 0.0    # slider default; +inflow dilutes, -outflow concentrates
 
 
@@ -475,8 +484,8 @@ class DxyzDestiny:
         return VcxFundrise.VALUATION_TIMELINE
 
     UNDERLYING_MARKS = {
-        "SpaceX": {"current_valuation_usd": 1.25e12, "ipo_target_usd": 1.75e12,
-                   "source_url": "https://www.cnbc.com/2026/05/20/spacex-ipo-live-updates.html"},
+        "SpaceX": {"current_valuation_usd": 1.25e12, "ipo_target_usd": 1.77e12,
+                   "source_url": "https://www.cnbc.com/2026/06/03/spacex-ipo-stock-price-roadshow-musk.html"},
     }
 
     NAV_LOG = "situations/dxyz_destiny/data/dxyz_nav_log.jsonl"
@@ -502,7 +511,7 @@ class DxyzDestiny:
         ("2024-03-26", "NYSE listing (DXYZ)", "listing"),
         ("2026-02-11", "Adds ~$100M Anthropic SPV", "mark"),
         ("2026-05-20", "SpaceX files S-1 (largest holding)", "ipo"),
-        ("2026-06-12", "Projected SpaceX IPO (SPCX)", "ipo"),
+        ("2026-06-12", "SpaceX IPO first trade (SPCX, $135/$1.77T)", "ipo"),
     ]
 
     HEADLINE_NAME = "SpaceX"
@@ -685,8 +694,8 @@ class ArkvxArkVenture:
         return VcxFundrise.VALUATION_TIMELINE
 
     UNDERLYING_MARKS = {
-        "SpaceX": {"current_valuation_usd": 1.25e12, "ipo_target_usd": 1.75e12,
-                   "source_url": "https://www.cnbc.com/2026/05/20/spacex-ipo-live-updates.html"},
+        "SpaceX": {"current_valuation_usd": 1.25e12, "ipo_target_usd": 1.77e12,
+                   "source_url": "https://www.cnbc.com/2026/06/03/spacex-ipo-stock-price-roadshow-musk.html"},
     }
 
     NAV_LOG = "situations/arkvx_arkventure/data/arkvx_nav_log.jsonl"
@@ -704,7 +713,7 @@ class ArkvxArkVenture:
     EVENTS = [
         ("2026-04-01", "SpaceX confidential S-1 (ARK is a holder)", "ipo"),
         ("2026-05-28", "Anthropic Series H ~$965B", "mark"),
-        ("2026-06-12", "Projected SpaceX IPO (SPCX)", "ipo"),
+        ("2026-06-12", "SpaceX IPO first trade (SPCX, $135/$1.77T)", "ipo"),
     ]
     HEADLINE_NAME = "SpaceX"
 

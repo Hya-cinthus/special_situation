@@ -157,9 +157,10 @@ function renderKpis() {
   const lastNavPt = [...DATA.series].reverse().find((p) => p.nav_per_share != null);
   const navTxt = lastNavPt ? "$" + lastNavPt.nav_per_share.toFixed(2) : "–";
   const mk125 = DATA.marks.find((m) => m.date === "2026-02-02") || {};
-  const mkIpo = DATA.marks.find((m) => m.date === "2026-06-12") || {};
+  const mkIpo = DATA.marks.find((m) => m.date === "2026-06-03") || {};
+  // IPO PRICED $1.77T (6/3). Pick the priced-IPO scenario (~$1.77T).
   const ipo175 = (DATA.scenario_table || []).find(
-    (r) => Math.round(r.ipo_valuation_usd) === 1750000000000) || {};
+    (r) => Math.round(r.ipo_valuation_usd / 1e10) === 177) || (DATA.scenario_table || [])[1] || {};
   const markAge = daysBetween("2026-02-02", today);
   const ov = (DATA.aum_overrides || [])[ (DATA.aum_overrides || []).length - 1 ];  // latest reported AUM
   // implied net inflows since last filing = current AUM − filed net assets grown by NAV
@@ -254,18 +255,18 @@ function renderKpis() {
         + "<span class='conf'>Confidence: MED — same basis as the reconstructed weight.</span>",
       sources: [S_EDGAR, S_YAHOO] },
 
-    { label: "IF IPO @ $1.75T", value: pct(ipo175.spacex_weight, 0) + " / " + signPct(ipo175.nav_stepup_pct, 0),
+    { label: "IF re-marked @ IPO $1.77T", value: pct(ipo175.spacex_weight, 0) + " / " + signPct(ipo175.nav_stepup_pct, 0),
       cls: "spx", small: true, note: "SpaceX weight / NAV step-up",
-      tip: "Re-marking SpaceX $1.25T → $1.75T (×1.40): weight " + pct(k.spacex_weight) + " → "
-        + pct(ipo175.spacex_weight) + ", per-share NAV step-up " + signPct(ipo175.nav_stepup_pct) + ". "
-        + "$1.75T is the S-1 / press target, <b>not yet realized</b>. Adjust it live in the Scenario Lab below. "
-        + "<span class='conf'>Confidence: scenario — forward, user-adjustable.</span>",
+      tip: "IPO PRICED $135/sh = $1.77T (6/3). Re-marking SpaceX $1.25T → $1.77T (×1.42): weight "
+        + pct(k.spacex_weight) + " → " + pct(ipo175.spacex_weight) + ", per-share NAV step-up "
+        + signPct(ipo175.nav_stepup_pct) + ". The fund still carries the stale $1.25T mark; it re-marks to "
+        + "the public price after first trade (6/12). <span class='conf'>IPO price confirmed; fund re-mark pending.</span>",
       sources: [S_IPO] },
 
-    { label: "Days to projected IPO", value: dToIpo >= 0 ? dToIpo : "traded",
+    { label: "Days to IPO first trade", value: dToIpo >= 0 ? dToIpo : "traded",
       note: ipo.ticker + " · " + ipo.first_trade_date,
-      tip: "Calendar days from today to SpaceX's projected first trading day (" + ipo.first_trade_date
-        + ", Nasdaq: " + ipo.ticker + "). Dates are S-1 / press targets and may move; re-verify. "
+      tip: "Calendar days to SpaceX's first trading day (" + ipo.first_trade_date
+        + ", Nasdaq: " + ipo.ticker + "). PRICED 6/3 at $135/sh ($1.77T); 555.6M shares ($75B raise). "
         + "<span class='conf'>Confidence: MED — announced target, not final.</span>",
       sources: [S_IPO] },
   ];
@@ -312,9 +313,11 @@ function renderMarkChain() {
     { d: "2026-05-04", t: "5-for-1 split (cosmetic only)", v: "$526.59 → $105.32",
       note: "Per-share figure divided by 5; the fund's SpaceX dollar value and weight are unchanged.",
       link: link(byDate("2026-05-04"), "Bloomberg") },
-    { d: "2026-06-12", t: "IPO target — NOT in the NAV yet", v: "$1.75T (target)", forward: true,
-      note: "S-1 / press target, unrealized as of today. NAV only steps up to a public mark once SpaceX actually trades.",
-      link: link(byDate("2026-06-12"), "S-1 / CNBC") },
+    { d: "2026-06-03", t: "IPO PRICED — the re-rate is now confirmed", v: "$135/sh = $1.77T", forward: true,
+      note: "Priced 6/3 at $135/share, 555.6M shares ($75B raise, +83.3M greenshoe), $1.77T valuation. "
+        + "First trade 6/12 on Nasdaq (SPCX). The fund still carries the stale $1.25T mark and will re-mark "
+        + "to the public price after it trades — a confirmed step-up, no longer a target.",
+      link: link(byDate("2026-06-03"), "CNBC (6/3)") },
   ];
 
   const rows = steps.map((s) => `
@@ -330,12 +333,12 @@ function renderMarkChain() {
 
   el.innerHTML = rows + `
     <div class="mark-callout">
-      <b>Bottom line.</b> Today's NAV embeds SpaceX at the <b>$1.25T</b> private mark
-      (<b>$526.59/share</b>, verified in the 3/31 SEC filing). It does <b>not</b> reflect the
-      <b>$1.75T</b> IPO target — open-end funds mark a private holding to its last observable
-      transaction, never to a hoped-for future IPO price. That ~$0.5T gap between the carried mark
-      and the IPO target, multiplied by SpaceX's ~31% weight and the fund's leverage, is precisely
-      this situation's thesis. Adjust the IPO valuation yourself in the Scenario Lab below.
+      <b>Bottom line.</b> Today's NAV still embeds SpaceX at the <b>$1.25T</b> private mark
+      (<b>$526.59/share</b>, verified in the 3/31 SEC filing). The IPO has now <b>PRICED at $1.77T</b>
+      ($135/share, 6/3) — so the re-rate is <b>confirmed, not a hope</b>. Once SpaceX trades (6/12) the
+      fund must mark to the public price: a ~<b>$0.52T</b> step-up on the SpaceX mark, multiplied by
+      SpaceX's ~26% weight and the fund's leverage. That captured-vs-priced gap is precisely this
+      situation's thesis — now with a known number. Adjust first-day pop in the Scenario Lab below.
     </div>`;
 }
 
@@ -437,7 +440,7 @@ function renderMtmCheck() {
     { b: "PENDING", color: SPX,
       h: "The real MTM event is the IPO re-rate (not yet in NAV)",
       n: "When SpaceX trades (~" + ipo.first_trade_date + ", " + ipo.ticker + "), the mark jumps from $1.25T "
-        + "to the public price. At $1.75T that's a weight step to " + pct(ipo175.spacex_weight)
+        + "to the public price. At the $1.77T IPO price that is a weight step to " + pct(ipo175.spacex_weight)
         + " and a NAV step-up of " + signPct(ipo175.nav_stepup_pct) + ". Model it in the Scenario Lab below." },
   ];
   el.innerHTML = rows.map((r) =>

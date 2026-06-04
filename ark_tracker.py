@@ -155,8 +155,12 @@ TIMELINE = [
      "text": "SpaceX submitted a confidential draft S-1 to the SEC (per ARK's own SpaceX-IPO guide).",
      "source_url": "https://www.ark-funds.com/articles/venture-fund/arks-guide-to-the-spacex-ipo",
      "confidence": "high"},
+    {"date": "2026-06-03", "cat": "SpaceX", "kind": "priced",
+     "text": "SpaceX IPO PRICED: $135/share, 555.6M shares ($75B raise) + 83.3M greenshoe, $1.77T valuation; "
+             "first trade 6/12 Nasdaq SPCX; Goldman lead, Musk 82% voting control. Largest IPO ever.",
+     "source_url": "https://www.cnbc.com/2026/06/03/spacex-ipo-stock-price-roadshow-musk.html", "confidence": "high"},
     {"date": "2026-05-20", "cat": "SpaceX", "kind": "filing",
-     "text": "SpaceX publicly filed its S-1; ~$1.75T target, Nasdaq SPCX, first trade ~June 12.",
+     "text": "SpaceX publicly filed its S-1; Nasdaq SPCX, first trade targeted ~June 12.",
      "source_url": "https://www.cnbc.com/2026/05/20/spacex-ipo-live-updates.html", "confidence": "high"},
     {"date": "2026-05-04", "cat": "ARK", "kind": "thesis",
      "text": "ARK published 'ARK's Guide To The SpaceX IPO' — signals intent to participate.",

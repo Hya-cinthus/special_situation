@@ -74,7 +74,7 @@ function renderKpis() {
         + "you may not get out at NAV when you want — not a premium." },
     { label: "Bull / Bear (NAV)", value: pctRaw(k.bull_return, 0) + " / " + pctRaw(k.bear_return, 0),
       note: "if privates re-rate",
-      tip: "At NAV, return ≈ NAV move. Bull = SpaceX→$1.75T etc.; bear = markdown. Modest because the "
+      tip: "At NAV, return ≈ NAV move. Bull = SpaceX→$1.77T IPO (priced 6/3) etc.; bear = markdown. Modest because the "
         + "private basket is only ~16% of the fund. <span class='conf'>scenario estimate.</span>" },
     { label: "Net assets", value: usd(k.net_assets_usd),
       note: "as of " + k.filed_date,
