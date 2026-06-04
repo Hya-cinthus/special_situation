@@ -167,6 +167,13 @@ def main(argv):
         print(f"[ark_options] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[ark_options] skipped: {e}")
+    # Hedged BPTIX-vs-public-holdings book (needs network for prices).
+    try:
+        import hedge_book
+        p = hedge_book.write_json()
+        print(f"[hedge_book] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[hedge_book] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 

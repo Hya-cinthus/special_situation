@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hedged SpaceX-isolation book — long BPTIX vs short holdings</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="sit-title">Hedged book — long BPTIX, short its public holdings</h1>
+    <span class="sub" id="gen"></span>
+    <nav class="sitnav">
+      <a href="overview.html">Overview</a>
+      <a href="index.html">BPTRX</a>
+      <a href="vcx.html">VCX</a>
+      <a href="dxyz.html">DXYZ</a>
+      <a href="rvi.html">RVI</a>
+      <a href="agix.html">AGIX</a>
+      <a href="arkvx.html">ARKVX</a>
+      <a href="ark.html">ARK IPO</a>
+      <a href="arkopt.html">ARKK Options</a>
+      <a href="hedge.html" class="active">Hedge Book</a>
+    </nav>
+  </header>
+  <div class="disclaimer" id="disclaimer"></div>
+
+  <main>
+    <div id="loading" class="loading">Loading…</div>
+    <div id="error" class="error" style="display:none"></div>
+
+    <div id="content" style="display:none">
+      <div class="kpis" id="kpis"></div>
+
+      <section class="card">
+        <h2>Daily P&L — Long vs Short vs Total (entered 2026-05-20)</h2>
+        <p class="desc">
+          Long 130,000 BPTIX, short its public holdings (Arch, CoStar, Tesla, Hyatt, Schwab, …) at fixed
+          share counts — a delta-1 hedge to <b>strip out the public book and isolate the private (SpaceX)
+          exposure</b> inside the fund. The long and short legs should track closely; the <b>Total</b> (orange)
+          is the residual — i.e. what you actually earn on the un-hedgeable SpaceX/private slice. Two accounts,
+          shown as combined total.
+        </p>
+        <div id="chart" class="chart" style="height:480px"></div>
+      </section>
+
+      <section class="card">
+        <h2>How to read it</h2>
+        <div class="memo">
+          <p><b>Why this trade.</b> BPTIX's NAV = public holdings + SpaceX + leverage. By shorting the public
+          holdings in their fund weights, you cancel the public-market P&L and are left long the part you
+          can't buy directly: <b>SpaceX (and the other privates) + the fund's leverage/fee drag</b>. The
+          <b>net long notional</b> (long − short) is roughly that un-hedgeable slice.</p>
+          <p><b>What the Total line means.</b> If it drifts <b>up</b>, the private book (mostly SpaceX, still
+          marked at the stale $1.25T) is being marked up or the fund is outperforming its public hedge; if it
+          drifts <b>down</b>, the hedge is over/under-sized or fees/leverage are bleeding. A big jump would
+          come when BPTIX re-marks SpaceX to the $1.77T IPO price after 6/12.</p>
+          <p class="dim">Caveats: excludes borrow/financing on the shorts, dividends, and BPTIX's own
+          leverage & fees; share counts are the combined 2-account totals; prices are Yahoo daily closes.</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Positions (entry 2026-05-20)</h2>
+        <div class="scroll-y" id="legs"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="hedge_app.js"></script>
+</body>
+</html>
