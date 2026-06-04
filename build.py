@@ -174,6 +174,13 @@ def main(argv):
         print(f"[hedge_book] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[hedge_book] skipped: {e}")
+    # Hedge-drift (reads the BPTRX override series; no network).
+    try:
+        import hedge_drift
+        p = hedge_drift.write_json()
+        print(f"[hedge_drift] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[hedge_drift] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 

@@ -61,6 +61,22 @@
         </div>
       </section>
 
+      <section class="card" id="drift-card">
+        <h2>Hedge drift — the fixed short is shrinking relative to a growing book</h2>
+        <p class="desc">
+          Your short is a <b>fixed share count</b> from 5/20. But the fund is taking inflows. Under the
+          assumption that <b>every Total-Assets change is allocated pro-rata to the public holdings while
+          SpaceX stays fixed</b>, the public book grows — so the fixed short progressively
+          <b>under-hedges</b>. Bars = how much too small the short now is (hedge deviation); blue line =
+          the fund's Total Assets driving it. A +X% deviation means an unintended long public-beta tilt of
+          ~X% has crept into the book.
+        </p>
+        <div class="kpis" id="drift-kpis"></div>
+        <div id="drift-chart" class="chart" style="height:400px"></div>
+        <div class="scroll-y" id="drift-table" style="margin-top:14px"></div>
+        <p class="desc" style="margin-top:10px">SpaceX held fixed at its last NPORT gross value; 5/20 entry public book interpolated. Pro-rata allocation is a simplification — the manager may not rebalance exactly proportionally.</p>
+      </section>
+
       <section class="card">
         <h2>Positions (entry 2026-05-20)</h2>
         <div class="scroll-y" id="legs"></div>
