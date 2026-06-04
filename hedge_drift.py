@@ -1,102 +1,136 @@
 """
 Hedge-drift analysis -> dashboard/data/hedge_drift.json
 
-The 5/20 short is a FIXED share count. But BPTRX/BPTIX is taking inflows, and
-under the stated assumption — every Total-Assets change is allocated pro-rata to
-the publicly-tradable holdings while the private (SpaceX) stake stays fixed — the
-public book GROWS, so a fixed-share short progressively UNDER-hedges it.
+Your hedge is FIXED: long 130,000 BPTIX shares + a fixed-share short basket of
+the fund's public holdings, both struck 2026-05-20. As the fund takes inflows and
+SpaceX stays marked flat, the hedge stops being delta-neutral. This quantifies by
+how much — and is careful to separate two very different numbers:
 
-This quantifies that drift, day by day, from the BPTRX reported Total Assets
-(gross) series we already maintain:
+  (A) PER-SHARE drift  <-- this is YOUR hedge drift.
+      You own a FIXED number of BPTIX shares. New fund inflows issue NEW shares to
+      NEW investors and buy public stock with their cash; that does NOT add public
+      exposure to your shares. Your per-share public exposure rises only because
+      SpaceX (a fixed dollar mark) is diluted across more shares. So the public
+      book embedded in *your* position, per share, is what your fixed short must
+      match:
+          public_per_share_t = (gross_total_assets_t - SpaceX_fixed) / shares_out_t
+          hedge_drift_t       = public_per_share_t / public_per_share_entry - 1
+      A +X% drift means your fixed short is X% too small -> an unintended +X% long
+      public-beta tilt has crept into your book.
 
-    public_book_t   = gross_total_assets_t  -  SpaceX_value (fixed)
-    target_short_t  = public_book_t   (what a perfectly-sized short would be)
-    actual_short    = public_book(entry)   (fixed at 5/20)
-    deviation_t     = target_short_t / actual_short - 1     (how under-hedged)
-    implied_scale_t = the factor each short position "should" be multiplied by
+  (B) FUND-level public-book growth  <-- context only, NOT your drift.
+      The fund's TOTAL public holdings = gross_total_assets - SpaceX_fixed. This
+      grows much faster than (A) because it includes new investors' inflows you
+      have no claim to. Reporting (B) as a hedge deviation overstates it ~3x.
 
-So if Total Assets rises X% (all into public names), every public short is X%
-too small, and you're left with an unintended LONG public-beta tilt of that size.
+Total assets come from the SAME reconstructed daily series the BPTRX main page
+shows (no hand interpolation): the series carries total_nav_usd and
+shares_outstanding for every day, and gross = total_nav_usd * leverage_ratio
+reproduces the Morningstar override anchors exactly. So the 2026-05-20 entry is a
+real reconstructed point, not a fabricated one.
 
-Reads dashboard/data/spacex_baron.json (the maintained override series). Pure stdlib.
+Reads dashboard/data/spacex_baron.json (+ hedge_book.json for the live short
+notional). Pure stdlib.
 """
 
 import json
 import os
-import sys
 import datetime
 
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 ENTRY = "2026-05-20"
 
 
-def _interp_entry(pts):
-    """Interpolate gross Total Assets at the 5/20 entry from the override points."""
-    def dt(s): return datetime.date.fromisoformat(s)
-    before = [p for p in pts if p["date"] <= ENTRY]
-    after = [p for p in pts if p["date"] >= ENTRY]
-    if any(p["date"] == ENTRY for p in pts):
-        return next(p["gross"] for p in pts if p["date"] == ENTRY)
-    if not before or not after:
-        # extrapolate flat from nearest
-        return (before or after)[0 if before else 0]["gross"] if (before or after) else None
-    a, b = before[-1], after[0]
-    span = (dt(b["date"]) - dt(a["date"])).days or 1
-    frac = (dt(ENTRY) - dt(a["date"])).days / span
-    return a["gross"] + (b["gross"] - a["gross"]) * frac
+def _load(name):
+    with open(os.path.join(_REPO_ROOT, "dashboard", "data", name), encoding="utf-8") as f:
+        return json.load(f)
 
 
 def build_payload():
-    base = json.load(open(os.path.join(_REPO_ROOT, "dashboard", "data", "spacex_baron.json"), encoding="utf-8"))
+    base = _load("spacex_baron.json")
     ov = base["aum_overrides"]
-    spacex_fixed = ov[-1]["spacex_value_usd"]   # fixed private stake (NPORT gross LMV)
+    leverage = ov[0]["leverage_ratio"]                 # fund-level gross/net (~1.1358)
+    spacex_fixed = ov[-1]["spacex_value_usd"]          # fixed private mark (NPORT gross LMV)
 
-    pts = [{"date": o["date"], "gross": o["reported_total_assets_usd"]}
-           for o in ov if o.get("reported_total_assets_usd")]
-    pts.sort(key=lambda p: p["date"])
+    # Daily reconstructed series (same one the main page renders). Every day has
+    # net NAV and reconstructed shares outstanding -> a real 2026-05-20 point.
+    srt = {r["date"]: r for r in base["series"]}
+    dates = sorted(d for d in srt if d >= ENTRY)
+    if ENTRY not in srt:
+        raise RuntimeError("series has no %s row to anchor the entry" % ENTRY)
 
-    gross_entry = _interp_entry(pts)
-    public_entry = gross_entry - spacex_fixed
+    def gross(d):
+        return srt[d]["total_nav_usd"] * leverage      # reproduces override anchors
+    def pub_total(d):
+        return gross(d) - spacex_fixed                 # fund's total public holdings (gross)
+    def shares(d):
+        return srt[d]["shares_outstanding"]
+    def pub_ps(d):
+        return pub_total(d) / shares(d)                # public $ per BPTIX share
+
+    pub_ps_entry = pub_ps(ENTRY)
+    pub_total_entry = pub_total(ENTRY)
+
+    # Actual fixed short (dollars) for the dollar-gap calc.
+    try:
+        short_notional = _load("hedge_book.json")["meta"]["short_notional"]
+    except Exception:
+        short_notional = None
 
     rows = []
-    for p in pts:
-        public = p["gross"] - spacex_fixed
-        scale = public / public_entry if public_entry else None
+    for d in dates:
+        ps = pub_ps(d)
+        hedge_drift = ps / pub_ps_entry - 1            # (A) YOUR drift
+        fund_growth = pub_total(d) / pub_total_entry - 1  # (B) context
         rows.append({
-            "date": p["date"],
-            "gross_total_assets": round(p["gross"], 0),
-            "public_book": round(public, 0),
-            "spacex_pct_of_gross": round(spacex_fixed / p["gross"], 4),
-            "implied_scale": round(scale, 4),               # what each short SHOULD be x
-            "hedge_deviation": round(scale - 1, 4),         # under-hedge fraction
+            "date": d,
+            "gross_total_assets": round(gross(d), 0),
+            "net_nav": round(srt[d]["total_nav_usd"], 0),
+            "shares_out": round(shares(d), 0),
+            "public_total": round(pub_total(d), 0),
+            "public_per_share": round(ps, 2),
+            "spacex_weight_net": round(spacex_fixed / srt[d]["total_nav_usd"], 4),
+            "hedge_drift": round(hedge_drift, 4),
+            "fund_public_growth": round(fund_growth, 4),
+            # dollars of short you'd need to ADD to re-neutralize (None if unknown)
+            "underhedge_gap_usd": round(short_notional * hedge_drift, 0) if short_notional else None,
+            "source": srt[d].get("source"),
         })
 
     last = rows[-1] if rows else {}
     return {
         "meta": {
-            "title": "Hedge drift — fixed short vs growing public book (pro-rata inflow assumption)",
+            "title": "Hedge drift — fixed short vs your per-share public exposure",
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "entry_date": ENTRY,
-            "assumption": ("Every change in the fund's Total Assets is allocated PRO-RATA across the "
-                           "publicly-tradable holdings; the private (SpaceX) stake stays fixed. So the public "
-                           "book = Total Assets − fixed SpaceX, and a fixed-share short under-hedges it as "
-                           "the fund grows on inflows."),
-            "disclaimer": ("Analysis, not investment advice. Built from the maintained BPTRX reported "
-                           "Total Assets (gross) series; SpaceX held fixed at its last NPORT gross LMV "
-                           "(~$%.2fB). 5/20 entry public book is interpolated. Assumes pro-rata public "
-                           "allocation of inflows — a simplification (the manager may not rebalance exactly "
-                           "pro-rata). Model, not a statement of record." % (spacex_fixed / 1e9)),
+            "leverage_ratio": round(leverage, 6),
             "spacex_fixed_usd": round(spacex_fixed, 0),
-            "gross_entry_usd": round(gross_entry, 0),
-            "public_entry_usd": round(public_entry, 0),
+            "short_notional_usd": round(short_notional, 0) if short_notional else None,
+            "public_per_share_entry": round(pub_ps_entry, 2),
+            "assumption": ("Every change in the fund's Total Assets is allocated PRO-RATA across the "
+                           "publicly-tradable holdings; the private (SpaceX) stake stays fixed. Total "
+                           "assets per day = net NAV (reconstructed daily series, same as the BPTRX main "
+                           "page) x leverage ratio %.4f, which reproduces the Morningstar override anchors "
+                           "exactly. So the %s entry is a real reconstructed point." % (leverage, ENTRY)),
+            "method_note": ("PER-SHARE drift is YOUR hedge drift: you hold a FIXED share count, so fund "
+                            "inflows (new shares to new investors) do not add public exposure to your "
+                            "shares — only SpaceX dilution per share does. FUND-level public-book growth "
+                            "is shown as context; it includes inflows you have no claim to and overstates "
+                            "the hedge gap ~3x."),
+            "disclaimer": ("Analysis, not investment advice. SpaceX held fixed at its last NPORT gross LMV "
+                           "(~$%.2fB); shares outstanding are reconstructed; pro-rata public allocation is a "
+                           "simplification (the manager may not rebalance exactly pro-rata). Model, not a "
+                           "statement of record." % (spacex_fixed / 1e9)),
             "last_data_day": last.get("date"),
         },
         "kpis": {
             "as_of": last.get("date"),
-            "hedge_deviation": last.get("hedge_deviation"),
-            "implied_scale": last.get("implied_scale"),
-            "public_book_now": last.get("public_book"),
-            "public_book_growth_usd": round((last.get("public_book", 0) - public_entry), 0),
+            "hedge_drift": last.get("hedge_drift"),                 # (A) the headline
+            "underhedge_gap_usd": last.get("underhedge_gap_usd"),
+            "public_per_share_now": last.get("public_per_share"),
+            "spacex_weight_net_now": last.get("spacex_weight_net"),
+            "spacex_weight_net_entry": rows[0]["spacex_weight_net"] if rows else None,
+            "fund_public_growth": last.get("fund_public_growth"),   # (B) the context
         },
         "series": rows,
     }
@@ -114,11 +148,19 @@ def write_json():
 
 if __name__ == "__main__":
     pl = build_payload()
-    m = pl["meta"]
-    print(f"SpaceX fixed ${m['spacex_fixed_usd']/1e9:.2f}B | entry public ${m['public_entry_usd']/1e9:.2f}B")
-    print(f"{'date':12s} {'grossTA':>9s} {'public':>9s} {'scale':>7s} {'deviation':>10s}")
+    m, k = pl["meta"], pl["kpis"]
+    print("leverage %.4f | SpaceX fixed $%.2fB | entry public/share $%.2f"
+          % (m["leverage_ratio"], m["spacex_fixed_usd"] / 1e9, m["public_per_share_entry"]))
+    print("%-11s %9s %8s %10s %9s %11s %11s"
+          % ("date", "grossTA", "sharesM", "pub/share", "spxWt", "hedgeDrift", "fundGrowth"))
     for r in pl["series"]:
-        print(f"{r['date']:12s} ${r['gross_total_assets']/1e9:>7.1f}B ${r['public_book']/1e9:>7.2f}B "
-              f"{r['implied_scale']:>7.3f} {r['hedge_deviation']*100:>+9.1f}%")
+        print("%-11s $%7.1fB %8.2f $%9.2f %8.1f%% %+10.1f%% %+10.1f%%"
+              % (r["date"], r["gross_total_assets"] / 1e9, r["shares_out"] / 1e6,
+                 r["public_per_share"], r["spacex_weight_net"] * 100,
+                 r["hedge_drift"] * 100, r["fund_public_growth"] * 100))
+    print("\nHEADLINE: your fixed short is %+.1f%% too small (per-share) -> add ~$%.2fM to re-neutralize."
+          % (k["hedge_drift"] * 100, (k["underhedge_gap_usd"] or 0) / 1e6))
+    print("Context (fund-level public book grew %+.1f%% — mostly inflows, NOT your drift)."
+          % (k["fund_public_growth"] * 100))
     p = write_json()
     print("wrote", p)

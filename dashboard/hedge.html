@@ -62,19 +62,25 @@
       </section>
 
       <section class="card" id="drift-card">
-        <h2>Hedge drift — the fixed short is shrinking relative to a growing book</h2>
+        <h2>Hedge drift — your fixed short vs your per-share public exposure</h2>
         <p class="desc">
-          Your short is a <b>fixed share count</b> from 5/20. But the fund is taking inflows. Under the
-          assumption that <b>every Total-Assets change is allocated pro-rata to the public holdings while
-          SpaceX stays fixed</b>, the public book grows — so the fixed short progressively
-          <b>under-hedges</b>. Bars = how much too small the short now is (hedge deviation); blue line =
-          the fund's Total Assets driving it. A +X% deviation means an unintended long public-beta tilt of
-          ~X% has crept into the book.
+          Your short is a <b>fixed share count</b> from 5/20, and you hold a <b>fixed</b> 130k BPTIX shares.
+          As the fund takes inflows it issues <b>new shares to new investors</b> and buys public stock with
+          their cash — that does <b>not</b> add public exposure to <i>your</i> shares. Your per-share public
+          exposure rises only because <b>SpaceX (fixed at $3.89B) is diluted across more shares</b>. So the
+          public book embedded in <i>your</i> position, per share, is what your fixed short must match — and
+          it has drifted by the <span style="color:#f85149"><b>red bars</b></span> below.
+        </p>
+        <p class="desc" style="margin-top:-4px">
+          The <span style="color:#8b97a7"><b>dotted grey line</b></span> is the <i>fund-level</i> public-book
+          growth — much larger, because it includes inflows you have no claim to. It is <b>context, not your
+          hedge drift</b>; reading it as your under-hedge overstates it ~3×. Blue line = the fund's Total Assets
+          (gross), the driver, taken from the same reconstructed daily series as the BPTRX main page.
         </p>
         <div class="kpis" id="drift-kpis"></div>
-        <div id="drift-chart" class="chart" style="height:400px"></div>
+        <div id="drift-chart" class="chart" style="height:420px"></div>
         <div class="scroll-y" id="drift-table" style="margin-top:14px"></div>
-        <p class="desc" style="margin-top:10px">SpaceX held fixed at its last NPORT gross value; 5/20 entry public book interpolated. Pro-rata allocation is a simplification — the manager may not rebalance exactly proportionally.</p>
+        <p class="desc" style="margin-top:10px">Total assets per day = net NAV (reconstructed daily series) × leverage ratio 1.1358, which reproduces the Morningstar override anchors exactly — so the 5/20 entry is a real reconstructed point, not interpolated by hand. SpaceX held fixed at its last NPORT gross LMV; shares outstanding reconstructed. Pro-rata allocation is a simplification.</p>
       </section>
 
       <section class="card">

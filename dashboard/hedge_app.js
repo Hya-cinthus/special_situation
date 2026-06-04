@@ -46,49 +46,58 @@ function render() {
     .catch(() => {});
 }
 
+function pct(x, signed) {
+  if (x == null) return "–";
+  return (signed && x >= 0 ? "+" : "") + (x * 100).toFixed(1) + "%";
+}
+
 function renderDrift() {
   const m = DRIFT.meta, k = DRIFT.kpis, s = DRIFT.series;
-  // KPI strip
+  // KPI strip — lead with the PER-SHARE drift (your real hedge); fund-level is context.
   const cards = [
-    { label: "Hedge deviation (now)", value: (k.hedge_deviation >= 0 ? "+" : "") + (k.hedge_deviation * 100).toFixed(1) + "%",
+    { label: "Your hedge drift (per BPTIX share)", value: pct(k.hedge_drift, true),
       cls: "b", note: "fixed short is this % too small" },
-    { label: "Public book should be ×", value: k.implied_scale.toFixed(3),
-      note: "vs the 5/20 short size" },
-    { label: "Public-book growth", value: usd(k.public_book_growth_usd),
-      note: "since 5/20 (pro-rata inflows)" },
-    { label: "Public book now", value: usd(k.public_book_now),
-      note: "gross TA − fixed SpaceX" },
+    { label: "Under-hedge gap", value: usd(k.underhedge_gap_usd),
+      cls: "b", note: "short to ADD to re-neutralize" },
+    { label: "SpaceX weight (net)", value: pct(k.spacex_weight_net_entry) + " → " + pct(k.spacex_weight_net_now),
+      note: "the dilution driving the drift" },
+    { label: "Fund public book (context)", value: pct(k.fund_public_growth, true),
+      cls: "muted", note: "mostly new inflows — NOT your drift" },
   ];
   document.getElementById("drift-kpis").innerHTML = cards.map((c) =>
     `<div class="kpi"><div class="label">${c.label}</div>
-      <div class="value" style="color:${c.cls === "b" ? BAD : TEXT}">${c.value}</div>
+      <div class="value" style="color:${c.cls === "b" ? BAD : c.cls === "muted" ? MUTED : TEXT}">${c.value}</div>
       <div class="note">${c.note}</div></div>`).join("");
-  // chart: deviation % bars (left) + Total Assets line (right)
+  // chart: per-share drift bars (left) + fund-level line (left, muted) + Total Assets (right)
   const x = s.map((r) => r.date);
   Plotly.newPlot("drift-chart", [
     { x, y: s.map((r) => r.gross_total_assets / 1e9), name: "Total Assets ($B, gross)",
-      type: "scatter", mode: "lines+markers", line: { color: ACC, width: 2 }, marker: { size: 5 },
+      type: "scatter", mode: "lines", line: { color: ACC, width: 2 },
       yaxis: "y2", hovertemplate: "Total Assets $%{y:.1f}B<extra></extra>" },
-    { x, y: s.map((r) => r.hedge_deviation * 100), name: "Hedge deviation (%)",
-      type: "bar", marker: { color: s.map((r) => r.hedge_deviation >= 0 ? "rgba(248,81,73,0.55)" : "rgba(63,185,80,0.55)") },
-      yaxis: "y", hovertemplate: "deviation %{y:+.1f}%<extra></extra>" },
+    { x, y: s.map((r) => r.fund_public_growth * 100), name: "Fund public book growth (context)",
+      type: "scatter", mode: "lines", line: { color: MUTED, width: 1.5, dash: "dot" },
+      yaxis: "y", hovertemplate: "fund-level %{y:+.1f}%<extra></extra>" },
+    { x, y: s.map((r) => r.hedge_drift * 100), name: "Your hedge drift (per share)",
+      type: "bar", marker: { color: s.map((r) => r.hedge_drift >= 0 ? "rgba(248,81,73,0.6)" : "rgba(63,185,80,0.6)") },
+      yaxis: "y", hovertemplate: "your drift %{y:+.1f}%<extra></extra>" },
   ], {
     paper_bgcolor: PLOT_BG, plot_bgcolor: PLOT_BG, font: { color: TEXT, size: 11 },
     hovermode: "x unified", hoverlabel: { bgcolor: "#0e1117", bordercolor: GRID },
     shapes: [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: 0, y1: 0, line: { color: GRID, width: 1 } }],
     xaxis: { gridcolor: GRID, color: TEXT, type: "date" },
-    yaxis: { title: "Hedge deviation (under-hedge %)", color: BAD, ticksuffix: "%", gridcolor: GRID, zeroline: false },
+    yaxis: { title: "Under-hedge (%)", color: BAD, ticksuffix: "%", gridcolor: GRID, zeroline: false },
     yaxis2: { title: "Total Assets ($B)", overlaying: "y", side: "right", color: ACC, rangemode: "tozero", showgrid: false },
-    legend: { orientation: "h", y: 1.12, font: { color: TEXT } },
-    margin: { t: 40, r: 60, b: 36, l: 60 },
+    legend: { orientation: "h", y: 1.16, font: { color: TEXT } },
+    margin: { t: 50, r: 60, b: 36, l: 60 },
   }, { responsive: true, displayModeBar: false, displaylogo: false });
   // table
   document.getElementById("drift-table").innerHTML =
-    `<table class="data"><thead><tr><th>Date</th><th>Total Assets (gross)</th><th>Public book</th>
-      <th>SpaceX % of gross</th><th>Short should be ×</th><th>Deviation</th></tr></thead><tbody>` +
-    s.map((r) => `<tr><td>${r.date}</td><td>${usd(r.gross_total_assets)}</td><td>${usd(r.public_book)}</td>
-      <td>${(r.spacex_pct_of_gross * 100).toFixed(1)}%</td><td>${r.implied_scale.toFixed(3)}</td>
-      <td style="color:${r.hedge_deviation >= 0 ? BAD : GOOD}">${(r.hedge_deviation >= 0 ? "+" : "") + (r.hedge_deviation * 100).toFixed(1)}%</td></tr>`).join("") +
+    `<table class="data"><thead><tr><th>Date</th><th>Total Assets (gross)</th><th>Shares out</th>
+      <th>Public / share</th><th>SpaceX wt (net)</th><th>Your drift (per share)</th><th>Fund growth (context)</th></tr></thead><tbody>` +
+    s.map((r) => `<tr><td>${r.date}</td><td>${usd(r.gross_total_assets)}</td><td>${(r.shares_out / 1e6).toFixed(2)}M</td>
+      <td>$${r.public_per_share.toFixed(2)}</td><td>${(r.spacex_weight_net * 100).toFixed(1)}%</td>
+      <td style="color:${r.hedge_drift >= 0 ? BAD : GOOD}">${pct(r.hedge_drift, true)}</td>
+      <td style="color:${MUTED}">${pct(r.fund_public_growth, true)}</td></tr>`).join("") +
     "</tbody></table>";
 }
 
