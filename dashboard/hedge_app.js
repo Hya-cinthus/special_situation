@@ -229,11 +229,16 @@ function renderShortBreakdown() {
   const n = legs.length;
   // one line per short ticker; distinct hues; traces in alphabetical order so the
   // unified hover lists them A->Z (legend traceorder 'normal' keeps that order).
-  const traces = legs.map((lg, i) => ({
-    x: dates, y: lg.pnl, name: lg.ticker, type: "scatter", mode: "lines",
-    line: { width: 1.4, color: `hsl(${Math.round((360 * i) / n)},65%,62%)` },
-    hovertemplate: lg.ticker + "  %{y:$,.0f}<extra></extra>",
-  }));
+  const traces = legs.map((lg, i) => {
+    const cum = lg.pnl;
+    // true daily P&L = change vs the prior listed (trading) day; entry day = 0
+    const daily = cum.map((v, j) => (j === 0 ? 0 : v - cum[j - 1]));
+    return {
+      x: dates, y: cum, customdata: daily, name: lg.ticker, type: "scatter", mode: "lines",
+      line: { width: 1.4, color: `hsl(${Math.round((360 * i) / n)},65%,62%)` },
+      hovertemplate: lg.ticker + "  day %{customdata:+$,.0f} · cum %{y:+$,.0f}<extra></extra>",
+    };
+  });
   Plotly.newPlot("short-chart", traces, {
     paper_bgcolor: PLOT_BG, plot_bgcolor: PLOT_BG, font: { color: TEXT, size: 11 },
     hovermode: "x unified",
