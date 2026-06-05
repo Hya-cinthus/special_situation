@@ -50,19 +50,22 @@ def build_payload():
     base = _load("spacex_baron.json")
     ov = base["aum_overrides"]
     leverage = ov[0]["leverage_ratio"]                 # fund-level gross/net (~1.1358)
-    spacex_fixed = ov[-1]["spacex_value_usd"]          # fixed private mark (NPORT gross LMV)
 
-    # Daily reconstructed series (same one the main page renders). Every day has
-    # net NAV and reconstructed shares outstanding -> a real 2026-05-20 point.
+    # Daily reconstructed series (same one the main page renders). Morningstar
+    # "Total Assets" is NET (confirmed by Baron 5/31); gross = net x leverage.
+    # SpaceX $ is per-day from the series (carried flat, then STEPS at the 6/4
+    # IPO reprice), so the public book correctly excludes the re-mark.
     srt = {r["date"]: r for r in base["series"]}
     dates = sorted(d for d in srt if d >= ENTRY)
     if ENTRY not in srt:
         raise RuntimeError("series has no %s row to anchor the entry" % ENTRY)
 
+    def spx(d):
+        return srt[d]["spacex_value_usd"]              # per-day private mark (steps 6/4)
     def gross(d):
-        return srt[d]["total_nav_usd"] * leverage      # reproduces override anchors
+        return srt[d]["total_nav_usd"] * leverage      # gross holdings = net x leverage
     def pub_total(d):
-        return gross(d) - spacex_fixed                 # fund's total public holdings (gross)
+        return gross(d) - spx(d)                        # fund's total public holdings (gross)
     def shares(d):
         return srt[d]["shares_outstanding"]
     def pub_ps(d):
@@ -91,15 +94,15 @@ def build_payload():
             "net_nav": round(net, 0),
             "leverage_ratio": round(leverage, 4),      # assumed constant (last NPORT gross/net)
             "shares_out": round(shares(d), 0),
-            "spacex_value": round(spacex_fixed, 0),    # fixed
+            "spacex_value": round(spx(d), 0),          # per-day (steps at 6/4 reprice)
             "public_total": round(pub, 0),
             "public_per_share": round(ps, 2),
             # composition as % of NET NAV (these three sum to 100%: public + spacex − borrowings)
-            "spacex_weight_net": round(spacex_fixed / net, 4),
+            "spacex_weight_net": round(spx(d) / net, 4),
             "public_weight_net": round(pub / net, 4),
             "borrow_weight_net": round(-(leverage - 1), 4),
             # composition as % of GROSS total assets (spacex + public = 100%)
-            "spacex_pct_gross": round(spacex_fixed / g, 4),
+            "spacex_pct_gross": round(spx(d) / g, 4),
             "public_pct_gross": round(pub / g, 4),
             "hedge_drift": round(hedge_drift, 4),
             "fund_public_growth": round(fund_growth, 4),
@@ -153,23 +156,22 @@ def build_payload():
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "entry_date": ENTRY,
             "leverage_ratio": round(leverage, 6),
-            "spacex_fixed_usd": round(spacex_fixed, 0),
+            "spacex_value_entry_usd": round(spx(ENTRY), 0),
+            "spacex_value_now_usd": round(spx(last.get("date")), 0) if last else None,
             "short_notional_usd": round(short_notional, 0) if short_notional else None,
             "public_per_share_entry": round(pub_ps_entry, 2),
-            "assumption": ("Every change in the fund's Total Assets is allocated PRO-RATA across the "
-                           "publicly-tradable holdings; the private (SpaceX) stake stays fixed. Total "
-                           "assets per day = net NAV (reconstructed daily series, same as the BPTRX main "
-                           "page) x leverage ratio %.4f, which reproduces the Morningstar override anchors "
-                           "exactly. So the %s entry is a real reconstructed point." % (leverage, ENTRY)),
+            "assumption": ("Morningstar 'Total Assets' is NET AUM (confirmed by Baron 5/31: SpaceX 23.2%% "
+                           "of net). gross = net x leverage %.4f. Inflows allocate PRO-RATA to the public "
+                           "holdings; SpaceX $ is carried flat then STEPS at the 2026-06-04 IPO reprice "
+                           "($105.32->$135/sh, +28.2%%). Daily series = the BPTRX main page." % leverage),
             "method_note": ("PER-SHARE drift is YOUR hedge drift: you hold a FIXED share count, so fund "
                             "inflows (new shares to new investors) do not add public exposure to your "
-                            "shares — only SpaceX dilution per share does. FUND-level public-book growth "
-                            "is shown as context; it includes inflows you have no claim to and overstates "
-                            "the hedge gap ~3x."),
-            "disclaimer": ("Analysis, not investment advice. SpaceX held fixed at its last NPORT gross LMV "
-                           "(~$%.2fB); shares outstanding are reconstructed; pro-rata public allocation is a "
-                           "simplification (the manager may not rebalance exactly pro-rata). Model, not a "
-                           "statement of record." % (spacex_fixed / 1e9)),
+                            "shares. FUND-level public-book growth is context; it includes inflows you have "
+                            "no claim to. The 6/4 SpaceX re-mark is excluded from the public book (it is a "
+                            "private-mark step, not a public-holding change)."),
+            "disclaimer": ("Analysis, not investment advice. SpaceX carried at NPORT LMV, re-marked 6/4 to "
+                           "the $135 IPO per-share price; shares outstanding are reconstructed; pro-rata "
+                           "public allocation is a simplification. Model, not a statement of record."),
             "last_data_day": last.get("date"),
         },
         "kpis": {
@@ -202,8 +204,9 @@ def write_json():
 if __name__ == "__main__":
     pl = build_payload()
     m, k = pl["meta"], pl["kpis"]
-    print("leverage %.4f | SpaceX fixed $%.2fB | entry public/share $%.2f"
-          % (m["leverage_ratio"], m["spacex_fixed_usd"] / 1e9, m["public_per_share_entry"]))
+    print("leverage %.4f | SpaceX entry $%.2fB -> now $%.2fB | entry public/share $%.2f"
+          % (m["leverage_ratio"], m["spacex_value_entry_usd"] / 1e9,
+             (m["spacex_value_now_usd"] or 0) / 1e9, m["public_per_share_entry"]))
     print("%-11s %9s %8s %10s %9s %11s %11s"
           % ("date", "grossTA", "sharesM", "pub/share", "spxWt", "hedgeDrift", "fundGrowth"))
     for r in pl["series"]:

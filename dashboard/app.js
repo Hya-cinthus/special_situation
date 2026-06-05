@@ -556,15 +556,15 @@ function renderAumChart() {
     x: ovr.map((o) => o.date), y: ovr.map((o) => o.net_assets_usd / 1e9),
     type: "scatter", mode: "markers", name: "Reported AUM (not SEC)",
     marker: { color: "#d29922", symbol: "diamond-open", size: 9, line: { width: 1.6 } },
-    // customdata: [raw Morningstar gross $B, leverage ratio]
+    // customdata: [gross holdings $B (= net x leverage), leverage ratio]
     customdata: ovr.map((o) => [
-      o.reported_total_assets_usd != null ? o.reported_total_assets_usd / 1e9 : null,
+      (o.net_assets_usd * (o.leverage_ratio || 1)) / 1e9,
       o.leverage_ratio || null,
     ]),
     hovertemplate:
-      "%{x}<br>Morningstar Total Assets (gross): <b>$%{customdata[0]:.1f}B</b>"
-      + "<br>÷ %{customdata[1]:.3f} leverage = net AUM $%{y:.2f}B"
-      + "<br><i>net is the weight denominator</i><extra></extra>",
+      "%{x}<br>Morningstar Total Assets = <b>NET AUM $%{y:.2f}B</b>"
+      + "<br>× %{customdata[1]:.3f} leverage = gross holdings $%{customdata[0]:.1f}B"
+      + "<br><i>net is the weight denominator (Baron 5/31 confirms net)</i><extra></extra>",
   };
   // dashed extrapolation of AUM to the IPO date (trend, low confidence)
   const traces = [line, diamonds, ovDiamonds];

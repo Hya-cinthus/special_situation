@@ -157,7 +157,10 @@ def reconstruct_daily(anchors: list[dict],
         nav_at = _nearest_prior_nav(navmap, nav_dates, ov["date"])
         if not nav_at or not ov.get("total_net_assets_usd"):
             continue
-        carried = (override_anchors[-1] if override_anchors else enriched[-1])["spacex_value_usd"]
+        # SpaceX $ is carried flat UNLESS this override carries an explicit re-mark
+        # (e.g. the 6/4 IPO reprice). A re-mark steps the private mark from here on.
+        carried = ov.get("spacex_value_usd") or \
+            (override_anchors[-1] if override_anchors else enriched[-1])["spacex_value_usd"]
         na = float(ov["total_net_assets_usd"])
         override_anchors.append({
             "report_date": ov["date"], "filing_date": None, "accession": None,

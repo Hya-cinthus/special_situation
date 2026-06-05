@@ -129,12 +129,22 @@ def build_payload():
                 "total_assets_prev_usd": TA_3, "total_assets_now_usd": TA_4,
                 "spacex_prev_usd": round(SPX_3_USD, 0), "leverage_prior": round(L0, 4),
             },
-            "conclusion": ("跨 S1/S3,SpaceX 6/4 反推到 $%.2fT–$%.2fT(部分 re-mark);"
-                           "full $1.77T 需要杠杆 0.70x(不可能)。结论:6/4 是中途价,"
-                           "full IPO $1.77T 估计 6/12 首日交易后落地。" % (lo / 1e12, hi / 1e12)),
-            "disclaimer": ("Reconciliation model, not filed data. SpaceX $-to-valuation mapping is "
-                           "linear off the 3/31 NPORT anchor ($3.89B @ $1.25T). The next NPORT (period "
-                           "6/30, filed ~late Aug) is the next hard confirmation. Not investment advice."),
+            "confirmed": {
+                "spacex_value_usd": round(SPX_3_USD * 135.0 / 105.32, 0),   # ~$4.99B
+                "per_share_old_split_adj": 105.32, "per_share_new": 135.0,
+                "per_share_remark_pct": round(135.0 / 105.32 - 1, 4),        # +28.2%
+                "valuation_post_money_usd": IPO_VAL,
+                "basis": ("Baron S-1: SpaceX common repriced $135.00 (preferred $6,750) on 2026-06-04. "
+                          "持仓按每股 $105.32->$135 (+28.2%) 重估到 ~$4.99B —— 不是按 $1.77T/$1.25T "
+                          "(+41.6%, 那会重复计 IPO 稀释)。这正好解释观测到的 +6.6% NAV。"),
+            },
+            "conclusion": ("已由 Baron S-1 证实:6/4 SpaceX 普通股 reprice 到 $135/股 (+28.2%% vs $105.32),"
+                           "持仓 $3.89B → ~$4.99B。$1.77T 是 post-money 整公司估值,不能直接套到持仓上。"
+                           "(早前 S1/S3 的 $%.2f–$%.2fT 反推与此一致;net 口径已由 5/31 披露 SpaceX 23.2%% 证实。)"
+                           % (lo / 1e12, hi / 1e12)),
+            "disclaimer": ("SpaceX $-to-price mapping linear off the 3/31 NPORT anchor ($3.89B @ $105.32 "
+                           "split-adj). 6/4 reprice per Baron S-1. Next NPORT (period 6/30, ~late Aug) is the "
+                           "next hard confirmation. Not investment advice."),
         },
         "scenarios": scenarios,
         "consistent_range_usd": [lo, hi],

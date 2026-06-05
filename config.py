@@ -230,11 +230,13 @@ class SpacexBaron:
     # reconciliation, NOT for AUM): 3/31 NPORT gross $11.77B / net $10.36B = ~1.136.
     LEVERAGE_RATIO_LAST = 11767988975.60 / 10360633779.17  # ~1.1358 (3/31 NPORT-P)
     # --- Net-vs-gross switch + leverage (the one place that controls it) -----
-    # WORKING ASSUMPTION (pending 5/31 month-end): Morningstar "Total Assets" is
-    # GROSS (leveraged), so net = reported / LEVERAGE_RATIO. Flip ASSUME_..._GROSS
-    # to False once confirmed net (Morningstar's glossary says net), and rebuild.
+    # CONFIRMED 2026-05-31: Baron's own site discloses SpaceX = 23.2% of NET assets.
+    # SpaceX $3.89B / 0.232 = $16.77B net == Morningstar "Total Assets" (~16.6-17.0B
+    # late May). So Morningstar "Total Assets" is NET AUM, NOT gross. (Under the old
+    # gross assumption SpaceX came out 26.6% -> wrong.) Leverage (1.1358) still exists
+    # and applies ON TOP for gross public-exposure math: gross = net x LEVERAGE_RATIO.
     LEVERAGE_RATIO = 11767988975.60 / 10360633779.17   # ~1.1358 (3/31 NPORT-P gross/net)
-    ASSUME_TOTAL_ASSETS_GROSS = True
+    ASSUME_TOTAL_ASSETS_GROSS = False
 
     # Daily Morningstar "Total Assets" prints feed the AUM true-up. The cowork
     # browser scraper APPENDS one JSON line per day to this log, which is the live
@@ -252,6 +254,25 @@ class SpacexBaron:
         {"date": "2026-05-27", "reported_total_assets_usd": 15.9e9, "confidence": "med",
          "source": "Morningstar website 'Total Assets' $15.9B (5/27 close)",
          "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote"},
+    ]
+
+    # --- SpaceX holding re-marks (private mark steps, applied post-last-filing) ---
+    # Between NPORT filings the SpaceX $ is carried flat EXCEPT at an explicit mark
+    # event. The 6/4 IPO reprice is the first such step. CRITICAL: the holding
+    # re-marks by the PER-SHARE price change ($105.32 split-adj @ $1.25T -> $135),
+    # i.e. +28.2%, NOT by the post-money valuation ratio (1.77/1.25 = +41.6%, which
+    # would double-count the $75B IPO raise / new-share dilution). 3.89026788e9 is
+    # the 3/31 NPORT-P SpaceX gross LMV at $1.25T ($526.59 pre-split = $105.32 post).
+    SPACEX_REMARKS = [
+        {"date": "2026-06-04",
+         "spacex_value_usd": 3.89026788e9 * (135.0 / 105.32),  # ~$4.987B
+         "per_share_old_split_adj": 105.32, "per_share_new": 135.0,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("Baron S-1 statement: SpaceX private common repriced $135.00 (preferred "
+                   "$6,750) on 2026-06-04. Holding re-marks by per-share $105.32->$135 (+28.2%), "
+                   "not the +41.6% post-money valuation ratio. Confirmed by the +6.6% NAV move."),
+         "source_url": "https://www.baroncapitalgroup.com/product-detail/baron-partners-fund-bptrx",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

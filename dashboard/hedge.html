@@ -79,9 +79,10 @@
           Your short is a <b>fixed share count</b> from 5/20, and you hold a <b>fixed</b> 130k BPTIX shares.
           As the fund takes inflows it issues <b>new shares to new investors</b> and buys public stock with
           their cash — that does <b>not</b> add public exposure to <i>your</i> shares. Your per-share public
-          exposure rises only because <b>SpaceX (fixed at $3.89B) is diluted across more shares</b>. So the
-          public book embedded in <i>your</i> position, per share, is what your fixed short must match — and
-          it has drifted by the <span style="color:#f85149"><b>red bars</b></span> below.
+          exposure rises only because <b>SpaceX (carried at $3.89B, then re-marked to ~$4.99B on the 6/4
+          IPO reprice) is diluted across more shares</b>. So the public book embedded in <i>your</i> position,
+          per share, is what your fixed short must match — and it has drifted by the
+          <span style="color:#f85149"><b>red bars</b></span> below.
         </p>
         <p class="desc" style="margin-top:-4px">
           The <span style="color:#8b97a7"><b>dotted grey line</b></span> is the <i>fund-level</i> public-book
@@ -92,28 +93,28 @@
         <div class="kpis" id="drift-kpis"></div>
         <div id="drift-chart" class="chart" style="height:420px"></div>
         <div class="scroll-y" id="drift-table" style="margin-top:14px"></div>
-        <p class="desc" style="margin-top:10px">Total assets per day = net NAV (reconstructed daily series) × leverage ratio 1.1358, which reproduces the Morningstar override anchors exactly — so the 5/20 entry is a real reconstructed point, not interpolated by hand. SpaceX held fixed at its last NPORT gross LMV; shares outstanding reconstructed. Pro-rata allocation is a simplification.</p>
+        <p class="desc" style="margin-top:10px">Morningstar "Total Assets" is NET AUM (confirmed by Baron's 5/31 disclosure: SpaceX = 23.2% of net); gross holdings = net × leverage 1.1358. The 5/20 entry is a real reconstructed point. SpaceX carried at NPORT LMV then stepped to the $135 IPO per-share price on 6/4; shares reconstructed. Pro-rata allocation is a simplification.</p>
       </section>
 
       <section class="card" id="comp-card">
         <h2>Fund composition over time — the dilution behind the drift</h2>
         <p class="desc">
-          Per dollar of your NAV: <span style="color:#ff7a45"><b>SpaceX</b></span> (private, marked flat at
-          $3.89B) plus <span style="color:#4da3ff"><b>public / other holdings</b></span>. Because SpaceX is a
-          fixed dollar amount and the public book grows with inflows, SpaceX's share of NAV
-          <b>falls (30.3% → 25.7%)</b> while the public share <b>rises (83.3% → 87.9%)</b> — that re-weighting
-          is exactly what drifts your hedge. The stack totals more than 100% of NAV: the bit
-          <b>above the dashed line is the fund's borrowings (leverage)</b>.
+          Per dollar of your NAV: <span style="color:#ff7a45"><b>SpaceX</b></span> (private) plus
+          <span style="color:#4da3ff"><b>public / other holdings</b></span>. As the fund takes inflows and
+          SpaceX is carried flat, SpaceX's share of NAV <b>falls from ~26.7% (5/20) to 23.2% (5/31)</b> —
+          which matches Baron's own 5/31 disclosure — then <b>jumps back to ~26.7% on the 6/4 IPO reprice</b>.
+          The public share moves inversely. The stack totals more than 100% of NAV: the bit
+          <b>above the dashed line is the fund's borrowings (leverage)</b>. (Live values in the cards below.)
         </p>
         <div class="kpis" id="comp-kpis"></div>
         <div id="comp-chart" class="chart" style="height:380px"></div>
         <div class="scroll-y" id="comp-table" style="margin-top:14px"></div>
         <p class="desc" style="margin-top:10px">
-          <b>On leverage:</b> the ratio (gross Total Assets ÷ net NAV) is <b>assumed constant at 1.1358</b>,
-          taken from the last NPORT filing (gross $11.768B ÷ net $10.361B). We do <b>not</b> have a daily
-          leverage feed, so this is a held-flat assumption, not observed daily variation — borrowings move
-          only as a fixed −13.6% of NAV. SpaceX $ is held at its last NPORT gross LMV; net NAV and shares are
-          from the reconstructed daily series.
+          <b>On net vs gross:</b> Morningstar "Total Assets" is the fund's <b>NET AUM</b> — confirmed by
+          Baron's own 5/31 page (SpaceX 23.2% of net; $3.89B ÷ 0.232 = $16.8B ≈ Morningstar). We previously
+          had this backwards (treating it as gross). <b>Gross holdings = net × leverage 1.1358</b> (from the
+          3/31 NPORT: gross $11.768B ÷ net $10.361B), held constant (no daily leverage feed), so borrowings
+          sit at −13.6% of NAV. SpaceX $ carried at NPORT LMV, stepped to the $135 IPO price on 6/4.
         </p>
       </section>
 

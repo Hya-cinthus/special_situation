@@ -81,7 +81,16 @@ function renderRemark() {
   document.getElementById("remark-table").innerHTML =
     `<table class="data"><thead><tr><th>情形</th><th>固定假设</th><th>反推</th><th>结果</th></tr></thead><tbody>${rows}</tbody></table>`;
   const con = document.getElementById("remark-conclusion");
-  if (con) con.innerHTML = `<p><b>结论:</b> ${m.conclusion}</p>`;
+  if (con) {
+    const cf = m.confirmed;
+    let html = "";
+    if (cf) html =
+      `<p style="border-left:3px solid ${GOOD};padding-left:10px"><b style="color:${GOOD}">✓ 已证实 (Baron S-1):</b> ` +
+      `SpaceX 6/4 reprice <b>$${cf.per_share_old_split_adj} → $${cf.per_share_new}/股</b> ` +
+      `(<b>+${(cf.per_share_remark_pct * 100).toFixed(1)}%</b>),持仓 <b>$3.89B → $${(cf.spacex_value_usd / 1e9).toFixed(2)}B</b>。` +
+      `整公司估值 $${(cf.valuation_post_money_usd / 1e12).toFixed(2)}T 是 post-money,<b>不能</b>直接套到持仓(会重复计 IPO 稀释)。</p>`;
+    con.innerHTML = html + `<p><b>结论:</b> ${m.conclusion}</p>`;
+  }
   const disc = document.getElementById("remark-disc");
   if (disc) disc.textContent = m.disclaimer;
 }

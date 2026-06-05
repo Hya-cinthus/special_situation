@@ -98,6 +98,17 @@ def resolve_aum_datapoints() -> list[dict]:
             "confidence": "med",
         }
 
+    # 3) Attach SpaceX holding re-marks (latest mark on/before each date). The
+    #    reconstruction uses this to STEP the private mark instead of carrying flat.
+    remarks = sorted(getattr(CFG, "SPACEX_REMARKS", []), key=lambda r: r["date"])
+    for dp in by_date.values():
+        rv = None
+        for rm in remarks:
+            if rm["date"] <= dp["date"]:
+                rv = rm["spacex_value_usd"]
+        if rv is not None:
+            dp["spacex_value_usd"] = rv
+
     return sorted(by_date.values(), key=lambda x: x["date"])
 
 
