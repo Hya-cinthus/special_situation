@@ -204,7 +204,7 @@ function renderChart() {
   const mk = (key, name, color, width) => ({
     x, y: s.map((r) => r[key]), name, type: "scatter", mode: "lines+markers",
     line: { color, width: width || 2 }, marker: { size: 5 },
-    hovertemplate: name + " %{y:$,.0f}<extra></extra>",
+    hovertemplate: name + " %{y:($,.0f}<extra></extra>",
   });
   Plotly.newPlot("chart", [
     mk("long_pnl", "Long (BPTIX)", GOOD),
@@ -236,7 +236,7 @@ function renderShortBreakdown() {
     return {
       x: dates, y: cum, customdata: daily, name: lg.ticker, type: "scatter", mode: "lines",
       line: { width: 1.4, color: `hsl(${Math.round((360 * i) / n)},65%,62%)` },
-      hovertemplate: lg.ticker + "  day %{customdata:+$,.0f} · cum %{y:+$,.0f}<extra></extra>",
+      hovertemplate: lg.ticker + "  day %{customdata:($,.0f} · cum %{y:($,.0f}<extra></extra>",
     };
   });
   Plotly.newPlot("short-chart", traces, {
