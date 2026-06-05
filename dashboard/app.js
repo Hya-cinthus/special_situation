@@ -104,6 +104,73 @@ function render() {
   renderMarksTable();
   renderGaps();
   initScenario();
+  fetch("data/nport_holdings.json", { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderRecon(d); }).catch(() => {});
+}
+
+/* ---- SpaceX holdings detail + full valuation reconciliation (bottom) ---- */
+function renderRecon(NP) {
+  const m = NP.meta, sx = NP.spacex, ct = NP.captable;
+  const intro = document.getElementById("recon-intro");
+  if (intro) intro.innerHTML =
+    `每一笔都来自基金 <b>3/31/2026 Portfolio of Investments</b>(脚注③:受限证券 = <b>${usd(m.spacex_value)} = ${pct(m.spacex_pct_of_net, 2)} of net</b>,正好是 SpaceX)。` +
+    `下面把 3/31 持仓 → 6/4 IPO 重估 → $1.77T 整公司估值,一步步连起来。`;
+  const spxNote = document.getElementById("recon-spx-note");
+  if (spxNote) spxNote.innerHTML =
+    `SpaceX 分 <b>5 个类别</b>:2 普通(Cl A/C)+ 3 优先(Cl H/I/Series N)。普通 @ $526.59/股、优先 @ $5,265.90/股(=普通的 10×),3/31 合计 <b>${usd(sx.value_3_31)}</b>。`;
+
+  // ① SpaceX classes table
+  const sRows = sx.classes.map((r) =>
+    `<tr><td><b>${r.name.split(", ").slice(-1)[0]}</b></td><td>${r.kind === "common" ? "普通" : "优先"}</td>
+      <td>${r.shares.toLocaleString()}</td><td>$${r.px_per_share.toLocaleString()}</td>
+      <td>${usd(r.value)}</td><td style="color:${SPX}">${usd(r.value_remark)}</td></tr>`).join("");
+  document.getElementById("recon-spacex").innerHTML =
+    `<table class="data"><thead><tr><th>类别</th><th>类型</th><th>股数(3/31)</th><th>$/股(3/31)</th>
+      <th>价值(3/31)</th><th>6/4 重估后</th></tr></thead><tbody>${sRows}
+      <tr style="font-weight:700;border-top:2px solid ${GRID}"><td>合计</td><td></td>
+      <td>${sx.total_shares_3_31.toLocaleString()}</td><td></td>
+      <td>${usd(sx.value_3_31)}</td><td style="color:${SPX}">${usd(sx.value_remark_6_4)}</td></tr></tbody></table>`;
+
+  // ② re-mark explanation
+  document.getElementById("recon-remark").innerHTML =
+    `<p>Baron S-1:SpaceX 普通股 <b>5-for-1 拆股</b>(5/4 生效)后,6/4 重估到 IPO 价 <b>$${ct.ipo_common_px}</b>;` +
+    `优先股<b>不拆</b>,重估到 <b>$${ct.ipo_preferred_px.toLocaleString()}</b>(= ${ct.conversion_ratio} × 普通,即 1 优先转 ${ct.conversion_ratio} 普通)。</p>` +
+    `<ul>` +
+    `<li>普通:${usd(sx.value_common_3_31)} × (135/105.32) = <b>${usd(sx.classes.filter(c => c.kind === "common").reduce((a, c) => a + c.value_remark, 0))}</b></li>` +
+    `<li>优先:${usd(sx.value_preferred_3_31)} × (6,750/5,265.9) = <b>${usd(sx.classes.filter(c => c.kind === "preferred").reduce((a, c) => a + c.value_remark, 0))}</b></li>` +
+    `<li><b>两者都 ×${sx.remark_factor.toFixed(4)}(+${((sx.remark_factor - 1) * 100).toFixed(1)}%)</b> → SpaceX 持仓 ${usd(sx.value_3_31)} → <b style="color:${SPX}">${usd(sx.value_remark_6_4)}</b></li>` +
+    `</ul><p class="dim">这 +28.2% 正好解释了 6/4 BPTRX NAV +6.6% 的跳动。</p>`;
+
+  // ③ cap-table tie-out
+  document.getElementById("recon-captable").innerHTML =
+    `<p>$1.77T 是 <b>post-money 整公司估值</b>,不能拿持仓的 +28.2% 去套。S-1 cap table(拆股后 pro-forma):</p>` +
+    `<ul>` +
+    `<li>pro-forma 普通股 = Class A ${(ct.pro_forma_classA / 1e9).toFixed(2)}B + Class B ${(ct.pro_forma_classB / 1e9).toFixed(2)}B = <b>${(ct.pro_forma_common / 1e9).toFixed(2)}B</b></li>` +
+    `<li>+ IPO 募资新股 ${(ct.ipo_new_shares / 1e6).toFixed(0)}M($75B/$135) + greenshoe ${(ct.greenshoe / 1e6).toFixed(0)}M</li>` +
+    `<li>= ${(ct.post_ipo_shares / 1e9).toFixed(2)}B 股 × $${ct.ipo_common_px} = <b>${usd(ct.post_ipo_valuation)}</b> ≈ 官方 ${usd(ct.stated_valuation)} ✓</li>` +
+    `</ul><p class="dim">估值涨得比每股快(+41.6% vs +28.2%),差额=发的新股:xAI 合并加的 Class B + 优先股转普通 + IPO 募资。</p>`;
+
+  // ④ net/gross/leverage
+  document.getElementById("recon-leverage").innerHTML =
+    `<ul>` +
+    `<li>普通持仓 ${usd(m.public_value)} + SpaceX ${usd(m.spacex_value)} = <b>Total Investments ${usd(m.total_investments)}</b>(net 的 ${(m.leverage * 100).toFixed(2)}%)</li>` +
+    `<li>− 负债净现金 ${usd(m.liabilities_less_cash)}(−${((m.leverage - 1) * 100).toFixed(2)}%)= <b>Net Assets ${usd(m.net_assets)}</b></li>` +
+    `<li>所以 <b>杠杆 = Total Investments / Net = ${m.leverage.toFixed(4)}</b>。Morningstar "Total Assets" 报的是 <b>Net</b>(由 5/31 披露 SpaceX 23.2% 证实);gross = net × ${m.leverage.toFixed(4)}。</li>` +
+    `</ul>`;
+
+  // ⑤ full holdings
+  const cls = (s) => ({ "Common": "普通股", "Private Common": "SpaceX 普通", "Private Preferred": "SpaceX 优先",
+    "Private Convertible Preferred": "可转优先" }[s] || s);
+  const hRows = NP.holdings.map((r) =>
+    `<tr><td>${cls(r.section)}</td><td>${r.group}</td><td>${r.name}</td>
+      <td>${r.shares.toLocaleString()}</td><td>${usd(r.cost)}</td><td>${usd(r.value)}</td></tr>`).join("");
+  document.getElementById("recon-holdings").innerHTML =
+    `<table class="data"><thead><tr><th>分类</th><th>行业</th><th>持仓</th><th>股数</th><th>成本</th><th>市值</th></tr></thead>` +
+    `<tbody>${hRows}<tr style="font-weight:700;border-top:2px solid ${GRID}"><td colspan="5">Total Investments</td>` +
+    `<td>${usd(NP.totals.total_value)}</td></tr></tbody></table>`;
+
+  const src = document.getElementById("recon-source");
+  if (src) src.innerHTML = "来源:" + m.source;
 }
 
 /* -------------------------------- KPIs --------------------------------- *

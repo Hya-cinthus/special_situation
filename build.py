@@ -188,6 +188,13 @@ def main(argv):
         print(f"[spacex_remark] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[spacex_remark] skipped: {e}")
+    # 3/31 NPORT holdings detail + full SpaceX valuation reconciliation (no network).
+    try:
+        import nport_holdings
+        p = nport_holdings.write_json()
+        print(f"[nport_holdings] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[nport_holdings] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 

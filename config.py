@@ -235,7 +235,9 @@ class SpacexBaron:
     # late May). So Morningstar "Total Assets" is NET AUM, NOT gross. (Under the old
     # gross assumption SpaceX came out 26.6% -> wrong.) Leverage (1.1358) still exists
     # and applies ON TOP for gross public-exposure math: gross = net x LEVERAGE_RATIO.
-    LEVERAGE_RATIO = 11767988975.60 / 10360633779.17   # ~1.1358 (3/31 NPORT-P gross/net)
+    LEVERAGE_RATIO = 11_782_549_084 / 10_394_470_144   # 1.1335 — exact, from the 3/31
+    # Portfolio of Investments: Total Investments $11,782,549,084 (113.35% of net) /
+    # Net Assets $10,394,470,144. (i.e. borrowings = -13.35% of net, as stated.)
     ASSUME_TOTAL_ASSETS_GROSS = False
 
     # Daily Morningstar "Total Assets" prints feed the AUM true-up. The cowork
