@@ -119,6 +119,29 @@ def build_payload():
     post_ipo_shares = pf_common + ipo_new + greenshoe
     post_ipo_val = post_ipo_shares * IPO_COMMON_PX
 
+    # --- Share-count bridge: where the dilution comes from (S-1 exact figures) -
+    # Actual common (3/31, post-split): Class A 44,444 + Class B 2,421,276,530.
+    # xAI Merger (closed 2026-02-02): issued 321,681,643 Cl A + 121,683,400 Cl B.
+    # The rest of the jump to pro-forma common = Preferred Conversion + Class C
+    # Reclassification (SpaceX is preferred-heavy; exact split is BLANK in the
+    # preliminary S-1, filled in the final 424B). Plus the IPO raise + greenshoe.
+    actual_common = 44_444 + 2_421_276_530
+    xai_classA, xai_classB = 321_681_643, 121_683_400
+    xai_total = xai_classA + xai_classB
+    pref_conv_reclass = pf_common - actual_common - xai_total   # residual (the bulk)
+    dilution = {
+        "actual_common": actual_common,
+        "xai_merger": xai_total, "xai_classA": xai_classA, "xai_classB": xai_classB,
+        "xai_date": "2026-02-02",
+        "pref_conv_and_reclass": pref_conv_reclass,
+        "pro_forma_common": pf_common,
+        "ipo_new": ipo_new, "greenshoe": greenshoe,
+        "post_ipo_common": post_ipo_shares,
+        "musk_perf_classB": 200_000_000,        # granted 2026-01-13, milestone-vesting
+        "musk_options_classB": 350_000_000,     # issuable on option exercise
+    }
+    assert actual_common + xai_total + pref_conv_reclass == pf_common
+
     return {
         "meta": {
             "title": "Baron Partners Fund — holdings & SpaceX valuation reconciliation",
@@ -156,6 +179,7 @@ def build_payload():
             "stated_valuation": IPO_VALUATION_POST_MONEY,
             "ipo_common_px": IPO_COMMON_PX, "ipo_preferred_px": IPO_PREFERRED_PX,
             "conversion_ratio": round(IPO_PREFERRED_PX / IPO_COMMON_PX),  # 50:1
+            "dilution": dilution,
         },
         "holdings": rows,
         "totals": {"total_value": total_value, "public_value": public_value,

@@ -61,35 +61,35 @@ function renderRemark() {
   const m = REMARK.meta, o = m.observables, sc = REMARK.scenarios;
   const obs = document.getElementById("remark-obs");
   if (obs) obs.innerHTML =
-    `观测(6/4):BPTRX NAV <b>${o.bptrx_nav_prev}→${o.bptrx_nav_now}</b> (<b style="color:${GOOD}">+${(o.nav_return * 100).toFixed(1)}%</b>) · ` +
-    `公开篮子 <b>+${(o.public_basket_return * 100).toFixed(2)}%</b> · Total Assets <b>$${(o.total_assets_prev_usd / 1e9).toFixed(1)}B → $${(o.total_assets_now_usd / 1e9).toFixed(1)}B</b> · ` +
-    `base 估值 $${(m.base_valuation_usd / 1e12).toFixed(2)}T · IPO $${(m.ipo_valuation_usd / 1e12).toFixed(2)}T`;
+    `Observed (6/4): BPTRX NAV <b>${o.bptrx_nav_prev}→${o.bptrx_nav_now}</b> (<b style="color:${GOOD}">+${(o.nav_return * 100).toFixed(1)}%</b>) · ` +
+    `public basket <b>+${(o.public_basket_return * 100).toFixed(2)}%</b> · Total Assets <b>$${(o.total_assets_prev_usd / 1e9).toFixed(1)}B → $${(o.total_assets_now_usd / 1e9).toFixed(1)}B</b> · ` +
+    `base val $${(m.base_valuation_usd / 1e12).toFixed(2)}T · IPO $${(m.ipo_valuation_usd / 1e12).toFixed(2)}T`;
   const rows = sc.map((s) => {
     let result;
     if (s.solved_for === "leverage")
-      result = `隐含 leverage <b style="color:${BAD}">${s.implied_leverage.toFixed(2)}×</b>`;
+      result = `implied leverage <b style="color:${BAD}">${s.implied_leverage.toFixed(2)}×</b>`;
     else
-      result = `SpaceX <b>$${(s.spacex_value_usd / 1e9).toFixed(2)}B</b> → 估值 <b style="color:${ACC}">$${(s.spacex_valuation_usd / 1e12).toFixed(2)}T</b> <span style="color:${MUTED}">(${(s.spacex_return * 100).toFixed(1)}%)</span>`;
+      result = `SpaceX <b>$${(s.spacex_value_usd / 1e9).toFixed(2)}B</b> → val <b style="color:${ACC}">$${(s.spacex_valuation_usd / 1e12).toFixed(2)}T</b> <span style="color:${MUTED}">(${(s.spacex_return * 100).toFixed(1)}%)</span>`;
     const vc = s.verdict === "impossible" ? BAD : GOOD;
     return `<tr>
       <td><b>${s.key}</b><br><span style="color:${MUTED};font-size:11px">${s.name}</span></td>
       <td style="font-size:12px">${s.fixed}</td>
-      <td style="font-size:12px">${s.solved_for === "leverage" ? "反推 leverage" : "反推 SpaceX mark"}</td>
+      <td style="font-size:12px">${s.solved_for === "leverage" ? "solve leverage" : "solve SpaceX mark"}</td>
       <td>${result}<br><span style="color:${vc};font-size:11px">[${s.verdict}] ${s.note}</span></td>
     </tr>`;
   }).join("");
   document.getElementById("remark-table").innerHTML =
-    `<table class="data"><thead><tr><th>情形</th><th>固定假设</th><th>反推</th><th>结果</th></tr></thead><tbody>${rows}</tbody></table>`;
+    `<table class="data"><thead><tr><th>Scenario</th><th>Fixed assumption</th><th>Solve for</th><th>Result</th></tr></thead><tbody>${rows}</tbody></table>`;
   const con = document.getElementById("remark-conclusion");
   if (con) {
     const cf = m.confirmed;
     let html = "";
     if (cf) html =
-      `<p style="border-left:3px solid ${GOOD};padding-left:10px"><b style="color:${GOOD}">✓ 已证实 (Baron S-1):</b> ` +
-      `SpaceX 6/4 reprice <b>$${cf.per_share_old_split_adj} → $${cf.per_share_new}/股</b> ` +
-      `(<b>+${(cf.per_share_remark_pct * 100).toFixed(1)}%</b>),持仓 <b>$3.89B → $${(cf.spacex_value_usd / 1e9).toFixed(2)}B</b>。` +
-      `整公司估值 $${(cf.valuation_post_money_usd / 1e12).toFixed(2)}T 是 post-money,<b>不能</b>直接套到持仓(会重复计 IPO 稀释)。</p>`;
-    con.innerHTML = html + `<p><b>结论:</b> ${m.conclusion}</p>`;
+      `<p style="border-left:3px solid ${GOOD};padding-left:10px"><b style="color:${GOOD}">✓ Confirmed (Baron S-1):</b> ` +
+      `SpaceX 6/4 reprice <b>$${cf.per_share_old_split_adj} → $${cf.per_share_new}/share</b> ` +
+      `(<b>+${(cf.per_share_remark_pct * 100).toFixed(1)}%</b>), holding <b>$3.89B → $${(cf.spacex_value_usd / 1e9).toFixed(2)}B</b>. ` +
+      `The $${(cf.valuation_post_money_usd / 1e12).toFixed(2)}T whole-company figure is post-money — <b>do not</b> apply it to the holding (double-counts IPO dilution).</p>`;
+    con.innerHTML = html + `<p><b>Conclusion:</b> ${m.conclusion}</p>`;
   }
   const disc = document.getElementById("remark-disc");
   if (disc) disc.textContent = m.disclaimer;

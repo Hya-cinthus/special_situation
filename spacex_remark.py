@@ -59,8 +59,8 @@ def build_payload():
     spx4_1 = SPX_3_USD * (1 + r_spx1)
     val4_1 = VAL_BASE * (1 + r_spx1)
     scenarios.append({
-        "key": "S1", "name": "Leverage 准确 + Total Assets = gross",
-        "fixed": "L = 1.1358(3/31 NPORT);18.7B 视为 gross(杠杆后)",
+        "key": "S1", "name": "Leverage accurate + Total Assets = gross",
+        "fixed": "L = 1.1358 (3/31 NPORT); treat 18.7B as gross (after leverage)",
         "solved_for": "SpaceX mark",
         "leverage": round(L0, 4),
         "net_aum_usd": round(TA_4 / L0, 0),
@@ -70,7 +70,7 @@ def build_payload():
         "spacex_return": round(r_spx1, 4),
         "public_gross_usd": round(TA_4 - spx4_1, 0),
         "verdict": "consistent",
-        "note": "数据自洽的默认情形:SpaceX 反推到 ~$1.57T,部分 re-mark。",
+        "note": "Internally-consistent default: SpaceX backs out to ~$1.57T, a partial re-mark.",
     })
 
     # --- S2: SpaceX = full $1.77T -> solve required leverage -------------------
@@ -78,8 +78,8 @@ def build_payload():
     net3_implied = (SPX_3_USD * r_spx_full + pub3 * R_PUB) / NAV_RET
     L_implied = TA_3 / net3_implied
     scenarios.append({
-        "key": "S2", "name": "SpaceX = full $1.77T 确定",
-        "fixed": "SpaceX 6/4 = $1.77T($5.51B);18.7B 视为 gross",
+        "key": "S2", "name": "SpaceX = full $1.77T (certain)",
+        "fixed": "SpaceX 6/4 = $1.77T ($5.51B); treat 18.7B as gross",
         "solved_for": "leverage",
         "spacex_value_usd": round(_val_to_usd(IPO_VAL), 0),
         "spacex_valuation_usd": IPO_VAL,
@@ -87,8 +87,8 @@ def build_payload():
         "implied_leverage": round(L_implied, 4),
         "implied_net_usd": round(net3_implied, 0),
         "verdict": "impossible",
-        "note": ("要让 full $1.77T 只产生 +6.6%% 的 NAV,杠杆得是 %.2fx(<1 = 净现金),"
-                 "对杠杆基金不可能 → 反证 6/4 不是 full mark。" % L_implied),
+        "note": ("For a full $1.77T mark to produce only +6.6%% NAV, leverage would have to be %.2fx "
+                 "(<1 = net cash), impossible for a levered fund -> proves 6/4 is not a full mark." % L_implied),
     })
 
     # --- S3: reported TA = NET AUM, L trusted -> solve SpaceX mark -------------
@@ -99,8 +99,8 @@ def build_payload():
     spx4_3 = SPX_3_USD * (1 + r_spx3)
     val4_3 = VAL_BASE * (1 + r_spx3)
     scenarios.append({
-        "key": "S3", "name": "Total Assets = net(真实 AUM)",
-        "fixed": "L = 1.1358;18.7B 视为 net AUM(非杠杆后)",
+        "key": "S3", "name": "Total Assets = net (true AUM)",
+        "fixed": "L = 1.1358; treat 18.7B as net AUM (not post-leverage)",
         "solved_for": "SpaceX mark",
         "leverage": round(L0, 4),
         "net_aum_usd": round(TA_4, 0),
@@ -110,7 +110,7 @@ def build_payload():
         "spacex_return": round(r_spx3, 4),
         "public_gross_usd": round(TA_4 * L0 - spx4_3, 0),
         "verdict": "consistent",
-        "note": "若 18.7B 是 net,SpaceX 反推到 ~$1.61T,仍是部分 re-mark。",
+        "note": "If 18.7B is net, SpaceX backs out to ~$1.61T, still a partial re-mark.",
     })
 
     lo = min(s["spacex_valuation_usd"] for s in scenarios if s["verdict"] == "consistent")
@@ -118,7 +118,7 @@ def build_payload():
 
     return {
         "meta": {
-            "title": "SpaceX 6/4 re-mark — 多情景重算",
+            "title": "SpaceX 6/4 re-mark — multi-scenario reconciliation",
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "as_of": "2026-06-04",
             "base_valuation_usd": VAL_BASE,
@@ -135,12 +135,13 @@ def build_payload():
                 "per_share_remark_pct": round(135.0 / 105.32 - 1, 4),        # +28.2%
                 "valuation_post_money_usd": IPO_VAL,
                 "basis": ("Baron S-1: SpaceX common repriced $135.00 (preferred $6,750) on 2026-06-04. "
-                          "持仓按每股 $105.32->$135 (+28.2%) 重估到 ~$4.99B —— 不是按 $1.77T/$1.25T "
-                          "(+41.6%, 那会重复计 IPO 稀释)。这正好解释观测到的 +6.6% NAV。"),
+                          "Holding re-marks by per-share $105.32->$135 (+28.2%) to ~$4.99B -- NOT by "
+                          "$1.77T/$1.25T (+41.6%, which double-counts IPO dilution). Explains the +6.6% NAV."),
             },
-            "conclusion": ("已由 Baron S-1 证实:6/4 SpaceX 普通股 reprice 到 $135/股 (+28.2%% vs $105.32),"
-                           "持仓 $3.89B → ~$4.99B。$1.77T 是 post-money 整公司估值,不能直接套到持仓上。"
-                           "(早前 S1/S3 的 $%.2f–$%.2fT 反推与此一致;net 口径已由 5/31 披露 SpaceX 23.2%% 证实。)"
+            "conclusion": ("Confirmed by Baron S-1: 6/4 SpaceX common repriced to $135/share (+28.2%% vs "
+                           "$105.32), holding $3.89B -> ~$4.99B. $1.77T is the post-money whole-company "
+                           "valuation, not to be applied to the holding. (The earlier S1/S3 back-outs of "
+                           "$%.2f-$%.2fT agree; net basis confirmed by the 5/31 disclosure of SpaceX 23.2%%.)"
                            % (lo / 1e12, hi / 1e12)),
             "disclaimer": ("SpaceX $-to-price mapping linear off the 3/31 NPORT anchor ($3.89B @ $105.32 "
                            "split-adj). 6/4 reprice per Baron S-1. Next NPORT (period 6/30, ~late Aug) is the "
