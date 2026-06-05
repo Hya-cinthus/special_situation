@@ -33,6 +33,16 @@ POSITIONS = {
 }
 
 
+# Manual NAV/price points for days Yahoo hasn't posted yet (mutual-fund NAV lags
+# ~1 day). Provenance must be a real reported figure, not an estimate.
+#   BPTIX 2026-06-04 NAV = 279.60 — provided by user from Baron/brokerage on 6/4
+#   (a +6.6% jump vs 6/3 $262.23, consistent with a SpaceX IPO re-mark). Will be
+#   superseded automatically once Yahoo publishes the same date.
+MANUAL_PX = {
+    "BPTIX": {"2026-06-04": 279.60},
+}
+
+
 def _epoch(d):
     return int(datetime.datetime.strptime(d, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc).timestamp())
 
@@ -54,6 +64,10 @@ def _series(tk, start, end):
 def build_payload():
     end = (datetime.date(2026, 6, 4) + datetime.timedelta(days=1)).isoformat()
     px = {tk: _series(tk, ENTRY, end) for tk in POSITIONS}
+    # merge manual points (only where Yahoo doesn't already have the day)
+    for tk, days in MANUAL_PX.items():
+        for d, v in days.items():
+            px.setdefault(tk, {}).setdefault(d, v)
 
     # trading-day calendar = dates where BPTIX has a price (the long anchor)
     dates = sorted(d for d in px["BPTIX"] if d >= ENTRY)
@@ -110,6 +124,9 @@ def build_payload():
             "short_notional": round(short_notional, 0),
             "n_shorts": sum(1 for s in POSITIONS.values() if s < 0),
             "last_data_day": last_row.get("date"),
+            "manual_marks": [{"ticker": tk, "date": d, "value": v,
+                              "source": "user-provided (Baron/brokerage), pending Yahoo"}
+                             for tk, days in MANUAL_PX.items() for d, v in days.items()],
         },
         "kpis": {
             "as_of": last_row.get("date"),

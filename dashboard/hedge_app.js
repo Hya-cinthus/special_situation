@@ -41,6 +41,11 @@ function render() {
   document.getElementById("disclaimer").textContent = m.disclaimer;
   document.getElementById("gen").textContent = "Generated " + m.generated_at;
   renderKpis(); renderChart(); renderShortBreakdown(); renderLegs();
+  const note = document.getElementById("pnl-note");
+  const mm = (DATA.meta.manual_marks || []);
+  if (note && mm.length) note.innerHTML = "⚠ Manual mark: " +
+    mm.map((x) => `<b>${x.ticker} ${x.date}</b> = $${x.value.toFixed(2)} (${x.source})`).join("; ") +
+    " — superseded automatically once the data provider posts the same date.";
   fetch("data/hedge_drift.json", { cache: "no-store" })
     .then((r) => r.ok ? r.json() : null).then((d) => { if (d) { DRIFT = d; renderDrift(); } })
     .catch(() => {});
