@@ -149,25 +149,54 @@ def build_payload():
     implied_125 = round(1.25e12 / OLD_PX)                      # ~11.869B
     bridge = [
         {"label": "$1.25T mark (Feb 2 headline)", "shares": implied_125, "delta": None,
-         "price": round(OLD_PX, 2), "valuation": round(implied_125 * OLD_PX),
-         "note": "= $1.25T / $105.32 (round Feb merger headline)"},
+         "price": round(OLD_PX, 2), "valuation": round(implied_125 * OLD_PX), "src_type": "derived",
+         "source": ("DERIVED = $1.25T / $105.32. $1.25T = SpaceX+xAI merger headline (CNBC 2026-02-03). "
+                    "$105.32 = $526.59 / 5 (split); $526.59 = the 3/31 NPORT mark (Baron's Cl A common "
+                    "$1,167,086,683 / 2,216,310 sh). Not a directly-reported share count.")},
         {"label": "True-up to the precise 3/31 cap-table count", "shares": pf_common,
          "delta": pf_common - implied_125, "price": round(OLD_PX, 2),
-         "valuation": round(pf_common * OLD_PX),
-         "note": "extra shares between the round headline and the exact pro-forma count (Feb→Mar issuance/vesting); at the same $105.32 the precise value is ~$1.32T"},
+         "valuation": round(pf_common * OLD_PX), "src_type": "residual",
+         "source": ("RESIDUAL = exact S-1 pro-forma common (12,520,310,769) − the round-headline implied "
+                    "count (11,868,816,347). No independent source: it is the gap between the round $1.25T "
+                    "headline and the exact filing (at the same $105.32 the precise value is ~$1.32T — value "
+                    "drifted up Feb→Mar and/or the $1.25T is rounded).")},
         {"label": "6/4 IPO price re-mark (+28.2%, NO new shares)", "shares": pf_common,
-         "delta": 0, "price": IPO_COMMON_PX, "valuation": round(pf_common * IPO_COMMON_PX),
-         "note": "this is the per-share gain Baron actually captures ($105.32→$135)"},
+         "delta": 0, "price": IPO_COMMON_PX, "valuation": round(pf_common * IPO_COMMON_PX), "src_type": "reported",
+         "source": ("REPORTED: Baron S-1 — SpaceX common reprices to $135.00 on 2026-06-04 (from $105.32). "
+                    "This is the per-share gain Baron actually captures; adds no shares.")},
         {"label": "+ IPO primary raise ($75B new cash)", "shares": pf_common + ipo_new,
          "delta": ipo_new, "price": IPO_COMMON_PX, "valuation": round((pf_common + ipo_new) * IPO_COMMON_PX),
-         "note": "555.6M new Class A sold at $135 (non-dilutive — cash in)"},
+         "src_type": "derived",
+         "source": ("DERIVED = $75B raise / $135 = 555.6M new Class A. $75B & $135 from CNBC IPO-priced "
+                    "(2026-06-03). The preliminary S-1 leaves the offering size blank; filled in the 424B.")},
         {"label": "+ greenshoe (over-allotment)", "shares": post_ipo_shares,
          "delta": greenshoe, "price": IPO_COMMON_PX, "valuation": round(post_ipo_shares * IPO_COMMON_PX),
-         "note": "= $1.77T post-money ✓"},
+         "src_type": "derived",
+         "source": ("DERIVED: 83.33M = 15% over-allotment (≈ $11.2B); CNBC IPO terms. Post-money = $1.77T ✓")},
     ]
     dilution["valuation_bridge"] = bridge
     dilution["implied_shares_at_125T"] = implied_125
     dilution["old_common_px_postsplit"] = round(OLD_PX, 2)
+
+    # Source-tagged breakdown of the 12.52B pro-forma common (Table B), with a
+    # RUNNING (cumulative) count so it reads like the bridge above.
+    dilution["source_breakdown"] = [
+        {"label": "Actual common on the books (3/31)", "delta": actual_common, "cumulative": actual_common,
+         "src_type": "reported",
+         "source": "S-1 cap table 'actual': Class A 44,444 + Class B 2,421,276,530."},
+        {"label": "+ xAI Merger (2026-02-02)", "delta": xai_total, "cumulative": actual_common + xai_total,
+         "src_type": "reported",
+         "source": ("S-1: \"issued 321,681,643 shares of Class A common stock and 121,683,400 shares of "
+                    "Class B common stock as partial consideration\" (common-control merger).")},
+        {"label": "+ Preferred conversion + Class C reclassification", "delta": pref_conv_reclass,
+         "cumulative": pf_common, "src_type": "reported-total / residual-split",
+         "source": ("Residual = pro-forma common (S-1) − actual − xAI. S-1 confirms ALL preferred converts to "
+                    "common and Class C reclassifies to Class A at the IPO; the exact per-line counts are "
+                    "blank in the preliminary S-1 (filled in the 424B).")},
+        {"label": "= Pro-forma common (3/31)", "delta": None, "cumulative": pf_common,
+         "src_type": "reported",
+         "source": "S-1 cap table 'pro forma': Class A 6,824,581,339 + Class B 5,695,729,430."},
+    ]
 
     return {
         "meta": {
