@@ -144,21 +144,33 @@ function renderRecon(NP) {
     `<li><b>Both ×${sx.remark_factor.toFixed(4)} (+${((sx.remark_factor - 1) * 100).toFixed(1)}%)</b> → SpaceX holding ${usd(sx.value_3_31)} → <b style="color:${SPX}">${usd(sx.value_remark_6_4)}</b></li>` +
     `</ul><p class="dim">This +28.2% exactly explains the +6.6% jump in BPTRX NAV on 6/4.</p>`;
 
-  // (3) cap-table tie-out + dilution bridge (where the extra shares come from)
-  const dl = ct.dilution, B = (x) => (x / 1e9).toFixed(3) + "B", M = (x) => (x / 1e6).toFixed(1) + "M";
+  // (3) cap-table tie-out: ONE additive bridge ($1.25T -> $1.77T) + source breakdown
+  const dl = ct.dilution, M = (x) => (x / 1e6).toFixed(1) + "M";
+  const dlt = (x) => x == null ? "" : (x === 0 ? "—" : (x > 0 ? "+" : "") + x.toLocaleString());
+  const valT = (x) => "$" + (x / 1e12).toFixed(3) + "T";
+  // Table A — single running share count, all post-split common
+  const aRows = dl.valuation_bridge.map((s, i) => {
+    const head = i === 0 || i === dl.valuation_bridge.length - 1;
+    const col = s.delta === 0 ? MUTED : (s.delta > 0 ? ACC : TEXT);
+    return `<tr${head ? ` style="font-weight:700;border-top:2px solid ${GRID}"` : ""}>
+      <td>${s.label}</td><td>${s.shares.toLocaleString()}</td>
+      <td style="color:${col}">${dlt(s.delta)}</td><td>$${s.price}</td>
+      <td style="color:${i === dl.valuation_bridge.length - 1 ? SPX : TEXT}">${valT(s.valuation)}</td></tr>
+      <tr><td colspan="5" class="dim" style="font-size:11px;padding-top:0">${s.note}</td></tr>`;
+  }).join("");
+  // Table B — where the 12.52B pro-forma common comes from
+  const bRows =
+    `<tr><td>Actual common on the books (3/31)</td><td>${dl.actual_common.toLocaleString()}</td><td>Class A 44,444 + Class B 2,421,276,530</td></tr>` +
+    `<tr><td>+ xAI Merger (2026-02-02)</td><td style="color:${ACC}">+${dl.xai_merger.toLocaleString()}</td><td>Cl A ${dl.xai_classA.toLocaleString()} + Cl B ${dl.xai_classB.toLocaleString()} issued to xAI holders (common-control)</td></tr>` +
+    `<tr><td>+ Preferred conversion + Class C reclass</td><td style="color:${ACC}">+${dl.pref_conv_and_reclass.toLocaleString()}</td><td><b>the bulk</b> — SpaceX funded mostly via preferred (Cl H/I/Series N + others), all converting to common at IPO (exact split blank in the preliminary S-1)</td></tr>` +
+    `<tr style="font-weight:700;border-top:2px solid ${GRID}"><td>= Pro-forma common (3/31)</td><td>${dl.pro_forma_common.toLocaleString()}</td><td>the row "True-up …" total above</td></tr>`;
   document.getElementById("recon-captable").innerHTML =
-    `<p>$1.77T is the <b>post-money whole-company valuation</b> — you can't apply the holding's +28.2% to it. ` +
-    `The whole-company value rose <b>+41.6%</b> while the per-share value rose only <b>+28.2%</b>; the gap is <b>more shares</b>. ` +
-    `Here is exactly where the post-split common share count comes from (S-1 figures):</p>` +
-    `<table class="data"><thead><tr><th>Step</th><th>Shares (post-split common)</th><th>Source</th></tr></thead><tbody>` +
-    `<tr><td>Actual common (3/31)</td><td>${dl.actual_common.toLocaleString()}</td><td>Class A 44,444 + Class B 2,421,276,530</td></tr>` +
-    `<tr><td>+ xAI Merger (2/2/2026)</td><td style="color:${ACC}">+${dl.xai_merger.toLocaleString()}</td><td>Cl A ${M(dl.xai_classA)} + Cl B ${M(dl.xai_classB)} issued to xAI holders (common-control)</td></tr>` +
-    `<tr><td>+ Preferred conversion + Class C reclass</td><td style="color:${ACC}">+${dl.pref_conv_and_reclass.toLocaleString()}</td><td><b>the bulk</b> — SpaceX funded mostly via preferred (Cl H/I/N + other series), all converts to common at IPO (exact split blank in the preliminary S-1)</td></tr>` +
-    `<tr style="font-weight:700;border-top:1px solid ${GRID}"><td>= Pro-forma common (pre-IPO)</td><td>${dl.pro_forma_common.toLocaleString()}</td><td>× $135 = ${usd(dl.pro_forma_common * ct.ipo_common_px)}</td></tr>` +
-    `<tr><td>+ IPO raise + greenshoe</td><td style="color:${ACC}">+${(dl.ipo_new + dl.greenshoe).toLocaleString()}</td><td>${M(dl.ipo_new)} ($75B/$135, new cash) + ${M(dl.greenshoe)} greenshoe</td></tr>` +
-    `<tr style="font-weight:700;border-top:2px solid ${GRID}"><td>= Post-IPO common</td><td style="color:${SPX}">${dl.post_ipo_common.toLocaleString()}</td><td>× $${ct.ipo_common_px} = <b>${usd(ct.post_ipo_valuation)}</b> ≈ stated ${usd(ct.stated_valuation)} ✓</td></tr>` +
-    `</tbody></table>` +
-    `<p class="dim" style="margin-top:8px"><b>Is Baron diluted?</b> Mostly no. Preferred conversion was already inside the $1.25T value (just reclassified to common); the IPO raise brings in matching $75B cash; the xAI merger added xAI's value. Baron's per-share value rose the full +28.2% on both its common and preferred. The only genuinely dilutive piece is Musk's milestone grants (200M perf Class B + 350M option Class B), which vest only on market-cap/Mars milestones.</p>`;
+    `<p>The whole-company value rose <b>+41.6% ($1.25T→$1.77T)</b> but the per-share value rose only <b>+28.2%</b> — the gap is <b>more shares</b>. ` +
+    `Here is one running share count (all post-split common), from the $1.25T mark to the $1.77T IPO:</p>` +
+    `<table class="data"><thead><tr><th>Step</th><th>Shares (running)</th><th>Δ shares</th><th>$/sh</th><th>Valuation</th></tr></thead><tbody>${aRows}</tbody></table>` +
+    `<p style="margin:14px 0 4px"><b>Where the 12.52B pro-forma common comes from</b> (the "True-up" row, broken out — including the exact xAI figure):</p>` +
+    `<table class="data"><thead><tr><th>Component</th><th>Shares (post-split)</th><th>Source</th></tr></thead><tbody>${bRows}</tbody></table>` +
+    `<p class="dim" style="margin-top:8px"><b>Is Baron diluted?</b> Mostly no. Preferred conversion was already inside the $1.25T value (just reclassified to common); the IPO raise brings in matching $75B cash; the xAI merger added xAI's value. Baron's per-share value rose the full <b>+28.2%</b> on both its common and preferred (that's the "price re-mark" row — no new shares). The only genuinely dilutive piece is Musk's milestone grants (${M(dl.musk_perf_classB)} perf + ${M(dl.musk_options_classB)} option Class B), which vest only on market-cap / Mars milestones.</p>`;
 
   // (4) net/gross/leverage
   document.getElementById("recon-leverage").innerHTML =

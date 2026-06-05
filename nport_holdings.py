@@ -142,6 +142,33 @@ def build_payload():
     }
     assert actual_common + xai_total + pref_conv_reclass == pf_common
 
+    # --- Single additive valuation bridge, ALL in post-split common shares -----
+    # Start from the share count the $1.25T headline implies, add each step, end at
+    # $1.77T. (preferred is folded in as converted common at 50:1.)
+    OLD_PX = 526.59 / SPLIT_RATIO                              # $105.318 post-split common
+    implied_125 = round(1.25e12 / OLD_PX)                      # ~11.869B
+    bridge = [
+        {"label": "$1.25T mark (Feb 2 headline)", "shares": implied_125, "delta": None,
+         "price": round(OLD_PX, 2), "valuation": round(implied_125 * OLD_PX),
+         "note": "= $1.25T / $105.32 (round Feb merger headline)"},
+        {"label": "True-up to the precise 3/31 cap-table count", "shares": pf_common,
+         "delta": pf_common - implied_125, "price": round(OLD_PX, 2),
+         "valuation": round(pf_common * OLD_PX),
+         "note": "extra shares between the round headline and the exact pro-forma count (Feb→Mar issuance/vesting); at the same $105.32 the precise value is ~$1.32T"},
+        {"label": "6/4 IPO price re-mark (+28.2%, NO new shares)", "shares": pf_common,
+         "delta": 0, "price": IPO_COMMON_PX, "valuation": round(pf_common * IPO_COMMON_PX),
+         "note": "this is the per-share gain Baron actually captures ($105.32→$135)"},
+        {"label": "+ IPO primary raise ($75B new cash)", "shares": pf_common + ipo_new,
+         "delta": ipo_new, "price": IPO_COMMON_PX, "valuation": round((pf_common + ipo_new) * IPO_COMMON_PX),
+         "note": "555.6M new Class A sold at $135 (non-dilutive — cash in)"},
+        {"label": "+ greenshoe (over-allotment)", "shares": post_ipo_shares,
+         "delta": greenshoe, "price": IPO_COMMON_PX, "valuation": round(post_ipo_shares * IPO_COMMON_PX),
+         "note": "= $1.77T post-money ✓"},
+    ]
+    dilution["valuation_bridge"] = bridge
+    dilution["implied_shares_at_125T"] = implied_125
+    dilution["old_common_px_postsplit"] = round(OLD_PX, 2)
+
     return {
         "meta": {
             "title": "Baron Partners Fund — holdings & SpaceX valuation reconciliation",
