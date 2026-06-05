@@ -49,6 +49,41 @@ function render() {
   fetch("data/hedge_drift.json", { cache: "no-store" })
     .then((r) => r.ok ? r.json() : null).then((d) => { if (d) { DRIFT = d; renderDrift(); } })
     .catch(() => {});
+  fetch("data/spacex_remark.json", { cache: "no-store" })
+    .then((r) => r.ok ? r.json() : null).then((d) => { if (d) { REMARK = d; renderRemark(); } })
+    .catch(() => {});
+}
+
+let REMARK = null;
+
+function renderRemark() {
+  if (!document.getElementById("remark-table")) return;
+  const m = REMARK.meta, o = m.observables, sc = REMARK.scenarios;
+  const obs = document.getElementById("remark-obs");
+  if (obs) obs.innerHTML =
+    `观测(6/4):BPTRX NAV <b>${o.bptrx_nav_prev}→${o.bptrx_nav_now}</b> (<b style="color:${GOOD}">+${(o.nav_return * 100).toFixed(1)}%</b>) · ` +
+    `公开篮子 <b>+${(o.public_basket_return * 100).toFixed(2)}%</b> · Total Assets <b>$${(o.total_assets_prev_usd / 1e9).toFixed(1)}B → $${(o.total_assets_now_usd / 1e9).toFixed(1)}B</b> · ` +
+    `base 估值 $${(m.base_valuation_usd / 1e12).toFixed(2)}T · IPO $${(m.ipo_valuation_usd / 1e12).toFixed(2)}T`;
+  const rows = sc.map((s) => {
+    let result;
+    if (s.solved_for === "leverage")
+      result = `隐含 leverage <b style="color:${BAD}">${s.implied_leverage.toFixed(2)}×</b>`;
+    else
+      result = `SpaceX <b>$${(s.spacex_value_usd / 1e9).toFixed(2)}B</b> → 估值 <b style="color:${ACC}">$${(s.spacex_valuation_usd / 1e12).toFixed(2)}T</b> <span style="color:${MUTED}">(${(s.spacex_return * 100).toFixed(1)}%)</span>`;
+    const vc = s.verdict === "impossible" ? BAD : GOOD;
+    return `<tr>
+      <td><b>${s.key}</b><br><span style="color:${MUTED};font-size:11px">${s.name}</span></td>
+      <td style="font-size:12px">${s.fixed}</td>
+      <td style="font-size:12px">${s.solved_for === "leverage" ? "反推 leverage" : "反推 SpaceX mark"}</td>
+      <td>${result}<br><span style="color:${vc};font-size:11px">[${s.verdict}] ${s.note}</span></td>
+    </tr>`;
+  }).join("");
+  document.getElementById("remark-table").innerHTML =
+    `<table class="data"><thead><tr><th>情形</th><th>固定假设</th><th>反推</th><th>结果</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const con = document.getElementById("remark-conclusion");
+  if (con) con.innerHTML = `<p><b>结论:</b> ${m.conclusion}</p>`;
+  const disc = document.getElementById("remark-disc");
+  if (disc) disc.textContent = m.disclaimer;
 }
 
 function pct(x, signed) {

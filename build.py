@@ -181,6 +181,13 @@ def main(argv):
         print(f"[hedge_drift] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[hedge_drift] skipped: {e}")
+    # SpaceX 6/4 re-mark multi-scenario reconciliation (documented inputs; no network).
+    try:
+        import spacex_remark
+        p = spacex_remark.write_json()
+        print(f"[spacex_remark] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[spacex_remark] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 
