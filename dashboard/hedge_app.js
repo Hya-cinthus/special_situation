@@ -44,18 +44,20 @@ function render() {
   const tog = document.getElementById("ex-remark-toggle");
   if (tog) tog.addEventListener("change", (e) => { EX_REMARK = e.target.checked; renderChart(); });
   const sel = document.getElementById("method-select");
-  if (sel) sel.addEventListener("change", (e) => { METHOD = e.target.value; renderChart(); });
+  if (sel) sel.addEventListener("change", (e) => { METHOD = e.target.value; renderChart(); renderMethodComp(); });
+  const order = ["actual", "fund_3_31", "fund_4_30", "fund_5_31", "blend", "optimal"];
+  const nm = { actual: "Actual", fund_3_31: "Fund 3/31", fund_4_30: "Fund 4/30", fund_5_31: "Fund 5/31", blend: "Blend 4/30+5/31", optimal: "Optimal 2-factor" };
   const sw = document.getElementById("swing-note"), rs = DATA.meta.residual_swing;
   if (sw && rs) {
-    const best = Object.entries(rs).filter(([k, v]) => v != null).sort((a, b) => a[1] - b[1])[0][0];
-    const nm = { actual: "Actual", reweight: "Fund-weight·net", const: "Gross·const", dyn: "Gross·dyn", optimal: "Optimal·2-factor" };
+    const cand = order.filter((k) => rs[k] != null);
+    const best = cand.slice().sort((a, b) => rs[a] - rs[b])[0];
     sw.innerHTML = "<b>Residual swing</b> (ex-re-mark σ of the net, lower = better hedge): " +
-      ["actual", "reweight", "const", "dyn", "optimal"].filter((k) => rs[k] != null).map((k) =>
-        `${nm[k]} <b style="color:${k === best ? GOOD : TEXT}">${usd(rs[k])}</b>`).join(" · ") +
-      ` → <b style="color:${GOOD}">${nm[best]} wins</b>. The 3/31 fund-weighting and gross-scaling both make it <i>worse</i>; ` +
-      `the win comes from a <b>data-driven Tesla adjustment</b> (which wants <i>less</i> Tesla), not the stale-filing weights. ` +
-      `(See the Optimal-hedge card — validated out-of-sample.)`;
+      cand.map((k) => `${nm[k]} <b style="color:${k === best ? GOOD : TEXT}">${usd(rs[k])}</b>`).join(" · ") +
+      ` → <b style="color:${GOOD}">${nm[best]} wins</b>. The disclosure-based baskets (4/30 / blend) beat your actual and the ` +
+      `stale 3/31 — using the fund's <b>real, drifting</b> weights is what matters (5/31 is <b>net-cash, no leverage</b>). ` +
+      `The data-fit Optimal is marginally lower but the no-fit Blend nearly matches it, so it's not overfitting.`;
   }
+  renderMethodComp();
   const note = document.getElementById("pnl-note");
   const mm = (DATA.meta.manual_marks || []);
   if (note && mm.length) note.innerHTML = "⚠ Manual mark: " +
@@ -386,9 +388,10 @@ let EX_REMARK = false;   // toggle: strip the 6/4 SpaceX re-mark from long/total
 let METHOD = "actual";   // basket-construction method
 const METHODS = {
   actual: { label: "Actual (your basket)", net: "total_pnl", netEx: "total_pnl_ex_remark", sl: "your public holdings", sw: "actual" },
-  reweight: { label: "Fund-weight · net scale", net: "net_reweight", netEx: "net_reweight_ex_remark", sl: "fund weights, your total", sw: "reweight" },
-  const: { label: "Fund-weight · gross (constant)", net: "net_const", netEx: "net_const_ex_remark", sl: "fund weights, gross, fixed", sw: "const" },
-  dyn: { label: "Fund-weight · gross (dynamic)", net: "net_dyn", netEx: "net_dyn_ex_remark", sl: "fund weights, gross, rebalanced", sw: "dyn" },
+  fund_3_31: { label: "Fund weights · 3/31 (stale)", net: "net_fund_3_31", netEx: "net_fund_3_31_ex_remark", sl: "3/31 NPORT weights", sw: "fund_3_31" },
+  fund_4_30: { label: "Fund weights · 4/30", net: "net_fund_4_30", netEx: "net_fund_4_30_ex_remark", sl: "4/30 disclosed weights", sw: "fund_4_30" },
+  fund_5_31: { label: "Fund weights · 5/31 (latest, no leverage)", net: "net_fund_5_31", netEx: "net_fund_5_31_ex_remark", sl: "5/31 disclosed weights (incl SPY proxy)", sw: "fund_5_31" },
+  blend: { label: "Blend 4/30 + 5/31", net: "net_blend", netEx: "net_blend_ex_remark", sl: "avg of 4/30 & 5/31", sw: "blend" },
   optimal: { label: "Optimal (min-variance 2-factor)", net: "net_optimal", netEx: "net_optimal_ex_remark", sl: "Tesla own ratio + rest", sw: "optimal" },
 };
 
@@ -419,6 +422,22 @@ function renderChart() {
     legend: { orientation: "h", y: 1.12, font: { color: TEXT } },
     margin: { t: 40, r: 16, b: 36, l: 64 },
   }, { responsive: true, displayModeBar: false, displaylogo: false });
+}
+
+function renderMethodComp() {
+  const el = document.getElementById("method-comp");
+  if (!el) return;
+  const comp = (DATA.meta.basket_compositions || {})[METHOD];
+  const rs = DATA.meta.residual_swing || {}, meth = METHODS[METHOD];
+  if (!comp) { el.innerHTML = ""; return; }
+  const rows = comp.map((c) =>
+    `<tr${c.ticker === "TSLA" ? ` style="background:rgba(248,81,73,0.08)"` : ""}>
+      <td><b>${c.ticker}</b></td><td>${c.shares.toLocaleString()}</td><td>${(c.weight * 100).toFixed(1)}%</td></tr>`).join("");
+  el.innerHTML =
+    `<div class="dim" style="font-size:12px;margin-bottom:4px"><b>${meth.label}</b> basket — residual σ ` +
+    `<b style="color:${TEXT}">${usd(rs[meth.sw])}</b> · scaled to your ~${usd(DATA.meta.short_notional)} short (net).` +
+    (METHOD === "actual" ? " (your real fixed shares)" : METHOD === "optimal" ? " (data-fit 2-factor)" : " (fund's disclosed weights, held constant)") +
+    `</div><table class="data"><thead><tr><th>Ticker</th><th>Shares</th><th>Weight</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function renderImpliedLev() {

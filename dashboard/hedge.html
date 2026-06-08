@@ -43,22 +43,23 @@
           shown as combined total.
         </p>
         <p class="desc" style="margin:2px 0 8px">
-          <b>Basket method</b> — the long (130k BPTIX) is fixed; only the short changes:
-          <b>Actual</b> = your real fixed shares; <b>Fund-weight · net</b> = your same total but split by the
-          fund's 3/31 weights (isolates the allocation fix); <b>Fund-weight · gross</b> (constant / dynamic) =
-          also scaled up ×1.1822 to the gross/levered public book.
-          <b>Surprise (and a correction to what I said earlier):</b> empirically your <b>Actual</b> basket hedges
-          the <b>best</b> — re-weighting to the 3/31 weights and scaling to gross both make the residual
-          <i>worse</i>. So the Tesla allocation gap is a real forward-looking exposure mismatch but <b>not</b>
-          what drove the swing in this window. Picking a method swaps the short + net lines; the actual net stays dotted.
+          <b>Basket method</b> — the long (130k BPTIX) is fixed; only the short changes. Each option below uses the
+          fund's <b>real holdings</b> at a disclosure date (3/31 NPORT, or the 4/30 / 5/31 site back-solves), held
+          constant and scaled to your ~$24.8M short (net — the fund is <b>net-cash on 5/31, no leverage</b>).
+          <b>Finding:</b> the <b>4/30 and the 4/30+5/31 blend</b> baskets cut the residual swing the most
+          (≈$31–33k vs your actual $49k and the stale 3/31 $66k) — because the fund's weights have <b>drifted</b>
+          (esp. Tesla, diluted by inflows) and the window sits between those snapshots. The data-fit <b>Optimal</b>
+          is marginally lower (~$28k) but the no-fit Blend nearly matches it, so it isn't overfitting. Picking a
+          method swaps the short + net lines (actual net stays dotted) and updates the basket panel on the right.
         </p>
         <label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#8b97a7;margin:0 16px 8px 0">
           Method:
           <select id="method-select" style="background:#0e1117;color:#e6edf3;border:1px solid #2a3343;border-radius:6px;padding:3px 6px">
             <option value="actual">Actual (your basket)</option>
-            <option value="reweight">Fund-weight · net scale (allocation fix only)</option>
-            <option value="const">Fund-weight · gross (constant)</option>
-            <option value="dyn">Fund-weight · gross (dynamic)</option>
+            <option value="fund_3_31">Fund weights · 3/31 (stale)</option>
+            <option value="fund_4_30">Fund weights · 4/30</option>
+            <option value="fund_5_31">Fund weights · 5/31 (latest, no leverage)</option>
+            <option value="blend">Blend 4/30 + 5/31 (best no-fit)</option>
             <option value="optimal">Optimal (min-variance 2-factor)</option>
           </select>
         </label>
@@ -67,6 +68,7 @@
         </label>
         <div id="chart" class="chart" style="height:480px"></div>
         <p class="desc" id="swing-note" style="margin-top:8px"></p>
+        <div class="scroll-y" id="method-comp" style="max-height:340px;margin-top:8px"></div>
         <p class="desc" id="pnl-note" style="margin-top:8px"></p>
       </section>
 

@@ -19,6 +19,7 @@ import statistics
 import urllib.request
 
 import nport_holdings
+import fund_snapshots
 
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 _UA = {"User-Agent": "Mozilla/5.0"}
@@ -69,6 +70,7 @@ def build_payload():
     for tk, days in MANUAL_PX.items():
         for d, v in days.items():
             px.setdefault(tk, {}).setdefault(d, v)
+    px["SPY"] = _series("SPY", ENTRY, end)   # market proxy used by the 5/31 snapshot
 
     # trading-day calendar = dates where BPTIX has a price (the long anchor)
     dates = sorted(d for d in px["BPTIX"] if d >= ENTRY)
@@ -225,14 +227,51 @@ def build_payload():
             r["net_optimal"] = round(r["long_pnl"] + short_opt, 2)
             r["net_optimal_ex_remark"] = round(r["long_pnl"] + short_opt - r["spacex_remark_pnl"], 2)
 
+    # --- Disclosure-based constant baskets (fund's real weights at 3/31, 4/30,
+    # 5/31, and a 4/30-5/31 blend), scaled to your short total (~net; 5/31 is net
+    # cash, so no leverage uplift). SPY is the market proxy for the 5/31 residual.
+    snap_names = shorts + ["SPY"]
+    epx = {t: px[t].get(ENTRY) for t in snap_names if t in px and px[t].get(ENTRY)}
+    FS = fund_snapshots
+    blend = {t: 0.5 * (FS.WEIGHTS_4_30.get(t, 0) + FS.WEIGHTS_5_31.get(t, 0))
+             for t in set(FS.WEIGHTS_4_30) | set(FS.WEIGHTS_5_31)}
+    wsets = {"fund_3_31": FS.WEIGHTS_3_31, "fund_4_30": FS.WEIGHTS_4_30,
+             "fund_5_31": FS.WEIGHTS_5_31, "blend": blend}
+    baskets = {m: {t: short_tot_e * w.get(t, 0) / epx[t] for t in snap_names if epx.get(t)}
+               for m, w in wsets.items()}
+    lastp = dict(epx)
+    for idx, r in enumerate(series):
+        d = r["date"]
+        for t in snap_names:
+            if t in px:
+                lastp[t] = px[t].get(d, lastp[t])
+        for m, bsk in baskets.items():
+            sm = -sum(bsk[t] * (lastp[t] - epx[t]) for t in bsk)
+            r["net_" + m] = round(r["long_pnl"] + sm, 2)
+            r["net_" + m + "_ex_remark"] = round(r["long_pnl"] + sm - r["spacex_remark_pnl"], 2)
+
+    # per-method basket composition (shares + weight) for the side panel
+    def _comp(bsk):
+        tv = sum(bsk[t] * epx[t] for t in bsk if epx.get(t)) or 1
+        return sorted(({"ticker": t.replace("-", "/"), "shares": round(bsk[t]),
+                        "weight": round(bsk[t] * epx[t] / tv, 4)} for t in bsk if epx.get(t)),
+                      key=lambda x: -x["weight"])
+    compositions = {m: _comp(bsk) for m, bsk in baskets.items()}
+    compositions["actual"] = _comp(actual_abs)
+    if opt_sh:
+        compositions["optimal"] = _comp(opt_sh)
+
     # residual swing per method = stdev of the ex-remark net (lower = better hedge).
     def _swing(key):
         vals = [r[key] for r in series if r.get(key) is not None]
         return round(statistics.pstdev(vals), 0) if len(vals) > 1 else None
     residual_swing = {
-        "actual": _swing("total_pnl_ex_remark"), "reweight": _swing("net_reweight_ex_remark"),
-        "const": _swing("net_const_ex_remark"), "dyn": _swing("net_dyn_ex_remark"),
+        "actual": _swing("total_pnl_ex_remark"),
+        "fund_3_31": _swing("net_fund_3_31_ex_remark"), "fund_4_30": _swing("net_fund_4_30_ex_remark"),
+        "fund_5_31": _swing("net_fund_5_31_ex_remark"), "blend": _swing("net_blend_ex_remark"),
         "optimal": _swing("net_optimal_ex_remark"),
+        "reweight": _swing("net_reweight_ex_remark"),
+        "const": _swing("net_const_ex_remark"), "dyn": _swing("net_dyn_ex_remark"),
     }
 
     last_row = series[-1] if series else {}
@@ -253,6 +292,8 @@ def build_payload():
             "long_shares": LONG_SH,
             "assumed_leverage": round(assumed_lev, 4) if assumed_lev else None,
             "residual_swing": residual_swing,
+            "basket_compositions": compositions,
+            "snapshot_leverage": fund_snapshots.LEVERAGE,
             "last_data_day": last_row.get("date"),
             "manual_marks": [{"ticker": tk, "date": d, "value": v,
                               "source": "user-provided (Baron/brokerage), pending Yahoo"}
