@@ -195,6 +195,13 @@ def main(argv):
         print(f"[nport_holdings] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[nport_holdings] skipped: {e}")
+    # Hedge basket vs fund holdings composition mismatch (no network).
+    try:
+        import basket_mismatch
+        p = basket_mismatch.write_json()
+        print(f"[basket_mismatch] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[basket_mismatch] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 

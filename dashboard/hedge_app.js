@@ -54,6 +54,51 @@ function render() {
   fetch("data/spacex_remark.json", { cache: "no-store" })
     .then((r) => r.ok ? r.json() : null).then((d) => { if (d) { REMARK = d; renderRemark(); } })
     .catch(() => {});
+  fetch("data/basket_mismatch.json", { cache: "no-store" })
+    .then((r) => r.ok ? r.json() : null).then((d) => { if (d) renderMismatch(d); })
+    .catch(() => {});
+}
+
+function renderMismatch(MM) {
+  if (!document.getElementById("mismatch-table")) return;
+  const m = MM.meta, rows = MM.rows;
+  const t = rows.find((r) => r.ticker === "TSLA") || rows[0];
+  document.getElementById("mismatch-intro").innerHTML =
+    `Your short is <b>1 / ${m.scale_inv}</b> of the fund's public book on average (${usd(m.short_total)} vs ` +
+    `${usd(m.fund_public_total)}). The <b>names match</b> — the gap is in the <b>proportions</b>. Biggest: ` +
+    `<b style="color:${BAD}">Tesla under-shorted ${t.diff_pp}pp (${usd(t.diff_usd)})</b> — TSLA is the fund's ` +
+    `largest public holding (${pct(t.fund_weight)} of the public book) but only ${pct(t.our_weight)} of your short. ` +
+    `"Δ to match" = shares to add (+) / trim (−) so each name's weight equals the fund's.`;
+  // KPIs
+  const totAdd = rows.filter((r) => r.delta_shares > 0).reduce((a, r) => a + r.delta_shares, 0);
+  const cards = [
+    { label: "TSLA gap", value: t.diff_pp + "pp / " + usd(t.diff_usd), cls: "b", note: "fund " + pct(t.fund_weight) + " vs you " + pct(t.our_weight) },
+    { label: "TSLA Δ to match", value: "+" + t.delta_shares.toLocaleString() + " sh", cls: "b", note: "add this many TSLA shorts" },
+    { label: "Names under-shorted", value: m.n_under + " of " + rows.length, note: "the rest are over-shorted" },
+    { label: "Avg scale", value: "1 / " + m.scale_inv, cls: "muted", note: "our short ÷ fund public book" },
+  ];
+  document.getElementById("mismatch-kpis").innerHTML = cards.map((c) =>
+    `<div class="kpi"><div class="label">${c.label}</div>
+      <div class="value" style="color:${c.cls === "b" ? BAD : c.cls === "muted" ? MUTED : TEXT}">${c.value}</div>
+      <div class="note">${c.note}</div></div>`).join("");
+  // table (sorted most under-shorted first)
+  const body = rows.map((r) => {
+    const u = r.diff_pp < -0.2, o = r.diff_pp > 0.2;
+    const col = u ? BAD : (o ? ACC : MUTED);
+    return `<tr${r.ticker === "TSLA" ? ` style="background:rgba(248,81,73,0.08)"` : ""}>
+      <td><b>${r.ticker}</b></td><td>${r.fund_shares.toLocaleString()}</td><td>${(r.fund_weight * 100).toFixed(1)}%</td>
+      <td>${r.our_shares.toLocaleString()}</td><td>${(r.our_weight * 100).toFixed(1)}%</td>
+      <td style="color:${col}"><b>${r.diff_pp > 0 ? "+" : ""}${r.diff_pp}pp</b></td>
+      <td style="color:${col}">${usd(r.diff_usd)}</td>
+      <td style="color:${col}">${r.delta_shares > 0 ? "+" : ""}${r.delta_shares.toLocaleString()}</td>
+      <td><span style="color:${u ? BAD : o ? ACC : MUTED};font-size:11px">${u ? "UNDER" : o ? "over" : "≈"}</span></td></tr>`;
+  }).join("");
+  document.getElementById("mismatch-table").innerHTML =
+    `<table class="data"><thead><tr><th>Ticker</th><th>Fund shares<br>(3/31)</th><th>Fund wt<br>(target)</th>` +
+    `<th>Our short<br>shares</th><th>Our wt</th><th>Diff</th><th>Diff $</th><th>Δ to match</th><th></th></tr></thead>` +
+    `<tbody>${body}</tbody></table>`;
+  document.getElementById("mismatch-src").innerHTML =
+    `<b>Target source:</b> ${m.target_source}<br><b>Our short:</b> ${m.short_source}<br><b>Pricing:</b> ${m.pricing_note}`;
 }
 
 let REMARK = null;
