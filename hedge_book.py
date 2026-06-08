@@ -104,6 +104,10 @@ def build_payload():
     dyn_prev = dict(const_sh)                              # yesterday's dynamic shares
     dyn_prev_px = {tk: entry_px[tk] for tk in shorts}
     dyn_cum = 0.0
+    actual_abs = {tk: abs(POSITIONS[tk]) for tk in shorts}
+    # collectors for the 2-factor min-variance fit (TSLA own ratio + rest scale)
+    L_daily, dpx_daily, px_snap = [], {tk: [] for tk in shorts}, []
+    prev_longex, prev_snap = 0.0, dict(entry_px)
 
     series = []
     last = {tk: entry_px[tk] for tk in POSITIONS}   # carry-forward for any missing day
@@ -136,6 +140,15 @@ def build_payload():
                 remark_cum_ps += prev_navb * (spx - prev_spx) / prev_net
             prev_spx, prev_net, prev_navb = spx, net, navb
         remark_pnl = LONG_SH * remark_cum_ps
+        # collect daily long-ex-remark P&L + price changes for the 2-factor fit
+        long_ex = longp - remark_pnl
+        snap = {tk: last[tk] for tk in shorts}
+        if di > 0:
+            L_daily.append(long_ex - prev_longex)
+            for tk in shorts:
+                dpx_daily[tk].append(snap[tk] - prev_snap[tk])
+        prev_longex, prev_snap = long_ex, snap
+        px_snap.append(snap)
         # implied leverage that makes the fixed short EXACTLY hedge the long's gross
         # public exposure: L* = spacex_weight + short_notional / (long_shares × NAV)
         implied_lev = (w + short_notl / (LONG_SH * navb)) if (w is not None and navb) else None
@@ -191,6 +204,27 @@ def build_payload():
                    for tk, sh in POSITIONS.items()),
                   key=lambda x: x["notional"])
 
+    # 2-factor min-variance optimal basket (TSLA own ratio + rest scale), held
+    # CONSTANT; then the net P&L under it (so the chart can show "Optimal" too).
+    opt_sh = {}
+    if len(L_daily) > 2:
+        m = len(L_daily)
+        Mt = dpx_daily["TSLA"]
+        Mr = [sum(actual_abs[tk] * dpx_daily[tk][j] for tk in shorts if tk != "TSLA") for j in range(m)]
+        a = sum(x * x for x in Mt); b = sum(Mt[j] * Mr[j] for j in range(m)); c = sum(x * x for x in Mr)
+        u = sum(Mt[j] * L_daily[j] for j in range(m)); v = sum(Mr[j] * L_daily[j] for j in range(m))
+        det = a * c - b * b
+        if det:
+            h1 = (u * c - v * b) / det; h2 = (a * v - b * u) / det
+            opt_sh = {tk: round(actual_abs[tk] * h2) for tk in shorts if tk != "TSLA"}
+            opt_sh["TSLA"] = round(h1)
+    if opt_sh:
+        for idx, r in enumerate(series):
+            snap = px_snap[idx]
+            short_opt = -sum(opt_sh[tk] * (snap[tk] - entry_px[tk]) for tk in shorts)
+            r["net_optimal"] = round(r["long_pnl"] + short_opt, 2)
+            r["net_optimal_ex_remark"] = round(r["long_pnl"] + short_opt - r["spacex_remark_pnl"], 2)
+
     # residual swing per method = stdev of the ex-remark net (lower = better hedge).
     def _swing(key):
         vals = [r[key] for r in series if r.get(key) is not None]
@@ -198,6 +232,7 @@ def build_payload():
     residual_swing = {
         "actual": _swing("total_pnl_ex_remark"), "reweight": _swing("net_reweight_ex_remark"),
         "const": _swing("net_const_ex_remark"), "dyn": _swing("net_dyn_ex_remark"),
+        "optimal": _swing("net_optimal_ex_remark"),
     }
 
     last_row = series[-1] if series else {}
