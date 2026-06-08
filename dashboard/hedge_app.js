@@ -64,41 +64,60 @@ function renderMismatch(MM) {
   const m = MM.meta, rows = MM.rows;
   const t = rows.find((r) => r.ticker === "TSLA") || rows[0];
   document.getElementById("mismatch-intro").innerHTML =
-    `Your short is <b>1 / ${m.scale_inv}</b> of the fund's public book on average (${usd(m.short_total)} vs ` +
-    `${usd(m.fund_public_total)}). The <b>names match</b> — the gap is in the <b>proportions</b>. Biggest: ` +
-    `<b style="color:${BAD}">Tesla under-shorted ${t.diff_pp}pp (${usd(t.diff_usd)})</b> — TSLA is the fund's ` +
-    `largest public holding (${pct(t.fund_weight)} of the public book) but only ${pct(t.our_weight)} of your short. ` +
-    `"Δ to match" = shares to add (+) / trim (−) so each name's weight equals the fund's.`;
-  // KPIs
-  const totAdd = rows.filter((r) => r.delta_shares > 0).reduce((a, r) => a + r.delta_shares, 0);
+    `Your short has <b>two</b> kinds of mismatch vs the fund. <b>(1) Allocation</b> — the split across names: ` +
+    `the names all match, but the <b>proportions</b> are off (biggest: ` +
+    `<b style="color:${BAD}">Tesla under-shorted ${t.diff_pp}pp / ${usd(t.diff_usd)}</b> — it's the fund's largest ` +
+    `public holding at ${pct(t.fund_weight)} but only ${pct(t.our_weight)} of your short). ` +
+    `<b>(2) Scale</b> — the total size: your short (${usd(m.short_total)}) ≈ the fund's <b>unlevered</b> public book, ` +
+    `but a full hedge needs the <b>gross</b> public exposure ${usd(m.gross_public_exposure)} ` +
+    `(= long × (leverage ${m.leverage} − SpaceX wt ${pct(m.spacex_weight_entry)})), so you're missing the ` +
+    `<b style="color:${BAD}">${usd(m.leverage_slice_usd)} leverage slice</b>. The <b>Perfect (full hedge)</b> ` +
+    `column fixes <b>both</b>. <span style="color:${MUTED}">Hover any column header for its source &amp; meaning.</span>`;
   const cards = [
-    { label: "TSLA gap", value: t.diff_pp + "pp / " + usd(t.diff_usd), cls: "b", note: "fund " + pct(t.fund_weight) + " vs you " + pct(t.our_weight) },
-    { label: "TSLA Δ to match", value: "+" + t.delta_shares.toLocaleString() + " sh", cls: "b", note: "add this many TSLA shorts" },
-    { label: "Names under-shorted", value: m.n_under + " of " + rows.length, note: "the rest are over-shorted" },
-    { label: "Avg scale", value: "1 / " + m.scale_inv, cls: "muted", note: "our short ÷ fund public book" },
+    { label: "TSLA weight gap", value: t.diff_pp + "pp / " + usd(t.diff_usd), cls: "b",
+      note: "fund " + pct(t.fund_weight) + " vs you " + pct(t.our_weight) + " (allocation)" },
+    { label: "TSLA → full hedge", value: "+" + t.delta_full_shares.toLocaleString() + " sh", cls: "b",
+      note: "short " + t.perfect_full_shares.toLocaleString() + " (have " + t.our_shares.toLocaleString() + ")" },
+    { label: "Leverage slice un-hedged", value: usd(m.leverage_slice_usd), cls: "b",
+      note: "short ≈ net public; gross needs ×" + m.leverage_factor + " (scale)" },
+    { label: "Full hedge total", value: usd(m.gross_public_exposure),
+      note: "vs your " + usd(m.short_total) + " short now" },
   ];
   document.getElementById("mismatch-kpis").innerHTML = cards.map((c) =>
     `<div class="kpi"><div class="label">${c.label}</div>
       <div class="value" style="color:${c.cls === "b" ? BAD : c.cls === "muted" ? MUTED : TEXT}">${c.value}</div>
       <div class="note">${c.note}</div></div>`).join("");
-  // table (sorted most under-shorted first)
+  // header with hover tooltip (native title)
+  const TH = (label, tip) => tip
+    ? `<th title="${tip}" style="border-bottom:1px dotted #5a6573;cursor:help">${label}</th>`
+    : `<th>${label}</th>`;
+  const head = "<tr>" +
+    TH("Ticker", "") +
+    TH("Fund shares<br>(3/31)", "Shares the fund held at 3/31/2026 — from the NPORT Portfolio of Investments (the authoritative filed holdings).") +
+    TH("Fund wt<br>(target)", "Target weight = this name's market value ÷ total public common ($7.89B), 3/31 NPORT. This is what % of your short the name SHOULD be. Leverage does NOT enter — it scales the total, not the split.") +
+    TH("Our short<br>shares", "Your hedge book's FIXED short, entered 2026-05-20 and held constant since.") +
+    TH("Our wt", "Your short value ÷ total short, valued at the SAME 3/31 prices — so the gap is purely the proportion choice, not price drift.") +
+    TH("Gap<br>(pp / $)", "Our weight − fund weight. Negative = UNDER-shorted (too little of this name vs the fund). The $ is that gap × your total short = dollars of this name over/under-weighted.") +
+    TH("Perfect<br>(full hedge)", "Full perfect hedge = fund weight × your position's GROSS public exposure ($28.9M = 130k × NAV × (leverage − SpaceX wt)) ÷ 3/31 price. Fixes BOTH the weight AND the ~18% leverage under-scale.") +
+    TH("Δ to<br>full hedge", "Perfect − your shares. + = add this many shorts to be fully hedged; − = trim.") +
+    TH("", "") + "</tr>";
   const body = rows.map((r) => {
     const u = r.diff_pp < -0.2, o = r.diff_pp > 0.2;
     const col = u ? BAD : (o ? ACC : MUTED);
+    const dF = r.delta_full_shares;
     return `<tr${r.ticker === "TSLA" ? ` style="background:rgba(248,81,73,0.08)"` : ""}>
       <td><b>${r.ticker}</b></td><td>${r.fund_shares.toLocaleString()}</td><td>${(r.fund_weight * 100).toFixed(1)}%</td>
       <td>${r.our_shares.toLocaleString()}</td><td>${(r.our_weight * 100).toFixed(1)}%</td>
-      <td style="color:${col}"><b>${r.diff_pp > 0 ? "+" : ""}${r.diff_pp}pp</b></td>
-      <td style="color:${col}">${usd(r.diff_usd)}</td>
-      <td style="color:${col}">${r.delta_shares > 0 ? "+" : ""}${r.delta_shares.toLocaleString()}</td>
+      <td style="color:${col}"><b>${r.diff_pp > 0 ? "+" : ""}${r.diff_pp}pp</b> <span style="color:${MUTED}">${usd(r.diff_usd)}</span></td>
+      <td style="color:${SPX}">${r.perfect_full_shares.toLocaleString()}</td>
+      <td style="color:${dF >= 0 ? BAD : ACC}"><b>${dF > 0 ? "+" : ""}${dF.toLocaleString()}</b></td>
       <td><span style="color:${u ? BAD : o ? ACC : MUTED};font-size:11px">${u ? "UNDER" : o ? "over" : "≈"}</span></td></tr>`;
   }).join("");
   document.getElementById("mismatch-table").innerHTML =
-    `<table class="data"><thead><tr><th>Ticker</th><th>Fund shares<br>(3/31)</th><th>Fund wt<br>(target)</th>` +
-    `<th>Our short<br>shares</th><th>Our wt</th><th>Diff</th><th>Diff $</th><th>Δ to match</th><th></th></tr></thead>` +
-    `<tbody>${body}</tbody></table>`;
+    `<table class="data"><thead>${head}</thead><tbody>${body}</tbody></table>`;
   document.getElementById("mismatch-src").innerHTML =
-    `<b>Target source:</b> ${m.target_source}<br><b>Our short:</b> ${m.short_source}<br><b>Pricing:</b> ${m.pricing_note}`;
+    `<b>Target source:</b> ${m.target_source}<br><b>Our short:</b> ${m.short_source}<br>` +
+    `<b>Pricing:</b> ${m.pricing_note}<br><b>Scale (leverage):</b> ${m.scale_note}`;
 }
 
 let REMARK = null;

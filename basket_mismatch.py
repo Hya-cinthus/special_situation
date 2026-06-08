@@ -40,6 +40,11 @@ TICKER_TO_NAME = {
 }
 
 
+def _load(name):
+    with open(os.path.join(_REPO_ROOT, "dashboard", "data", name), encoding="utf-8") as f:
+        return json.load(f)
+
+
 def build_payload():
     fund = {}
     for sec, grp, name, sh, cost, val in nport_holdings.HOLDINGS:
@@ -58,22 +63,42 @@ def build_payload():
         legs.append((tk, name, fsh, fval, px, ush, uval))
 
     scale = short_total / fund_total                      # our basket = this fraction of the fund
+
+    # --- SCALE leg: your BPTIX position's GROSS public exposure (what a FULL hedge
+    # must cover) = long_notional × (leverage − SpaceX weight). The fixed short was
+    # sized to ~the NET (unlevered) public book, so it misses the leverage slice.
+    try:
+        hb, sb = _load("hedge_book.json"), _load("spacex_baron.json")
+        long_notional = hb["meta"]["long_notional"]
+        w_spx = {r["date"]: r["spacex_weight"] for r in sb["series"]}["2026-05-20"]
+        lev = sb["aum_overrides"][0]["leverage_ratio"]
+        gross_pub_exp = long_notional * (lev - w_spx)
+        net_pub_exp = long_notional * (1.0 - w_spx)
+        lev_factor = gross_pub_exp / net_pub_exp
+    except Exception:
+        long_notional = w_spx = lev = gross_pub_exp = net_pub_exp = lev_factor = None
+
     rows = []
     for tk, name, fsh, fval, px, ush, uval in legs:
         fw = fval / fund_total
         uw = uval / short_total
-        target_sh = round(fsh * scale)                    # shares to match the fund weight exactly
+        target_sh = round(fsh * scale)                    # weight-only fix (keeps total constant)
+        # full perfect hedge = fund weight × your GROSS public exposure ÷ 3/31 price
+        # (fixes the allocation AND adds the leverage scale)
+        perfect_full = round(gross_pub_exp * fw / px) if gross_pub_exp else None
         rows.append({
             "ticker": tk.replace("-", "/"), "name": name,
             "fund_shares": fsh, "fund_value": round(fval, 0), "fund_weight": round(fw, 4),
             "our_shares": ush, "our_value": round(uval, 0), "our_weight": round(uw, 4),
             "diff_pp": round((uw - fw) * 100, 2),
-            "diff_usd": round((uw - fw) * short_total, 0),  # $ of this name over/under-hedged
+            "diff_usd": round((uw - fw) * short_total, 0),  # $ of this name over/under-weighted
             "target_shares": target_sh,
-            "delta_shares": target_sh - ush,                 # +add / -trim to match
-            "ratio_inv": round(fsh / ush) if ush else None,  # fund holds 1 per N of ours
+            "delta_shares": target_sh - ush,                 # +add / -trim to fix WEIGHT only
+            "perfect_full_shares": perfect_full,             # fix weight + leverage scale
+            "delta_full_shares": (perfect_full - ush) if perfect_full is not None else None,
+            "ratio_inv": round(fsh / ush) if ush else None,
         })
-    rows.sort(key=lambda r: r["diff_pp"])                 # most UNDER-shorted first
+    rows.sort(key=lambda r: r["diff_pp"])                 # most UNDER-weighted first
 
     unders = [r for r in rows if r["diff_pp"] < -0.2]
     return {
@@ -92,6 +117,17 @@ def build_payload():
             "scale": round(scale, 6), "scale_inv": round(1 / scale),
             "n_under": len(unders),
             "biggest_under": rows[0]["ticker"] if rows else None,
+            # scale leg (leverage)
+            "long_notional": round(long_notional, 0) if long_notional else None,
+            "spacex_weight_entry": round(w_spx, 4) if w_spx else None,
+            "leverage": round(lev, 4) if lev else None,
+            "gross_public_exposure": round(gross_pub_exp, 0) if gross_pub_exp else None,
+            "net_public_exposure": round(net_pub_exp, 0) if net_pub_exp else None,
+            "leverage_factor": round(lev_factor, 4) if lev_factor else None,
+            "leverage_slice_usd": round(gross_pub_exp - net_pub_exp, 0) if gross_pub_exp else None,
+            "scale_note": ("Your fixed short ($24.8M) ≈ the NET (unlevered) public book; a FULL hedge needs "
+                           "the GROSS public exposure = long_notional × (leverage − SpaceX wt). The gap is "
+                           "the leverage slice."),
         },
         "rows": rows,
     }
