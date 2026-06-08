@@ -82,19 +82,23 @@ def build_payload():
     for tk, name, fsh, fval, px, ush, uval in legs:
         fw = fval / fund_total
         uw = uval / short_total
-        target_sh = round(fsh * scale)                    # weight-only fix (keeps total constant)
-        # full perfect hedge = fund weight × your GROSS public exposure ÷ 3/31 price
-        # (fixes the allocation AND adds the leverage scale)
-        perfect_full = round(gross_pub_exp * fw / px) if gross_pub_exp else None
+        # Step 1 — WEIGHT fix: bring this name to the fund weight at your CURRENT
+        # (net-sized) short total. target = fund_weight × short_total ÷ price.
+        target_sh = round(fsh * scale)
+        # Step 2 — LEVERAGE scale: multiply the whole basket up by lev_factor so it
+        # covers the GROSS (levered) public book, not just the net. So:
+        #   perfect_full = target_sh × lev_factor   (=> delta_full = Δweight + Δlev)
+        perfect_full = round(target_sh * lev_factor) if lev_factor else None
         rows.append({
             "ticker": tk.replace("-", "/"), "name": name,
             "fund_shares": fsh, "fund_value": round(fval, 0), "fund_weight": round(fw, 4),
             "our_shares": ush, "our_value": round(uval, 0), "our_weight": round(uw, 4),
             "diff_pp": round((uw - fw) * 100, 2),
             "diff_usd": round((uw - fw) * short_total, 0),  # $ of this name over/under-weighted
-            "target_shares": target_sh,
-            "delta_shares": target_sh - ush,                 # +add / -trim to fix WEIGHT only
-            "perfect_full_shares": perfect_full,             # fix weight + leverage scale
+            "target_shares": target_sh,                      # after WEIGHT fix (net scale)
+            "delta_weight": target_sh - ush,                 # Δ from the weight fix
+            "perfect_full_shares": perfect_full,             # after weight + leverage
+            "delta_leverage": (perfect_full - target_sh) if perfect_full is not None else None,
             "delta_full_shares": (perfect_full - ush) if perfect_full is not None else None,
             "ratio_inv": round(fsh / ush) if ush else None,
         })
@@ -124,7 +128,9 @@ def build_payload():
             "gross_public_exposure": round(gross_pub_exp, 0) if gross_pub_exp else None,
             "net_public_exposure": round(net_pub_exp, 0) if net_pub_exp else None,
             "leverage_factor": round(lev_factor, 4) if lev_factor else None,
-            "leverage_slice_usd": round(gross_pub_exp - net_pub_exp, 0) if gross_pub_exp else None,
+            # table-consistent (3/31-price) totals so the per-name math ties exactly
+            "full_hedge_total": round(short_total * lev_factor, 0) if lev_factor else None,
+            "leverage_slice_usd": round(short_total * (lev_factor - 1), 0) if lev_factor else None,
             "scale_note": ("Your fixed short ($24.8M) ≈ the NET (unlevered) public book; a FULL hedge needs "
                            "the GROSS public exposure = long_notional × (leverage − SpaceX wt). The gap is "
                            "the leverage slice."),
@@ -148,10 +154,12 @@ if __name__ == "__main__":
     m = pl["meta"]
     print("fund public $%.2fB | our short $%.1fM = %.4f%% (1 / %d)"
           % (m["fund_public_total"] / 1e9, m["short_total"] / 1e6, m["scale"] * 100, m["scale_inv"]))
-    print("%-7s %8s %8s %7s %11s %9s" % ("ticker", "fundWt", "ourWt", "diff", "diff$", "addShares"))
+    print("lev_factor %.4f | full hedge total $%.1fM | leverage slice $%.1fM"
+          % (m["leverage_factor"], m["full_hedge_total"] / 1e6, m["leverage_slice_usd"] / 1e6))
+    print("%-7s %8s %8s %7s %9s %9s %9s" % ("ticker", "fundWt", "ourWt", "diff", "dWeight", "dLev", "dFull"))
     for r in pl["rows"]:
-        print("%-7s %7.1f%% %7.1f%% %+6.1f %11s %+9d"
+        print("%-7s %7.1f%% %7.1f%% %+6.1f %+9d %+9d %+9d"
               % (r["ticker"], r["fund_weight"] * 100, r["our_weight"] * 100, r["diff_pp"],
-                 "$%.0fk" % (r["diff_usd"] / 1e3), r["delta_shares"]))
+                 r["delta_weight"], r["delta_leverage"], r["delta_full_shares"]))
     p = write_json()
     print("wrote", p)
