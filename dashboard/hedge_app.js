@@ -45,6 +45,15 @@ function render() {
   if (tog) tog.addEventListener("change", (e) => { EX_REMARK = e.target.checked; renderChart(); });
   const sel = document.getElementById("method-select");
   if (sel) sel.addEventListener("change", (e) => { METHOD = e.target.value; renderChart(); });
+  const sw = document.getElementById("swing-note"), rs = DATA.meta.residual_swing;
+  if (sw && rs) {
+    const best = Object.entries(rs).filter(([k, v]) => v != null).sort((a, b) => a[1] - b[1])[0][0];
+    const nm = { actual: "Actual", reweight: "Fund-weight·net", const: "Fund-weight·gross-const", dyn: "Fund-weight·gross-dyn" };
+    sw.innerHTML = "<b>Residual swing</b> (ex-re-mark σ of the net, lower = better hedge): " +
+      ["actual", "reweight", "const", "dyn"].filter((k) => rs[k] != null).map((k) =>
+        `${nm[k]} <b style="color:${k === best ? GOOD : TEXT}">${usd(rs[k])}</b>`).join(" · ") +
+      ` → <b style="color:${GOOD}">${nm[best]} hedges best</b>. Re-weighting to the 3/31 fund weights and scaling to gross both make it <i>worse</i> — so the residual is long-vs-short tracking + likely-stale 3/31 weights, <b>not</b> the Tesla allocation gap (that's a forward-looking exposure mismatch, not what drove this window).`;
+  }
   const note = document.getElementById("pnl-note");
   const mm = (DATA.meta.manual_marks || []);
   if (note && mm.length) note.innerHTML = "⚠ Manual mark: " +
@@ -322,9 +331,10 @@ function renderKpis() {
 let EX_REMARK = false;   // toggle: strip the 6/4 SpaceX re-mark from long/total
 let METHOD = "actual";   // basket-construction method
 const METHODS = {
-  actual: { label: "Actual (your basket)", net: "total_pnl", netEx: "total_pnl_ex_remark", sl: "your public holdings" },
-  const: { label: "Perfect · constant", net: "net_const", netEx: "net_const_ex_remark", sl: "fund-weight, gross, fixed" },
-  dyn: { label: "Perfect · dynamic", net: "net_dyn", netEx: "net_dyn_ex_remark", sl: "fund-weight, gross, rebalanced" },
+  actual: { label: "Actual (your basket)", net: "total_pnl", netEx: "total_pnl_ex_remark", sl: "your public holdings", sw: "actual" },
+  reweight: { label: "Fund-weight · net scale", net: "net_reweight", netEx: "net_reweight_ex_remark", sl: "fund weights, your total", sw: "reweight" },
+  const: { label: "Fund-weight · gross (constant)", net: "net_const", netEx: "net_const_ex_remark", sl: "fund weights, gross, fixed", sw: "const" },
+  dyn: { label: "Fund-weight · gross (dynamic)", net: "net_dyn", netEx: "net_dyn_ex_remark", sl: "fund weights, gross, rebalanced", sw: "dyn" },
 };
 
 function renderChart() {

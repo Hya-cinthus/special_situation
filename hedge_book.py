@@ -15,6 +15,7 @@ import json
 import os
 import sys
 import datetime
+import statistics
 import urllib.request
 
 import nport_holdings
@@ -94,8 +95,11 @@ def build_payload():
     shorts = [tk for tk in POSITIONS if POSITIONS[tk] < 0]
     fw = nport_holdings.public_weights_by_ticker()        # {tk:{weight,price,fund_shares}}
     wspx_e = sbx.get(ENTRY, {}).get("spacex_weight")
+    short_tot_e = sum(-POSITIONS[tk] * entry_px[tk] for tk in shorts)   # your short total @ entry (~net)
     gpe_e = (LONG_SH * entry_px["BPTIX"] * (assumed_lev - wspx_e)
              if (assumed_lev and wspx_e is not None) else None)   # gross public exposure @ entry
+    # RE-WEIGHT (net scale): fund weights at YOUR total -> isolates the allocation fix
+    rw_sh = {tk: short_tot_e * fw[tk]["weight"] / entry_px[tk] for tk in shorts} if fw else {}
     const_sh = {tk: gpe_e * fw[tk]["weight"] / entry_px[tk] for tk in shorts} if gpe_e else {}
     dyn_prev = dict(const_sh)                              # yesterday's dynamic shares
     dyn_prev_px = {tk: entry_px[tk] for tk in shorts}
@@ -136,6 +140,10 @@ def build_payload():
         # public exposure: L* = spacex_weight + short_notional / (long_shares × NAV)
         implied_lev = (w + short_notl / (LONG_SH * navb)) if (w is not None and navb) else None
 
+        # --- RE-WEIGHT (net scale) short P&L --------------------------------
+        net_rw = None
+        if rw_sh:
+            net_rw = longp - sum(rw_sh[tk] * (last[tk] - entry_px[tk]) for tk in shorts)
         # --- CONSTANT-perfect & DYNAMIC-perfect short P&L (cumulative) ---------
         net_const = net_dyn = None
         if gpe_e:
@@ -155,6 +163,8 @@ def build_payload():
                        "spacex_remark_pnl": round(remark_pnl, 2),
                        "long_pnl_ex_remark": round(longp - remark_pnl, 2),
                        "total_pnl_ex_remark": round(longp + shortp - remark_pnl, 2),
+                       "net_reweight": round(net_rw, 2) if net_rw is not None else None,
+                       "net_reweight_ex_remark": round(net_rw - remark_pnl, 2) if net_rw is not None else None,
                        "net_const": round(net_const, 2) if net_const is not None else None,
                        "net_const_ex_remark": round(net_const - remark_pnl, 2) if net_const is not None else None,
                        "net_dyn": round(net_dyn, 2) if net_dyn is not None else None,
@@ -181,6 +191,15 @@ def build_payload():
                    for tk, sh in POSITIONS.items()),
                   key=lambda x: x["notional"])
 
+    # residual swing per method = stdev of the ex-remark net (lower = better hedge).
+    def _swing(key):
+        vals = [r[key] for r in series if r.get(key) is not None]
+        return round(statistics.pstdev(vals), 0) if len(vals) > 1 else None
+    residual_swing = {
+        "actual": _swing("total_pnl_ex_remark"), "reweight": _swing("net_reweight_ex_remark"),
+        "const": _swing("net_const_ex_remark"), "dyn": _swing("net_dyn_ex_remark"),
+    }
+
     last_row = series[-1] if series else {}
     return {
         "meta": {
@@ -198,6 +217,7 @@ def build_payload():
             "n_shorts": sum(1 for s in POSITIONS.values() if s < 0),
             "long_shares": LONG_SH,
             "assumed_leverage": round(assumed_lev, 4) if assumed_lev else None,
+            "residual_swing": residual_swing,
             "last_data_day": last_row.get("date"),
             "manual_marks": [{"ticker": tk, "date": d, "value": v,
                               "source": "user-provided (Baron/brokerage), pending Yahoo"}
