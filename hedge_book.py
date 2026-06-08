@@ -70,10 +70,28 @@ def build_payload():
     # trading-day calendar = dates where BPTIX has a price (the long anchor)
     dates = sorted(d for d in px["BPTIX"] if d >= ENTRY)
     entry_px = {tk: px[tk].get(ENTRY) for tk in POSITIONS}
+    LONG_SH = POSITIONS["BPTIX"]                     # 130,000
+
+    # Fund-level series (SpaceX $, net NAV, SpaceX weight) for two extra studies:
+    #  (a) strip the SpaceX re-mark out of the long/total P&L (toggle on the chart);
+    #  (b) the implied perfect-hedge leverage each day.
+    try:
+        sbx_data = json.load(open(os.path.join(_REPO_ROOT, "dashboard", "data", "spacex_baron.json"), encoding="utf-8"))
+        sbx = {r["date"]: r for r in sbx_data["series"]}
+        assumed_lev = sbx_data["aum_overrides"][0]["leverage_ratio"]
+    except Exception:
+        sbx, assumed_lev = {}, None
 
     series = []
     last = {tk: entry_px[tk] for tk in POSITIONS}   # carry-forward for any missing day
     short_pnl_by_tk = {tk: [] for tk in POSITIONS if POSITIONS[tk] < 0}
+    # SpaceX re-mark accumulator: cumulative re-mark contribution to NAV per BPTIX
+    # share. The mark steps only on a re-mark day; the % impact (Δspacex / prior net)
+    # applies to all share classes, so contribution = prior BPTIX NAV × that %.
+    remark_cum_ps = 0.0
+    prev_spx = sbx.get(ENTRY, {}).get("spacex_value_usd")
+    prev_net = sbx.get(ENTRY, {}).get("total_nav_usd")
+    prev_navb = entry_px["BPTIX"]
     for d in dates:
         longp = shortp = 0.0
         for tk, sh in POSITIONS.items():
@@ -85,8 +103,28 @@ def build_payload():
             else:
                 shortp += pnl
                 short_pnl_by_tk[tk].append(round(pnl, 2))
-        series.append({"date": d, "long_pnl": round(longp, 2),
-                       "short_pnl": round(shortp, 2), "total_pnl": round(longp + shortp, 2)})
+        navb = last["BPTIX"]
+        short_notl = sum(-sh * last[tk] for tk, sh in POSITIONS.items() if sh < 0)  # |sh|×px
+        row = sbx.get(d)
+        w = row.get("spacex_weight") if row else None
+        if row:
+            spx, net = row["spacex_value_usd"], row["total_nav_usd"]
+            if prev_spx is not None and abs(spx - prev_spx) > 1 and prev_net:
+                remark_cum_ps += prev_navb * (spx - prev_spx) / prev_net
+            prev_spx, prev_net, prev_navb = spx, net, navb
+        remark_pnl = LONG_SH * remark_cum_ps
+        # implied leverage that makes the fixed short EXACTLY hedge the long's gross
+        # public exposure: L* = spacex_weight + short_notional / (long_shares × NAV)
+        implied_lev = (w + short_notl / (LONG_SH * navb)) if (w is not None and navb) else None
+        series.append({"date": d,
+                       "long_pnl": round(longp, 2), "short_pnl": round(shortp, 2),
+                       "total_pnl": round(longp + shortp, 2),
+                       "spacex_remark_pnl": round(remark_pnl, 2),
+                       "long_pnl_ex_remark": round(longp - remark_pnl, 2),
+                       "total_pnl_ex_remark": round(longp + shortp - remark_pnl, 2),
+                       "short_notional_t": round(short_notl, 0), "nav_bptix": round(navb, 2),
+                       "spacex_weight": round(w, 4) if w is not None else None,
+                       "implied_leverage": round(implied_lev, 4) if implied_lev is not None else None})
 
     # per-ticker daily P&L for the SHORT legs, sorted alphabetically by display ticker
     short_legs_pnl = sorted(
@@ -121,6 +159,8 @@ def build_payload():
             "long_notional": round(long_notional, 0),
             "short_notional": round(short_notional, 0),
             "n_shorts": sum(1 for s in POSITIONS.values() if s < 0),
+            "long_shares": LONG_SH,
+            "assumed_leverage": round(assumed_lev, 4) if assumed_lev else None,
             "last_data_day": last_row.get("date"),
             "manual_marks": [{"ticker": tk, "date": d, "value": v,
                               "source": "user-provided (Baron/brokerage), pending Yahoo"}
@@ -131,6 +171,10 @@ def build_payload():
             "long_pnl": last_row.get("long_pnl"),
             "short_pnl": last_row.get("short_pnl"),
             "total_pnl": last_row.get("total_pnl"),
+            "total_pnl_ex_remark": last_row.get("total_pnl_ex_remark"),
+            "spacex_remark_pnl": last_row.get("spacex_remark_pnl"),
+            "implied_leverage": last_row.get("implied_leverage"),
+            "assumed_leverage": round(assumed_lev, 4) if assumed_lev else None,
         },
         "series": series,
         "legs": legs,

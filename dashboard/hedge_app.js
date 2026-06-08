@@ -40,7 +40,9 @@ function render() {
   const m = DATA.meta;
   document.getElementById("disclaimer").textContent = m.disclaimer;
   document.getElementById("gen").textContent = "Generated " + m.generated_at;
-  renderKpis(); renderChart(); renderShortBreakdown(); renderLegs();
+  renderKpis(); renderChart(); renderShortBreakdown(); renderLegs(); renderImpliedLev();
+  const tog = document.getElementById("ex-remark-toggle");
+  if (tog) tog.addEventListener("change", (e) => { EX_REMARK = e.target.checked; renderChart(); });
   const note = document.getElementById("pnl-note");
   const mm = (DATA.meta.manual_marks || []);
   if (note && mm.length) note.innerHTML = "⚠ Manual mark: " +
@@ -247,18 +249,23 @@ function renderKpis() {
       <div class="note">${c.note}</div></div>`).join("");
 }
 
+let EX_REMARK = false;   // toggle: strip the 6/4 SpaceX re-mark from long/total
+
 function renderChart() {
   const s = DATA.series;
   const x = s.map((r) => r.date);
+  const longKey = EX_REMARK ? "long_pnl_ex_remark" : "long_pnl";
+  const totalKey = EX_REMARK ? "total_pnl_ex_remark" : "total_pnl";
   const mk = (key, name, color, width) => ({
     x, y: s.map((r) => r[key]), name, type: "scatter", mode: "lines+markers",
     line: { color, width: width || 2 }, marker: { size: 5 },
     hovertemplate: name + " %{y:($,.0f}<extra></extra>",
   });
+  const suffix = EX_REMARK ? " — ex SpaceX re-mark" : "";
   Plotly.newPlot("chart", [
-    mk("long_pnl", "Long (BPTIX)", GOOD),
+    mk(longKey, "Long (BPTIX)" + suffix, GOOD),
     mk("short_pnl", "Short (public holdings)", BAD),
-    mk("total_pnl", "Total (≈ SpaceX/private)", SPX, 3),
+    mk(totalKey, "Total (≈ SpaceX/private)" + suffix, SPX, 3),
   ], {
     paper_bgcolor: PLOT_BG, plot_bgcolor: PLOT_BG, font: { color: TEXT, size: 11 },
     hovermode: "x unified", hoverlabel: { bgcolor: "#0e1117", bordercolor: GRID },
@@ -267,6 +274,45 @@ function renderChart() {
     yaxis: { title: "P&L ($)", gridcolor: GRID, color: TEXT, tickformat: "$,.0s", zeroline: false },
     legend: { orientation: "h", y: 1.12, font: { color: TEXT } },
     margin: { t: 40, r: 16, b: 36, l: 64 },
+  }, { responsive: true, displayModeBar: false, displaylogo: false });
+}
+
+function renderImpliedLev() {
+  const el = document.getElementById("impl-lev-chart");
+  if (!el) return;
+  const s = DATA.series.filter((r) => r.implied_leverage != null);
+  const x = s.map((r) => r.date);
+  const La = DATA.meta.assumed_leverage;
+  // KPIs
+  const last = s[s.length - 1] || {};
+  const cards = [
+    { label: "Implied leverage (now)", value: last.implied_leverage.toFixed(4) + "×",
+      cls: "spx", note: "leverage that would make the fixed short a PERFECT hedge" },
+    { label: "Assumed leverage", value: La.toFixed(4) + "×",
+      cls: "muted", note: "fund's actual gross÷net (3/31 NPORT)" },
+    { label: "Gap (implied − assumed)", value: pct(last.implied_leverage - La, true),
+      cls: "b", note: "implied < assumed → fund carries MORE public beta than the short → under-hedged" },
+  ];
+  document.getElementById("impl-lev-kpis").innerHTML = cards.map((c) =>
+    `<div class="kpi"><div class="label">${c.label}</div>
+      <div class="value" style="color:${c.cls === "spx" ? SPX : c.cls === "b" ? BAD : MUTED}">${c.value}</div>
+      <div class="note">${c.note}</div></div>`).join("");
+  Plotly.newPlot("impl-lev-chart", [
+    { x, y: s.map((r) => r.implied_leverage), name: "Implied perfect-hedge leverage",
+      type: "scatter", mode: "lines+markers", line: { color: SPX, width: 2.5 }, marker: { size: 5 },
+      hovertemplate: "implied %{y:.4f}×<extra></extra>" },
+    { x, y: x.map(() => La), name: "Assumed leverage (" + La.toFixed(4) + "×)",
+      type: "scatter", mode: "lines", line: { color: MUTED, width: 1.5, dash: "dash" },
+      hovertemplate: "assumed " + La.toFixed(4) + "×<extra></extra>" },
+    { x, y: x.map(() => 1.0), name: "Unlevered (1.00×)",
+      type: "scatter", mode: "lines", line: { color: GRID, width: 1, dash: "dot" }, hoverinfo: "skip" },
+  ], {
+    paper_bgcolor: PLOT_BG, plot_bgcolor: PLOT_BG, font: { color: TEXT, size: 11 },
+    hovermode: "x unified", hoverlabel: { bgcolor: "#0e1117", bordercolor: GRID },
+    xaxis: { gridcolor: GRID, color: TEXT, type: "date" },
+    yaxis: { title: "Leverage (×)", gridcolor: GRID, color: TEXT, zeroline: false },
+    legend: { orientation: "h", y: 1.14, font: { color: TEXT } },
+    margin: { t: 40, r: 16, b: 36, l: 52 },
   }, { responsive: true, displayModeBar: false, displaylogo: false });
 }
 

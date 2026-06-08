@@ -42,6 +42,9 @@
           is the residual — i.e. what you actually earn on the un-hedgeable SpaceX/private slice. Two accounts,
           shown as combined total.
         </p>
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#8b97a7;margin:2px 0 6px">
+          <input type="checkbox" id="ex-remark-toggle" /> Exclude SpaceX re-mark (strip the 6/4 jump to read long-vs-short dominance)
+        </label>
         <div id="chart" class="chart" style="height:480px"></div>
         <p class="desc" id="pnl-note" style="margin-top:8px"></p>
       </section>
@@ -55,6 +58,28 @@
           stock fell); <b>down</b> means it lost (the stock rose).
         </p>
         <div id="short-chart" class="chart" style="height:480px"></div>
+      </section>
+
+      <section class="card" id="impl-lev-card">
+        <h2>Implied perfect-hedge leverage — is the hedge ratio actually dynamic?</h2>
+        <p class="desc">
+          Instead of assuming a <b>fixed</b> leverage (1.1335) and calling the short "under-hedged", flip the
+          question: <b>what leverage would make the fixed short an exact hedge each day?</b> Solve
+          <code>L* = SpaceX wt + short notional ÷ (130k × BPTIX NAV)</code> daily. Read it against the assumed
+          1.1335 (dashed) and 1.00 (unlevered, dotted): <b>implied &lt; assumed → the fund carries more public
+          beta than the short covers → under-hedged (long dominates)</b>; implied &gt; assumed → over-hedged
+          (short dominates).
+        </p>
+        <div class="kpis" id="impl-lev-kpis"></div>
+        <div id="impl-lev-chart" class="chart" style="height:380px"></div>
+        <p class="desc" style="margin-top:10px">
+          <b>What it shows:</b> the implied leverage is a <b>smooth ~1.0 (slightly declining), not a swinging
+          line</b> — i.e. the short was sized to roughly the fund's <i>unlevered (net)</i> public book, so it
+          structurally under-hedges the levered (1.1335×) fund, a little more each day as the book grows.
+          So the day-to-day <b>dominance flips you see in the P&amp;L are NOT a leverage signal</b> — strip the
+          SpaceX re-mark (toggle above) and the residual wobble is basket tracking error + the SpaceX/leverage
+          carry, not the leverage ratio swinging. Uses the BPTRX-reconstruction SpaceX weight as the BPTIX-class proxy.
+        </p>
       </section>
 
       <section class="card">
