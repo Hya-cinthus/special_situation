@@ -21,9 +21,15 @@ import os
 import datetime
 
 import hedge_book
+import nport_holdings
 
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 ENTRY = hedge_book.ENTRY
+
+# Baron's own 2026-05-31 site disclosure (top-10, % of NET assets) — fresher than
+# the 3/31 NPORT. Used to JUSTIFY (not fit) the data-driven "less Tesla".
+DISCLOSED_5_31 = {"TSLA": 0.167, "MSCI": 0.047, "H": 0.043, "SCHW": 0.039,
+                  "SHOP": 0.038, "ACGL": 0.035, "IT": 0.033, "SPOT": 0.032, "FDS": 0.029}
 
 
 def _mean(a):
@@ -89,6 +95,42 @@ def build_payload():
     unhedged = _std(L)
     actual_std = _std(net_actual(allidx))
 
+    # --- JUSTIFICATION: does Baron's 5/31 disclosure explain 'less Tesla'? --------
+    NET = nport_holdings.NET_ASSETS
+    fundv = {name: val for sec, g, name, sh, c, val in nport_holdings.HOLDINGS if sec == "Common"}
+    tsla_3_31 = fundv["Tesla, Inc."] / NET                 # 23.1% of net (3/31 NPORT)
+    tsla_5_31 = DISCLOSED_5_31["TSLA"]                      # 16.7% of net (5/31 Baron)
+    fw = nport_holdings.public_weights_by_ticker()
+    short_total = sum(actual[tk] * e[tk] for tk in shorts)
+    tsla_target_3_31 = fw["TSLA"]["weight"] * short_total / e["TSLA"]   # 3/31-implied hedge
+    justification = {
+        "tsla_pct_net_3_31": round(tsla_3_31, 4), "tsla_pct_net_5_31": round(tsla_5_31, 4),
+        "disclosure_ratio": round(tsla_5_31 / tsla_3_31, 3),           # ~0.72
+        "tsla_target_3_31": round(tsla_target_3_31),
+        "tsla_optimal_2factor": round(h1),
+        "twofactor_ratio": round(h1 / tsla_target_3_31, 3),            # ~0.72 (should match)
+    }
+
+    # --- DYNAMICS: should the hedge scale with AUM? (constant vs dynamic) ---------
+    sbx = {r["date"]: r for r in json.load(open(os.path.join(_REPO_ROOT, "dashboard", "data", "spacex_baron.json"), encoding="utf-8"))["series"]}
+    NETe = sbx[ENTRY]["total_nav_usd"]; NAVe = px["BPTIX"][ENTRY]
+    cons, aum, navsh, last = [], [], [], {tk: px[tk][ENTRY] for tk in px}
+    for d in dates:
+        for tk in px:
+            last[tk] = px[tk].get(d, last[tk])
+        longp = 130000 * (last["BPTIX"] - NAVe); rmk = hbser[d]["spacex_remark_pnl"]
+        aum_r = sbx.get(d, {}).get("total_nav_usd", NETe) / NETe
+        nav_r = last["BPTIX"] / NAVe
+        def nx(s):
+            return longp - sum(actual[tk] * s * (last[tk] - e[tk]) for tk in shorts) - rmk
+        cons.append(nx(1.0)); aum.append(nx(aum_r)); navsh.append(nx(nav_r))
+    dynamics = {
+        "constant_swing": round(_std(cons)), "aum_scaled_swing": round(_std(aum)),
+        "navshare_scaled_swing": round(_std(navsh)),
+        "aum_growth_pct": round((sbx[dates[-1]]["total_nav_usd"] / NETe - 1) * 100, 1),
+        "navshare_growth_pct": round((last["BPTIX"] / NAVe - 1) * 100, 1),
+    }
+
     # recommended basket (2-factor full fit) + per-name delta
     rec = {tk: round(actual[tk] * h2) for tk in shorts if tk != "TSLA"}
     rec["TSLA"] = round(h1)
@@ -107,7 +149,14 @@ def build_payload():
             "caveat": ("~11 daily observations: only 1-2 factors are statistically justifiable. The "
                        "2-factor result is robust across three validations, but one short window — treat "
                        "the recommended shares as directional, and refresh weights at the next NPORT (6/30)."),
+            "mandate": ("Baron Partners Fund: non-diversified, concentrated (top-10 heavy), long-term, "
+                        "high-conviction; turnover only ~5% (it lets winners ride, rarely trades); may "
+                        "borrow up to 1/3 of total assets (≈1.5x cap; currently ~1.13x). So relative "
+                        "weights drift with inflows + prices and are only re-disclosed periodically — which "
+                        "is exactly why the 3/31 weights go stale (and the 5/31 site disclosure is fresher)."),
         },
+        "justification": justification,
+        "dynamics": dynamics,
         "metrics": {
             "unhedged_daily_std": round(unhedged, 0),
             "actual_daily_std": round(actual_std, 0),

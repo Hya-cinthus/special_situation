@@ -98,23 +98,30 @@ function renderOptimal(O) {
     `<div class="kpi"><div class="label">${c.label}</div>
       <div class="value" style="color:${c.cls === "g" ? GOOD : c.cls === "spx" ? SPX : c.cls === "b" ? BAD : TEXT}">${c.value}</div>
       <div class="note">${c.note}</div></div>`).join("");
+  const j = O.justification, dy = O.dynamics;
   document.getElementById("opt-body").innerHTML =
     `<p><b>The 2-factor optimal hedge:</b> Tesla <b>${tf.tsla_current.toLocaleString()} → ${tf.tsla_optimal.toLocaleString()}</b> ` +
     `(<b style="color:${BAD}">trim ${(tf.tsla_optimal - tf.tsla_current).toLocaleString()}</b>) and scale the rest of the basket ` +
     `<b>×${tf.rest_scale}</b>. Jackknife keeps Tesla in a tight ${mt.jack_tsla_min.toLocaleString()}–${mt.jack_tsla_max.toLocaleString()} ` +
     `(stable signal, not noise).</p>` +
-    `<p class="dim"><b>Why LESS Tesla, when the mismatch card said add it?</b> The mismatch card compares to the <i>stale 3/31</i> ` +
-    `weights (Tesla 30.4%). The realized co-movement says the fund's <b>current</b> Tesla weight is lower — Tesla has fallen / been ` +
-    `trimmed since March. So the data-driven hedge and the stale-filing hedge disagree, and the data wins for minimizing realized swing.</p>` +
-    `<p class="dim"><b>Constant vs dynamic?</b> A well-built <i>constant</i> 2-factor basket (~net scale) captures most of it. Daily ` +
-    `P&L re-fitting OVER-fits (even fitting the scale alone hurt out-of-sample). The real "dynamic" lever is updating the <b>weights</b> ` +
-    `(esp. Tesla) when fresh holdings arrive — the next NPORT (period 6/30) or Baron's monthly page — not chasing daily P&L.</p>`;
+    `<p style="border-left:3px solid ${GOOD};padding-left:10px"><b style="color:${GOOD}">✓ Why "less Tesla" is justified, not overfit:</b> ` +
+    `Baron's own <b>5/31 site disclosure</b> shows Tesla fell to <b>${pct(j.tsla_pct_net_5_31)} of net</b>, down from ` +
+    `<b>${pct(j.tsla_pct_net_3_31)}</b> at 3/31 — a ratio of <b>${j.disclosure_ratio}</b>. The P&L-derived optimal Tesla ` +
+    `(${j.tsla_optimal_2factor.toLocaleString()}) vs the stale-3/31 target (${j.tsla_target_3_31.toLocaleString()}) is a ratio of ` +
+    `<b>${j.twofactor_ratio}</b> — i.e. the data <b>independently rediscovered the fund's actual current Tesla weight</b>. ` +
+    `The mismatch card's "add Tesla" used the <i>stale</i> 3/31 weight; the fund's Tesla weight has since dropped (inflow dilution + relative moves), and your basket was already closer to current.</p>` +
+    `<p class="dim"><b>Constant vs dynamic?</b> Don't scale with AUM. Over this window AUM grew <b>${dy.aum_growth_pct}%</b> but ` +
+    `scaling the hedge by AUM made the swing <b style="color:${BAD}">worse</b> (${usd(dy.aum_scaled_swing)} vs ${usd(dy.constant_swing)} constant) — ` +
+    `because you hold a <b>fixed 130k shares</b>, so inflows buy stock for <i>new</i> investors, not you; your exposure tracks ` +
+    `NAV-per-share (+${dy.navshare_growth_pct}%), not AUM. So keep the hedge <b>~constant in share count</b>; the only real "dynamic" ` +
+    `lever is updating the relative <b>weights</b> (esp. Tesla) when fresh holdings are disclosed — not chasing daily P&L (that overfits).</p>`;
   const body = O.recommended.map((r) =>
     `<tr><td><b>${r.ticker}</b></td><td>${r.current.toLocaleString()}</td><td>${r.recommended.toLocaleString()}</td>
       <td style="color:${r.delta > 0 ? ACC : (r.delta < 0 ? BAD : MUTED)}">${r.delta > 0 ? "+" : ""}${r.delta.toLocaleString()}</td></tr>`).join("");
   document.getElementById("opt-table").innerHTML =
     `<table class="data"><thead><tr><th>Ticker</th><th>Current short</th><th>Optimal (2-factor)</th><th>Δ</th></tr></thead><tbody>${body}</tbody></table>`;
-  document.getElementById("opt-caveat").innerHTML = "<b>Caveat:</b> " + m.caveat;
+  document.getElementById("opt-caveat").innerHTML =
+    "<b>Fund mandate:</b> " + m.mandate + "<br><b>Caveat:</b> " + m.caveat;
 }
 
 function renderMismatch(MM) {
