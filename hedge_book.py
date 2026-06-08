@@ -34,13 +34,11 @@ POSITIONS = {
 
 
 # Manual NAV/price points for days Yahoo hasn't posted yet (mutual-fund NAV lags
-# ~1 day). Provenance must be a real reported figure, not an estimate.
-#   BPTIX 2026-06-04 NAV = 279.60 — provided by user from Baron/brokerage on 6/4
-#   (a +6.6% jump vs 6/3 $262.23, consistent with a SpaceX IPO re-mark). Will be
-#   superseded automatically once Yahoo publishes the same date.
-MANUAL_PX = {
-    "BPTIX": {"2026-06-04": 279.60},
-}
+# ~1 day). Provenance must be a real reported figure, not an estimate. Only used
+# where Yahoo doesn't already have the day (setdefault). Currently empty: Yahoo has
+# caught up through 6/5 (the earlier BPTIX 6/4=$279.60 manual mark now matches the
+# published Yahoo close, so it's no longer needed).
+MANUAL_PX = {}
 
 
 def _epoch(d):
@@ -62,7 +60,7 @@ def _series(tk, start, end):
 
 
 def build_payload():
-    end = (datetime.date(2026, 6, 4) + datetime.timedelta(days=1)).isoformat()
+    end = (datetime.date(2026, 6, 5) + datetime.timedelta(days=1)).isoformat()
     px = {tk: _series(tk, ENTRY, end) for tk in POSITIONS}
     # merge manual points (only where Yahoo doesn't already have the day)
     for tk, days in MANUAL_PX.items():
