@@ -68,6 +68,51 @@ function render() {
   fetch("data/basket_mismatch.json", { cache: "no-store" })
     .then((r) => r.ok ? r.json() : null).then((d) => { if (d) renderMismatch(d); })
     .catch(() => {});
+  fetch("data/optimal_hedge.json", { cache: "no-store" })
+    .then((r) => r.ok ? r.json() : null).then((d) => { if (d) renderOptimal(d); })
+    .catch(() => {});
+}
+
+function renderOptimal(O) {
+  if (!document.getElementById("opt-table")) return;
+  const m = O.meta, mt = O.metrics, tf = O.twofactor;
+  document.getElementById("opt-intro").innerHTML =
+    `Framing the hedge as a <b>minimum-variance</b> problem (minimize the daily net swing, ex the 6/4 re-mark) ` +
+    `and validating <b>out-of-sample</b> on ${m.n_obs} obs (leave-one-out CV + a 7/4 train-test + a jackknife) — ` +
+    `because fitting 23 hedge ratios on 11 days would be hopeless overfit. <b>Result:</b> your actual basket already ` +
+    `removes <b style="color:${GOOD}">${mt.actual_var_reduction_pct}%</b> of the daily swing and is ~net-scaled; the one ` +
+    `robust improvement is a <b>2-factor</b> hedge (Tesla on its own ratio) — which roughly <b>halves</b> the residual.`;
+  const cards = [
+    { label: "Daily swing — unhedged → actual", value: usd(mt.unhedged_daily_std) + " → " + usd(mt.actual_daily_std),
+      cls: "g", note: mt.actual_var_reduction_pct + "% variance removed by your basket" },
+    { label: "LOOCV residual (out-of-sample)", value: usd(mt.loocv_actual) + " → " + usd(mt.loocv_2factor),
+      cls: "spx", note: "actual basket → 2-factor (Tesla own ratio)" },
+    { label: "Train(7)/Test(4) residual", value: usd(mt.traintest_actual) + " → " + usd(mt.traintest_2factor),
+      cls: "spx", note: "independent confirmation, ~halved" },
+    { label: "Optimal Tesla short", value: tf.tsla_optimal.toLocaleString() + " sh", cls: "b",
+      note: "vs your " + tf.tsla_current.toLocaleString() + " (data wants LESS, not more)" },
+  ];
+  document.getElementById("opt-kpis").innerHTML = cards.map((c) =>
+    `<div class="kpi"><div class="label">${c.label}</div>
+      <div class="value" style="color:${c.cls === "g" ? GOOD : c.cls === "spx" ? SPX : c.cls === "b" ? BAD : TEXT}">${c.value}</div>
+      <div class="note">${c.note}</div></div>`).join("");
+  document.getElementById("opt-body").innerHTML =
+    `<p><b>The 2-factor optimal hedge:</b> Tesla <b>${tf.tsla_current.toLocaleString()} → ${tf.tsla_optimal.toLocaleString()}</b> ` +
+    `(<b style="color:${BAD}">trim ${(tf.tsla_optimal - tf.tsla_current).toLocaleString()}</b>) and scale the rest of the basket ` +
+    `<b>×${tf.rest_scale}</b>. Jackknife keeps Tesla in a tight ${mt.jack_tsla_min.toLocaleString()}–${mt.jack_tsla_max.toLocaleString()} ` +
+    `(stable signal, not noise).</p>` +
+    `<p class="dim"><b>Why LESS Tesla, when the mismatch card said add it?</b> The mismatch card compares to the <i>stale 3/31</i> ` +
+    `weights (Tesla 30.4%). The realized co-movement says the fund's <b>current</b> Tesla weight is lower — Tesla has fallen / been ` +
+    `trimmed since March. So the data-driven hedge and the stale-filing hedge disagree, and the data wins for minimizing realized swing.</p>` +
+    `<p class="dim"><b>Constant vs dynamic?</b> A well-built <i>constant</i> 2-factor basket (~net scale) captures most of it. Daily ` +
+    `P&L re-fitting OVER-fits (even fitting the scale alone hurt out-of-sample). The real "dynamic" lever is updating the <b>weights</b> ` +
+    `(esp. Tesla) when fresh holdings arrive — the next NPORT (period 6/30) or Baron's monthly page — not chasing daily P&L.</p>`;
+  const body = O.recommended.map((r) =>
+    `<tr><td><b>${r.ticker}</b></td><td>${r.current.toLocaleString()}</td><td>${r.recommended.toLocaleString()}</td>
+      <td style="color:${r.delta > 0 ? ACC : (r.delta < 0 ? BAD : MUTED)}">${r.delta > 0 ? "+" : ""}${r.delta.toLocaleString()}</td></tr>`).join("");
+  document.getElementById("opt-table").innerHTML =
+    `<table class="data"><thead><tr><th>Ticker</th><th>Current short</th><th>Optimal (2-factor)</th><th>Δ</th></tr></thead><tbody>${body}</tbody></table>`;
+  document.getElementById("opt-caveat").innerHTML = "<b>Caveat:</b> " + m.caveat;
 }
 
 function renderMismatch(MM) {
