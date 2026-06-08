@@ -25,19 +25,7 @@ import hedge_book
 
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-# our short ticker -> fund holding name (3/31 Portfolio of Investments)
-TICKER_TO_NAME = {
-    "ACGL": "Arch Capital Group Ltd.", "BIRK": "Birkenstock Holding PLC",
-    "CHH": "Choice Hotels International, Inc.", "CSGP": "CoStar Group, Inc.",
-    "FDS": "FactSet Research Systems, Inc.", "FIG": "Figma, Inc., Cl A",
-    "GLPI": "Gaming and Leisure Properties, Inc.", "GWRE": "Guidewire Software, Inc.",
-    "H": "Hyatt Hotels Corp., Cl A", "HEI": "HEICO Corp.", "HEI-A": "HEICO Corp., Cl A",
-    "IDXX": "IDEXX Laboratories, Inc.", "IT": "Gartner, Inc.",
-    "KNSL": "Kinsale Capital Group, Inc.", "MSCI": "MSCI, Inc.", "MTN": "Vail Resorts, Inc.",
-    "ONON": "On Holding AG, Cl A", "RRR": "Red Rock Resorts, Inc., Cl A",
-    "SCHW": "The Charles Schwab Corp.", "SHOP": "Shopify, Inc., Cl A",
-    "SPOT": "Spotify Technology SA", "TSLA": "Tesla, Inc.", "VRSK": "Verisk Analytics, Inc.",
-}
+TICKER_TO_NAME = nport_holdings.TICKER_TO_NAME   # mapping lives in nport_holdings
 
 
 def _load(name):

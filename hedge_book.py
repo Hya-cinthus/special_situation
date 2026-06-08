@@ -17,6 +17,8 @@ import sys
 import datetime
 import urllib.request
 
+import nport_holdings
+
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 _UA = {"User-Agent": "Mozilla/5.0"}
 ENTRY = "2026-05-20"
@@ -82,6 +84,23 @@ def build_payload():
     except Exception:
         sbx, assumed_lev = {}, None
 
+    # --- alternative basket constructions (chart toggle) ----------------------
+    # The LONG (130k BPTIX) is fixed; only the SHORT changes by method:
+    #   ACTUAL    = your real fixed shares.
+    #   CONSTANT  = sized RIGHT at entry (fund weights × your gross public exposure),
+    #               then held fixed. allocation + leverage scale, no rebalance.
+    #   DYNAMIC   = rebalanced every day to your CURRENT gross public exposure
+    #               (NAV & SpaceX-weight drift), fund weights held at 3/31.
+    shorts = [tk for tk in POSITIONS if POSITIONS[tk] < 0]
+    fw = nport_holdings.public_weights_by_ticker()        # {tk:{weight,price,fund_shares}}
+    wspx_e = sbx.get(ENTRY, {}).get("spacex_weight")
+    gpe_e = (LONG_SH * entry_px["BPTIX"] * (assumed_lev - wspx_e)
+             if (assumed_lev and wspx_e is not None) else None)   # gross public exposure @ entry
+    const_sh = {tk: gpe_e * fw[tk]["weight"] / entry_px[tk] for tk in shorts} if gpe_e else {}
+    dyn_prev = dict(const_sh)                              # yesterday's dynamic shares
+    dyn_prev_px = {tk: entry_px[tk] for tk in shorts}
+    dyn_cum = 0.0
+
     series = []
     last = {tk: entry_px[tk] for tk in POSITIONS}   # carry-forward for any missing day
     short_pnl_by_tk = {tk: [] for tk in POSITIONS if POSITIONS[tk] < 0}
@@ -92,7 +111,7 @@ def build_payload():
     prev_spx = sbx.get(ENTRY, {}).get("spacex_value_usd")
     prev_net = sbx.get(ENTRY, {}).get("total_nav_usd")
     prev_navb = entry_px["BPTIX"]
-    for d in dates:
+    for di, d in enumerate(dates):
         longp = shortp = 0.0
         for tk, sh in POSITIONS.items():
             p = px[tk].get(d, last[tk])
@@ -116,12 +135,30 @@ def build_payload():
         # implied leverage that makes the fixed short EXACTLY hedge the long's gross
         # public exposure: L* = spacex_weight + short_notional / (long_shares × NAV)
         implied_lev = (w + short_notl / (LONG_SH * navb)) if (w is not None and navb) else None
+
+        # --- CONSTANT-perfect & DYNAMIC-perfect short P&L (cumulative) ---------
+        net_const = net_dyn = None
+        if gpe_e:
+            short_const = -sum(const_sh[tk] * (last[tk] - entry_px[tk]) for tk in shorts)
+            net_const = longp + short_const
+            if di > 0:   # dynamic: hold yesterday's shares through today's move
+                dyn_cum += -sum(dyn_prev[tk] * (last[tk] - dyn_prev_px[tk]) for tk in shorts)
+            net_dyn = longp + dyn_cum
+            wt = w if w is not None else wspx_e            # rebalance for tomorrow
+            gpet = LONG_SH * navb * (assumed_lev - wt)
+            dyn_prev = {tk: gpet * fw[tk]["weight"] / last[tk] for tk in shorts}
+            dyn_prev_px = {tk: last[tk] for tk in shorts}
+
         series.append({"date": d,
                        "long_pnl": round(longp, 2), "short_pnl": round(shortp, 2),
                        "total_pnl": round(longp + shortp, 2),
                        "spacex_remark_pnl": round(remark_pnl, 2),
                        "long_pnl_ex_remark": round(longp - remark_pnl, 2),
                        "total_pnl_ex_remark": round(longp + shortp - remark_pnl, 2),
+                       "net_const": round(net_const, 2) if net_const is not None else None,
+                       "net_const_ex_remark": round(net_const - remark_pnl, 2) if net_const is not None else None,
+                       "net_dyn": round(net_dyn, 2) if net_dyn is not None else None,
+                       "net_dyn_ex_remark": round(net_dyn - remark_pnl, 2) if net_dyn is not None else None,
                        "short_notional_t": round(short_notl, 0), "nav_bptix": round(navb, 2),
                        "spacex_weight": round(w, 4) if w is not None else None,
                        "implied_leverage": round(implied_lev, 4) if implied_lev is not None else None})

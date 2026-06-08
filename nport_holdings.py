@@ -77,6 +77,33 @@ def _is_spacex(name):
     return name.startswith(_SPACEX)
 
 
+# our short ticker -> fund holding name (the public common holdings). Shared by
+# basket_mismatch.py and hedge_book.py so the mapping lives in one place.
+TICKER_TO_NAME = {
+    "ACGL": "Arch Capital Group Ltd.", "BIRK": "Birkenstock Holding PLC",
+    "CHH": "Choice Hotels International, Inc.", "CSGP": "CoStar Group, Inc.",
+    "FDS": "FactSet Research Systems, Inc.", "FIG": "Figma, Inc., Cl A",
+    "GLPI": "Gaming and Leisure Properties, Inc.", "GWRE": "Guidewire Software, Inc.",
+    "H": "Hyatt Hotels Corp., Cl A", "HEI": "HEICO Corp.", "HEI-A": "HEICO Corp., Cl A",
+    "IDXX": "IDEXX Laboratories, Inc.", "IT": "Gartner, Inc.",
+    "KNSL": "Kinsale Capital Group, Inc.", "MSCI": "MSCI, Inc.", "MTN": "Vail Resorts, Inc.",
+    "ONON": "On Holding AG, Cl A", "RRR": "Red Rock Resorts, Inc., Cl A",
+    "SCHW": "The Charles Schwab Corp.", "SHOP": "Shopify, Inc., Cl A",
+    "SPOT": "Spotify Technology SA", "TSLA": "Tesla, Inc.", "VRSK": "Verisk Analytics, Inc.",
+}
+
+
+def public_weights_by_ticker():
+    """{ticker: {weight, price, fund_shares}} from the 3/31 public common book."""
+    fund = {name: (sh, val) for sec, grp, name, sh, cost, val in HOLDINGS if sec == "Common"}
+    total = sum(v for _, v in fund.values())
+    out = {}
+    for tk, name in TICKER_TO_NAME.items():
+        sh, val = fund[name]
+        out[tk] = {"weight": val / total, "price": val / sh, "fund_shares": sh}
+    return out
+
+
 def build_payload():
     rows = [{"section": s, "group": g, "name": n, "shares": sh, "cost": c, "value": v}
             for (s, g, n, sh, c, v) in HOLDINGS]

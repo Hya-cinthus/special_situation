@@ -42,8 +42,25 @@
           is the residual — i.e. what you actually earn on the un-hedgeable SpaceX/private slice. Two accounts,
           shown as combined total.
         </p>
-        <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#8b97a7;margin:2px 0 6px">
-          <input type="checkbox" id="ex-remark-toggle" /> Exclude SpaceX re-mark (strip the 6/4 jump to read long-vs-short dominance)
+        <p class="desc" style="margin:2px 0 8px">
+          <b>Basket method</b> — the long (130k BPTIX) is fixed; only the short changes:
+          <b>Actual</b> = your real fixed shares; <b>Perfect · constant</b> = sized right at entry
+          (fund weights × your gross public exposure) then held fixed; <b>Perfect · dynamic</b> = rebalanced
+          daily to your current gross public exposure. <i>Note: the two "perfect" methods use the assumed
+          1.1335 leverage and therefore</i> <b>over-hedge</b> <i>pre-6/4 (bigger drawdowns) — because the fund
+          empirically transmits only ~net public beta (see the implied-leverage card). Picking a method swaps
+          the short + net lines; the actual net stays as a dotted reference.</i>
+        </p>
+        <label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#8b97a7;margin:0 16px 8px 0">
+          Method:
+          <select id="method-select" style="background:#0e1117;color:#e6edf3;border:1px solid #2a3343;border-radius:6px;padding:3px 6px">
+            <option value="actual">Actual (your basket)</option>
+            <option value="const">Perfect · constant (fund-weight, gross, fixed)</option>
+            <option value="dyn">Perfect · dynamic (rebalanced daily)</option>
+          </select>
+        </label>
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#8b97a7;margin:0 0 6px">
+          <input type="checkbox" id="ex-remark-toggle" /> Exclude SpaceX re-mark
         </label>
         <div id="chart" class="chart" style="height:480px"></div>
         <p class="desc" id="pnl-note" style="margin-top:8px"></p>

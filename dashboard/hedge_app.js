@@ -43,6 +43,8 @@ function render() {
   renderKpis(); renderChart(); renderShortBreakdown(); renderLegs(); renderImpliedLev();
   const tog = document.getElementById("ex-remark-toggle");
   if (tog) tog.addEventListener("change", (e) => { EX_REMARK = e.target.checked; renderChart(); });
+  const sel = document.getElementById("method-select");
+  if (sel) sel.addEventListener("change", (e) => { METHOD = e.target.value; renderChart(); });
   const note = document.getElementById("pnl-note");
   const mm = (DATA.meta.manual_marks || []);
   if (note && mm.length) note.innerHTML = "⚠ Manual mark: " +
@@ -318,23 +320,32 @@ function renderKpis() {
 }
 
 let EX_REMARK = false;   // toggle: strip the 6/4 SpaceX re-mark from long/total
+let METHOD = "actual";   // basket-construction method
+const METHODS = {
+  actual: { label: "Actual (your basket)", net: "total_pnl", netEx: "total_pnl_ex_remark", sl: "your public holdings" },
+  const: { label: "Perfect · constant", net: "net_const", netEx: "net_const_ex_remark", sl: "fund-weight, gross, fixed" },
+  dyn: { label: "Perfect · dynamic", net: "net_dyn", netEx: "net_dyn_ex_remark", sl: "fund-weight, gross, rebalanced" },
+};
 
 function renderChart() {
-  const s = DATA.series;
-  const x = s.map((r) => r.date);
+  const s = DATA.series, x = s.map((r) => r.date);
+  const meth = METHODS[METHOD] || METHODS.actual;
   const longKey = EX_REMARK ? "long_pnl_ex_remark" : "long_pnl";
-  const totalKey = EX_REMARK ? "total_pnl_ex_remark" : "total_pnl";
-  const mk = (key, name, color, width) => ({
-    x, y: s.map((r) => r[key]), name, type: "scatter", mode: "lines+markers",
-    line: { color, width: width || 2 }, marker: { size: 5 },
+  const netKey = EX_REMARK ? meth.netEx : meth.net;
+  const sfx = EX_REMARK ? " (ex re-mark)" : "";
+  const mk = (yfn, name, color, width, dash) => ({
+    x, y: s.map(yfn), name, type: "scatter", mode: dash ? "lines" : "lines+markers",
+    line: { color, width: width || 2, dash }, marker: { size: 5 },
     hovertemplate: name + " %{y:($,.0f}<extra></extra>",
   });
-  const suffix = EX_REMARK ? " — ex SpaceX re-mark" : "";
-  Plotly.newPlot("chart", [
-    mk(longKey, "Long (BPTIX)" + suffix, GOOD),
-    mk("short_pnl", "Short (public holdings)", BAD),
-    mk(totalKey, "Total (≈ SpaceX/private)" + suffix, SPX, 3),
-  ], {
+  const traces = [
+    mk((r) => r[longKey], "Long (BPTIX)" + sfx, GOOD),
+    mk((r) => (r[netKey] != null ? r[netKey] - r[longKey] : null), "Short — " + meth.sl, BAD),
+    mk((r) => r[netKey], "Net — " + meth.label + sfx, SPX, 3),
+  ];
+  if (METHOD !== "actual")   // overlay the actual net (faint) for comparison
+    traces.push(mk((r) => (EX_REMARK ? r.total_pnl_ex_remark : r.total_pnl), "Net — actual (ref)", MUTED, 1.5, "dot"));
+  Plotly.newPlot("chart", traces, {
     paper_bgcolor: PLOT_BG, plot_bgcolor: PLOT_BG, font: { color: TEXT, size: 11 },
     hovermode: "x unified", hoverlabel: { bgcolor: "#0e1117", bordercolor: GRID },
     shapes: [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: 0, y1: 0, line: { color: GRID, width: 1 } }],
