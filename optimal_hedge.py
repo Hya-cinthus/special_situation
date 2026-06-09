@@ -46,7 +46,7 @@ def _rms(a):
 
 
 def build_payload():
-    end = "2026-06-08"
+    end = "2026-06-10"
     px = {tk: hedge_book._series(tk, ENTRY, end) for tk in hedge_book.POSITIONS}
     hbser = {r["date"]: r for r in json.load(open(os.path.join(_REPO_ROOT, "dashboard", "data", "hedge_book.json"), encoding="utf-8"))["series"]}
     dates = sorted(d for d in px["BPTIX"] if d >= ENTRY)
