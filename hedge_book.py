@@ -64,7 +64,7 @@ def _series(tk, start, end):
 
 
 def build_payload():
-    end = (datetime.date(2026, 6, 8) + datetime.timedelta(days=1)).isoformat()
+    end = (datetime.date(2026, 6, 9) + datetime.timedelta(days=1)).isoformat()
     px = {tk: _series(tk, ENTRY, end) for tk in POSITIONS}
     # merge manual points (only where Yahoo doesn't already have the day)
     for tk, days in MANUAL_PX.items():
