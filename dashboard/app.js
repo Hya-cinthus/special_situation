@@ -248,6 +248,9 @@ function renderKpis() {
   const dToIpo = daysBetween(today, ipo.first_trade_date);
 
   const la = DATA.anchors[DATA.anchors.length - 1];           // latest measured filing
+  const lt = DATA.lookthrough || null;                        // per-share SpaceX look-through
+  const ltX = lt && lt.per_share ? lt.per_share.BPTIX : null;
+  const ltR = lt && lt.per_share ? lt.per_share.BPTRX : null;
   const filingUrl = secFilingUrl(la.accession);
   const lastNavPt = [...DATA.series].reverse().find((p) => p.nav_per_share != null);
   const navTxt = lastNavPt ? "$" + lastNavPt.nav_per_share.toFixed(2) : "–";
@@ -316,6 +319,27 @@ function renderKpis() {
         + "“Space Exploration Technologies”. "
         + "<span class='conf'>Confidence: HIGH — measured.</span>",
       sources: [S_EDGAR] },
+
+    { label: "SpaceX shares held by fund", value: lt ? (lt.spacex_shares_held / 1e6).toFixed(2) + "M" : "–", cls: "spx",
+      note: lt ? "post-split · carried @ $" + lt.spacex_mark_per_share + " mark" : "",
+      tip: "= SpaceX $ held " + usd(lt ? lt.spacex_value_usd : 0) + " ÷ $" + (lt ? lt.spacex_mark_per_share : 135)
+        + " current per-share mark (post 5-for-1 split). Carried flat from the 3/31 filing — a private holding "
+        + "can't be added with daily creation cash, and there's been no observable SpaceX transaction since. "
+        + "<span class='conf'>Confidence: HIGH for the $ (measured NPORT-P); share count derived at the $135 mark.</span>",
+      sources: [S_EDGAR, S_IPO] },
+
+    { label: "SpaceX shares per BPTIX share", value: ltX ? ltX.spacex_shares.toFixed(3) : "–", cls: "spx", hl: true,
+      note: lt ? "$" + (ltX ? ltX.spacex_usd.toFixed(2) : "–") + " SpaceX per share · AUM " + lt.as_of : "",
+      tip: "Per <b>one BPTIX share</b> (NAV $" + (ltX ? ltX.nav.toFixed(2) : "–") + ", " + (ltX ? ltX.nav_as_of : "–")
+        + "): SpaceX weight " + pct(lt ? lt.spacex_weight : 0) + " × NAV ÷ $" + (lt ? lt.spacex_mark_per_share : 135)
+        + "/share mark = <b>" + (ltX ? ltX.spacex_shares.toFixed(4) : "–") + " SpaceX shares</b> (≈ $"
+        + (ltX ? ltX.spacex_usd.toFixed(2) : "–") + " of SpaceX). At the reported AUM of "
+        + usd(lt ? lt.fund_aum_usd : 0) + " (" + (lt ? lt.as_of : "") + "), the fund holds ~"
+        + (lt ? (lt.spacex_shares_held / 1e6).toFixed(2) : "–") + "M SpaceX shares total. "
+        + "Per <b>BPTRX</b> share it's " + (ltR ? ltR.spacex_shares.toFixed(3) : "–")
+        + " (lower NAV $" + (ltR ? ltR.nav.toFixed(2) : "–") + "). "
+        + "<span class='conf'>Confidence: MED — SpaceX $ measured & carried at the $135 mark; AUM is the reported figure; class NAVs from Yahoo.</span>",
+      sources: ov ? [S_AUM, S_EDGAR, S_YAHOO] : [S_EDGAR, S_YAHOO] },
 
     { label: "Reconstructed fund AUM", value: usd(k.total_nav_usd),
       note: ov ? "trued-up to reported " + ov.date + " + NAV drift" : "NAV × est. shares",

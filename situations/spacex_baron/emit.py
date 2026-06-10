@@ -118,6 +118,64 @@ def _project_aum(recon: dict, cur_val: float, spacex_value: float) -> dict:
     }
 
 
+def _latest_bptix_nav():
+    """Latest BPTIX NAV/share from hedge_book.json (Yahoo-sourced). (nav, date) | (None, None)."""
+    p = os.path.join(_REPO_ROOT, DASHBOARD_DATA_DIR, "hedge_book.json")
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+        for r in reversed(d["series"]):
+            if r.get("nav_bptix") is not None:
+                return float(r["nav_bptix"]), r["date"]
+    except Exception:
+        pass
+    return None, None
+
+
+def _lookthrough(recon: dict) -> dict | None:
+    """Per-share SpaceX look-through at the latest reported AUM.
+
+    How much SpaceX $ — and how many SpaceX shares — sit behind one fund share.
+    SpaceX $ is carried at the latest private mark ($135 post 5-for-1 split); the
+    fund's SpaceX share count = SpaceX $ ÷ that mark (carried flat from 3/31, since
+    a private holding can't be added with daily cash). Per-class figures use each
+    share class's own NAV: SpaceX shares / class-share = weight × class_NAV ÷ mark.
+    """
+    ov_list = recon.get("aum_overrides") or []
+    series = [p for p in recon["series"] if p.get("total_nav_usd")]
+    if ov_list:
+        a = ov_list[-1]
+        aum, spx, bptrx_nav, as_of = a["net_assets_usd"], a["spacex_value_usd"], a["nav_at_report"], a["report_date"]
+    elif series:
+        a = series[-1]
+        aum, spx, bptrx_nav, as_of = a["total_nav_usd"], a["spacex_value_usd"], a["nav_per_share"], a["date"]
+    else:
+        return None
+    remarks = sorted(getattr(CFG, "SPACEX_REMARKS", []), key=lambda r: r["date"])
+    mark = remarks[-1].get("per_share_new") if remarks else None
+    weight = (spx / aum) if aum else None
+    if not (weight and mark):
+        return None
+    nav_date = series[-1]["date"] if series else None
+    bptix_nav, bptix_date = _latest_bptix_nav()
+
+    def _per(nav):
+        return {"nav": round(nav, 2), "spacex_usd": round(weight * nav, 2),
+                "spacex_shares": round(weight * nav / mark, 4)} if nav else None
+
+    return {
+        "as_of": as_of,
+        "fund_aum_usd": aum,
+        "spacex_value_usd": round(spx, 2),
+        "spacex_weight": round(weight, 6),
+        "spacex_mark_per_share": mark,
+        "spacex_shares_held": round(spx / mark, 0),
+        "per_share": {
+            "BPTRX": {**(_per(bptrx_nav) or {}), "nav_as_of": nav_date} if bptrx_nav else None,
+            "BPTIX": {**_per(bptix_nav), "nav_as_of": bptix_date} if bptix_nav else None,
+        },
+    }
+
+
 def build_payload() -> dict:
     anchors = _load_anchors_csv()
     nav = _load_nav_csv()
@@ -156,6 +214,7 @@ def build_payload() -> dict:
     } for a in recon["anchors"]]
 
     aum_projection = _project_aum(recon, cur_val, spacex_value)
+    lookthrough = _lookthrough(recon)
 
     payload = {
         "meta": {
@@ -199,6 +258,7 @@ def build_payload() -> dict:
             "confidence": o["confidence"],
         } for o in recon.get("aum_overrides", [])],
         "aum_projection": aum_projection,
+        "lookthrough": lookthrough,
         "events": [{"date": d, "label": l, "kind": k} for d, l, k in CFG.EVENTS],
         "density_eras": [{"start": s, "end": e, "label": l, "confidence": c}
                          for s, e, l, c in CFG.DENSITY_ERAS],
