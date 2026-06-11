@@ -106,6 +106,8 @@ function render() {
   initScenario();
   fetch("data/nport_holdings.json", { cache: "no-store" })
     .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderRecon(d); }).catch(() => {});
+  fetch("data/baron_spacex_funds.json", { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderBaronFunds(d); }).catch(() => {});
 }
 
 /* ---- SpaceX holdings detail + full valuation reconciliation (bottom) ---- */
@@ -199,6 +201,153 @@ function renderRecon(NP) {
 
   const src = document.getElementById("recon-source");
   if (src) src.innerHTML = "Source: " + m.source;
+}
+
+/* ---- SpaceX across the Baron fund family + IPO allocation (bottom) ---- */
+const BF_PAL = ["#ff7a45", "#4da3ff", "#3fb950", "#d29922", "#a371f7", "#f778ba"];
+function _rgba(hex, a) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+function _cTag(level) {
+  const c = { CONFIRMED: GOOD, MEASURED: GOOD, REPORTED: ACC, ESTIMATED: WARN,
+              RUMORED: WARN, "NOT FOUND": BAD, UNDISCLOSED: BAD }[level] || MUTED;
+  return `<span style="color:${c};font-size:10px;font-weight:700">[${level}]</span>`;
+}
+function renderBaronFunds(d) {
+  const F = d.funds, fam = d.family_by_quarter, L = d.latest, fw = d.firm_wide,
+        ipo = d.ipo, ord = d.baron_order, al = d.ipo_allocation;
+  const famTot = L.total_spacex_usd, bpPub = L.baron_partners_share_pct;
+
+  // intro
+  const intro = document.getElementById("bf-intro");
+  if (intro) intro.innerHTML =
+    `Ron Baron has put in a <b>$1B order</b> to buy more SpaceX at the IPO. To judge how much of that reaches ` +
+    `<b>Baron Partners Fund</b> (the home of the BPTIX share class you hold), this maps SpaceX across <b>every</b> ` +
+    `Baron fund that holds it — straight from each fund's SEC NPORT-P filings — in dollars and as a % of the fund. ` +
+    `Bottom line up front: Baron Partners is <b>~${bpPub.toFixed(0)}% of Baron's public-fund SpaceX</b> but only ` +
+    `<b>~${al.baron_partners_share_of_firm_wide_pct.toFixed(0)}% of firm-wide SpaceX</b> (the private BaronX vehicles dwarf the mutual funds), ` +
+    `so a filled $1B order plausibly sends <b>~$260M–$650M</b> into the fund — incremental, not transformational.`;
+
+  // KPIs
+  const kpi = (label, value, note, cls) =>
+    `<div class="kpi"><span class="label">${label}</span><div class="value${cls ? " " + cls : ""}">${value}</div>` +
+    `<div class="note">${note}</div></div>`;
+  document.getElementById("bf-kpis").innerHTML =
+    kpi("Baron funds holding SpaceX", d.meta.n_funds, "open-end mutual funds (SEC NPORT-P)") +
+    kpi("Family SpaceX — public funds", usd(famTot), "across the 6 funds · 3/31/2026", "spx") +
+    kpi("Baron Partners share", bpPub.toFixed(0) + "%", "of Baron's public-fund SpaceX $") +
+    kpi("Firm-wide SpaceX (Baron letter)", usd(fw.stated_total_usd), "incl. private BaronX vehicles") +
+    kpi("Baron's IPO order", usd(ord.amount_usd), "requested · may not fully fill", "spx");
+
+  // ① funds table
+  document.getElementById("bf-funds-note").innerHTML =
+    `Every figure is the fund's own filed NPORT-P at 3/31/2026 (SpaceX = all tranches summed; % is of the fund's net assets). ` +
+    `Sorted by SpaceX dollars. ${_cTag("MEASURED")} straight from SEC filings.`;
+  const fRows = F.map((f, i) => {
+    const isBP = f.series_id === "S000000588";
+    const tick = [f.ticker_retail, f.ticker_institutional].filter(Boolean).join(" / ");
+    const share = famTot ? (f.latest.spacex_value_usd / famTot * 100) : 0;
+    return `<tr${isBP ? ` style="background:${_rgba(BF_PAL[0], 0.10)}"` : ""}>
+      <td><span style="color:${BF_PAL[i % BF_PAL.length]}">●</span> <b>${f.name}</b></td>
+      <td class="dim">${tick || "—"}</td>
+      <td>${usd(f.latest.spacex_value_usd)}</td>
+      <td>${f.latest.spacex_pct_of_net.toFixed(1)}%</td>
+      <td>${share.toFixed(1)}%</td>
+      <td class="dim">${f.first_report_date}</td></tr>`;
+  }).join("");
+  document.getElementById("bf-funds-table").innerHTML =
+    `<table class="data"><thead><tr><th>Fund</th><th>Share classes</th><th>SpaceX $</th>
+      <th>% of net</th><th>% of family</th><th>Held since</th></tr></thead><tbody>${fRows}
+      <tr style="font-weight:700;border-top:2px solid ${GRID}"><td>Family total (6 funds)</td><td></td>
+      <td>${usd(famTot)}</td><td></td><td>100%</td><td></td></tr></tbody></table>`;
+
+  // ② stacked dollars chart
+  const dates = fam.map((q) => q.report_date);
+  const dollarTraces = F.map((f, i) => {
+    const col = BF_PAL[i % BF_PAL.length];
+    const yByDate = {}; f.series.forEach((p) => { yByDate[p.report_date] = p.spacex_value_usd; });
+    return {
+      x: dates, y: dates.map((dt) => (yByDate[dt] != null ? yByDate[dt] / 1e9 : null)),
+      type: "scatter", mode: "lines", name: f.name.replace("Baron ", "").replace(" Fund", ""),
+      stackgroup: "one", line: { color: col, width: 1 }, fillcolor: _rgba(col, 0.55),
+      hovertemplate: "%{x}<br>" + f.name + " SpaceX $%{y:.2f}B<extra></extra>",
+    };
+  });
+  Plotly.newPlot("bf-chart-dollars", dollarTraces, baseLayout({
+    yaxis: { title: "SpaceX held (USD billions)", tickprefix: "$", ticksuffix: "B", tickformat: ".0f", gridcolor: GRID, color: TEXT, rangemode: "tozero" },
+    xaxis: { gridcolor: GRID, color: TEXT, type: "date" },
+    legend: { orientation: "h", y: 1.12, font: { color: TEXT, size: 10 } }, margin: { t: 34, r: 12, b: 30, l: 54 },
+  }), plotConfig());
+
+  // ③ % of net lines
+  const pctTraces = F.map((f, i) => {
+    const col = BF_PAL[i % BF_PAL.length];
+    const yByDate = {}; f.series.forEach((p) => { yByDate[p.report_date] = p.spacex_pct_of_net; });
+    return {
+      x: dates, y: dates.map((dt) => (yByDate[dt] != null ? yByDate[dt] : null)),
+      type: "scatter", mode: "lines+markers", name: f.name.replace("Baron ", "").replace(" Fund", ""),
+      line: { color: col, width: 1.6 }, marker: { size: 3 }, connectgaps: false,
+      hovertemplate: "%{x}<br>" + f.name + " = %{y:.1f}% of net<extra></extra>",
+    };
+  });
+  Plotly.newPlot("bf-chart-pct", pctTraces, baseLayout({
+    yaxis: { title: "SpaceX % of fund net assets", ticksuffix: "%", gridcolor: GRID, color: TEXT, rangemode: "tozero" },
+    xaxis: { gridcolor: GRID, color: TEXT, type: "date" },
+    legend: { orientation: "h", y: 1.12, font: { color: TEXT, size: 10 } }, margin: { t: 34, r: 12, b: 30, l: 50 },
+  }), plotConfig());
+
+  // ④ firm-wide table (incl. private vehicles + residual)
+  document.getElementById("bf-firm-note").innerHTML =
+    `From Baron's own <b>Q1-2026 "Letter from Ron," Table I</b> (3/31/2026). The 6 open-end mutual funds tie to the SEC ` +
+    `scan above to the decimal. But Baron holds far more SpaceX in <b>private</b> vehicles (BaronX is ~99% SpaceX) — so ` +
+    `Baron Partners is only ~${al.baron_partners_share_of_firm_wide_pct.toFixed(0)}% of the firm-wide total. ` +
+    `${_cTag("REPORTED")} Baron self-disclosure.`;
+  const vRows = fw.vehicles.map((v) => {
+    const isBP = v[0] === "Baron Partners Fund";
+    return `<tr${isBP ? ` style="background:${_rgba(BF_PAL[0], 0.10)}"` : ""}>
+      <td><b>${v[0]}</b></td><td class="dim">${v[4]}</td>
+      <td>${usd(v[1])}</td><td>${v[2].toFixed(1)}%</td>
+      <td style="color:${v[3] ? GOOD : MUTED}">${v[3] ? "✓ NPORT" : "private"}</td></tr>`;
+  }).join("");
+  const resRow = fw.residual_usd > 0
+    ? `<tr><td class="dim">Other Baron accounts / SMAs (not itemized)</td><td class="dim">residual</td>
+        <td class="dim">${usd(fw.residual_usd)}</td><td class="dim">—</td><td class="dim">—</td></tr>` : "";
+  document.getElementById("bf-firm-table").innerHTML =
+    `<table class="data"><thead><tr><th>Baron vehicle</th><th>Type</th><th>SpaceX $</th><th>% of net</th><th>SEC-visible?</th></tr></thead>` +
+    `<tbody>${vRows}${resRow}<tr style="font-weight:700;border-top:2px solid ${GRID}"><td>Firm-wide total (Baron stated)</td><td></td>` +
+    `<td>${usd(fw.stated_total_usd)}</td><td></td><td></td></tr></tbody></table>`;
+
+  // ⑤ IPO facts memo
+  const bn = (x) => "$" + (x / 1e9).toFixed(1) + "B";
+  document.getElementById("bf-ipo").innerHTML =
+    `<ul>` +
+    `<li><b>${ipo.ticker}</b> on ${ipo.exchange} — first trade <b>${ipo.first_trade_date}</b> (priced ${ipo.pricing_date}). ${_cTag("CONFIRMED")}</li>` +
+    `<li>Fixed offer price <b>$${ipo.offer_price_usd}</b>; ${ipo.structure}. Post-money valuation <b>${usd(ipo.post_money_valuation_usd)}</b>. ${_cTag("CONFIRMED")}</li>` +
+    `<li>Stock split <b>${ipo.split}</b> → private mark $${ipo.post_split_private_mark_usd}/sh; IPO at $${ipo.offer_price_usd} is a +${(((ipo.offer_price_usd / ipo.post_split_private_mark_usd) - 1) * 100).toFixed(0)}% step. ${_cTag("CONFIRMED")}</li>` +
+    `<li>Primary raise <b>${(ipo.primary_shares / 1e6).toFixed(0)}M shares × $${ipo.offer_price_usd} = ${bn(ipo.primary_raise_usd)}</b> (≈${bn(ipo.with_greenshoe_usd)} with greenshoe) — largest IPO ever. ${_cTag("CONFIRMED")}</li>` +
+    `<li>Leads: ${ipo.lead_banks.join(", ")}. FY2025: revenue ${bn(ipo.fy2025_revenue_usd)}, net loss ${bn(ipo.fy2025_net_loss_usd)}. ${_cTag("REPORTED")}</li>` +
+    `</ul>`;
+
+  // ⑥ allocation analysis
+  const sc = al.scenarios.map((s) =>
+    `<tr><td>${s.label}<br><span class="dim" style="font-size:11px">Baron Partners = ${s.basis_pct}% of this base</span></td>
+      <td>${usd(s.full_fill.to_baron_partners_usd)}<br><span class="dim">${s.full_fill.pct_of_bp_nav}% of NAV</span></td>
+      <td>${usd(s.half_fill.to_baron_partners_usd)}<br><span class="dim">${s.half_fill.pct_of_bp_nav}% of NAV</span></td></tr>`).join("");
+  document.getElementById("bf-alloc").innerHTML =
+    `<p style="border-left:3px solid ${SPX};padding-left:10px;font-style:italic;color:${TEXT}">"${ord.quote}"<br>` +
+    `<span class="dim" style="font-style:normal">— ${ord.attribution} ${_cTag("REPORTED")}</span></p>` +
+    `<p><b>Why $1B?</b> ${ord.rationale} The ${al.primary_dilution_pct}% primary dilution on Baron's ~$14.9B SpaceX would take ` +
+    `<b>${usd(al.anti_dilution_firmwide_usd)}</b> just to hold the firm's ownership % flat — so the $1B is anti-dilution <i>plus</i> a genuine add.</p>` +
+    `<p><b>How much reaches Baron Partners (BPTIX)?</b> No source discloses the per-fund split ${_cTag("NOT FOUND")}, so we bound it two ways. ` +
+    `Per-fund share of the order, by allocation basis:</p>` +
+    `<table class="data"><thead><tr><th>Allocation basis</th><th>If $1B fills</th><th>If ~$0.5B fills</th></tr></thead><tbody>${sc}</tbody></table>` +
+    `<p class="dim" style="margin-top:8px">${al.share_class_note}</p>` +
+    `<p style="margin-top:10px"><b>Bottom line.</b> ${al.bottom_line}</p>` +
+    `<p class="dim">${_cTag("MEASURED")} allocation bases (SEC + Baron letter). ${_cTag("NOT FOUND")} the actual per-fund split — treat the dollar figures as a reasoned range, not a disclosed number.</p>`;
+
+  const src = document.getElementById("bf-source");
+  if (src) src.innerHTML = "Source: " + d.meta.source + " · firm-wide & IPO/order figures per Baron's Q1-2026 letter and 2026 news (tagged inline). Generated " + (d.meta.generated_at || "").slice(0, 10) + ".";
 }
 
 /* -------------------------------- KPIs --------------------------------- *

@@ -209,6 +209,13 @@ def main(argv):
         print(f"[optimal_hedge] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[optimal_hedge] skipped: {e}")
+    # SpaceX across the Baron fund family — NPORT-P cross-fund scan (network; cached).
+    try:
+        import baron_spacex_funds
+        p = baron_spacex_funds.write_json()
+        print(f"[baron_spacex_funds] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[baron_spacex_funds] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 
