@@ -1081,5 +1081,92 @@
     ],
     "source": "measured",
     "confidence": "high"
+  },
+  {
+    "report_date": "2026-03-31",
+    "filing_date": "2026-06-01",
+    "accession": "0001867090-26-000054",
+    "net_assets_usd": 678918108.63,
+    "total_assets_usd": 701493299.35,
+    "n_holdings": 59,
+    "top_holdings": [
+      {
+        "name": "DBH1 LP",
+        "valUSD": 72479780.0,
+        "pctVal": 10.67577651541
+      },
+      {
+        "name": "Quiet OA Access LP",
+        "valUSD": 64613489.0,
+        "pctVal": 9.517125582404
+      },
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 56388340.0,
+        "pctVal": 8.305617317202
+      },
+      {
+        "name": "JP Morgan U.S. Treasury Plus Money Market Fund, Capital Shares",
+        "valUSD": 38310180.95,
+        "pctVal": 5.642827973362
+      },
+      {
+        "name": "HOF Capital AG Follow On, LLC",
+        "valUSD": 36029463.0,
+        "pctVal": 5.306893797943
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 30231356.0,
+        "pctVal": 4.452872241249
+      },
+      {
+        "name": "SP Private Investments XIII, LLC",
+        "valUSD": 26856090.0,
+        "pctVal": 3.955718614457
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 23256000.0,
+        "pctVal": 3.425449948143
+      },
+      {
+        "name": "AI Access 12, LLC",
+        "valUSD": 20000000.0,
+        "pctVal": 2.945863388495
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 19548977.0,
+        "pctVal": 2.879430781342
+      },
+      {
+        "name": "Epic Games, Inc.",
+        "valUSD": 19179610.0,
+        "pctVal": 2.825025545231
+      },
+      {
+        "name": "dbt Labs, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 2.209400192648
+      },
+      {
+        "name": "Ramp Business Corp.",
+        "valUSD": 13365000.0,
+        "pctVal": 1.968573209362
+      },
+      {
+        "name": "SWITCH Data Centers - SWCH 2025-DATA E",
+        "valUSD": 12315662.5,
+        "pctVal": 1.814012963191
+      },
+      {
+        "name": "Ramp Business Corp.",
+        "valUSD": 11999970.0,
+        "pctVal": 1.767513614302
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
   }
 ]
