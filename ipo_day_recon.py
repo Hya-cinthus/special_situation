@@ -273,6 +273,12 @@ def build_payload():
     # C*(close/P - 1) = leftover(version) -> P(C) = close / (1 + leftover/C). One
     # curve per weight version; the JS draws it with the day's range shaded so you
     # can see where a buy is physically possible (P within the day's range).
+    # BPTIX class NAV (for the per-BPTIX-share SpaceX look-through in the hover).
+    try:
+        nav_bptix = hedge_book._series("BPTIX", d0, end).get(d1) or nav1
+    except Exception:
+        nav_bptix = nav1
+
     locus_versions = []
     for lab, _W in locus_wsets:
         rp = pub_by_version[lab]
@@ -318,6 +324,11 @@ def build_payload():
         "nav_identity": nav_identity,
         "spx_contrib_pct": round(spx_c_pct, 2), "actual_nav_pct": round(nav_g * 100, 2),
         "aum_prior_usd": round(aum0),
+        # for the per-BPTIX-share SpaceX look-through in the hover (post-hypothetical-buy):
+        "spx_value_at_close_usd": round(spx1_val), "net_aum_usd": round(aum1),
+        "nav_bptix": round(nav_bptix, 2),
+        "spx_weight_nobuy_pct": round(spx1_val / aum1 * 100, 2),
+        "spx_shares_per_bptix_nobuy": round(spx1_val / aum1 * nav_bptix / close_px, 4),
         "note": ("Curve: avg price P(C) = close / (1 + leftover/C); P is always above the $" + str(close_px)
                  + " close, so a buy is only real where P ≤ the day's $" + (str(spcx_ohlc["high"]) if spcx_ohlc else "?")
                  + " high → C ≥ ~$" + (str(round((cmin_c or 0) / 1e6)) if cmin_c else "?") + "M. TWO hard caps box "

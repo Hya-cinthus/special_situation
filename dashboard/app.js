@@ -258,16 +258,22 @@ function renderIpoDay(d) {
       // actual NAV = SpaceX contrib + public contrib + buy contrib.
       const A0 = pl.aum_prior_usd, buyPnlM = lo / 1e6, buyPct = lo / A0 * 100;
       const spxC = pl.spx_contrib_pct, navA = pl.actual_nav_pct, pubC = navA - spxC - buyPct;
+      // post-buy SpaceX look-through (per BPTIX share + % of net)
+      const spx0v = pl.spx_value_at_close_usd, A1 = pl.net_aum_usd, navB = pl.nav_bptix;
       const curve = {
         x: xs, y: ys, type: "scatter", mode: "lines", name: "implied avg exec price",
         line: { color: SPX, width: 2.2 },
-        customdata: xs.map((x, i) => [(close / ys[i] - 1) * 100, x * (close / ys[i] - 1) * 1000]),
+        customdata: xs.map((x, i) => {
+          const C = x * 1e9, P = ys[i], spxNew = spx0v + C * close / P, wNew = spxNew / A1;
+          return [(close / P - 1) * 100, C * (close / P - 1) / 1e6, wNew * 100, wNew * navB / close];
+        }),
         hovertemplate:
           "buy <b>$%{x:.2f}B</b> at avg <b>$%{y:.2f}</b><br>" +
-          "per-$ intraday: %{customdata[0]:.1f}%  →  buy P&L %{customdata[1]:.0f}M" +
+          "per-$ intraday: %{customdata[0]:.1f}%  →  buy P&L $%{customdata[1]:.0f}M" +
           " = <b>" + buyPct.toFixed(2) + "% of NAV</b> (the leftover)<br>" +
           "NAV: +" + spxC.toFixed(2) + "% (SpaceX) + " + pubC.toFixed(2) + "% (public) " +
-          buyPct.toFixed(2) + "% (buy) = <b>+" + navA.toFixed(2) + "%</b><extra></extra>",
+          buyPct.toFixed(2) + "% (buy) = <b>+" + navA.toFixed(2) + "%</b><br>" +
+          "⇒ SpaceX <b>%{customdata[2]:.1f}% of net</b> · <b>%{customdata[3]:.3f}</b> SpaceX sh per BPTIX sh<extra></extra>",
       };
       const cminMark = {
         x: [cmin], y: [pl.intraday_high], type: "scatter", mode: "markers",
@@ -313,7 +319,10 @@ function renderIpoDay(d) {
     const ci = pl.versions.findIndex((v) => v.is_central);
     drawLocus(ci >= 0 ? ci : 0);
     const ln = document.getElementById("ipoday-locus-note");
-    if (ln) ln.innerHTML = (pl.nav_identity ? "<b>" + pl.nav_identity + "</b><br>" : "") + pl.note;
+    if (ln) ln.innerHTML = (pl.nav_identity ? "<b>" + pl.nav_identity + "</b><br>" : "") + pl.note +
+      "<br><span style='color:" + MUTED + "'>Baseline (no buy): SpaceX <b>" + pl.spx_weight_nobuy_pct +
+      "% of net</b>, <b>" + pl.spx_shares_per_bptix_nobuy + "</b> SpaceX sh per BPTIX sh (BPTIX NAV $" +
+      pl.nav_bptix + "). Hover any point to see how a buy raises both.</span>";
   }
 
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;
