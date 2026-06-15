@@ -76,9 +76,19 @@ def _base_closes(H):
             for t in legs if legs[t].get("shares")}
 
 
+def _ensemble():
+    """Perfect-fit ensemble (normalized weights) from ipo_day_recon, for a NAV band."""
+    try:
+        e = json.load(open(os.path.join(_REPO_ROOT, "dashboard", "data", "ipo_day_recon.json"), encoding="utf-8"))["best_fit"]["ensemble"]
+        return e["tickers"], e["fits"]
+    except Exception:
+        return [], []
+
+
 def build_payload():
     WS, H = _weightings()
     methods = list(METHOD_LABELS)
+    ens_tk, ens_fits = _ensemble()
     prev = {"nav": BASE["nav"], "spcx": BASE["spcx"], "aum": BASE["aum"],
             "spx_value": BASE["spacex_value"], "closes": _base_closes(H)}
     rows = []
@@ -99,12 +109,25 @@ def build_payload():
             preds[m] = {"basket_ret_pct": round(br * 100, 3),
                         "nav_return_pct": round(navret * 100, 3),
                         "pred_nav": round(prev["nav"] * (1 + navret), 2)}
+        # perfect-fit ensemble band: apply each fit's (normalized) weights -> NAV range
+        ens_navs = []
+        for fw in ens_fits:
+            num = den = 0.0
+            for ti, t in enumerate(ens_tk):
+                a, b, w = prev["closes"].get(t), e["closes"].get(t), fw[ti]
+                if a and b and w:
+                    num += w * (b / a - 1)
+                    den += w
+            br = num / den if den else 0.0
+            ens_navs.append(prev["nav"] * (1 + w_spx * spx_ret + (1 - w_spx) * br))
+        pf_range = [round(min(ens_navs), 2), round(max(ens_navs), 2)] if ens_navs else None
         actual = e.get("actual_nav")
         errs = ({m: round(preds[m]["pred_nav"] - actual, 2) for m in methods} if actual else {})
         best = min(errs, key=lambda m: abs(errs[m])) if errs else None
         rows.append({"date": e["date"], "spcx": e["spcx"], "spcx_ret_pct": round(spx_ret * 100, 2),
                      "spacex_weight_pct": round(w_spx * 100, 2), "prior_nav": prev["nav"],
-                     "preds": preds, "actual_nav": actual, "errors": errs, "best_method": best})
+                     "preds": preds, "perfect_fit_range": pf_range,
+                     "actual_nav": actual, "errors": errs, "best_method": best})
         # chain to next day: base off ACTUAL nav if known, else the median prediction
         base_nav = actual if actual else sorted(preds[m]["pred_nav"] for m in methods)[len(methods) // 2]
         spx_value = prev["spx_value"] * (e["spcx"] / prev["spcx"])

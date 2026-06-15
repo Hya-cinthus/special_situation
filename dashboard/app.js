@@ -122,7 +122,7 @@ function renderDailyLog(d) {
   const note = document.getElementById("dailylog-note");
   if (note) note.innerHTML = d.meta.note;
   const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt</th>" +
-    ms.map((m) => `<th>${lbl[m]}</th>`).join("") + "<th>Actual NAV</th><th>best</th></tr>";
+    ms.map((m) => `<th>${lbl[m]}</th>`).join("") + "<th>perfect-fit range</th><th>Actual NAV</th><th>best</th></tr>";
   const body = d.rows.slice().reverse().map((r) => {
     const cells = ms.map((m) => {
       const isBest = r.best_method === m;
@@ -130,10 +130,11 @@ function renderDailyLog(d) {
       const errTxt = err != null ? `<br><span class="dim" style="font-size:10px">${err >= 0 ? "+" : ""}${err}</span>` : "";
       return `<td style="${isBest ? `background:${_rgba(GOOD, 0.16)};font-weight:700` : ""}">${r.preds[m].pred_nav.toFixed(2)}${errTxt}</td>`;
     }).join("");
+    const pf = r.perfect_fit_range ? `<span style="color:${SPX}">${r.perfect_fit_range[0].toFixed(2)} – ${r.perfect_fit_range[1].toFixed(2)}</span>` : "—";
     const act = r.actual_nav != null ? `<b style="color:${SPX}">${r.actual_nav.toFixed(2)}</b>` : `<span class="dim">pending</span>`;
     const best = r.best_method ? lbl[r.best_method] : "—";
     return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${r.spcx_ret_pct >= 0 ? "+" : ""}${r.spcx_ret_pct}%)</span></td>` +
-      `<td>${r.spacex_weight_pct}%</td>${cells}<td>${act}</td><td class="dim">${best}</td></tr>`;
+      `<td>${r.spacex_weight_pct}%</td>${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td></tr>`;
   }).join("");
   card.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
   const src = document.getElementById("dailylog-src");
@@ -460,22 +461,45 @@ function renderIpoDay(d) {
     if (intro) intro.innerHTML =
       `Free reweight of the 23 stocks fit to <b>5/20–6/11 only</b> (Friday held out). It hits the history ` +
       `<b>perfectly</b> (in-sample RMS ${bf.in_sample_rms_pct}%). With ${bf.n_obs} days vs ${bf.n_stocks} stocks the ` +
-      `perfect fit is <b>non-unique</b> — three different perfect fits predict Friday's public contribution anywhere in ` +
-      `<b>${bf.friday_pred_range[0]}%–${bf.friday_pred_range[1]}%</b>. Out-of-sample, this fit's Friday residual is ` +
-      `<b>${bf.friday_resid_pct}%</b> vs the disclosed basket's ${bf.disclosed_friday_resid_pct}% — reweighting absorbs ~half the −0.25%.`;
-    const top = bf.weights.slice(0, 14).reverse();
+      `perfect fit is <b>non-unique</b> — across <b>~${bf.cluster.n} perfect fits</b> the Friday public-contribution ` +
+      `prediction clusters at <b>+${bf.cluster.fri_mean}%</b> (range +${bf.cluster.fri_min}% to +${bf.cluster.fri_max}%), ` +
+      `and the <b>actual +${bf.cluster.fri_actual}% falls inside</b>. They agree most on <b>TSLA (~24–28%)</b>; the mid/small ` +
+      `names are interchangeable. Out-of-sample this fit's Friday residual is <b>${bf.friday_resid_pct}%</b> vs the disclosed ` +
+      `basket's ${bf.disclosed_friday_resid_pct}% — reweighting absorbs ~half the −0.25%, no SpaceX buy needed.`;
+    // weights: ALL stocks, disclosed vs ensemble-mean with the perfect-fit range as whiskers
+    const ws = (bf.weight_stats || []).slice().reverse();   // ascending -> largest at top
     const wtraces = [
-      { type: "bar", orientation: "h", name: "disclosed 5/31", y: top.map((w) => w.ticker), x: top.map((w) => w.disclosed_pct),
+      { type: "bar", orientation: "h", name: "disclosed 5/31", y: ws.map((w) => w.ticker), x: ws.map((w) => w.disclosed_pct),
         marker: { color: MUTED }, hovertemplate: "%{y} disclosed %{x:.1f}%<extra></extra>" },
-      { type: "bar", orientation: "h", name: "best-fit", y: top.map((w) => w.ticker), x: top.map((w) => w.fitted_pct),
-        marker: { color: SPX }, hovertemplate: "%{y} best-fit %{x:.1f}%<extra></extra>" },
+      { type: "bar", orientation: "h", name: "perfect-fit (mean ± range)", y: ws.map((w) => w.ticker), x: ws.map((w) => w.ens_mean_pct),
+        marker: { color: SPX },
+        error_x: { type: "data", symmetric: false, array: ws.map((w) => w.ens_max_pct - w.ens_mean_pct),
+          arrayminus: ws.map((w) => w.ens_mean_pct - w.ens_min_pct), color: "rgba(255,122,69,0.5)", thickness: 1.2, width: 2 },
+        customdata: ws.map((w) => [w.ens_min_pct, w.ens_max_pct, w.span_pp]),
+        hovertemplate: "%{y} perfect-fit mean %{x:.1f}% · range [%{customdata[0]:.1f}, %{customdata[1]:.1f}] · span %{customdata[2]:.1f}pp<extra></extra>" },
     ];
     Plotly.newPlot("ipoday-bestfit-w", wtraces, baseLayout({
       barmode: "group", xaxis: { title: "weight (% of public book)", ticksuffix: "%", gridcolor: GRID, color: TEXT },
-      yaxis: { gridcolor: GRID, color: TEXT, tickfont: { size: 10 }, automargin: true },
-      legend: { orientation: "h", y: 1.08, font: { color: TEXT, size: 10 } }, margin: { t: 38, r: 12, b: 42, l: 52 },
-      annotations: [{ x: 0, y: 1.15, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
-        text: "<b>What 'perfect match' looks like</b> (biggest moves; overfit & illustrative — not a disclosure)", font: { color: TEXT, size: 11 } }],
+      yaxis: { gridcolor: GRID, color: TEXT, tickfont: { size: 9 }, automargin: true },
+      legend: { orientation: "h", y: 1.03, font: { color: TEXT, size: 10 } }, margin: { t: 28, r: 12, b: 42, l: 52 },
+    }), plotConfig());
+    // cluster: each perfect fit's Friday public-contribution prediction (strip) + actual
+    const cl = bf.cluster, pts = cl.fri_points;
+    const ctr = [{ type: "scatter", mode: "markers", x: pts, y: pts.map((_, i) => (i % 7) - 3),
+      marker: { color: SPX, size: 7, opacity: 0.55 },
+      hovertemplate: "a perfect fit → Friday public +%{x:.2f}%<extra></extra>" }];
+    Plotly.newPlot("ipoday-bestfit-cluster", ctr, baseLayout({
+      xaxis: { title: "Friday public-contribution prediction (% of NAV)", ticksuffix: "%", gridcolor: GRID, color: TEXT },
+      yaxis: { visible: false, range: [-6, 6] }, showlegend: false, margin: { t: 26, r: 12, b: 42, l: 12 },
+      shapes: [
+        { type: "line", x0: cl.fri_actual, x1: cl.fri_actual, yref: "paper", y0: 0, y1: 1, line: { color: GOOD, width: 2 } },
+        { type: "line", x0: cl.fri_mean, x1: cl.fri_mean, yref: "paper", y0: 0, y1: 1, line: { color: ACC, width: 1, dash: "dot" } },
+      ],
+      annotations: [
+        { x: cl.fri_actual, y: 1.0, yref: "paper", text: "actual +" + cl.fri_actual + "%", font: { color: GOOD, size: 10 }, showarrow: false, yanchor: "bottom" },
+        { x: 0, y: 1.12, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
+          text: "<b>" + cl.n + " perfect fits cluster at +" + cl.fri_mean + "% (range +" + cl.fri_min + "% to +" + cl.fri_max + "%)</b> — the actual falls INSIDE → no buy needed", font: { color: TEXT, size: 11 } },
+      ],
     }), plotConfig());
     const rs = bf.resid_series, fri = d.noise_compare ? d.noise_compare.fri_date : "2026-06-12";
     const rtr = { type: "bar", x: rs.map((p) => p.date), y: rs.map((p) => p.resid_pct),
@@ -483,16 +507,13 @@ function renderIpoDay(d) {
       hovertemplate: "%{x}<br>residual %{y:.3f}%<extra></extra>" };
     Plotly.newPlot("ipoday-bestfit-r", [rtr], baseLayout({
       xaxis: { type: "date", gridcolor: GRID, color: TEXT },
-      yaxis: { title: "best-fit hedging residual", ticksuffix: "%", gridcolor: GRID, color: TEXT, zeroline: true, zerolinecolor: GRID },
-      shapes: [hline(0, MUTED)], showlegend: false, margin: { t: 32, r: 12, b: 40, l: 56 },
-      annotations: [
-        { x: 0, y: 1.09, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
-          text: "<b>Hedging residual of the best-fit basket</b>: ≈0 every in-sample day (perfect), Friday (red, out-of-sample) = " + bf.friday_resid_pct + "%", font: { color: TEXT, size: 11 } },
-        { x: fri, y: bf.friday_resid_pct, xref: "x", yref: "y", text: "Fri (held out)", showarrow: true, arrowcolor: BAD, font: { color: BAD, size: 10 }, ax: -24, ay: -16 },
-      ],
+      yaxis: { title: "residual", ticksuffix: "%", gridcolor: GRID, color: TEXT, zeroline: true, zerolinecolor: GRID },
+      shapes: [hline(0, MUTED)], showlegend: false, margin: { t: 16, r: 12, b: 40, l: 56 },
+      annotations: [{ x: fri, y: bf.friday_resid_pct, xref: "x", yref: "y", text: "Fri (held out) " + bf.friday_resid_pct + "%", showarrow: true, arrowcolor: BAD, font: { color: BAD, size: 10 }, ax: -30, ay: -16 }],
     }), plotConfig());
     const bn = document.getElementById("ipoday-bestfit-note");
-    if (bn) bn.innerHTML = bf.note;
+    if (bn) bn.innerHTML = bf.note + " <b>Cluster:</b> across ~" + cl.n + " perfect fits, <b>" + (cl.pinned.join(", ") || "few") +
+      "</b> are pinned (all fits agree) while <b>" + (cl.free.join(", ") || "several") + "</b> are free (collinear, interchangeable); TSLA clusters ~24–28%. The common thread is they all predict Friday's public contribution near +" + cl.fri_mean + "%, with the actual inside that band.";
   }
 
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;

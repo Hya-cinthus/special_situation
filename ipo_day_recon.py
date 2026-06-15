@@ -24,6 +24,7 @@ import json
 import os
 import datetime
 import statistics
+import random
 
 import hedge_book
 import fund_snapshots
@@ -473,16 +474,30 @@ def build_payload():
                 fds.append(d)
         insample = [k for k, dd in enumerate(fds) if dd <= "2026-06-11"]
 
-        def _nnls(init):
+        # coordinate-descent NNLS with incremental residual (fast: O(iters x nF x obs))
+        Xs = [Xh[k] for k in insample]
+        Ys = [Yh[k] for k in insample]
+        mI = len(Xs)
+        xx = [sum(Xs[k][j] * Xs[k][j] for k in range(mI)) for j in range(nF)]
+
+        def _nnls(init, iters=900):
             g = list(init)
-            for _ in range(2500):
+            pred = [sum(g[j] * Xs[k][j] for j in range(nF)) for k in range(mI)]
+            for _ in range(iters):
                 for j in range(nF):
-                    num = den = 0.0
-                    for k in insample:
-                        resj = Yh[k] - sum(g[jj] * Xh[k][jj] for jj in range(nF) if jj != j)
-                        num += Xh[k][j] * resj
-                        den += Xh[k][j] * Xh[k][j]
-                    g[j] = max(0.0, num / den) if den else g[j]
+                    if not xx[j]:
+                        continue
+                    num = 0.0
+                    for k in range(mI):
+                        num += Xs[k][j] * (Ys[k] - pred[k] + g[j] * Xs[k][j])
+                    newg = num / xx[j]
+                    if newg < 0:
+                        newg = 0.0
+                    dg = newg - g[j]
+                    if dg:
+                        for k in range(mI):
+                            pred[k] += dg * Xs[k][j]
+                        g[j] = newg
             return g
 
         sden = sum(fund_snapshots.WEIGHTS_5_31[t] for t in fit_names) or 1
@@ -505,12 +520,42 @@ def build_payload():
         g2 = _nnls([(0.30 if t in ("SHOP", "SPOT", "ONON", "FIG", "MTN", "IT") else 0.02) for t in fit_names])
         g3 = _nnls([(0.30 if t in ("TSLA", "SCHW", "GWRE", "BIRK", "FDS", "CHH") else 0.02) for t in fit_names])
         fp = [x for x in (_fripred(g1), _fripred(g2), _fripred(g3)) if x is not None]
+
+        # ENSEMBLE of perfect fits from random inits: do they cluster? which stocks are
+        # PINNED (all fits agree) vs FREE (collinear, interchangeable). Also the spread
+        # of the held-out prediction -> the NAV-estimate uncertainty band.
+        random.seed(7)
+        ens = [_nnls([random.uniform(0, 0.10) for _ in range(nF)], iters=900) for _ in range(50)]
+        ens_w = []
+        for g in ens:
+            sg = sum(g) or 1
+            ens_w.append([gi / sg for gi in g])
+        wstats = []
+        for j in range(nF):
+            col = sorted(ew[j] * 100 for ew in ens_w)
+            wstats.append({"ticker": fit_names[j].replace("-", "/"),
+                           "disclosed_pct": round(disc_norm[fit_names[j]] * 100, 2),
+                           "central_pct": round(g1[j] / gs * 100, 2),
+                           "ens_min_pct": round(col[0], 2), "ens_mean_pct": round(sum(col) / len(col), 2),
+                           "ens_max_pct": round(col[-1], 2), "span_pp": round(col[-1] - col[0], 2)})
+        wstats.sort(key=lambda r: -r["ens_mean_pct"])
+        ens_fri = sorted(x for x in (_fripred(g) for g in ens) if x is not None)
+        kf6 = next((k for k, dd in enumerate(fds) if dd == d1), None)
+        cluster = {
+            "fri_points": [round(x, 3) for x in ens_fri], "n": len(ens),
+            "fri_min": round(ens_fri[0], 3), "fri_mean": round(sum(ens_fri) / len(ens_fri), 3),
+            "fri_max": round(ens_fri[-1], 3),
+            "fri_actual": round(Yh[kf6] * 100, 3) if kf6 is not None else None,
+            "pinned": [w["ticker"] for w in wstats if w["span_pp"] < 3],
+            "free": [w["ticker"] for w in wstats if w["span_pp"] > 6],
+        }
         best_fit = {
             "in_sample_rms_pct": round(in_rms, 4), "friday_resid_pct": fri_res,
             "n_obs": len(insample), "n_stocks": nF,
             "friday_pred_range": [round(min(fp), 3), round(max(fp), 3)] if fp else None,
             "disclosed_friday_resid_pct": next((m["fri_pct"] for m in nc_methods if m.get("is_central")), None),
-            "weights": wtbl, "resid_series": resid,
+            "weights": wtbl, "weight_stats": wstats, "cluster": cluster, "resid_series": resid,
+            "ensemble": {"tickers": fit_names, "fits": [[round(w, 5) for w in ew] for ew in ens_w]},
             "note": ("Free NNLS reweight of the 23 stocks, fit to 5/20–6/11 ONLY (Friday held out). It nails "
                      "the history perfectly (in-sample RMS " + str(round(in_rms, 3)) + "%) — but with 15 days vs "
                      "23 stocks the perfect fit is NON-UNIQUE (3 different perfect fits predict Friday's public "
