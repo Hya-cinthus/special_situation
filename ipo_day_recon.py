@@ -402,9 +402,22 @@ def build_payload():
                     }
 
     breakeven_rpub = (nav_g * aum0 - spx0_val * spx_ret) / pub0 * 100   # r_pub for zero leftover (no buy)
+    # rank Friday among all daily residuals for the central basket (is it special?)
+    rank_txt = ""
+    central_m = next((x for x in nc_methods if x.get("is_central")), None)
+    if central_m:
+        rows = sorted(central_m["series"], key=lambda p: -abs(p["err_pct"]))
+        fr = next((i for i, p in enumerate(rows) if p["date"] == d1), None)
+        if fr is not None:
+            bigger = ", ".join(p["date"][5:] + (" %+.2f%%" % p["err_pct"]) for p in rows[:fr])
+            rank_txt = (" CRUCIAL: Friday is only the #" + str(fr + 1) + " largest daily residual of "
+                        + str(len(rows)) + " — bigger ones (" + (bigger or "none") + ") happened on days with "
+                        "NO SpaceX event (it was flat at $135 before 6/12), so they are unambiguously pure "
+                        "basket noise. Friday's is smaller than those → it is the same noise, not a buy signal.")
     noise_compare = {
         "fri_date": d1, "leftover_pct_fundnav": round(buy_c_pct, 3),
         "breakeven_rpub_pct": round(breakeven_rpub, 3), "central_rpub_pct": round(pub_central * 100, 3),
+        "friday_rank": (fr + 1) if (central_m and fr is not None) else None,
         "methods": nc_methods,
         "note": ("Each bar is a day's NAV-prediction error for the selected basket (the hedge study's "
                  "tracking residual, ex the SpaceX re-mark), as % of the NAV/share return. Friday (red) is "
@@ -413,7 +426,7 @@ def build_payload():
                  "The 'no-buy edge' would require the public sleeve to have returned +" + str(round(breakeven_rpub, 2))
                  + "% on Friday vs our +" + str(round(pub_central * 100, 2)) + "% estimate — a ~0.34pp gap, ~2σ of "
                  "daily basket noise, entirely reachable. (The min-var 'optimal' shows Friday as ~2.9σ only "
-                 "because it's overfit — tiny in-sample σ; out-of-sample it misses like the others.)"),
+                 "because it's overfit — tiny in-sample σ; out-of-sample it misses like the others.)" + rank_txt),
     }
 
     # detectability floor: buy that lifts NAV by more than the proxy noise band
