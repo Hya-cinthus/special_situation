@@ -437,8 +437,22 @@ def build_payload():
     try:
         LONG = 130000
         fit_names = [t for t in fund_snapshots.WEIGHTS_5_31 if t != "SPY"]
-        ph = {t: hedge_book._series(t, hedge_book.ENTRY, end) for t in fit_names}
         hs2 = H["series"]
+        # Reconstruct each stock's daily close from hedge_book (NO network — robust on
+        # CI): short leg pnl_t = shares × (close_t − entry) → close_t = entry + pnl_t/shares.
+        sdates = [r["date"] for r in hs2]
+        legs = {l["ticker"].replace("/", "-"): l for l in H.get("legs", []) if l.get("side") == "short"}
+        spnl = {p["ticker"].replace("/", "-"): p for p in H.get("short_legs_pnl", [])}
+        ph = {}
+        for t in fit_names:
+            l, sp = legs.get(t), spnl.get(t)
+            if not l or not sp or not l.get("shares"):
+                continue
+            pl = sp["pnl"]
+            if len(pl) != len(sdates):
+                continue
+            ph[t] = {sdates[i]: l["entry_px"] + pl[i] / l["shares"] for i in range(len(sdates))}
+        fit_names = [t for t in fit_names if t in ph]   # keep only reconstructable names
         nF = len(fit_names)
         Yh, Xh, fds = [], [], []
         for i in range(1, len(hs2)):
