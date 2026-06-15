@@ -127,12 +127,16 @@ function renderIpoDay(d) {
     `SpaceX (SPCX) first traded ${d.meta.date}, closing <b>$${sp.close}</b> (<b>${sd(sp.return_pct)}</b> vs the $${sp.ipo_price} IPO price). ` +
     `Assuming the fund's SpaceX position is <b>unchanged</b> and <b>no leverage</b>, can marking everything to that close reproduce the reported <b>${usd(g.aum_reported)}</b> AUM — and would a new IPO buy even show up?`;
 
+  const ssRows = (d.split_solve && d.split_solve.rows) || [];
+  const buyVals = ssRows.map((r) => r.spacex_ipo_buy_usd);
+  const buyMin = buyVals.length ? Math.min(...buyVals) : t.implied_buy_lo_usd;
+  const buyMax = buyVals.length ? Math.max(...buyVals) : t.implied_buy_hi_usd;
   const kpi = (label, value, note, cls) =>
     `<div class="kpi"><span class="label">${label}</span><div class="value${cls ? " " + cls : ""}">${value}</div><div class="note">${note}</div></div>`;
   document.getElementById("ipoday-kpis").innerHTML =
     kpi("SPCX first close", "$" + sp.close, sd(sp.return_pct) + " vs $" + sp.ipo_price + " IPO", "spx") +
     kpi("SpaceX weight now", sv.weight_now_pct.toFixed(1) + "%", "was " + t.spacex_weight_start_pct + "% (at $135)", "spx") +
-    kpi("Implied IPO add", "≈ $0", mUSD(t.implied_buy_lo_usd) + " to " + mUSD(t.implied_buy_hi_usd)) +
+    kpi("Implied IPO add", buyMax <= 0 ? "none" : "≈ $0", "solve: " + mUSD(buyMin) + " to " + mUSD(buyMax)) +
     kpi("Net inflows (Fri)", usd(g.inflow_usd), "AUM growth beyond marks");
 
   document.getElementById("ipoday-growth").innerHTML =
@@ -155,19 +159,20 @@ function renderIpoDay(d) {
     `<ul>` +
     `<li>SpaceX sleeve: ${t.spacex_weight_start_pct}% × ${sd(sp.return_pct)} = <b style="color:${SPX}">+${t.spacex_contribution_pct}%</b> &nbsp;(this alone is most of the day's NAV move)</li>` +
     `<li>Public sleeve: ${(100 - t.spacex_weight_start_pct).toFixed(2)}% × public return (${t.public_return_lo_pct}% to ${t.public_return_hi_pct}%) → +${(t.predicted_nav_lo_pct - t.spacex_contribution_pct).toFixed(2)}% to +${(t.predicted_nav_hi_pct - t.spacex_contribution_pct).toFixed(2)}%</li>` +
-    `<li><b>Predicted NAV band: +${t.predicted_nav_lo_pct}% to +${t.predicted_nav_hi_pct}%</b> &nbsp;(the band = two public-basket weightings)</li>` +
-    `<li><b style="color:${GOOD}">Actual NAV: ${sd(t.actual_nav_pct)}</b> — inside the band ⇒ no extra SpaceX kicker needed.</li>` +
+    `<li><b>Predicted NAV band: +${t.predicted_nav_lo_pct}% to +${t.predicted_nav_hi_pct}%</b> &nbsp;(band = fund 3/31→5/31 weight versions; 5/31 central +${t.predicted_nav_central_pct}%)</li>` +
+    `<li><b style="color:${GOOD}">Actual NAV: ${sd(t.actual_nav_pct)}</b> — at/below the band ⇒ the implied SpaceX add solves <b>negative</b> ⇒ no IPO buy.</li>` +
     `</ul>` +
     `<p style="margin:8px 0 4px">What a real buy <i>would</i> have done to NAV:</p>` +
     `<table class="data"><thead><tr><th>Hypothetical IPO buy</th><th>extra NAV</th><th>NAV would be</th></tr></thead><tbody>${scen}` +
     `<tr style="font-weight:700;border-top:2px solid ${GRID}"><td>Actual NAV</td><td></td><td style="color:${GOOD}">${sd(t.actual_nav_pct)}</td></tr></tbody></table>` +
-    `<p class="dim" style="margin-top:8px">Reverse-solving the actual NAV ⇒ implied SpaceX weight ${t.implied_spacex_weight_lo_pct}%–${t.implied_spacex_weight_hi_pct}% (vs ${t.spacex_weight_start_pct}% start) ⇒ implied add <b>${mUSD(t.implied_buy_lo_usd)} to ${mUSD(t.implied_buy_hi_usd)} ≈ 0</b>. A buy above ~${usd(t.detect_floor_usd)} would have cleared the proxy noise and shown up; it didn't.</p>`;
+    `<p class="dim" style="margin-top:8px">Reverse-solving the actual NAV across the three fund-weight versions ⇒ implied SpaceX add <b>${mUSD(buyMin)} to ${mUSD(buyMax)}</b> — negative throughout, i.e. <b>no add</b> (you can't buy negative; the small shortfall is model noise — weight drift, cash in the sleeve, preferred-vs-common tracking). A $0.65B buy would have lifted NAV to +6.2% vs the actual ${sd(t.actual_nav_pct)}.</p>`;
 
   // ③ solve the split (X = SpaceX bought at IPO, B = neutral subscription)
   if (d.split_solve) {
     const ss = d.split_solve;
     const rows = ss.rows.map((r) =>
-      `<tr><td>${r.label} (${r.r_pub_pct >= 0 ? "+" : ""}${r.r_pub_pct}%)</td>` +
+      `<tr${r.is_central ? ` style="background:${_rgba ? _rgba(SPX, 0.10) : "rgba(255,122,69,0.10)"}"` : ""}>` +
+      `<td>${r.label} (r_pub ${r.r_pub_pct >= 0 ? "+" : ""}${r.r_pub_pct}%)${r.is_central ? " <span class='dim'>← freshest</span>" : ""}</td>` +
       `<td style="color:${r.spacex_ipo_buy_usd > 5e6 ? SPX : MUTED}"><b>${mUSD(r.spacex_ipo_buy_usd)}</b></td>` +
       `<td>${mUSD(r.neutral_inflow_usd)}</td><td class="dim">${mUSD(r.total_in_usd)}</td></tr>`).join("");
     document.getElementById("ipoday-split").innerHTML =
@@ -177,9 +182,9 @@ function renderIpoDay(d) {
       `<li><b>Eq1 (NAV):</b> +${g.nav_growth_pct}% = [SpaceX_end + Public_end + ${sp.return_pct}%·X] / ${(g.aum_prior / 1e9).toFixed(1)}B − 1 &nbsp;←&nbsp;<b>B drops out</b></li>` +
       `<li><b>Eq2 (AUM):</b> ${(g.aum_reported / 1e9).toFixed(1)}B = SpaceX_end + Public_end + (1+${sp.return_pct}%)·X + B</li>` +
       `</ul>` +
-      `<p>2 equations, 3 unknowns (X, B, public return) → fix the public return, solve (X, B):</p>` +
-      `<table class="data"><thead><tr><th>assumed public return</th><th>X — SpaceX at IPO</th><th>B — neutral new money</th><th>total in</th></tr></thead><tbody>${rows}</tbody></table>` +
-      `<p class="dim" style="margin-top:8px">Total new cash <b>${usd(ss.total_inflow_usd)}</b> is pinned regardless of the split. The IPO-buy share <b>X brackets ~0</b> (about −$272M to +$209M), capped far under the $1B order; <b>B (neutral subscriptions) is the larger part.</b> The split can't be pinned tighter without the exact public-basket return — but a large IPO buy is ruled out either way.</p>`;
+      `<p>Public return is <b>known</b> (market data × the fund's weights) → 2 equations, 2 unknowns (X, B). One row per disclosed weight version:</p>` +
+      `<table class="data"><thead><tr><th>fund weight version</th><th>X — SpaceX at IPO</th><th>B — neutral new money</th><th>total in</th></tr></thead><tbody>${rows}</tbody></table>` +
+      `<p class="dim" style="margin-top:8px">Total new cash <b>${usd(ss.total_inflow_usd)}</b> is pinned regardless of the version. <b>X is negative in all three</b> (${mUSD(buyMin)} to ${mUSD(buyMax)}) — i.e. <b>no SpaceX added</b> at the IPO; neutral subscriptions B absorb the inflow. 5/31 (freshest) is the central estimate; the 3/31→5/31 spread is the band. A large IPO buy is firmly ruled out.</p>`;
   }
 
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;

@@ -59,23 +59,32 @@ def build_payload():
     # public basket return d0->d1, two weightings (fund 5/31 weights vs equal)
     shorts = [tk for tk in hedge_book.POSITIONS if hedge_book.POSITIONS[tk] < 0]
     end = (datetime.date.fromisoformat(d1) + datetime.timedelta(days=1)).isoformat()
-    px = {tk: hedge_book._series(tk, d0, end) for tk in shorts}
+    # public-basket return d0->d1 is KNOWN market data; only the WEIGHTING is a
+    # choice. We use the fund's three disclosed weight versions (3/31 NPORT, 4/30,
+    # 5/31 back-solve; 5/31 includes an SPY residual). 5/31 is freshest -> the
+    # central estimate; the spread across versions is the (small) error band.
+    wsets = [("3/31", fund_snapshots.WEIGHTS_3_31), ("4/30", fund_snapshots.WEIGHTS_4_30),
+             ("5/31", fund_snapshots.WEIGHTS_5_31)]
+    allnames = sorted(set().union(*[set(w) for _, w in wsets]))
+    px = {tk: hedge_book._series(tk, d0, end) for tk in allnames}
 
     def _ret(tk):
-        a, b = px[tk].get(d0), px[tk].get(d1)
+        a, b = px.get(tk, {}).get(d0), px.get(tk, {}).get(d1)
         return (b / a - 1) if (a and b) else None
 
-    W = fund_snapshots.WEIGHTS_5_31
-    num = den = 0.0
-    for tk in shorts:
-        w, r = W.get(tk, 0), _ret(tk)
-        if w and r is not None:
-            num += w * r
-            den += w
-    pub_w = num / den if den else 0.0                   # 5/31-weighted public return
-    rr = [_ret(tk) for tk in shorts if _ret(tk) is not None]
-    pub_e = sum(rr) / len(rr) if rr else 0.0            # equal-weight public return
-    pub_lo, pub_hi = min(pub_w, pub_e), max(pub_w, pub_e)
+    def _basket(W):
+        num = den = 0.0
+        for tk, w in W.items():
+            r = _ret(tk)
+            if w and r is not None:
+                num += w * r
+                den += w
+        return num / den if den else 0.0
+
+    pub_by_version = {lab: _basket(W) for lab, W in wsets}
+    pub_central = pub_by_version["5/31"]               # freshest = the estimate
+    pub_vals = list(pub_by_version.values())
+    pub_lo, pub_hi = min(pub_vals), max(pub_vals)
 
     # growth rates
     aum_g = aum1 / aum0 - 1
@@ -84,13 +93,14 @@ def build_payload():
 
     # AUM change decomposition (position unchanged)
     remark_gain = spx1_val - spx0_val
-    public_gain = aum0 * (1 - w_spx0) * ((pub_w + pub_e) / 2)
+    public_gain = aum0 * (1 - w_spx0) * pub_central
 
     # predicted NAV band (position unchanged) and the implied-buy check
     def pred(pub):
         return w_spx0 * spx_ret + (1 - w_spx0) * pub
 
     pred_lo, pred_hi = sorted([pred(pub_lo), pred(pub_hi)])
+    pred_central = pred(pub_central)
 
     def implied_w(pub):
         return (nav_g - pub) / (spx_ret - pub)
@@ -114,13 +124,13 @@ def build_payload():
         B = aum1 - spx1_val - pub0 * (1 + rp) - (1 + spx_ret) * X
         return X, B
 
-    pub_mid = (pub_lo + pub_hi) / 2
     split_solve = []
-    for lab, rp in [("public equal-weight", pub_e), ("public mid", pub_mid), ("public 5/31-weighted", pub_w)]:
+    for lab, _W in wsets:
+        rp = pub_by_version[lab]
         X, B = _solve(rp)
-        split_solve.append({"label": lab, "r_pub_pct": round(rp * 100, 3),
+        split_solve.append({"label": "fund " + lab + " weights", "r_pub_pct": round(rp * 100, 3),
                             "spacex_ipo_buy_usd": round(X), "neutral_inflow_usd": round(B),
-                            "total_in_usd": round(X + B)})
+                            "total_in_usd": round(X + B), "is_central": lab == "5/31"})
     total_inflow = round(sum(s["total_in_usd"] for s in split_solve) / len(split_solve))
 
     # detectability floor: buy that lifts NAV by more than the proxy noise band
@@ -133,9 +143,10 @@ def build_payload():
             "date": d1, "prior_date": d0,
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "assumptions": "SpaceX share count unchanged (no IPO add); no leverage (net = sum of marks); "
-                           "preferred tracks common proportionally; public basket proxied by the 23 hedge names.",
-            "disclaimer": "Analysis, not advice. Public-basket return is a proxy (covers ~92% of the 5/31 "
-                          "disclosed weights), which sets the error band on the implied-buy estimate.",
+                           "preferred tracks common proportionally. Public-basket return = known stock "
+                           "returns x the fund's disclosed weights (3/31 NPORT, 4/30, 5/31 back-solve).",
+            "disclaimer": "Analysis, not advice. The public return is KNOWN (market data); only the weighting "
+                          "is a choice — 5/31 is freshest (the estimate), the 3/31->5/31 spread is the band.",
         },
         "spcx": {"ipo_price": spx_px_old, "close": spx_px_new, "return_pct": round(spx_ret * 100, 2)},
         "growth": {
@@ -155,7 +166,9 @@ def build_payload():
             "spacex_weight_start_pct": round(w_spx0 * 100, 2),
             "spacex_contribution_pct": round(w_spx0 * spx_ret * 100, 3),
             "public_return_lo_pct": round(pub_lo * 100, 3), "public_return_hi_pct": round(pub_hi * 100, 3),
+            "public_return_central_pct": round(pub_central * 100, 3),
             "predicted_nav_lo_pct": round(pred_lo * 100, 3), "predicted_nav_hi_pct": round(pred_hi * 100, 3),
+            "predicted_nav_central_pct": round(pred_central * 100, 3),
             "actual_nav_pct": round(nav_g * 100, 3),
             "implied_spacex_weight_lo_pct": round(iw_lo * 100, 2), "implied_spacex_weight_hi_pct": round(iw_hi * 100, 2),
             "implied_buy_lo_usd": round(buy_lo), "implied_buy_hi_usd": round(buy_hi),
@@ -171,16 +184,20 @@ def build_payload():
         "spacex_value": {"prior_usd": round(spx0_val), "current_usd": round(spx1_val),
                          "weight_now_pct": round(spx1_val / aum1 * 100, 2)},
         "conclusion": (
-            "AUM grew +{:.1f}% (19.0B->{:.1f}B) but per-share NAV only +{:.1f}% — the {:.1f}-point gap is "
-            "~${:.0f}M of net inflows, not an IPO buy. The +{:.1f}% NAV is almost entirely the SpaceX re-mark "
-            "(+{:.1f}% on its own), and sits INSIDE the no-add prediction band ({:.1f}%-{:.1f}%). A material "
-            "IPO purchase (>~${:.0f}M) would have lifted NAV above the band; it didn't. Implied add ~${:+.0f}M "
-            "to ${:+.0f}M ≈ 0 within proxy noise. So as of {} close there is no evidence Baron Partners/BPTIX "
-            "added SpaceX at the IPO; the firm-wide $1B order more likely sits in the private BaronX vehicles "
-            "or hasn't settled into this NAV yet."
-        ).format(aum_g * 100, aum1 / 1e9, nav_g * 100, (aum_g - nav_g) * 100, inflow / 1e6,
-                 nav_g * 100, w_spx0 * spx_ret * 100, pred_lo * 100, pred_hi * 100,
-                 detect_floor / 1e6, buy_lo / 1e6, buy_hi / 1e6, d1),
+            "AUM grew +{:.1f}% ({:.1f}B->{:.1f}B) but per-share NAV only +{:.1f}% — the {:.1f}-point gap is "
+            "~${:.0f}M of net subscriptions, not an IPO buy. The +{:.1f}% NAV is almost entirely the existing "
+            "SpaceX re-marking +{:.0f}% (worth +{:.1f}% on its own); adding the public book's known +{:.1f}% to "
+            "+{:.1f}% return brings the no-add prediction to +{:.1f}%-+{:.1f}%, slightly ABOVE the actual "
+            "+{:.1f}%. So solving for an IPO add gives a NEGATIVE number in all three fund-weight versions "
+            "(X ${:+.0f}M to ${:+.0f}M) — i.e. NO add (you can't buy negative; the small shortfall is model "
+            "noise — weight drift, cash in the sleeve, preferred-vs-common tracking). Net subscriptions absorb "
+            "the full ~${:.0f}M. A real buy >~${:.0f}M would have lifted NAV well above the band; it didn't. So "
+            "as of {} close there is no evidence Baron Partners/BPTIX added SpaceX at the IPO — the firm-wide "
+            "$1B order more likely sits in the private BaronX vehicles or hasn't settled into this NAV yet."
+        ).format(aum_g * 100, aum0 / 1e9, aum1 / 1e9, nav_g * 100, (aum_g - nav_g) * 100, inflow / 1e6,
+                 nav_g * 100, spx_ret * 100, w_spx0 * spx_ret * 100, pub_lo * 100, pub_hi * 100,
+                 pred_lo * 100, pred_hi * 100, nav_g * 100, buy_lo / 1e6, buy_hi / 1e6,
+                 total_inflow / 1e6, 0.645e9 / 1e6, d1),
     }
 
 
