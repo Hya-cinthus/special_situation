@@ -291,6 +291,7 @@ def build_payload():
                                "leftover_usd": round(lo),
                                "min_plausible_buy_usd": round(cmin) if cmin else None,
                                "price_at_order_cap": round(p_at_order, 2) if p_at_order else None,
+                               "pub_value_usd": round(pub0 * (1 + rp)),   # Friday-marked public book
                                "is_central": lab == "5/31"})
     cmin_c = next((v["min_plausible_buy_usd"] for v in locus_versions if v["is_central"]), None)
     p_at_order_c = next((v["price_at_order_cap"] for v in locus_versions if v["is_central"]), None)
@@ -326,9 +327,13 @@ def build_payload():
         "aum_prior_usd": round(aum0),
         # for the per-BPTIX-share SpaceX look-through in the hover (post-hypothetical-buy):
         "spx_value_at_close_usd": round(spx1_val), "net_aum_usd": round(aum1),
-        "nav_bptix": round(nav_bptix, 2),
+        "nav_bptix": round(nav_bptix, 2), "mark_px": close_px,
         "spx_weight_nobuy_pct": round(spx1_val / aum1 * 100, 2),
         "spx_shares_per_bptix_nobuy": round(spx1_val / aum1 * nav_bptix / close_px, 4),
+        "spx_shares_total_nobuy": round(spx1_val / close_px),   # common-equiv shares
+        # baseline (no buy) fund balance sheet: leverage = total investments / net
+        "lev_nobuy": round((spx1_val + pub0 * (1 + pub_central)) / aum1, 3),
+        "cash_nobuy_usd": round(aum1 - (spx1_val + pub0 * (1 + pub_central))),
         "note": ("Curve: avg price P(C) = close / (1 + leftover/C); P is always above the $" + str(close_px)
                  + " close, so a buy is only real where P ≤ the day's $" + (str(spcx_ohlc["high"]) if spcx_ohlc else "?")
                  + " high → C ≥ ~$" + (str(round((cmin_c or 0) / 1e6)) if cmin_c else "?") + "M. TWO hard caps box "

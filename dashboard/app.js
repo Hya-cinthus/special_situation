@@ -258,22 +258,27 @@ function renderIpoDay(d) {
       // actual NAV = SpaceX contrib + public contrib + buy contrib.
       const A0 = pl.aum_prior_usd, buyPnlM = lo / 1e6, buyPct = lo / A0 * 100;
       const spxC = pl.spx_contrib_pct, navA = pl.actual_nav_pct, pubC = navA - spxC - buyPct;
-      // post-buy SpaceX look-through (per BPTIX share + % of net)
-      const spx0v = pl.spx_value_at_close_usd, A1 = pl.net_aum_usd, navB = pl.nav_bptix;
+      // post-buy fund balance sheet for the hover (look-through + cash + leverage)
+      const spx0v = pl.spx_value_at_close_usd, A1 = pl.net_aum_usd, navB = pl.nav_bptix, PUB = v.pub_value_usd;
       const curve = {
         x: xs, y: ys, type: "scatter", mode: "lines", name: "implied avg exec price",
         line: { color: SPX, width: 2.2 },
         customdata: xs.map((x, i) => {
-          const C = x * 1e9, P = ys[i], spxNew = spx0v + C * close / P, wNew = spxNew / A1;
-          return [(close / P - 1) * 100, C * (close / P - 1) / 1e6, wNew * 100, wNew * navB / close];
+          const C = x * 1e9, P = ys[i];
+          const spxNew = spx0v + C * close / P, wNew = spxNew / A1;     // SpaceX $ + weight
+          const totInv = spxNew + PUB, lev = totInv / A1, netCash = A1 - totInv;
+          return [(close / P - 1) * 100, C * (close / P - 1) / 1e6, wNew * 100, wNew * navB / close,
+                  spxNew / close / 1e6, spxNew / 1e9, lev, netCash / 1e9];
         }),
         hovertemplate:
-          "buy <b>$%{x:.2f}B</b> at avg <b>$%{y:.2f}</b><br>" +
-          "per-$ intraday: %{customdata[0]:.1f}%  →  buy P&L $%{customdata[1]:.0f}M" +
-          " = <b>" + buyPct.toFixed(2) + "% of NAV</b> (the leftover)<br>" +
-          "NAV: +" + spxC.toFixed(2) + "% (SpaceX) + " + pubC.toFixed(2) + "% (public) " +
-          buyPct.toFixed(2) + "% (buy) = <b>+" + navA.toFixed(2) + "%</b><br>" +
-          "⇒ SpaceX <b>%{customdata[2]:.1f}% of net</b> · <b>%{customdata[3]:.3f}</b> SpaceX sh per BPTIX sh<extra></extra>",
+          "<b>buy $%{x:.2f}B</b> at avg <b>$%{y:.2f}</b> (per-$ intraday %{customdata[0]:.1f}%)<br>" +
+          "buy P&L $%{customdata[1]:.0f}M = <b>" + buyPct.toFixed(2) + "% of NAV</b> (leftover)<br>" +
+          "NAV: +" + spxC.toFixed(2) + "%(SpX) + " + pubC.toFixed(2) + "%(pub) " +
+          buyPct.toFixed(2) + "%(buy) = <b>+" + navA.toFixed(2) + "%</b><br>" +
+          "──── fund after this buy ────<br>" +
+          "SpaceX: <b>$%{customdata[5]:.2f}B</b> · %{customdata[4]:.1f}M sh @ $" + close.toFixed(2) + " mark<br>" +
+          "weight: <b>%{customdata[2]:.1f}% of net</b> · %{customdata[3]:.3f} SpaceX sh / BPTIX sh<br>" +
+          "Net AUM $" + (A1 / 1e9).toFixed(1) + "B · cash/(borrow) <b>$%{customdata[7]:+.2f}B</b> · leverage <b>%{customdata[6]:.3f}×</b><extra></extra>",
       };
       const cminMark = {
         x: [cmin], y: [pl.intraday_high], type: "scatter", mode: "markers",
@@ -296,8 +301,12 @@ function renderIpoDay(d) {
       Plotly.newPlot("ipoday-locus", [curve, cminMark], baseLayout({
         xaxis: { title: "SpaceX bought into BPTIX ($B, log)", type: "log", gridcolor: GRID, color: TEXT, range: [Math.log10(0.15), Math.log10(8)] },
         yaxis: { title: "implied avg execution price", tickprefix: "$", range: [130, 205], gridcolor: GRID, color: TEXT },
-        shapes: shapes, showlegend: false, margin: { t: 16, r: 14, b: 44, l: 56 },
+        shapes: shapes, showlegend: false, margin: { t: 34, r: 14, b: 44, l: 56 },
         annotations: [
+          { x: 0, y: 1.04, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
+            text: "<b>Net AUM $" + (A1 / 1e9).toFixed(1) + "B</b> · SpaceX mark $" + close.toFixed(2) +
+                  " · baseline leverage " + pl.lev_nobuy + "× (net cash $" + (pl.cash_nobuy_usd / 1e9).toFixed(2) + "B)",
+            font: { color: TEXT, size: 11 } },
           ann(0.16, pl.intraday_high, "FEASIBLE: $" + cmin.toFixed(2) + "B–$" + order.toFixed(1) + "B @ ~$" + v.price_at_order_cap + "–$" + pl.intraday_high, SPX),
           ann(order, 134, " $1B order", WARN, "left"),
           ann(levT, 198, " 1.25× lev cap", MUTED, "left"),
@@ -320,9 +329,11 @@ function renderIpoDay(d) {
     drawLocus(ci >= 0 ? ci : 0);
     const ln = document.getElementById("ipoday-locus-note");
     if (ln) ln.innerHTML = (pl.nav_identity ? "<b>" + pl.nav_identity + "</b><br>" : "") + pl.note +
-      "<br><span style='color:" + MUTED + "'>Baseline (no buy): SpaceX <b>" + pl.spx_weight_nobuy_pct +
-      "% of net</b>, <b>" + pl.spx_shares_per_bptix_nobuy + "</b> SpaceX sh per BPTIX sh (BPTIX NAV $" +
-      pl.nav_bptix + "). Hover any point to see how a buy raises both.</span>";
+      "<br><span style='color:" + MUTED + "'><b>Baseline (no buy):</b> SpaceX <b>" + usd(pl.spx_value_at_close_usd) +
+      "</b> · " + (pl.spx_shares_total_nobuy / 1e6).toFixed(1) + "M sh @ $" + pl.mark_px + " mark · <b>" +
+      pl.spx_weight_nobuy_pct + "% of net</b> · " + pl.spx_shares_per_bptix_nobuy + " SpaceX sh/BPTIX sh. " +
+      "Net AUM <b>" + usd(pl.net_aum_usd) + "</b> · cash <b>" + usd(pl.cash_nobuy_usd) + "</b> · leverage <b>" +
+      pl.lev_nobuy + "×</b> (net cash) · BPTIX NAV $" + pl.nav_bptix + ". Hover any point for the fund's balance sheet under that buy.</span>";
   }
 
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;
