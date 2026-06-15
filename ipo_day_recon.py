@@ -378,6 +378,29 @@ def build_payload():
                                "is_central": m == "fund 5/31", "series": ser})
     except Exception:
         pass
+
+    # --- Friday per-holding contribution: weight x return, to show "big names rose,
+    # long-tail fell" — why no reweighting within the basket can lower it to breakeven.
+    friday_stocks = []
+    W5 = fund_snapshots.WEIGHTS_5_31
+    denom = sum(W5.values()) or 1
+    for tk in sorted(W5):
+        r = _ret(tk)
+        if r is None:
+            continue
+        w = W5[tk] / denom
+        friday_stocks.append({"ticker": tk.replace("-", "/"), "ret_pct": round(r * 100, 2),
+                              "weight_pct": round(w * 100, 2), "contrib_pct": round(w * r * 100, 4)})
+    friday_stocks.sort(key=lambda x: -x["contrib_pct"])
+    friday_block = {"date": d1, "stocks": friday_stocks,
+                    "basket_ret_pct": round(sum(s["contrib_pct"] for s in friday_stocks), 3),
+                    "note": ("Each bar = a holding's contribution to Friday's public-basket return (5/31 "
+                             "weight × its 6/12 return). TSLA alone (~23% × +1.8%) drives ~+0.41pp; the big "
+                             "names (SCHW, MSCI, H, FDS, CHH, GWRE, BIRK) all rose. The Friday fallers "
+                             "(SHOP, SPOT, ONON, FIG, MTN) are small-weight, so their drag is tiny — which is "
+                             "why no plausible reweighting gets the basket below ~+0.9%."),
+                    }
+
     breakeven_rpub = (nav_g * aum0 - spx0_val * spx_ret) / pub0 * 100   # r_pub for zero leftover (no buy)
     noise_compare = {
         "fri_date": d1, "leftover_pct_fundnav": round(buy_c_pct, 3),
@@ -440,6 +463,7 @@ def build_payload():
         "funding": funding,
         "price_locus": price_locus,
         "noise_compare": noise_compare,
+        "friday_stocks": friday_block,
         "split_solve": {
             "rows": split_solve, "total_inflow_usd": total_inflow,
             "note": ("2 equations (NAV, AUM), 3 unknowns (X, B, public return) — so the split needs the "

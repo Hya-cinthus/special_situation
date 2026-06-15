@@ -403,6 +403,28 @@ function renderIpoDay(d) {
     if (nn) nn.innerHTML = nc.note;
   }
 
+  // ⑨ Friday per-holding contribution (weight × return), sorted
+  if (d.friday_stocks && d.friday_stocks.stocks.length && document.getElementById("ipoday-friday")) {
+    const fb = d.friday_stocks, st = fb.stocks.slice().reverse();   // smallest contrib at bottom for barh
+    const bars = {
+      type: "bar", orientation: "h",
+      y: st.map((s) => s.ticker), x: st.map((s) => s.contrib_pct),
+      marker: { color: st.map((s) => (s.contrib_pct >= 0 ? GOOD : BAD)) },
+      customdata: st.map((s) => [s.weight_pct, s.ret_pct]),
+      hovertemplate: "%{y}: weight %{customdata[0]:.1f}% × return %{customdata[1]:+.2f}% = <b>%{x:+.3f}pp</b><extra></extra>",
+    };
+    Plotly.newPlot("ipoday-friday", [bars], baseLayout({
+      xaxis: { title: "contribution to Friday's public-basket return (pp)", ticksuffix: "pp", gridcolor: GRID, color: TEXT, zeroline: true, zerolinecolor: MUTED },
+      yaxis: { gridcolor: GRID, color: TEXT, tickfont: { size: 9 }, automargin: true },
+      showlegend: false, margin: { t: 30, r: 14, b: 42, l: 52 },
+      annotations: [{ x: 0, y: 1.04, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
+        text: "<b>Sum = +" + fb.basket_ret_pct + "%</b> public-basket return · TSLA alone ≈ +0.41pp · biggest drag SHOP only −0.10pp",
+        font: { color: TEXT, size: 11 } }],
+    }), plotConfig());
+    const fn = document.getElementById("ipoday-friday-note");
+    if (fn) fn.innerHTML = fb.note;
+  }
+
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;
   const src = document.getElementById("ipoday-source");
   if (src) src.innerHTML = "<span class='dim'>" + d.meta.assumptions + " " + d.meta.disclaimer + "</span>";
