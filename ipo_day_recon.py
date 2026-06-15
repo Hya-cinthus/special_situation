@@ -364,8 +364,12 @@ def build_payload():
                 a, b = hs[i - 1].get(key), hs[i].get(key)
                 if a is None or b is None:
                     continue
-                err = (b - a) / (LONG * hs[i]["nav_bptix"]) * 100      # % of NAV/share return
-                ser.append({"date": hs[i]["date"], "err_pct": round(err, 4)})
+                nav = hs[i]["nav_bptix"]
+                err = (b - a) / (LONG * nav) * 100                     # actual − predicted (deviation)
+                la, lb = hs[i - 1].get("long_pnl_ex_remark"), hs[i].get("long_pnl_ex_remark")
+                act = (lb - la) / (LONG * nav) * 100 if (la is not None and lb is not None) else None
+                ser.append({"date": hs[i]["date"], "err_pct": round(err, 4),
+                            "actual_pct": round(act, 4) if act is not None else None})   # basket pred = actual − err
                 if hs[i]["date"] == d1:
                     fri = round(err, 4)
             sd = statistics.pstdev([p["err_pct"] for p in ser]) if len(ser) > 1 else 0

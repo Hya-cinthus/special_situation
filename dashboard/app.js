@@ -336,45 +336,69 @@ function renderIpoDay(d) {
       pl.lev_nobuy + "×</b> (net cash) · BPTIX NAV $" + pl.nav_bptix + ". Hover any point for the fund's balance sheet under that buy.</span>";
   }
 
-  // ⑧ noise check: daily NAV-prediction error per basket, Friday highlighted
+  // ⑧ noise check: daily NAV-prediction error per basket, two views, Friday highlighted
   if (d.noise_compare && d.noise_compare.methods.length && document.getElementById("ipoday-noise")) {
     const nc = d.noise_compare, fri = nc.fri_date;
-    const drawNoise = (vi) => {
-      const m = nc.methods[vi], sd = m.daily_sd_pct;
-      const xs = m.series.map((p) => p.date), ys = m.series.map((p) => p.err_pct);
-      const cols = m.series.map((p) => (p.date === fri ? BAD : ACC));
-      const bars = {
-        x: xs, y: ys, type: "bar", marker: { color: cols },
-        hovertemplate: "%{x}<br>NAV-prediction error %{y:.3f}%<extra></extra>",
-      };
-      const band = (k, c) => ({ type: "rect", xref: "paper", yref: "y", x0: 0, x1: 1,
-        y0: -k * sd, y1: k * sd, fillcolor: c, line: { width: 0 }, layer: "below" });
-      Plotly.newPlot("ipoday-noise", [bars], baseLayout({
+    let curVi = nc.methods.findIndex((m) => m.is_central); if (curVi < 0) curVi = 0;
+    let curMode = "dev";   // "dev" = deviation bars; "cmp" = actual vs backed-out NAV
+    const drawNoise = () => {
+      const m = nc.methods[curVi], sd = m.daily_sd_pct, xs = m.series.map((p) => p.date);
+      let traces, shapes, yTitle;
+      if (curMode === "dev") {
+        const ys = m.series.map((p) => p.err_pct);
+        traces = [{ x: xs, y: ys, type: "bar", marker: { color: m.series.map((p) => (p.date === fri ? BAD : ACC)) },
+          hovertemplate: "%{x}<br>deviation (actual − predicted) %{y:.3f}%<extra></extra>" }];
+        const band = (k, c) => ({ type: "rect", xref: "paper", yref: "y", x0: 0, x1: 1,
+          y0: -k * sd, y1: k * sd, fillcolor: c, line: { width: 0 }, layer: "below" });
+        shapes = [band(2, "rgba(139,151,167,0.10)"), band(1, "rgba(139,151,167,0.16)"), hline(0, MUTED)];
+        yTitle = "daily deviation (actual − predicted)";
+      } else {
+        const act = m.series.map((p) => p.actual_pct), prd = m.series.map((p, i) => (p.actual_pct == null ? null : p.actual_pct - p.err_pct));
+        traces = [
+          { x: xs, y: act, type: "scatter", mode: "lines+markers", name: "actual NAV (ex re-mark)", line: { color: SPX, width: 2 }, marker: { size: 4 },
+            hovertemplate: "%{x}<br>actual %{y:.3f}%<extra></extra>" },
+          { x: xs, y: prd, type: "scatter", mode: "lines+markers", name: "basket backed-out NAV", line: { color: ACC, width: 2, dash: "dot" }, marker: { size: 4 },
+            hovertemplate: "%{x}<br>predicted %{y:.3f}%<extra></extra>" },
+        ];
+        shapes = [hline(0, MUTED)];
+        yTitle = "daily NAV contribution (ex re-mark)";
+      }
+      const friP = m.fri_pct || 0, friS = m.fri_sigma || 0;
+      Plotly.newPlot("ipoday-noise", traces, baseLayout({
         xaxis: { type: "date", gridcolor: GRID, color: TEXT },
-        yaxis: { title: "daily NAV-prediction error", ticksuffix: "%", gridcolor: GRID, color: TEXT, zeroline: true, zerolinecolor: GRID },
-        shapes: [band(2, "rgba(139,151,167,0.10)"), band(1, "rgba(139,151,167,0.16)"), hline(0, MUTED)],
-        showlegend: false, margin: { t: 30, r: 14, b: 40, l: 56 },
+        yaxis: { title: yTitle, ticksuffix: "%", gridcolor: GRID, color: TEXT, zeroline: true, zerolinecolor: GRID },
+        shapes: shapes, showlegend: curMode === "cmp",
+        legend: { orientation: "h", y: 1.12, font: { color: TEXT, size: 10 } },
+        margin: { t: 32, r: 14, b: 40, l: 58 },
         annotations: [
-          { x: 0, y: 1.06, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
-            text: "<b>" + m.label + "</b>: daily noise ±" + sd.toFixed(3) + "% (1σ) · <b>Fri " + (m.fri_pct || 0).toFixed(3) + "% = " + (m.fri_sigma || 0).toFixed(1) + "σ</b> " + (Math.abs(m.fri_sigma) <= 2 ? "→ NORMAL" : "→ (overfit basket)"),
+          { x: 0, y: 1.07, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
+            text: "<b>" + m.label + "</b>: daily noise ±" + sd.toFixed(3) + "% (1σ) · <b>Fri " + friP.toFixed(3) + "% = " + friS.toFixed(1) + "σ</b> " + (Math.abs(friS) <= 2 ? "→ NORMAL" : "→ (overfit)"),
             font: { color: TEXT, size: 11 } },
-          { x: fri, y: m.fri_pct, xref: "x", yref: "y", text: "Fri", showarrow: true, arrowcolor: BAD,
-            font: { color: BAD, size: 10 }, ax: 0, ay: 18 },
+          { x: fri, y: curMode === "dev" ? friP : (m.series.find((p) => p.date === fri) || {}).actual_pct, xref: "x", yref: "y",
+            text: "Fri −0.25%", showarrow: true, arrowcolor: BAD, font: { color: BAD, size: 10 }, ax: 0, ay: -22 },
         ],
       }), plotConfig());
     };
+    const styleBtns = (box, cur, attr) => box.querySelectorAll("button").forEach((b) => {
+      const on = +b.dataset[attr] === cur; b.style.background = on ? "#1d3350" : PLOT_BG; b.style.borderColor = on ? "#3a5d86" : GRID; });
+    const btn = (label, attr, val) =>
+      `<button data-${attr}="${val}" style="margin-right:6px;padding:3px 9px;background:${PLOT_BG};color:${TEXT};border:1px solid ${GRID};border-radius:5px;cursor:pointer;font-size:12px">${label}</button>`;
+    const vbox = document.getElementById("ipoday-noise-view");
+    vbox.innerHTML = btn("show deviation", "vm", 0) + btn("actual vs backed-out NAV", "vm", 1);
+    vbox.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+      curMode = b.dataset.vm === "1" ? "cmp" : "dev"; drawNoise();
+      vbox.querySelectorAll("button").forEach((x) => { const on = (x.dataset.vm === "1") === (curMode === "cmp"); x.style.background = on ? "#1d3350" : PLOT_BG; x.style.borderColor = on ? "#3a5d86" : GRID; });
+    }));
     const tn = document.getElementById("ipoday-noise-toggle");
     tn.innerHTML = nc.methods.map((m, i) =>
       `<button data-ni="${i}" style="margin-right:6px;padding:3px 9px;background:${m.is_central ? "#1d3350" : PLOT_BG};` +
-      `color:${TEXT};border:1px solid ${m.is_central ? "#3a5d86" : GRID};border-radius:5px;cursor:pointer;font-size:12px">` +
-      `${m.label}${m.is_central ? " ★" : ""}</button>`).join("");
+      `color:${TEXT};border:1px solid ${m.is_central ? "#3a5d86" : GRID};border-radius:5px;cursor:pointer;font-size:12px">${m.label}${m.is_central ? " ★" : ""}</button>`).join("");
     tn.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
-      drawNoise(+b.dataset.ni);
-      tn.querySelectorAll("button").forEach((x) => { x.style.background = PLOT_BG; x.style.borderColor = GRID; });
-      b.style.background = "#1d3350"; b.style.borderColor = "#3a5d86";
+      curVi = +b.dataset.ni; drawNoise(); styleBtns(tn, curVi, "ni");
     }));
-    const ci = nc.methods.findIndex((m) => m.is_central);
-    drawNoise(ci >= 0 ? ci : 0);
+    // init view-toggle highlight (deviation active)
+    vbox.querySelectorAll("button").forEach((x) => { const on = x.dataset.vm === "0"; x.style.background = on ? "#1d3350" : PLOT_BG; x.style.borderColor = on ? "#3a5d86" : GRID; });
+    drawNoise();
     const nn = document.getElementById("ipoday-noise-note");
     if (nn) nn.innerHTML = nc.note;
   }
