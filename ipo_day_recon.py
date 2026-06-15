@@ -253,6 +253,33 @@ def build_payload():
                     "only the 6/30 NPORT (share count) or a gross-vs-net leverage read settles it."),
     }
 
+    # --- (amount x avg-execution-price) locus for a SpaceX buy. The NAV pins
+    # C*(close/P - 1) = leftover(version) -> P(C) = close / (1 + leftover/C). One
+    # curve per weight version; the JS draws it with the day's range shaded so you
+    # can see where a buy is physically possible (P within the day's range).
+    locus_versions = []
+    for lab, _W in wsets:
+        rp = pub_by_version[lab]
+        lo = nav_g * aum0 - spx0_val * spx_ret - pub0 * rp
+        cmin = (abs(lo) / (spcx_ohlc["high"] / close_px - 1)) if spcx_ohlc else None
+        locus_versions.append({"label": "fund " + lab, "r_pub_pct": round(rp * 100, 3),
+                               "leftover_usd": round(lo),
+                               "min_plausible_buy_usd": round(cmin) if cmin else None,
+                               "is_central": lab == "5/31"})
+    cmin_c = next((v["min_plausible_buy_usd"] for v in locus_versions if v["is_central"]), None)
+    price_locus = {
+        "close_px": close_px, "ipo_px": ipo_px,
+        "intraday_high": spcx_ohlc["high"] if spcx_ohlc else None,
+        "intraday_low": spcx_ohlc["low"] if spcx_ohlc else None,
+        "net_flow_usd": round(inflow), "versions": locus_versions,
+        "note": ("Curve: avg price P(C) = close / (1 + leftover/C). The leftover is slightly negative, so P "
+                 "is always ABOVE the close — a buy is only physically real where P ≤ the day's high, i.e. "
+                 "C ≥ ~$" + (str(round((cmin_c or 0) / 1e6)) if cmin_c else "?") + "M (5/31); the bigger the buy, "
+                 "the closer the avg price sits to the $" + str(close_px) + " close. Net flow is fixed at +$"
+                 + str(round(inflow / 1e6)) + "M inflow, so a multi-$B buy must be funded by LEVERAGE (invisible "
+                 "to NAV & AUM), not subscriptions or selling. This is the one scenario the data can't exclude."),
+    }
+
     # detectability floor: buy that lifts NAV by more than the proxy noise band
     noise = abs(pub_hi - pub_lo) * (1 - w_spx0)         # NAV uncertainty from public proxy
     detect_floor = noise / spx_ret * aum1               # $ buy that would clear the noise
@@ -298,6 +325,7 @@ def build_payload():
         "bounds": bounds,
         "all_spacex": all_spacex,
         "funding": funding,
+        "price_locus": price_locus,
         "split_solve": {
             "rows": split_solve, "total_inflow_usd": total_inflow,
             "note": ("2 equations (NAV, AUM), 3 unknowns (X, B, public return) — so the split needs the "
