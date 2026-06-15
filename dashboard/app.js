@@ -163,6 +163,25 @@ function renderIpoDay(d) {
     `<tr style="font-weight:700;border-top:2px solid ${GRID}"><td>Actual NAV</td><td></td><td style="color:${GOOD}">${sd(t.actual_nav_pct)}</td></tr></tbody></table>` +
     `<p class="dim" style="margin-top:8px">Reverse-solving the actual NAV ⇒ implied SpaceX weight ${t.implied_spacex_weight_lo_pct}%–${t.implied_spacex_weight_hi_pct}% (vs ${t.spacex_weight_start_pct}% start) ⇒ implied add <b>${mUSD(t.implied_buy_lo_usd)} to ${mUSD(t.implied_buy_hi_usd)} ≈ 0</b>. A buy above ~${usd(t.detect_floor_usd)} would have cleared the proxy noise and shown up; it didn't.</p>`;
 
+  // ③ solve the split (X = SpaceX bought at IPO, B = neutral subscription)
+  if (d.split_solve) {
+    const ss = d.split_solve;
+    const rows = ss.rows.map((r) =>
+      `<tr><td>${r.label} (${r.r_pub_pct >= 0 ? "+" : ""}${r.r_pub_pct}%)</td>` +
+      `<td style="color:${r.spacex_ipo_buy_usd > 5e6 ? SPX : MUTED}"><b>${mUSD(r.spacex_ipo_buy_usd)}</b></td>` +
+      `<td>${mUSD(r.neutral_inflow_usd)}</td><td class="dim">${mUSD(r.total_in_usd)}</td></tr>`).join("");
+    document.getElementById("ipoday-split").innerHTML =
+      `<p>Split the new money into <b>X</b> = SpaceX bought at the $${sp.ipo_price} IPO (gains ${sd(sp.return_pct)} intraday) ` +
+      `+ <b>B</b> = neutral subscription priced at NAV (no intraday P&amp;L). Two equations:</p>` +
+      `<ul style="font-family:monospace;font-size:12px;line-height:1.7">` +
+      `<li><b>Eq1 (NAV):</b> +${g.nav_growth_pct}% = [SpaceX_end + Public_end + ${sp.return_pct}%·X] / ${(g.aum_prior / 1e9).toFixed(1)}B − 1 &nbsp;←&nbsp;<b>B drops out</b></li>` +
+      `<li><b>Eq2 (AUM):</b> ${(g.aum_reported / 1e9).toFixed(1)}B = SpaceX_end + Public_end + (1+${sp.return_pct}%)·X + B</li>` +
+      `</ul>` +
+      `<p>2 equations, 3 unknowns (X, B, public return) → fix the public return, solve (X, B):</p>` +
+      `<table class="data"><thead><tr><th>assumed public return</th><th>X — SpaceX at IPO</th><th>B — neutral new money</th><th>total in</th></tr></thead><tbody>${rows}</tbody></table>` +
+      `<p class="dim" style="margin-top:8px">Total new cash <b>${usd(ss.total_inflow_usd)}</b> is pinned regardless of the split. The IPO-buy share <b>X brackets ~0</b> (about −$272M to +$209M), capped far under the $1B order; <b>B (neutral subscriptions) is the larger part.</b> The split can't be pinned tighter without the exact public-basket return — but a large IPO buy is ruled out either way.</p>`;
+  }
+
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;
   const src = document.getElementById("ipoday-source");
   if (src) src.innerHTML = "<span class='dim'>" + d.meta.assumptions + " " + d.meta.disclaimer + "</span>";

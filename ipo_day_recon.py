@@ -103,6 +103,26 @@ def build_payload():
              "nav_would_be_pct": round((nav_g + x * spx_ret / aum1) * 100, 2)}
             for x in (0.322e9, 0.645e9, 1.0e9)]
 
+    # --- Solve the 2-eq system: split new money into X (SpaceX bought at the IPO
+    # price, gains intraday) + B (neutral subscription at NAV, no intraday P&L).
+    # Forward pricing => B drops out of the NAV equation; only X lifts NAV. With
+    # r_pub fixed: X from NAV eq, B from AUM eq. Total X+B is pinned ~ the inflow.
+    pub0 = aum0 - spx0_val
+
+    def _solve(rp):
+        X = (aum0 * (1 + nav_g) - spx1_val - pub0 * (1 + rp)) / spx_ret
+        B = aum1 - spx1_val - pub0 * (1 + rp) - (1 + spx_ret) * X
+        return X, B
+
+    pub_mid = (pub_lo + pub_hi) / 2
+    split_solve = []
+    for lab, rp in [("public equal-weight", pub_e), ("public mid", pub_mid), ("public 5/31-weighted", pub_w)]:
+        X, B = _solve(rp)
+        split_solve.append({"label": lab, "r_pub_pct": round(rp * 100, 3),
+                            "spacex_ipo_buy_usd": round(X), "neutral_inflow_usd": round(B),
+                            "total_in_usd": round(X + B)})
+    total_inflow = round(sum(s["total_in_usd"] for s in split_solve) / len(split_solve))
+
     # detectability floor: buy that lifts NAV by more than the proxy noise band
     noise = abs(pub_hi - pub_lo) * (1 - w_spx0)         # NAV uncertainty from public proxy
     detect_floor = noise / spx_ret * aum1               # $ buy that would clear the noise
@@ -142,6 +162,12 @@ def build_payload():
             "detect_floor_usd": round(detect_floor),
         },
         "buy_scenarios": scen,
+        "split_solve": {
+            "rows": split_solve, "total_inflow_usd": total_inflow,
+            "note": ("2 equations (NAV, AUM), 3 unknowns (X, B, public return) — so the split needs the "
+                     "public-basket return fixed. Total new cash X+B is pinned ~$%.0fM regardless; only the "
+                     "IPO-buy share X moves with the public assumption, and it brackets ~0." % (total_inflow / 1e6)),
+        },
         "spacex_value": {"prior_usd": round(spx0_val), "current_usd": round(spx1_val),
                          "weight_now_pct": round(spx1_val / aum1 * 100, 2)},
         "conclusion": (
