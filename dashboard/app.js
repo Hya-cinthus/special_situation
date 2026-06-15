@@ -483,24 +483,35 @@ function renderIpoDay(d) {
       yaxis: { gridcolor: GRID, color: TEXT, tickfont: { size: 9 }, automargin: true },
       legend: { orientation: "h", y: 1.03, font: { color: TEXT, size: 10 } }, margin: { t: 28, r: 12, b: 42, l: 52 },
     }), plotConfig());
-    // cluster: each perfect fit's Friday public-contribution prediction (strip) + actual
-    const cl = bf.cluster, pts = cl.fri_points;
-    const ctr = [{ type: "scatter", mode: "markers", x: pts, y: pts.map((_, i) => (i % 7) - 3),
-      marker: { color: SPX, size: 7, opacity: 0.55 },
-      hovertemplate: "a perfect fit → Friday public +%{x:.2f}%<extra></extra>" }];
-    Plotly.newPlot("ipoday-bestfit-cluster", ctr, baseLayout({
-      xaxis: { title: "Friday public-contribution prediction (% of NAV)", ticksuffix: "%", gridcolor: GRID, color: TEXT },
-      yaxis: { visible: false, range: [-6, 6] }, showlegend: false, margin: { t: 26, r: 12, b: 42, l: 12 },
-      shapes: [
-        { type: "line", x0: cl.fri_actual, x1: cl.fri_actual, yref: "paper", y0: 0, y1: 1, line: { color: GOOD, width: 2 } },
-        { type: "line", x0: cl.fri_mean, x1: cl.fri_mean, yref: "paper", y0: 0, y1: 1, line: { color: ACC, width: 1, dash: "dot" } },
-      ],
-      annotations: [
-        { x: cl.fri_actual, y: 1.0, yref: "paper", text: "actual +" + cl.fri_actual + "%", font: { color: GOOD, size: 10 }, showarrow: false, yanchor: "bottom" },
-        { x: 0, y: 1.12, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
-          text: "<b>" + cl.n + " perfect fits cluster at +" + cl.fri_mean + "% (range +" + cl.fri_min + "% to +" + cl.fri_max + "%)</b> — the actual falls INSIDE → no buy needed", font: { color: TEXT, size: 11 } },
-      ],
-    }), plotConfig());
+    // cluster: interactive X/Y scatter — each dot is one perfect fit; toggle any axis
+    const cl = bf.cluster, feats = bf.ensemble_features || [], opts = bf.axis_options || [];
+    if (feats.length && opts.length) {
+      const getV = (f, key) => (key.indexOf("w:") === 0 ? (f.w[key.slice(2)] || 0) : f[key]);
+      const optLabel = (k) => ((opts.find((o) => o.key === k) || {}).label || k);
+      let xKey = "dist_5_31", yKey = "friday_resid";
+      const drawScatter = () => {
+        const sc = [{ type: "scatter", mode: "markers", x: feats.map((f) => getV(f, xKey)), y: feats.map((f) => getV(f, yKey)),
+          marker: { size: 9, color: feats.map((f) => f.friday_resid), colorscale: [[0, BAD], [0.5, MUTED], [1, GOOD]], cmid: 0,
+            showscale: true, colorbar: { title: { text: "Fri resid %", side: "right" }, thickness: 10, len: 0.7, tickfont: { size: 9, color: TEXT } },
+            line: { width: 0.5, color: "#0e1117" } },
+          hovertemplate: optLabel(xKey) + " %{x:.2f}<br>" + optLabel(yKey) + " %{y:.2f}<extra></extra>" }];
+        Plotly.newPlot("ipoday-bestfit-cluster", sc, baseLayout({
+          xaxis: { title: optLabel(xKey), gridcolor: GRID, color: TEXT },
+          yaxis: { title: optLabel(yKey), gridcolor: GRID, color: TEXT },
+          shapes: yKey === "friday_resid" ? [hline(0, GOOD)] : [], showlegend: false, margin: { t: 16, r: 12, b: 46, l: 60 },
+        }), plotConfig());
+      };
+      const sel = (id, cur) => `<select id="${id}" style="background:${PLOT_BG};color:${TEXT};border:1px solid ${GRID};border-radius:4px;padding:2px 6px;font-size:12px">` +
+        opts.map((o) => `<option value="${o.key}"${o.key === cur ? " selected" : ""}>${o.label}</option>`).join("") + "</select>";
+      const axbox = document.getElementById("ipoday-bestfit-axes");
+      if (axbox) {
+        axbox.innerHTML = `<span class="dim">Y:</span> ${sel("bf-y", yKey)} &nbsp; <span class="dim">X:</span> ${sel("bf-x", xKey)} ` +
+          `&nbsp;<span class="dim">color = Friday residual (red = fit over-predicts → no buy; green = under → would need a buy). ${cl.n} fits, all perfect in-sample. TSLA pinned ~24–28%; ${(cl.free || []).slice(0, 4).join("/")}… are free.</span>`;
+        document.getElementById("bf-y").addEventListener("change", (e) => { yKey = e.target.value; drawScatter(); });
+        document.getElementById("bf-x").addEventListener("change", (e) => { xKey = e.target.value; drawScatter(); });
+      }
+      drawScatter();
+    }
     const rs = bf.resid_series, fri = d.noise_compare ? d.noise_compare.fri_date : "2026-06-12";
     const rtr = { type: "bar", x: rs.map((p) => p.date), y: rs.map((p) => p.resid_pct),
       marker: { color: rs.map((p) => (p.date === fri ? BAD : GOOD)) },

@@ -549,6 +549,27 @@ def build_payload():
             "pinned": [w["ticker"] for w in wstats if w["span_pp"] < 3],
             "free": [w["ticker"] for w in wstats if w["span_pp"] > 6],
         }
+        # per-fit feature vectors for the interactive X/Y cluster scatter
+        fri_act = cluster["fri_actual"] or 0
+        disc3 = {t: fund_snapshots.WEIGHTS_3_31.get(t, 0) for t in fit_names}; s3 = sum(disc3.values()) or 1
+        disc4 = {t: fund_snapshots.WEIGHTS_4_30.get(t, 0) for t in fit_names}; s4 = sum(disc4.values()) or 1
+        ens_features = []
+        for idx in range(len(ens)):
+            gw = ens_w[idx]
+            wd = {fit_names[j].replace("-", "/"): round(gw[j] * 100, 2) for j in range(nF)}
+            fp_i = _fripred(ens[idx]) or 0
+            ens_features.append({
+                "friday_pred": round(fp_i, 3), "friday_resid": round(fri_act - fp_i, 3),
+                "dist_3_31": round(sum(abs(gw[j] - disc3[fit_names[j]] / s3) for j in range(nF)) * 100, 1),
+                "dist_4_30": round(sum(abs(gw[j] - disc4[fit_names[j]] / s4) for j in range(nF)) * 100, 1),
+                "dist_5_31": round(sum(abs(gw[j] - disc_norm[fit_names[j]]) for j in range(nF)) * 100, 1),
+                "w": wd})
+        axis_options = ([{"key": "friday_resid", "label": "Friday residual (% NAV)"},
+                         {"key": "friday_pred", "label": "Friday public pred (% NAV)"},
+                         {"key": "dist_5_31", "label": "L1 dist from 5/31 (pp)"},
+                         {"key": "dist_4_30", "label": "L1 dist from 4/30 (pp)"},
+                         {"key": "dist_3_31", "label": "L1 dist from 3/31 (pp)"}]
+                        + [{"key": "w:" + w["ticker"], "label": w["ticker"] + " wt (%)"} for w in wstats])
         best_fit = {
             "in_sample_rms_pct": round(in_rms, 4), "friday_resid_pct": fri_res,
             "n_obs": len(insample), "n_stocks": nF,
@@ -556,6 +577,7 @@ def build_payload():
             "disclosed_friday_resid_pct": next((m["fri_pct"] for m in nc_methods if m.get("is_central")), None),
             "weights": wtbl, "weight_stats": wstats, "cluster": cluster, "resid_series": resid,
             "ensemble": {"tickers": fit_names, "fits": [[round(w, 5) for w in ew] for ew in ens_w]},
+            "ensemble_features": ens_features, "axis_options": axis_options,
             "note": ("Free NNLS reweight of the 23 stocks, fit to 5/20–6/11 ONLY (Friday held out). It nails "
                      "the history perfectly (in-sample RMS " + str(round(in_rms, 3)) + "%) — but with 15 days vs "
                      "23 stocks the perfect fit is NON-UNIQUE (3 different perfect fits predict Friday's public "
