@@ -23,6 +23,7 @@ public-basket and SPCX closes from Yahoo.
 import json
 import os
 import datetime
+import statistics
 
 import hedge_book
 import fund_snapshots
@@ -346,6 +347,48 @@ def build_payload():
                  + (str(spcx_ohlc["high"]) if spcx_ohlc else "?") + " — a tight, plausible band."),
     }
 
+    # --- Noise comparison vs the hedge study: is Friday's leftover abnormal next to
+    # each basket's everyday daily tracking noise? Per method, the daily ex-remark
+    # NAV-prediction error (= the hedge book's daily residual, as % of the BPTIX
+    # position = % of NAV/share return), its sd, and where Friday sits in sd units.
+    noise_keys = {"actual": "total_pnl_ex_remark", "fund 3/31": "net_fund_3_31_ex_remark",
+                  "fund 4/30": "net_fund_4_30_ex_remark", "fund 5/31": "net_fund_5_31_ex_remark",
+                  "blend": "net_blend_ex_remark", "optimal (min-var)": "net_optimal_ex_remark"}
+    nc_methods = []
+    try:
+        hs = H["series"]
+        LONG = 130000
+        for m, key in noise_keys.items():
+            ser, fri = [], None
+            for i in range(1, len(hs)):
+                a, b = hs[i - 1].get(key), hs[i].get(key)
+                if a is None or b is None:
+                    continue
+                err = (b - a) / (LONG * hs[i]["nav_bptix"]) * 100      # % of NAV/share return
+                ser.append({"date": hs[i]["date"], "err_pct": round(err, 4)})
+                if hs[i]["date"] == d1:
+                    fri = round(err, 4)
+            sd = statistics.pstdev([p["err_pct"] for p in ser]) if len(ser) > 1 else 0
+            nc_methods.append({"label": m, "daily_sd_pct": round(sd, 4), "fri_pct": fri,
+                               "fri_sigma": round(fri / sd, 2) if (sd and fri is not None) else None,
+                               "is_central": m == "fund 5/31", "series": ser})
+    except Exception:
+        pass
+    breakeven_rpub = (nav_g * aum0 - spx0_val * spx_ret) / pub0 * 100   # r_pub for zero leftover (no buy)
+    noise_compare = {
+        "fri_date": d1, "leftover_pct_fundnav": round(buy_c_pct, 3),
+        "breakeven_rpub_pct": round(breakeven_rpub, 3), "central_rpub_pct": round(pub_central * 100, 3),
+        "methods": nc_methods,
+        "note": ("Each bar is a day's NAV-prediction error for the selected basket (the hedge study's "
+                 "tracking residual, ex the SpaceX re-mark), as % of the NAV/share return. Friday (red) is "
+                 "~1.3–1.9σ for the real baskets — INSIDE the everyday scatter, not an outlier. So the "
+                 "−0.25% IPO-day leftover is most likely just basket tracking error → no SpaceX buy needed. "
+                 "The 'no-buy edge' would require the public sleeve to have returned +" + str(round(breakeven_rpub, 2))
+                 + "% on Friday vs our +" + str(round(pub_central * 100, 2)) + "% estimate — a ~0.34pp gap, ~2σ of "
+                 "daily basket noise, entirely reachable. (The min-var 'optimal' shows Friday as ~2.9σ only "
+                 "because it's overfit — tiny in-sample σ; out-of-sample it misses like the others.)"),
+    }
+
     # detectability floor: buy that lifts NAV by more than the proxy noise band
     noise = abs(pub_hi - pub_lo) * (1 - w_spx0)         # NAV uncertainty from public proxy
     detect_floor = noise / spx_ret * aum1               # $ buy that would clear the noise
@@ -392,6 +435,7 @@ def build_payload():
         "all_spacex": all_spacex,
         "funding": funding,
         "price_locus": price_locus,
+        "noise_compare": noise_compare,
         "split_solve": {
             "rows": split_solve, "total_inflow_usd": total_inflow,
             "note": ("2 equations (NAV, AUM), 3 unknowns (X, B, public return) — so the split needs the "

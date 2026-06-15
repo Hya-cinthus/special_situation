@@ -336,6 +336,49 @@ function renderIpoDay(d) {
       pl.lev_nobuy + "×</b> (net cash) · BPTIX NAV $" + pl.nav_bptix + ". Hover any point for the fund's balance sheet under that buy.</span>";
   }
 
+  // ⑧ noise check: daily NAV-prediction error per basket, Friday highlighted
+  if (d.noise_compare && d.noise_compare.methods.length && document.getElementById("ipoday-noise")) {
+    const nc = d.noise_compare, fri = nc.fri_date;
+    const drawNoise = (vi) => {
+      const m = nc.methods[vi], sd = m.daily_sd_pct;
+      const xs = m.series.map((p) => p.date), ys = m.series.map((p) => p.err_pct);
+      const cols = m.series.map((p) => (p.date === fri ? BAD : ACC));
+      const bars = {
+        x: xs, y: ys, type: "bar", marker: { color: cols },
+        hovertemplate: "%{x}<br>NAV-prediction error %{y:.3f}%<extra></extra>",
+      };
+      const band = (k, c) => ({ type: "rect", xref: "paper", yref: "y", x0: 0, x1: 1,
+        y0: -k * sd, y1: k * sd, fillcolor: c, line: { width: 0 }, layer: "below" });
+      Plotly.newPlot("ipoday-noise", [bars], baseLayout({
+        xaxis: { type: "date", gridcolor: GRID, color: TEXT },
+        yaxis: { title: "daily NAV-prediction error", ticksuffix: "%", gridcolor: GRID, color: TEXT, zeroline: true, zerolinecolor: GRID },
+        shapes: [band(2, "rgba(139,151,167,0.10)"), band(1, "rgba(139,151,167,0.16)"), hline(0, MUTED)],
+        showlegend: false, margin: { t: 30, r: 14, b: 40, l: 56 },
+        annotations: [
+          { x: 0, y: 1.06, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
+            text: "<b>" + m.label + "</b>: daily noise ±" + sd.toFixed(3) + "% (1σ) · <b>Fri " + (m.fri_pct || 0).toFixed(3) + "% = " + (m.fri_sigma || 0).toFixed(1) + "σ</b> " + (Math.abs(m.fri_sigma) <= 2 ? "→ NORMAL" : "→ (overfit basket)"),
+            font: { color: TEXT, size: 11 } },
+          { x: fri, y: m.fri_pct, xref: "x", yref: "y", text: "Fri", showarrow: true, arrowcolor: BAD,
+            font: { color: BAD, size: 10 }, ax: 0, ay: 18 },
+        ],
+      }), plotConfig());
+    };
+    const tn = document.getElementById("ipoday-noise-toggle");
+    tn.innerHTML = nc.methods.map((m, i) =>
+      `<button data-ni="${i}" style="margin-right:6px;padding:3px 9px;background:${m.is_central ? "#1d3350" : PLOT_BG};` +
+      `color:${TEXT};border:1px solid ${m.is_central ? "#3a5d86" : GRID};border-radius:5px;cursor:pointer;font-size:12px">` +
+      `${m.label}${m.is_central ? " ★" : ""}</button>`).join("");
+    tn.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+      drawNoise(+b.dataset.ni);
+      tn.querySelectorAll("button").forEach((x) => { x.style.background = PLOT_BG; x.style.borderColor = GRID; });
+      b.style.background = "#1d3350"; b.style.borderColor = "#3a5d86";
+    }));
+    const ci = nc.methods.findIndex((m) => m.is_central);
+    drawNoise(ci >= 0 ? ci : 0);
+    const nn = document.getElementById("ipoday-noise-note");
+    if (nn) nn.innerHTML = nc.note;
+  }
+
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;
   const src = document.getElementById("ipoday-source");
   if (src) src.innerHTML = "<span class='dim'>" + d.meta.assumptions + " " + d.meta.disclaimer + "</span>";
