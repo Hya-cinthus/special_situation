@@ -210,6 +210,38 @@ function renderIpoDay(d) {
       `<p style="margin-top:6px">${b.summary}</p>`;
   }
 
+  // ⑤ all-SpaceX counter-test: implied execution price
+  if (d.all_spacex) {
+    const a = d.all_spacex, io = a.intraday;
+    const arows = a.rows.map((r) =>
+      `<tr><td>${r.label} (r_pub ${r.r_pub_pct >= 0 ? "+" : ""}${r.r_pub_pct}%)</td>` +
+      `<td style="color:${r.above_intraday_high ? BAD : SPX}"><b>$${r.exec_price.toFixed(2)}</b></td>` +
+      `<td>+${r.premium_to_close_pct}% vs close</td>` +
+      `<td style="color:${r.above_intraday_high ? BAD : MUTED}">${r.above_intraday_high ? "above the day's high — impossible" : "within range"}</td></tr>`).join("");
+    document.getElementById("ipoday-allspx").innerHTML =
+      `<p>Flip it around: force <b>every new dollar to be SpaceX</b> (no neutral money, no selling). Cash spent = the ${usd(a.cash_spent_usd)} inflow (pinned). What average execution price matches <b>both</b> the NAV and the AUM?</p>` +
+      (io ? `<p class="dim">SPCX on ${d.meta.date}: open $${io.open}, <b>high $${io.high}</b>, low $${io.low}, close $${io.close}.</p>` : "") +
+      `<table class="data"><thead><tr><th>weight version</th><th>implied avg exec price</th><th>premium</th><th>plausible?</th></tr></thead><tbody>${arows}</tbody></table>` +
+      `<p style="margin-top:8px">${a.summary}</p>`;
+  }
+
+  // ⑥ funding channels & leverage
+  if (d.funding) {
+    const f = d.funding;
+    const frows = f.channels.map((c) => {
+      const visible = /invisible/i.test(c.at_market_buy);
+      return `<tr><td><b>${c.funding}</b></td>` +
+        `<td style="color:${BAD}">${c.cheap_buy}</td>` +
+        `<td style="color:${visible ? WARN : MUTED}">${c.at_market_buy}</td></tr>`;
+    }).join("");
+    const lev = f.hist_leverage;
+    document.getElementById("ipoday-funding").innerHTML =
+      `<p>Now add <b>leverage</b>, and use the fact that Baron <b>never sells</b> (positions keep rising). Any SpaceX add must be funded by <b>subscriptions or borrowing</b>, not by selling. How visible is each?</p>` +
+      `<table class="data"><thead><tr><th>funding source</th><th>cheap / IPO-price buy</th><th>at-market buy</th></tr></thead><tbody>${frows}</tbody></table>` +
+      `<p class="dim" style="margin-top:8px">Net AUM <b>${usd(f.net_aum_usd)}</b>; mandate allows borrowing up to 1/3 of gross → gross up to <b>${usd(f.gross_cap_usd)}</b> (1.5×), borrow up to <b>${usd(f.borrow_cap_usd)}</b>. Historical leverage: 3/31 ${lev["2026-03-31"]}× → 4/30 ${lev["2026-04-30"]}× → 5/31 <b>${lev["2026-05-31"]}× (net cash)</b>. Plenty of room to re-lever invisibly.</p>` +
+      `<p style="margin-top:6px">${f.summary}</p>`;
+  }
+
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;
   const src = document.getElementById("ipoday-source");
   if (src) src.innerHTML = "<span class='dim'>" + d.meta.assumptions + " " + d.meta.disclaimer + "</span>";

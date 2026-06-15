@@ -37,6 +37,29 @@ def _two_anchor_days(sbx):
     return (pts[-2], pts[-1]) if len(pts) >= 2 else (None, None)
 
 
+def _ohlc(tk, day):
+    """Yahoo OHLC for one ticker on one date (for the SPCX intraday range)."""
+    import urllib.request
+
+    def ep(x):
+        return int(datetime.datetime.strptime(x, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc).timestamp())
+    lo = (datetime.date.fromisoformat(day) - datetime.timedelta(days=2)).isoformat()
+    hi = (datetime.date.fromisoformat(day) + datetime.timedelta(days=2)).isoformat()
+    u = (f"https://query1.finance.yahoo.com/v8/finance/chart/{tk}"
+         f"?period1={ep(lo)}&period2={ep(hi)}&interval=1d")
+    try:
+        j = json.loads(urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"}), timeout=30).read())
+        r = j["chart"]["result"][0]
+        q = r["indicators"]["quote"][0]
+        for i, t in enumerate(r["timestamp"]):
+            if datetime.datetime.fromtimestamp(t, datetime.timezone.utc).date().isoformat() == day:
+                return {"open": round(q["open"][i], 2), "high": round(q["high"][i], 2),
+                        "low": round(q["low"][i], 2), "close": round(q["close"][i], 2)}
+    except Exception:
+        pass
+    return None
+
+
 def build_payload():
     sbx = json.load(open(os.path.join(_REPO_ROOT, "dashboard", "data", "spacex_baron.json"), encoding="utf-8"))
     prev, cur = _two_anchor_days(sbx)
@@ -167,6 +190,69 @@ def build_payload():
                     % (leftover / 1e6, close_px, total_inflow / 1e6, total_inflow / 1e6)),
     }
 
+    # --- All-SpaceX counter-test: force B=0 (every new dollar buys SpaceX). Cash
+    # spent C = the inflow (pinned); closing value V = aum1 - existing marked. The
+    # implied avg execution price P = C * close / V. If the actual NAV sits BELOW
+    # the no-add line, the buy must lose intraday -> P lands ABOVE the close.
+    spcx_ohlc = _ohlc("SPCX", d1)
+    allspx_rows = []
+    for lab, _W in wsets:
+        rp = pub_by_version[lab]
+        V = aum1 - spx1_val - pub0 * (1 + rp)           # closing value of the new SpaceX
+        P = inflow * close_px / V if V else None
+        allspx_rows.append({"label": "fund " + lab, "r_pub_pct": round(rp * 100, 3),
+                            "exec_price": round(P, 2) if P else None,
+                            "premium_to_close_pct": round((P / close_px - 1) * 100, 1) if P else None,
+                            "above_intraday_high": bool(spcx_ohlc and P and P > spcx_ohlc["high"])})
+    p_lo = min(r["exec_price"] for r in allspx_rows)
+    p_hi = max(r["exec_price"] for r in allspx_rows)
+    all_spacex = {
+        "cash_spent_usd": round(inflow), "close_px": close_px, "intraday": spcx_ohlc,
+        "rows": allspx_rows, "exec_price_lo": p_lo, "exec_price_hi": p_hi,
+        "summary": ("Force B=0 — every new dollar buys SpaceX. Cash spent = the ${:.0f}M inflow (pinned); "
+                    "to match BOTH the NAV and the AUM the average execution price must be ${:.0f}-${:.0f} "
+                    "— ABOVE the ${:.2f} close{}. The day's range was only ${}-${}, so that's impossible "
+                    "(you can't buy above the high). The reason is counter-intuitive: the actual NAV sits "
+                    "slightly BELOW the no-add line, so any SpaceX added must LOSE intraday — i.e. be bought "
+                    "ABOVE the close, not cheaply. This rules out 'all the new money was a SpaceX buy' and "
+                    "is the opposite of a cheap grab. The only buy that fits the data is one made AT the "
+                    "close (≈0 P&L, invisible), up to the ~${:.0f}M cash.").format(
+                        inflow / 1e6, p_lo, p_hi, close_px,
+                        (" and even above the $%.2f intraday high" % spcx_ohlc["high"]) if spcx_ohlc else "",
+                        ("%.2f" % spcx_ohlc["low"]) if spcx_ohlc else "?",
+                        ("%.2f" % spcx_ohlc["high"]) if spcx_ohlc else "?",
+                        inflow / 1e6),
+    }
+
+    # --- Funding channels incl. LEVERAGE. Given Baron's never-sell style, any add is
+    # funded by subscriptions or borrowing, not by selling. Leverage opens a channel
+    # invisible to BOTH NAV and AUM (only the gross/net ratio moves) -> the real upper
+    # bound on an undetectable at-market add is the borrow cap, not the inflow.
+    borrow_cap = aum1 * 0.5            # mandate: borrow up to 1/3 of gross -> gross <= 1.5x net
+    funding = {
+        "net_aum_usd": aum1, "borrow_cap_usd": round(borrow_cap), "gross_cap_usd": round(aum1 * 1.5),
+        "subscription_cap_usd": round(inflow),
+        "hist_leverage": {"2026-03-31": 1.134, "2026-04-30": 1.071, "2026-05-31": 0.968},
+        "channels": [
+            {"funding": "New subscriptions", "cheap_buy": "ruled out (NAV would spike)",
+             "at_market_buy": "visible in AUM (≤ ~$" + str(round(inflow / 1e6)) + "M inflow); NAV-neutral"},
+            {"funding": "Leverage (borrow)", "cheap_buy": "ruled out (NAV would spike)",
+             "at_market_buy": "INVISIBLE to NAV & AUM — only gross/net moves; up to ~$" + str(round(borrow_cap / 1e9, 1)) + "B"},
+            {"funding": "Sell old holdings", "cheap_buy": "excluded", "at_market_buy": "excluded — Baron's never-sell style"},
+        ],
+        "summary": ("Nothing extreme actually happened: the +" + str(round(nav_g * 100, 1)) + "% NAV is almost "
+                    "entirely the existing SpaceX re-marking +" + str(int(round(spx_ret * 100))) + "% (+"
+                    + str(round(w_spx0 * spx_ret * 100, 1)) + "% on its own) plus ~+0.7% public; the leftover "
+                    "is only ~−0.25% (model noise — public-return estimate, a possible small lockup mark-discount, "
+                    "or cash). The 'extreme' $" + str(p_lo) + "–$" + str(p_hi) + " price in 5 only appears because "
+                    "a tiny ~−$47M residual is forced onto a small buy. With leverage in play: Baron never sells, "
+                    "so any add is funded by subscriptions OR borrowing. A cheap / IPO-priced add is ruled out "
+                    "under every funding (it spikes NAV). An at-market add is NAV-neutral, and if funded by "
+                    "leverage it is AUM-neutral too — invisible up to the ~$" + str(round(borrow_cap / 1e9, 1))
+                    + "B borrow cap. So one day of NAV+AUM CANNOT rule out a sizeable at-market leveraged add; "
+                    "only the 6/30 NPORT (share count) or a gross-vs-net leverage read settles it."),
+    }
+
     # detectability floor: buy that lifts NAV by more than the proxy noise band
     noise = abs(pub_hi - pub_lo) * (1 - w_spx0)         # NAV uncertainty from public proxy
     detect_floor = noise / spx_ret * aum1               # $ buy that would clear the noise
@@ -210,6 +296,8 @@ def build_payload():
         },
         "buy_scenarios": scen,
         "bounds": bounds,
+        "all_spacex": all_spacex,
+        "funding": funding,
         "split_solve": {
             "rows": split_solve, "total_inflow_usd": total_inflow,
             "note": ("2 equations (NAV, AUM), 3 unknowns (X, B, public return) — so the split needs the "
