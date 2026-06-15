@@ -187,6 +187,29 @@ function renderIpoDay(d) {
       `<p class="dim" style="margin-top:8px">Total new cash <b>${usd(ss.total_inflow_usd)}</b> is pinned regardless of the version. <b>X is negative in all three</b> (${mUSD(buyMin)} to ${mUSD(buyMax)}) — i.e. <b>no SpaceX added</b> at the IPO; neutral subscriptions B absorb the inflow. 5/31 (freshest) is the central estimate; the 3/31→5/31 spread is the band. A large IPO buy is firmly ruled out.</p>`;
   }
 
+  // ④ bound a buy at an unknown price
+  if (d.bounds) {
+    const b = d.bounds;
+    const brows = b.rows.map((r) => {
+      const mb = r.max_buy_usd == null ? "<b>unbounded</b> (cash only)" : mUSD(r.max_buy_usd);
+      const col = r.max_buy_usd == null ? GOOD : (r.max_buy_usd < 0 ? BAD : SPX);
+      return `<tr><td>$${r.price.toFixed(2)}</td><td>${r.ret_pct >= 0 ? "+" : ""}${r.ret_pct}%</td>` +
+        `<td style="color:${col}">${mb}</td><td class="dim">${r.verdict}</td></tr>`;
+    }).join("");
+    document.getElementById("ipoday-bounds").innerHTML =
+      `<p>Now drop the assumption that any buy was at the $${b.ipo_px} IPO price — suppose they bought SpaceX ` +
+      `<b>in the market at an unknown price</b>, closing $${b.close_px}. The NAV pins the trade's <b>P&amp;L</b> ` +
+      `(≈ ${mUSD(b.leftover_trading_pnl_usd)}, basically zero), <b>not its size</b>. Max buy consistent with the NAV, by price:</p>` +
+      `<table class="data"><thead><tr><th>buy price</th><th>intraday return</th><th>max buy vs NAV</th><th>verdict</th></tr></thead><tbody>${brows}</tbody></table>` +
+      `<p style="margin-top:8px"><b>The boundary:</b></p><ul>` +
+      `<li><b style="color:${BAD}">Cheap / at-IPO buy → ruled out</b> (≈$0): any buy below the close gains intraday and would push NAV <i>above</i> the actual ${sd(t.actual_nav_pct)}.</li>` +
+      `<li><b style="color:${GOOD}">At-the-close buy → invisible</b>: ~0 intraday P&amp;L, identical to a cash subscription. Bounded only by the ~${usd(b.cash_funded_max_usd)} of new cash (more if funded by selling public).</li>` +
+      `<li><b>Above-the-close buy → large but unlikely</b>: only if they chased the intraday high.</li>` +
+      `</ul>` +
+      `<p class="dim" style="margin-top:6px"><b>Mechanics:</b> ${b.mechanics}</p>` +
+      `<p style="margin-top:6px">${b.summary}</p>`;
+  }
+
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;
   const src = document.getElementById("ipoday-source");
   if (src) src.innerHTML = "<span class='dim'>" + d.meta.assumptions + " " + d.meta.disclaimer + "</span>";

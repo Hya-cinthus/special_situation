@@ -133,6 +133,40 @@ def build_payload():
                             "total_in_usd": round(X + B), "is_central": lab == "5/31"})
     total_inflow = round(sum(s["total_in_usd"] for s in split_solve) / len(split_solve))
 
+    # --- Boundary: a SpaceX buy at an UNKNOWN price. The NAV pins the trade's P&L
+    # (= the small leftover), NOT its size. Bound the buy across extreme prices: a
+    # buy below the close gains intraday (would lift NAV -> ruled out beyond ~0); a
+    # buy AT the close has 0 P&L -> invisible to NAV (limited only by available cash).
+    g_actual = nav_g * aum0
+    g_spx_exist = spx0_val * spx_ret
+    leftover = g_actual - g_spx_exist - pub0 * pub_central    # ~ -$47M
+    close_px, ipo_px = spx_px_new, spx_px_old
+    bound_rows = []
+    for P in (ipo_px, round((ipo_px + close_px) / 2, 2), close_px,
+              round(close_px * 1.025, 2), round(close_px * 1.12, 2)):
+        ret = close_px / P - 1
+        if abs(ret) < 1e-4:
+            bound_rows.append({"price": P, "ret_pct": 0.0, "max_buy_usd": None,
+                               "verdict": "invisible to NAV (0 intraday P&L) — limited only by cash"})
+        else:
+            C = leftover / ret
+            bound_rows.append({"price": P, "ret_pct": round(ret * 100, 1), "max_buy_usd": round(C),
+                               "verdict": "ruled out (a gain would push NAV above actual)" if C < 0 else "consistent"})
+    bounds = {
+        "leftover_trading_pnl_usd": round(leftover), "close_px": close_px, "ipo_px": ipo_px,
+        "cash_funded_max_usd": total_inflow, "rows": bound_rows,
+        "mechanics": ("Forward pricing: same-day subscriptions strike at the CLOSING NAV, so they don't "
+                      "dilute or drag that day's per-share NAV; the cash drags returns only later, until "
+                      "deployed. Share count changes at the close; actual holdings change when the manager "
+                      "trades — possibly days later and at market, which stays invisible to daily NAV/AUM."),
+        "summary": ("The NAV pins the trade's P&L (~$%.0fM, ~0), not its size. A buy below the $%.2f close "
+                    "is ruled out (it would lift NAV above the actual); a buy AT the close has ~0 P&L and is "
+                    "invisible — indistinguishable from a cash subscription, bounded only by the ~$%.0fM of "
+                    "new cash (more if funded by selling public). So: no cheap / IPO-priced grab, but an "
+                    "at-market add up to ~$%.0fM cannot be excluded. Only the 6/30 NPORT share count settles it."
+                    % (leftover / 1e6, close_px, total_inflow / 1e6, total_inflow / 1e6)),
+    }
+
     # detectability floor: buy that lifts NAV by more than the proxy noise band
     noise = abs(pub_hi - pub_lo) * (1 - w_spx0)         # NAV uncertainty from public proxy
     detect_floor = noise / spx_ret * aum1               # $ buy that would clear the noise
@@ -175,6 +209,7 @@ def build_payload():
             "detect_floor_usd": round(detect_floor),
         },
         "buy_scenarios": scen,
+        "bounds": bounds,
         "split_solve": {
             "rows": split_solve, "total_inflow_usd": total_inflow,
             "note": ("2 equations (NAV, AUM), 3 unknowns (X, B, public return) — so the split needs the "
@@ -191,13 +226,16 @@ def build_payload():
             "+{:.1f}%. So solving for an IPO add gives a NEGATIVE number in all three fund-weight versions "
             "(X ${:+.0f}M to ${:+.0f}M) — i.e. NO add (you can't buy negative; the small shortfall is model "
             "noise — weight drift, cash in the sleeve, preferred-vs-common tracking). Net subscriptions absorb "
-            "the full ~${:.0f}M. A real buy >~${:.0f}M would have lifted NAV well above the band; it didn't. So "
-            "as of {} close there is no evidence Baron Partners/BPTIX added SpaceX at the IPO — the firm-wide "
-            "$1B order more likely sits in the private BaronX vehicles or hasn't settled into this NAV yet."
+            "the full ~${:.0f}M. So as of {} close there is no evidence of a CHEAP / IPO-priced SpaceX grab "
+            "(that would have spiked NAV). BUT an at-MARKET add (bought near the $160.95 close) has ~0 intraday "
+            "P&L and is INVISIBLE to NAV — it could be anywhere from $0 to ~${:.0f}M (the new cash), or more "
+            "via rotation, and cannot be excluded. Central read: ~$0 (new money is subscriptions); only the "
+            "6/30 NPORT share count settles whether they added at market. The firm-wide $1B order more likely "
+            "sits in the private BaronX vehicles or hasn't settled into this NAV yet."
         ).format(aum_g * 100, aum0 / 1e9, aum1 / 1e9, nav_g * 100, (aum_g - nav_g) * 100, inflow / 1e6,
                  nav_g * 100, spx_ret * 100, w_spx0 * spx_ret * 100, pub_lo * 100, pub_hi * 100,
                  pred_lo * 100, pred_hi * 100, nav_g * 100, buy_lo / 1e6, buy_hi / 1e6,
-                 total_inflow / 1e6, 0.645e9 / 1e6, d1),
+                 total_inflow / 1e6, d1, total_inflow / 1e6),
     }
 
 
