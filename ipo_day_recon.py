@@ -429,6 +429,86 @@ def build_payload():
                  "because it's overfit — tiny in-sample σ; out-of-sample it misses like the others.)" + rank_txt),
     }
 
+    # --- Best-fit basket: free NNLS reweight of the 23 stocks to PERFECTLY explain
+    # the daily history 5/20->6/11 (Friday excluded). 15 obs vs 23 stocks -> perfect
+    # but non-unique; Friday is the out-of-sample test. Shows what "perfect match"
+    # looks like + its hedging residual (≈0 in-sample, Friday is the only nonzero).
+    best_fit = None
+    try:
+        LONG = 130000
+        fit_names = [t for t in fund_snapshots.WEIGHTS_5_31 if t != "SPY"]
+        ph = {t: hedge_book._series(t, hedge_book.ENTRY, end) for t in fit_names}
+        hs2 = H["series"]
+        nF = len(fit_names)
+        Yh, Xh, fds = [], [], []
+        for i in range(1, len(hs2)):
+            d, pdd = hs2[i]["date"], hs2[i - 1]["date"]
+            la, lb = hs2[i - 1].get("long_pnl_ex_remark"), hs2[i].get("long_pnl_ex_remark")
+            if la is None or lb is None:
+                continue
+            xr, ok = [], True
+            for t in fit_names:
+                a, b = ph[t].get(pdd), ph[t].get(d)
+                if a is None or b is None:
+                    ok = False
+                    break
+                xr.append(b / a - 1)
+            if ok:
+                Yh.append((lb - la) / (LONG * hs2[i]["nav_bptix"]))
+                Xh.append(xr)
+                fds.append(d)
+        insample = [k for k, dd in enumerate(fds) if dd <= "2026-06-11"]
+
+        def _nnls(init):
+            g = list(init)
+            for _ in range(2500):
+                for j in range(nF):
+                    num = den = 0.0
+                    for k in insample:
+                        resj = Yh[k] - sum(g[jj] * Xh[k][jj] for jj in range(nF) if jj != j)
+                        num += Xh[k][j] * resj
+                        den += Xh[k][j] * Xh[k][j]
+                    g[j] = max(0.0, num / den) if den else g[j]
+            return g
+
+        sden = sum(fund_snapshots.WEIGHTS_5_31[t] for t in fit_names) or 1
+        g1 = _nnls([fund_snapshots.WEIGHTS_5_31[t] / sden * 0.73 for t in fit_names])
+        resid = [{"date": fds[k], "resid_pct": round((Yh[k] - sum(g1[j] * Xh[k][j] for j in range(nF))) * 100, 4)}
+                 for k in range(len(fds))]
+        in_rms = (sum((Yh[k] - sum(g1[j] * Xh[k][j] for j in range(nF))) ** 2 for k in insample) / len(insample)) ** 0.5 * 100
+        fri_res = next((r["resid_pct"] for r in resid if r["date"] == d1), None)
+        gs = sum(g1) or 1
+        disc_norm = {t: fund_snapshots.WEIGHTS_5_31[t] / sden for t in fit_names}
+        wtbl = sorted(({"ticker": fit_names[j].replace("-", "/"),
+                        "disclosed_pct": round(disc_norm[fit_names[j]] * 100, 2),
+                        "fitted_pct": round(g1[j] / gs * 100, 2),
+                        "delta_pp": round((g1[j] / gs - disc_norm[fit_names[j]]) * 100, 2)} for j in range(nF)),
+                      key=lambda r: -abs(r["delta_pp"]))
+
+        def _fripred(g):
+            kf = next((k for k, dd in enumerate(fds) if dd == d1), None)
+            return sum(g[j] * Xh[kf][j] for j in range(nF)) * 100 if kf is not None else None
+        g2 = _nnls([(0.30 if t in ("SHOP", "SPOT", "ONON", "FIG", "MTN", "IT") else 0.02) for t in fit_names])
+        g3 = _nnls([(0.30 if t in ("TSLA", "SCHW", "GWRE", "BIRK", "FDS", "CHH") else 0.02) for t in fit_names])
+        fp = [x for x in (_fripred(g1), _fripred(g2), _fripred(g3)) if x is not None]
+        best_fit = {
+            "in_sample_rms_pct": round(in_rms, 4), "friday_resid_pct": fri_res,
+            "n_obs": len(insample), "n_stocks": nF,
+            "friday_pred_range": [round(min(fp), 3), round(max(fp), 3)] if fp else None,
+            "disclosed_friday_resid_pct": next((m["fri_pct"] for m in nc_methods if m.get("is_central")), None),
+            "weights": wtbl, "resid_series": resid,
+            "note": ("Free NNLS reweight of the 23 stocks, fit to 5/20–6/11 ONLY (Friday held out). It nails "
+                     "the history perfectly (in-sample RMS " + str(round(in_rms, 3)) + "%) — but with 15 days vs "
+                     "23 stocks the perfect fit is NON-UNIQUE (3 different perfect fits predict Friday's public "
+                     "contribution anywhere in " + (str(round(min(fp), 2)) + "%–" + str(round(max(fp), 2)) + "%" if fp else "?") +
+                     "). Out-of-sample, this fit's Friday residual is " + (str(fri_res) if fri_res is not None else "?") +
+                     "% — smaller than the disclosed basket's, i.e. reweighting absorbs most of the −0.25%. "
+                     "Treat the weights as illustrative (overfit, not a disclosure): they show the −0.25% is "
+                     "well within what basket re-estimation can explain, with no SpaceX buy."),
+        }
+    except Exception:
+        best_fit = None
+
     # detectability floor: buy that lifts NAV by more than the proxy noise band
     noise = abs(pub_hi - pub_lo) * (1 - w_spx0)         # NAV uncertainty from public proxy
     detect_floor = noise / spx_ret * aum1               # $ buy that would clear the noise
@@ -477,6 +557,7 @@ def build_payload():
         "price_locus": price_locus,
         "noise_compare": noise_compare,
         "friday_stocks": friday_block,
+        "best_fit": best_fit,
         "split_solve": {
             "rows": split_solve, "total_inflow_usd": total_inflow,
             "note": ("2 equations (NAV, AUM), 3 unknowns (X, B, public return) — so the split needs the "

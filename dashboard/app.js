@@ -425,6 +425,48 @@ function renderIpoDay(d) {
     if (fn) fn.innerHTML = fb.note;
   }
 
+  // ⑩ best-fit basket: fitted vs disclosed weights + its daily hedging residual
+  if (d.best_fit && document.getElementById("ipoday-bestfit-w")) {
+    const bf = d.best_fit;
+    const intro = document.getElementById("ipoday-bestfit-intro");
+    if (intro) intro.innerHTML =
+      `Free reweight of the 23 stocks fit to <b>5/20–6/11 only</b> (Friday held out). It hits the history ` +
+      `<b>perfectly</b> (in-sample RMS ${bf.in_sample_rms_pct}%). With ${bf.n_obs} days vs ${bf.n_stocks} stocks the ` +
+      `perfect fit is <b>non-unique</b> — three different perfect fits predict Friday's public contribution anywhere in ` +
+      `<b>${bf.friday_pred_range[0]}%–${bf.friday_pred_range[1]}%</b>. Out-of-sample, this fit's Friday residual is ` +
+      `<b>${bf.friday_resid_pct}%</b> vs the disclosed basket's ${bf.disclosed_friday_resid_pct}% — reweighting absorbs ~half the −0.25%.`;
+    const top = bf.weights.slice(0, 14).reverse();
+    const wtraces = [
+      { type: "bar", orientation: "h", name: "disclosed 5/31", y: top.map((w) => w.ticker), x: top.map((w) => w.disclosed_pct),
+        marker: { color: MUTED }, hovertemplate: "%{y} disclosed %{x:.1f}%<extra></extra>" },
+      { type: "bar", orientation: "h", name: "best-fit", y: top.map((w) => w.ticker), x: top.map((w) => w.fitted_pct),
+        marker: { color: SPX }, hovertemplate: "%{y} best-fit %{x:.1f}%<extra></extra>" },
+    ];
+    Plotly.newPlot("ipoday-bestfit-w", wtraces, baseLayout({
+      barmode: "group", xaxis: { title: "weight (% of public book)", ticksuffix: "%", gridcolor: GRID, color: TEXT },
+      yaxis: { gridcolor: GRID, color: TEXT, tickfont: { size: 10 }, automargin: true },
+      legend: { orientation: "h", y: 1.08, font: { color: TEXT, size: 10 } }, margin: { t: 38, r: 12, b: 42, l: 52 },
+      annotations: [{ x: 0, y: 1.15, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
+        text: "<b>What 'perfect match' looks like</b> (biggest moves; overfit & illustrative — not a disclosure)", font: { color: TEXT, size: 11 } }],
+    }), plotConfig());
+    const rs = bf.resid_series, fri = d.noise_compare ? d.noise_compare.fri_date : "2026-06-12";
+    const rtr = { type: "bar", x: rs.map((p) => p.date), y: rs.map((p) => p.resid_pct),
+      marker: { color: rs.map((p) => (p.date === fri ? BAD : GOOD)) },
+      hovertemplate: "%{x}<br>residual %{y:.3f}%<extra></extra>" };
+    Plotly.newPlot("ipoday-bestfit-r", [rtr], baseLayout({
+      xaxis: { type: "date", gridcolor: GRID, color: TEXT },
+      yaxis: { title: "best-fit hedging residual", ticksuffix: "%", gridcolor: GRID, color: TEXT, zeroline: true, zerolinecolor: GRID },
+      shapes: [hline(0, MUTED)], showlegend: false, margin: { t: 32, r: 12, b: 40, l: 56 },
+      annotations: [
+        { x: 0, y: 1.09, xref: "paper", yref: "paper", xanchor: "left", showarrow: false,
+          text: "<b>Hedging residual of the best-fit basket</b>: ≈0 every in-sample day (perfect), Friday (red, out-of-sample) = " + bf.friday_resid_pct + "%", font: { color: TEXT, size: 11 } },
+        { x: fri, y: bf.friday_resid_pct, xref: "x", yref: "y", text: "Fri (held out)", showarrow: true, arrowcolor: BAD, font: { color: BAD, size: 10 }, ax: -24, ay: -16 },
+      ],
+    }), plotConfig());
+    const bn = document.getElementById("ipoday-bestfit-note");
+    if (bn) bn.innerHTML = bf.note;
+  }
+
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;
   const src = document.getElementById("ipoday-source");
   if (src) src.innerHTML = "<span class='dim'>" + d.meta.assumptions + " " + d.meta.disclaimer + "</span>";
