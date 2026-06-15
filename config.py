@@ -275,6 +275,17 @@ class SpacexBaron:
                    "not the +41.6% post-money valuation ratio. Confirmed by the +6.6% NAV move."),
          "source_url": "https://www.baroncapitalgroup.com/product-detail/baron-partners-fund-bptrx",
          "confidence": "high"},
+        {"date": "2026-06-12",
+         "spacex_value_usd": 3.89026788e9 * (160.95 / 105.32),  # ~$5.946B
+         "per_share_old_split_adj": 105.32, "per_share_new": 160.95,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SpaceX (SPCX) first public trade 2026-06-12, closing $160.95 (+19.2% vs the "
+                   "$135 IPO price). Holding now marks to the LIVE market: re-marks by per-share "
+                   "$105.32->$160.95 (+52.8% off the 3/31 split-adj basis). First market-based mark; "
+                   "supersedes the $135 IPO-price mark. Assumes the fund's SpaceX share count is "
+                   "unchanged (no confirmed IPO add yet)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
