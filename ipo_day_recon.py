@@ -30,6 +30,9 @@ from config import SpacexBaron as CFG
 
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 
+ORDER_CAP = 1_000_000_000   # Baron's news-confirmed ~$1B firm-wide SpaceX IPO order (BPTIX <= this)
+LEV_CAP = 1.25              # leverage ceiling 1.25x (user-specified working cap; mandate max is 1.5x)
+
 
 def _two_anchor_days(sbx):
     """Latest two daily points carrying a reported (external_aum) AUM."""
@@ -88,7 +91,20 @@ def build_payload():
     # central estimate; the spread across versions is the (small) error band.
     wsets = [("3/31", fund_snapshots.WEIGHTS_3_31), ("4/30", fund_snapshots.WEIGHTS_4_30),
              ("5/31", fund_snapshots.WEIGHTS_5_31)]
-    allnames = sorted(set().union(*[set(w) for _, w in wsets]))
+    # ALSO pull the best-fit baskets from the hedge study (optimal min-variance, blend)
+    # as extra weight versions for the locus chart — their weights are the data-driven
+    # estimate of the fund's effective public exposure.
+    extra_wsets = []
+    try:
+        H = json.load(open(os.path.join(_REPO_ROOT, "dashboard", "data", "hedge_book.json"), encoding="utf-8"))
+        comps = H["meta"]["basket_compositions"]
+        for m, lab in (("optimal", "optimal (min-var)"), ("blend", "blend 4/30+5/31")):
+            if m in comps:
+                extra_wsets.append((lab, {r["ticker"].replace("/", "-"): r["weight"] for r in comps[m]}))
+    except Exception:
+        pass
+    locus_wsets = wsets + extra_wsets
+    allnames = sorted(set().union(*[set(w) for _, w in locus_wsets]))
     px = {tk: hedge_book._series(tk, d0, end) for tk in allnames}
 
     def _ret(tk):
@@ -104,9 +120,9 @@ def build_payload():
                 den += w
         return num / den if den else 0.0
 
-    pub_by_version = {lab: _basket(W) for lab, W in wsets}
+    pub_by_version = {lab: _basket(W) for lab, W in locus_wsets}
     pub_central = pub_by_version["5/31"]               # freshest = the estimate
-    pub_vals = list(pub_by_version.values())
+    pub_vals = [pub_by_version[lab] for lab, _ in wsets]   # band from the 3 disclosed only
     pub_lo, pub_hi = min(pub_vals), max(pub_vals)
 
     # growth rates
@@ -258,26 +274,60 @@ def build_payload():
     # curve per weight version; the JS draws it with the day's range shaded so you
     # can see where a buy is physically possible (P within the day's range).
     locus_versions = []
-    for lab, _W in wsets:
+    for lab, _W in locus_wsets:
         rp = pub_by_version[lab]
         lo = nav_g * aum0 - spx0_val * spx_ret - pub0 * rp
         cmin = (abs(lo) / (spcx_ohlc["high"] / close_px - 1)) if spcx_ohlc else None
-        locus_versions.append({"label": "fund " + lab, "r_pub_pct": round(rp * 100, 3),
+        # price implied at the $1B order cap (if the buy is the full $1B)
+        p_at_order = (close_px / (1 + lo / ORDER_CAP)) if ORDER_CAP else None
+        fundlab = lab if lab.startswith(("optimal", "blend")) else "fund " + lab
+        locus_versions.append({"label": fundlab, "r_pub_pct": round(rp * 100, 3),
                                "leftover_usd": round(lo),
                                "min_plausible_buy_usd": round(cmin) if cmin else None,
+                               "price_at_order_cap": round(p_at_order, 2) if p_at_order else None,
                                "is_central": lab == "5/31"})
     cmin_c = next((v["min_plausible_buy_usd"] for v in locus_versions if v["is_central"]), None)
+    p_at_order_c = next((v["price_at_order_cap"] for v in locus_versions if v["is_central"]), None)
+    lo_c = next((v["leftover_usd"] for v in locus_versions if v["is_central"]), 0)
+    spx_c_pct = w_spx0 * spx_ret * 100                 # existing SpaceX re-mark contribution
+    pub_c_pct = pub0 * pub_central / aum0 * 100         # public contribution (5/31)
+    buy_c_pct = lo_c / aum0 * 100                       # the buy's P&L = leftover, as % of NAV
+    nav_identity = ("How every point reconciles (5/31): actual +" + str(round(nav_g * 100, 2))
+                    + "% NAV = +" + str(round(spx_c_pct, 2)) + "% (existing SpaceX re-marking +"
+                    + str(int(round(spx_ret * 100))) + "%) + " + str(round(pub_c_pct, 2)) + "% (public book) "
+                    + ("+" if buy_c_pct >= 0 else "") + str(round(buy_c_pct, 2))
+                    + "% (the new buy's intraday P&L = the leftover). EVERY point on the curve produces that "
+                    "same " + str(round(buy_c_pct, 2)) + "% buy-P&L — only the size×price split moves: P&L = "
+                    "C × (close/P − 1), held fixed at $" + str(round(lo_c / 1e6)) + "M.")
+
+    # Two hard caps on how much SpaceX BPTIX could have bought:
+    #  (1) Baron's news-confirmed ~$1B firm-wide order (BPTIX <= this).
+    #  (2) Leverage cap 1.25x: max SpaceX add = (1.25 - entry leverage) x net base.
+    #      Two timing cases for the base: Thu close (no Fri inflow) vs Fri (incl inflow).
+    L_entry = 0.968                                    # most recent (5/31) net-cash leverage
+    lev_cap_thu = (LEV_CAP - L_entry) * aum0           # base = Thu net (no new money)
+    lev_cap_fri = (LEV_CAP - L_entry) * aum1           # base = Fri net (new money leverable too)
     price_locus = {
         "close_px": close_px, "ipo_px": ipo_px,
         "intraday_high": spcx_ohlc["high"] if spcx_ohlc else None,
         "intraday_low": spcx_ohlc["low"] if spcx_ohlc else None,
         "net_flow_usd": round(inflow), "versions": locus_versions,
-        "note": ("Curve: avg price P(C) = close / (1 + leftover/C). The leftover is slightly negative, so P "
-                 "is always ABOVE the close — a buy is only physically real where P ≤ the day's high, i.e. "
-                 "C ≥ ~$" + (str(round((cmin_c or 0) / 1e6)) if cmin_c else "?") + "M (5/31); the bigger the buy, "
-                 "the closer the avg price sits to the $" + str(close_px) + " close. Net flow is fixed at +$"
-                 + str(round(inflow / 1e6)) + "M inflow, so a multi-$B buy must be funded by LEVERAGE (invisible "
-                 "to NAV & AUM), not subscriptions or selling. This is the one scenario the data can't exclude."),
+        "order_cap_usd": ORDER_CAP, "lev_cap": LEV_CAP, "entry_leverage": L_entry,
+        "lev_cap_thu_usd": round(lev_cap_thu), "lev_cap_fri_usd": round(lev_cap_fri),
+        "feasible_lo_usd": round(cmin_c) if cmin_c else None, "feasible_hi_usd": ORDER_CAP,
+        "nav_identity": nav_identity,
+        "spx_contrib_pct": round(spx_c_pct, 2), "actual_nav_pct": round(nav_g * 100, 2),
+        "aum_prior_usd": round(aum0),
+        "note": ("Curve: avg price P(C) = close / (1 + leftover/C); P is always above the $" + str(close_px)
+                 + " close, so a buy is only real where P ≤ the day's $" + (str(spcx_ohlc["high"]) if spcx_ohlc else "?")
+                 + " high → C ≥ ~$" + (str(round((cmin_c or 0) / 1e6)) if cmin_c else "?") + "M. TWO hard caps box "
+                 "the buy in: Baron's news-confirmed $1B order (BPTIX ≤ $1B) and the 1.25× leverage ceiling "
+                 "(headroom ~$" + str(round(lev_cap_thu / 1e9, 1)) + "B on Thu's base, ~$" + str(round(lev_cap_fri / 1e9, 1))
+                 + "B if Fri's inflow is leverable too — both far above $1B, so the ORDER binds). Net flow is "
+                 "fixed at +$" + str(round(inflow / 1e6)) + "M, so a >$357M buy must be LEVERAGE-funded. Feasible "
+                 "interval (if a buy happened at all): ~$" + (str(round((cmin_c or 0) / 1e6)) if cmin_c else "?")
+                 + "M–$1B, at ~$" + (str(p_at_order_c) if p_at_order_c else "?") + "–$"
+                 + (str(spcx_ohlc["high"]) if spcx_ohlc else "?") + " — a tight, plausible band."),
     }
 
     # detectability floor: buy that lifts NAV by more than the proxy noise band

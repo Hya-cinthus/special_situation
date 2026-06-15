@@ -254,31 +254,50 @@ function renderIpoDay(d) {
         ys.push(close / (1 + lo / C));
       }
       const cmin = v.min_plausible_buy_usd / 1e9;
+      // per-point NAV math for the hover: buy P&L = C×(close/P−1) = leftover (constant);
+      // actual NAV = SpaceX contrib + public contrib + buy contrib.
+      const A0 = pl.aum_prior_usd, buyPnlM = lo / 1e6, buyPct = lo / A0 * 100;
+      const spxC = pl.spx_contrib_pct, navA = pl.actual_nav_pct, pubC = navA - spxC - buyPct;
       const curve = {
         x: xs, y: ys, type: "scatter", mode: "lines", name: "implied avg exec price",
         line: { color: SPX, width: 2.2 },
-        hovertemplate: "buy $%{x:.2f}B → avg exec $%{y:.2f}<extra></extra>",
+        customdata: xs.map((x, i) => [(close / ys[i] - 1) * 100, x * (close / ys[i] - 1) * 1000]),
+        hovertemplate:
+          "buy <b>$%{x:.2f}B</b> at avg <b>$%{y:.2f}</b><br>" +
+          "per-$ intraday: %{customdata[0]:.1f}%  →  buy P&L %{customdata[1]:.0f}M" +
+          " = <b>" + buyPct.toFixed(2) + "% of NAV</b> (the leftover)<br>" +
+          "NAV: +" + spxC.toFixed(2) + "% (SpaceX) + " + pubC.toFixed(2) + "% (public) " +
+          buyPct.toFixed(2) + "% (buy) = <b>+" + navA.toFixed(2) + "%</b><extra></extra>",
       };
       const cminMark = {
-        x: [cmin], y: [pl.intraday_high], type: "scatter", mode: "markers+text",
-        name: "min plausible buy", marker: { color: BAD, size: 8, symbol: "circle" },
-        text: ["≥$" + cmin.toFixed(2) + "B to stay ≤ high"], textposition: "top right",
-        textfont: { color: BAD, size: 10 }, hoverinfo: "skip",
+        x: [cmin], y: [pl.intraday_high], type: "scatter", mode: "markers",
+        marker: { color: BAD, size: 8, symbol: "circle" },
+        hovertemplate: "min buy ≥$" + cmin.toFixed(2) + "B (else price > high)<extra></extra>",
       };
+      const order = pl.order_cap_usd / 1e9, levT = pl.lev_cap_thu_usd / 1e9, levF = pl.lev_cap_fri_usd / 1e9;
       const shapes = [
         // day's trading range band (physically achievable prices)
         { type: "rect", xref: "paper", yref: "y", x0: 0, x1: 1, y0: pl.intraday_low, y1: pl.intraday_high,
           fillcolor: "rgba(63,185,80,0.08)", line: { width: 0 }, layer: "below" },
-        hline(close, ACC, "close $" + close), hline(pl.intraday_high, BAD, "intraday high $" + pl.intraday_high),
-        hline(pl.intraday_low, MUTED, "low $" + pl.intraday_low), hline(pl.ipo_px, MUTED, "IPO $" + pl.ipo_px),
+        // FEASIBLE box: C in [cmin, $1B order] AND price in [close, high]
+        { type: "rect", xref: "x", yref: "y", x0: cmin, x1: order, y0: close, y1: pl.intraday_high,
+          fillcolor: "rgba(255,122,69,0.16)", line: { color: SPX, width: 1, dash: "dot" }, layer: "below" },
+        hline(close, ACC), hline(pl.intraday_high, BAD), hline(pl.intraday_low, MUTED), hline(pl.ipo_px, MUTED),
+        vline(order, WARN), vline(levT, MUTED), vline(levF, MUTED),
       ];
+      const ann = (x, y, t, c, ax, ay) => ({ x: x, y: y, xref: "x", yref: "y", text: t, showarrow: false,
+        font: { color: c, size: 10 }, xanchor: ax || "left", yanchor: ay || "bottom" });
       Plotly.newPlot("ipoday-locus", [curve, cminMark], baseLayout({
-        xaxis: { title: "SpaceX bought ($B)", type: "log", gridcolor: GRID, color: TEXT },
+        xaxis: { title: "SpaceX bought into BPTIX ($B, log)", type: "log", gridcolor: GRID, color: TEXT, range: [Math.log10(0.15), Math.log10(8)] },
         yaxis: { title: "implied avg execution price", tickprefix: "$", range: [130, 205], gridcolor: GRID, color: TEXT },
         shapes: shapes, showlegend: false, margin: { t: 16, r: 14, b: 44, l: 56 },
-        annotations: [{ x: 0, y: pl.intraday_high, xref: "paper", yref: "y", xanchor: "left", yanchor: "bottom",
-          text: "  green = the day's $" + pl.intraday_low + "–$" + pl.intraday_high + " trading range (a real buy must land here)",
-          showarrow: false, font: { color: GOOD, size: 10 } }],
+        annotations: [
+          ann(0.16, pl.intraday_high, "FEASIBLE: $" + cmin.toFixed(2) + "B–$" + order.toFixed(1) + "B @ ~$" + v.price_at_order_cap + "–$" + pl.intraday_high, SPX),
+          ann(order, 134, " $1B order", WARN, "left"),
+          ann(levT, 198, " 1.25× lev cap", MUTED, "left"),
+          ann(0.155, pl.intraday_high + 1, "day's $" + pl.intraday_low + "–$" + pl.intraday_high + " range", GOOD),
+          ann(0.155, close + 0.6, "close $" + close, ACC),
+        ],
       }), plotConfig());
     };
     const tog = document.getElementById("ipoday-locus-toggle");
@@ -294,7 +313,7 @@ function renderIpoDay(d) {
     const ci = pl.versions.findIndex((v) => v.is_central);
     drawLocus(ci >= 0 ? ci : 0);
     const ln = document.getElementById("ipoday-locus-note");
-    if (ln) ln.innerHTML = pl.note;
+    if (ln) ln.innerHTML = (pl.nav_identity ? "<b>" + pl.nav_identity + "</b><br>" : "") + pl.note;
   }
 
   document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;
@@ -302,9 +321,13 @@ function renderIpoDay(d) {
   if (src) src.innerHTML = "<span class='dim'>" + d.meta.assumptions + " " + d.meta.disclaimer + "</span>";
 }
 
-function hline(y, color, label) {
+function hline(y, color) {
   return { type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: y, y1: y,
            line: { color: color, width: 1, dash: "dot" } };
+}
+function vline(x, color) {
+  return { type: "line", xref: "x", yref: "paper", x0: x, x1: x, y0: 0, y1: 1,
+           line: { color: color, width: 1, dash: "dash" } };
 }
 
 /* ---- SpaceX holdings detail + full valuation reconciliation (bottom) ---- */
