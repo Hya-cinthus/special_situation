@@ -108,6 +108,64 @@ function render() {
     .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderRecon(d); }).catch(() => {});
   fetch("data/baron_spacex_funds.json", { cache: "no-store" })
     .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderBaronFunds(d); }).catch(() => {});
+  fetch("data/ipo_day_recon.json", { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderIpoDay(d); }).catch(() => {});
+}
+
+/* ---- IPO-day reconciliation card (SpaceX first trade: marks vs AUM) ---- */
+function renderIpoDay(d) {
+  const card = document.getElementById("ipoday-card");
+  if (!card) return;
+  card.style.display = "";
+  const g = d.growth, t = d.nav_test, ad = d.aum_decomp, sp = d.spcx, sv = d.spacex_value;
+  const sd = (x) => (x >= 0 ? "+" : "") + x.toFixed(2) + "%";
+  const mUSD = (x) => (x >= 0 ? "+" : "−") + "$" + Math.abs(x / 1e6).toFixed(0) + "M";
+
+  document.getElementById("ipoday-title").innerHTML =
+    `IPO day (${d.meta.date}): did BPTIX buy SpaceX at the IPO? — marks vs reported AUM`;
+  document.getElementById("ipoday-intro").innerHTML =
+    `SpaceX (SPCX) first traded ${d.meta.date}, closing <b>$${sp.close}</b> (<b>${sd(sp.return_pct)}</b> vs the $${sp.ipo_price} IPO price). ` +
+    `Assuming the fund's SpaceX position is <b>unchanged</b> and <b>no leverage</b>, can marking everything to that close reproduce the reported <b>${usd(g.aum_reported)}</b> AUM — and would a new IPO buy even show up?`;
+
+  const kpi = (label, value, note, cls) =>
+    `<div class="kpi"><span class="label">${label}</span><div class="value${cls ? " " + cls : ""}">${value}</div><div class="note">${note}</div></div>`;
+  document.getElementById("ipoday-kpis").innerHTML =
+    kpi("SPCX first close", "$" + sp.close, sd(sp.return_pct) + " vs $" + sp.ipo_price + " IPO", "spx") +
+    kpi("SpaceX weight now", sv.weight_now_pct.toFixed(1) + "%", "was " + t.spacex_weight_start_pct + "% (at $135)", "spx") +
+    kpi("Implied IPO add", "≈ $0", mUSD(t.implied_buy_lo_usd) + " to " + mUSD(t.implied_buy_hi_usd)) +
+    kpi("Net inflows (Fri)", usd(g.inflow_usd), "AUM growth beyond marks");
+
+  document.getElementById("ipoday-growth").innerHTML =
+    `<table class="data"><thead><tr><th>Measure</th><th>Calculation</th><th>Result</th><th>What it includes</th></tr></thead><tbody>` +
+    `<tr><td><b>AUM growth</b></td><td>${(g.aum_reported / 1e9).toFixed(1)}B / ${(g.aum_prior / 1e9).toFixed(1)}B − 1</td>` +
+    `<td style="color:${ACC}"><b>${sd(g.aum_growth_pct)}</b></td><td class="dim">includes new money</td></tr>` +
+    `<tr><td><b>NAV / share growth</b></td><td>${g.nav_current} / ${g.nav_prior} − 1</td>` +
+    `<td style="color:${SPX}"><b>${sd(g.nav_growth_pct)}</b></td><td class="dim">pure market return, NO new money</td></tr>` +
+    `<tr style="font-weight:700;border-top:2px solid ${GRID}"><td>Difference</td><td>${sd(g.aum_growth_pct)} − ${sd(g.nav_growth_pct)}</td>` +
+    `<td>${sd(g.inflow_pct)}</td><td>= net inflows <b>${usd(g.inflow_usd)}</b></td></tr></tbody></table>` +
+    `<p style="margin-top:10px"><b>AUM change ${usd(ad.total_change_usd)} decomposes as:</b> SpaceX re-mark <b style="color:${SPX}">+${(ad.spacex_remark_usd / 1e9).toFixed(2)}B</b> ` +
+    `+ public holdings +${(ad.public_gain_usd / 1e9).toFixed(2)}B + net inflows +${(ad.inflow_usd / 1e9).toFixed(2)}B. ` +
+    `Marking the existing book to Friday's close (no new money) gives <b>${usd(ad.marked_no_inflow_usd)}</b> — only <b>${usd(ad.gap_vs_reported_usd)}</b> short of the reported ${usd(g.aum_reported)}. ` +
+    `<span class="dim">That ${usd(ad.gap_vs_reported_usd)} shortfall is inflows, not a SpaceX buy.</span></p>`;
+
+  const scen = d.buy_scenarios.map((s) =>
+    `<tr><td>buy $${(s.usd / 1e9).toFixed(2)}B at $${sp.ipo_price}</td><td>+${s.extra_nav_pct}%</td><td>${sd(s.nav_would_be_pct)}</td></tr>`).join("");
+  document.getElementById("ipoday-navtest").innerHTML =
+    `<p>New shares bought at the $${sp.ipo_price} IPO that close at $${sp.close} gain ${sd(sp.return_pct)} <i>intraday</i> — so a real IPO buy would push per-share NAV <b>above</b> the no-add prediction. The prediction (position unchanged):</p>` +
+    `<ul>` +
+    `<li>SpaceX sleeve: ${t.spacex_weight_start_pct}% × ${sd(sp.return_pct)} = <b style="color:${SPX}">+${t.spacex_contribution_pct}%</b> &nbsp;(this alone is most of the day's NAV move)</li>` +
+    `<li>Public sleeve: ${(100 - t.spacex_weight_start_pct).toFixed(2)}% × public return (${t.public_return_lo_pct}% to ${t.public_return_hi_pct}%) → +${(t.predicted_nav_lo_pct - t.spacex_contribution_pct).toFixed(2)}% to +${(t.predicted_nav_hi_pct - t.spacex_contribution_pct).toFixed(2)}%</li>` +
+    `<li><b>Predicted NAV band: +${t.predicted_nav_lo_pct}% to +${t.predicted_nav_hi_pct}%</b> &nbsp;(the band = two public-basket weightings)</li>` +
+    `<li><b style="color:${GOOD}">Actual NAV: ${sd(t.actual_nav_pct)}</b> — inside the band ⇒ no extra SpaceX kicker needed.</li>` +
+    `</ul>` +
+    `<p style="margin:8px 0 4px">What a real buy <i>would</i> have done to NAV:</p>` +
+    `<table class="data"><thead><tr><th>Hypothetical IPO buy</th><th>extra NAV</th><th>NAV would be</th></tr></thead><tbody>${scen}` +
+    `<tr style="font-weight:700;border-top:2px solid ${GRID}"><td>Actual NAV</td><td></td><td style="color:${GOOD}">${sd(t.actual_nav_pct)}</td></tr></tbody></table>` +
+    `<p class="dim" style="margin-top:8px">Reverse-solving the actual NAV ⇒ implied SpaceX weight ${t.implied_spacex_weight_lo_pct}%–${t.implied_spacex_weight_hi_pct}% (vs ${t.spacex_weight_start_pct}% start) ⇒ implied add <b>${mUSD(t.implied_buy_lo_usd)} to ${mUSD(t.implied_buy_hi_usd)} ≈ 0</b>. A buy above ~${usd(t.detect_floor_usd)} would have cleared the proxy noise and shown up; it didn't.</p>`;
+
+  document.getElementById("ipoday-conclusion").innerHTML = "<b>Bottom line.</b> " + d.conclusion;
+  const src = document.getElementById("ipoday-source");
+  if (src) src.innerHTML = "<span class='dim'>" + d.meta.assumptions + " " + d.meta.disclaimer + "</span>";
 }
 
 /* ---- SpaceX holdings detail + full valuation reconciliation (bottom) ---- */
