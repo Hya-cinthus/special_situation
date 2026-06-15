@@ -110,6 +110,34 @@ function render() {
     .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderBaronFunds(d); }).catch(() => {});
   fetch("data/ipo_day_recon.json", { cache: "no-store" })
     .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderIpoDay(d); }).catch(() => {});
+  fetch("data/daily_nav_log.json", { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderDailyLog(d); }).catch(() => {});
+}
+
+/* ---- Daily NAV-estimate log: per-basket predicted NAV vs actual ---- */
+function renderDailyLog(d) {
+  const card = document.getElementById("dailylog-table");
+  if (!card) return;
+  const ms = d.meta.methods, lbl = d.meta.method_labels;
+  const note = document.getElementById("dailylog-note");
+  if (note) note.innerHTML = d.meta.note;
+  const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt</th>" +
+    ms.map((m) => `<th>${lbl[m]}</th>`).join("") + "<th>Actual NAV</th><th>best</th></tr>";
+  const body = d.rows.slice().reverse().map((r) => {
+    const cells = ms.map((m) => {
+      const isBest = r.best_method === m;
+      const err = r.errors && r.errors[m] != null ? r.errors[m] : null;
+      const errTxt = err != null ? `<br><span class="dim" style="font-size:10px">${err >= 0 ? "+" : ""}${err}</span>` : "";
+      return `<td style="${isBest ? `background:${_rgba(GOOD, 0.16)};font-weight:700` : ""}">${r.preds[m].pred_nav.toFixed(2)}${errTxt}</td>`;
+    }).join("");
+    const act = r.actual_nav != null ? `<b style="color:${SPX}">${r.actual_nav.toFixed(2)}</b>` : `<span class="dim">pending</span>`;
+    const best = r.best_method ? lbl[r.best_method] : "—";
+    return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${r.spcx_ret_pct >= 0 ? "+" : ""}${r.spcx_ret_pct}%)</span></td>` +
+      `<td>${r.spacex_weight_pct}%</td>${cells}<td>${act}</td><td class="dim">${best}</td></tr>`;
+  }).join("");
+  card.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
+  const src = document.getElementById("dailylog-src");
+  if (src) src.innerHTML = "<span class='dim'>Cells = predicted BPTIX NAV under each weighting (green = closest to actual; small number = error vs actual). " + d.meta.disclaimer + "</span>";
 }
 
 /* ---- IPO-day reconciliation card (SpaceX first trade: marks vs AUM) ---- */

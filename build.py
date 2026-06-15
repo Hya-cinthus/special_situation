@@ -223,6 +223,13 @@ def main(argv):
         print(f"[ipo_day_recon] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[ipo_day_recon] skipped: {e}")
+    # Daily NAV-estimate log (user-pasted closes; per-basket prediction vs actual; no network).
+    try:
+        import daily_nav_log
+        p = daily_nav_log.write_json()
+        print(f"[daily_nav_log] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[daily_nav_log] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 
