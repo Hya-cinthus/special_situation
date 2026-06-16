@@ -230,6 +230,13 @@ def main(argv):
         print(f"[daily_nav_log] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[daily_nav_log] skipped: {e}")
+    # Daily SpaceX-weight recalibration ledger (inverts actual NAV+AUM -> weight/buy/flow; no network).
+    try:
+        import recalibrate
+        p = recalibrate.write_json()
+        print(f"[recalibrate] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[recalibrate] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 
