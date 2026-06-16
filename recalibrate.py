@@ -46,6 +46,22 @@ _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 PRIMARY = "fund_5_31"   # most-recent disclosure = headline basket; band spans all
 
+# Append-only "vintage" log: each day's estimate is FROZEN the first time its
+# actual NAV is known and is NEVER revised afterwards. This is the honest
+# real-time / out-of-sample track record. The REVISED ledger (recomputed every
+# build with all current data + assumptions) lives alongside it; the two coincide
+# until a later filing, a re-mark, or the long-replication smoother rewrites
+# history. Lives OUTSIDE the regenerated dashboard/data set so the build can't
+# overwrite it (same pattern as morningstar_aum_log.jsonl).
+VINTAGE_PATH = os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data",
+                            "recalibration_vintage.jsonl")
+
+# Fields snapshotted into the frozen vintage row (a subset of the ledger row).
+_VINTAGE_FIELDS = ("date", "spcx", "spcx_ret_pct", "basket_ret_pct", "basket_ret_band_pct",
+                   "actual_nav", "navret_pct", "implied_w_spx_pct", "implied_w_spx_band_pct",
+                   "carried_w_spx_pct", "w_spx_delta_pct", "implied_buy_m", "implied_buy_band_m",
+                   "buy_attributed_to", "implied_net_flow_b", "interpretation")
+
 
 def _basket_ret(W, prev_closes, closes):
     num = den = 0.0
@@ -87,6 +103,43 @@ def _vol_tolerance(H):
                      "used to fake the SpaceX signal), >1 = loose (low impact on NAV, "
                      "unidentifiable anyway). Symmetric, anchored to the 5/31 disclosed "
                      "weight -> no trend bias.") % (H["series"][0]["date"], H["series"][-1]["date"])}
+
+
+def _freeze_vintage(ledger):
+    """Append-only: freeze each day's estimate the first time its actual NAV is
+    known; never touch rows already frozen. Returns (vintage_rows, vintage_series)
+    in date order. Rebuilding is idempotent (a frozen date is read verbatim)."""
+    frozen = {}
+    order = []
+    if os.path.exists(VINTAGE_PATH):
+        with open(VINTAGE_PATH, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                r = json.loads(line)
+                frozen[r["date"]] = r
+                order.append(r["date"])
+    added = []
+    for row in ledger:
+        if row.get("implied_w_spx_pct") is None:
+            continue
+        if row["date"] in frozen:
+            continue
+        snap = {k: row[k] for k in _VINTAGE_FIELDS if k in row}
+        frozen[row["date"]] = snap
+        order.append(row["date"])
+        added.append(snap)
+    if added:
+        os.makedirs(os.path.dirname(VINTAGE_PATH), exist_ok=True)
+        with open(VINTAGE_PATH, "a", encoding="utf-8") as f:
+            for snap in added:
+                f.write(json.dumps(snap, ensure_ascii=False, allow_nan=False) + "\n")
+    rows = [frozen[d] for d in sorted(set(order))]
+    series = [{"date": r["date"], "implied_w_spx_pct": r["implied_w_spx_pct"],
+               "lo": r["implied_w_spx_band_pct"][0], "hi": r["implied_w_spx_band_pct"][1]}
+              for r in rows]
+    return rows, series
 
 
 def build_payload():
@@ -163,6 +216,7 @@ def build_payload():
                     "spx_value": sv_end, "closes": e["closes"]}
         ledger.append(row)
 
+    vintage_rows, vintage_series = _freeze_vintage(ledger)
     belief = _belief(B, ledger)
     return {
         "meta": {
@@ -170,6 +224,12 @@ def build_payload():
             "primary_basket": PRIMARY,
             "headline": ("Each day's ACTUAL NAV + AUM, inverted to the SpaceX weight / SpaceX buy / "
                          "net flow needed to explain it -- and how that estimate is revised as data lands."),
+            "two_views_note": ("AS-OF (vintage): every day's estimate is FROZEN the morning its actual NAV "
+                               "lands and is never edited -- the honest real-time track record. REVISED "
+                               "(all-data): the whole history is re-estimated each build with everything known "
+                               "now. The two coincide until a later NPORT filing, a SpaceX re-mark, or the "
+                               "long-replication smoother rewrites past days -- then the gap between them IS "
+                               "the revision."),
             "method_labels": dl.METHOD_LABELS,
             "dof_note": ("2 observations/day (NAV return + AUM) vs ~25 free unknowns -> we DON'T free the "
                          "public weights daily; they stay pinned to the disclosed 3/31->4/30->5/31 path and "
@@ -182,8 +242,10 @@ def build_payload():
             "disclaimer": "Estimate, not the fund's record. AUM prints are coarse (0.1B) -> flow/buy bands are wide.",
         },
         "vol_tolerance": _vol_tolerance(H),
-        "ledger": ledger,
-        "w_spx_series": series,
+        "ledger": ledger,                       # REVISED (recomputed every build)
+        "w_spx_series": series,                 # REVISED series
+        "vintage_ledger": vintage_rows,         # AS-OF (frozen, append-only)
+        "w_spx_series_vintage": vintage_series, # AS-OF series
         "belief": belief,
     }
 

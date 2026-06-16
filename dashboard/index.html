@@ -278,10 +278,16 @@
         <h2>Daily recalibration — back-solving SpaceX weight, buy &amp; flow</h2>
         <p class="desc" id="recalib-headline"></p>
         <div id="recalib-belief" style="margin:14px 0"></div>
-        <h3 style="margin:18px 0 6px">SpaceX weight — estimate revised each day</h3>
-        <div id="recalib-wchart" style="height:340px"></div>
-        <h3 style="margin:18px 0 6px">Recalibration ledger</h3>
+        <p class="desc" id="recalib-views-note"></p>
+
+        <h3 style="margin:18px 0 6px">① As-of (vintage) — each day frozen the morning it's first known</h3>
+        <div id="recalib-wchart-vintage" style="height:320px"></div>
+        <div class="scroll-x" id="recalib-ledger-vintage"></div>
+
+        <h3 style="margin:24px 0 6px">② Revised (all-data) — whole history re-estimated each build</h3>
+        <div id="recalib-wchart" style="height:320px"></div>
         <div class="scroll-x" id="recalib-ledger"></div>
+
         <h3 style="margin:20px 0 6px">Why we don't free the public weights daily (degrees of freedom)</h3>
         <div id="recalib-method" class="memo"></div>
         <h3 style="margin:20px 0 6px">Volatility-aware drift budget — high-vol pinned, low-vol loose</h3>

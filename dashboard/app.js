@@ -1474,6 +1474,64 @@ function plotConfig() {
            modeBarButtonsToRemove: ["lasso2d", "select2d"] };
 }
 
+/* SpaceX-weight series chart: shared by the as-of (vintage) and revised views.
+ * `implied` = [{date, implied_w_spx_pct, lo, hi}]; `carried` = full series with
+ * carried_w_spx_pct as the mechanical no-buy baseline. */
+function drawWChart(elId, implied, carried, label, color) {
+  if (!document.getElementById(elId)) return;
+  const base = { x: carried.map((x) => x.date), y: carried.map((x) => x.carried_w_spx_pct),
+    type: "scatter", mode: "lines+markers", name: "carried (no-buy)",
+    line: { color: MUTED, width: 2, dash: "dot" }, marker: { size: 6 } };
+  const imp = { x: implied.map((x) => x.date), y: implied.map((x) => x.implied_w_spx_pct),
+    type: "scatter", mode: "markers", name: "implied (" + label + ")",
+    marker: { color: color, size: 11, symbol: "diamond" },
+    error_y: { type: "data", symmetric: false, array: implied.map((x) => x.hi - x.implied_w_spx_pct),
+               arrayminus: implied.map((x) => x.implied_w_spx_pct - x.lo), color: color, thickness: 1.4, width: 6 } };
+  Plotly.newPlot(elId, [base, imp], baseLayout({
+    margin: { l: 48, r: 16, t: 6, b: 34 }, hovermode: "closest",
+    showlegend: true, legend: { orientation: "h", y: 1.14, x: 0 },
+    xaxis: { gridcolor: GRID, type: "category" },
+    yaxis: { gridcolor: GRID, title: "SpaceX weight (% of net)", ticksuffix: "%" },
+  }), plotConfig());
+}
+
+/* Recalibration ledger table: shared by both views. */
+function drawRecalibLedger(elId, rows, isVintage) {
+  const L = document.getElementById(elId);
+  if (!L) return;
+  const sp = (x, dd = 2) => (x == null ? "—" : (x >= 0 ? "+" : "") + Number(x).toFixed(dd));
+  const mUSD = (x) => (x == null ? "—" : (x >= 0 ? "+" : "−") + "$" + Math.abs(x).toFixed(0) + "M");
+  const bUSD = (x) => (x == null ? "—" : (x >= 0 ? "+" : "−") + "$" + Math.abs(x).toFixed(2) + "B");
+  const head = "<tr><th>Date</th><th>SPCX (ret)</th><th>basket ret</th><th>Actual NAV (ret)</th>" +
+    "<th>implied SpaceX wt</th><th>carried</th><th>Δ</th><th>implied buy</th><th>net flow</th></tr>";
+  const body = rows.slice().reverse().map((r) => {
+    if (r.implied_w_spx_pct == null) {
+      return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${sp(r.spcx_ret_pct)}%)</span></td>` +
+        `<td>${sp(r.basket_ret_pct, 2)}%</td><td class="dim">pending</td><td colspan="5" class="dim">awaiting actual NAV</td></tr>`;
+    }
+    const dcol = r.w_spx_delta_pct > 0.3 ? SPX : (r.w_spx_delta_pct < -0.3 ? BAD : MUTED);
+    const fcol = r.implied_net_flow_b == null ? MUTED : (r.implied_net_flow_b < 0 ? BAD : GOOD);
+    const carriedCell = r.carried_w_spx_pct != null ? r.carried_w_spx_pct + "%" : "—";
+    return `<tr><td><b>${r.date}</b></td>` +
+      `<td>$${r.spcx} <span class="dim">(${sp(r.spcx_ret_pct)}%)</span></td>` +
+      `<td>${sp(r.basket_ret_pct, 2)}% <span class="dim">[${sp(r.basket_ret_band_pct[0], 2)},${sp(r.basket_ret_band_pct[1], 2)}]</span></td>` +
+      `<td><b style="color:${SPX}">${r.actual_nav.toFixed(2)}</b> <span class="dim">(${sp(r.navret_pct)}%)</span></td>` +
+      `<td><b>${r.implied_w_spx_pct}%</b> <span class="dim">(${r.implied_w_spx_band_pct[0]}–${r.implied_w_spx_band_pct[1]})</span></td>` +
+      `<td class="dim">${carriedCell}</td>` +
+      `<td style="color:${dcol};font-weight:700">${sp(r.w_spx_delta_pct)}pt</td>` +
+      `<td style="color:${r.implied_buy_m > 5 ? SPX : MUTED}"><b>${mUSD(r.implied_buy_m)}</b><br><span class="dim" style="font-size:10px">on ${r.buy_attributed_to}</span></td>` +
+      `<td style="color:${fcol}">${bUSD(r.implied_net_flow_b)}</td></tr>`;
+  }).join("");
+  const cap = isVintage
+    ? "Frozen the morning each actual NAV first landed — never edited. The honest real-time track record."
+    : "Recomputed every build with all current data + assumptions. Inverts each day's actual NAV (and AUM) into SpaceX weight, buy (attributed to the prior close) and net flow. Bands span the 3/31→5/31 disclosed weightings.";
+  L.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>` +
+    `<p class="dim" style="margin-top:6px">${cap}</p>`;
+  const interp = rows.filter((r) => r.interpretation).slice().reverse()
+    .map((r) => `<li><b>${r.date}:</b> ${r.interpretation}</li>`).join("");
+  if (interp) L.innerHTML += `<ul style="margin-top:8px">${interp}</ul>`;
+}
+
 /* ---- Daily recalibration ledger: invert actual NAV+AUM -> weight/buy/flow ---- */
 function renderRecalib(d) {
   const card = document.getElementById("recalib-card");
@@ -1507,52 +1565,15 @@ function renderRecalib(d) {
       `<p style="margin:10px 0 0">${b.takeaway}</p>`;
   }
 
-  // --- SpaceX-weight series chart: carried vs implied (with band) ---
-  const s = d.w_spx_series, dates = s.map((x) => x.date);
-  const carried = { x: dates, y: s.map((x) => x.carried_w_spx_pct), type: "scatter",
-    mode: "lines+markers", name: "carried (no-buy)", line: { color: MUTED, width: 2, dash: "dot" },
-    marker: { size: 7 } };
-  const impPts = s.filter((x) => x.implied_w_spx_pct != null);
-  const implied = { x: impPts.map((x) => x.date), y: impPts.map((x) => x.implied_w_spx_pct),
-    type: "scatter", mode: "markers", name: "implied by actual NAV", marker: { color: SPX, size: 11, symbol: "diamond" },
-    error_y: { type: "data", symmetric: false, array: impPts.map((x) => x.hi - x.implied_w_spx_pct),
-               arrayminus: impPts.map((x) => x.implied_w_spx_pct - x.lo), color: SPX, thickness: 1.4, width: 6 } };
-  Plotly.newPlot("recalib-wchart", [carried, implied], baseLayout({
-    margin: { l: 48, r: 16, t: 8, b: 36 }, hovermode: "closest",
-    showlegend: true, legend: { orientation: "h", y: 1.12, x: 0 },
-    xaxis: { gridcolor: GRID, type: "category" },
-    yaxis: { gridcolor: GRID, title: "SpaceX weight (% of net)", ticksuffix: "%" },
-  }), plotConfig());
-
-  // --- ledger table ---
-  const L = document.getElementById("recalib-ledger");
-  if (L) {
-    const head = "<tr><th>Date</th><th>SPCX (ret)</th><th>basket ret</th><th>Actual NAV (ret)</th>" +
-      "<th>implied SpaceX wt</th><th>carried</th><th>Δ</th><th>implied buy</th><th>net flow</th></tr>";
-    const body = d.ledger.slice().reverse().map((r) => {
-      if (r.implied_w_spx_pct == null) {
-        return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${sp(r.spcx_ret_pct)}%)</span></td>` +
-          `<td>${sp(r.basket_ret_pct, 2)}%</td><td class="dim">pending</td><td colspan="5" class="dim">awaiting actual NAV</td></tr>`;
-      }
-      const dcol = r.w_spx_delta_pct > 0.3 ? SPX : (r.w_spx_delta_pct < -0.3 ? BAD : MUTED);
-      const fcol = r.implied_net_flow_b == null ? MUTED : (r.implied_net_flow_b < 0 ? BAD : GOOD);
-      return `<tr><td><b>${r.date}</b></td>` +
-        `<td>$${r.spcx} <span class="dim">(${sp(r.spcx_ret_pct)}%)</span></td>` +
-        `<td>${sp(r.basket_ret_pct, 2)}% <span class="dim">[${sp(r.basket_ret_band_pct[0], 2)},${sp(r.basket_ret_band_pct[1], 2)}]</span></td>` +
-        `<td><b style="color:${SPX}">${r.actual_nav.toFixed(2)}</b> <span class="dim">(${sp(r.navret_pct)}%)</span></td>` +
-        `<td><b>${r.implied_w_spx_pct}%</b> <span class="dim">(${r.implied_w_spx_band_pct[0]}–${r.implied_w_spx_band_pct[1]})</span></td>` +
-        `<td class="dim">${r.carried_w_spx_pct}%</td>` +
-        `<td style="color:${dcol};font-weight:700">${sp(r.w_spx_delta_pct)}pt</td>` +
-        `<td style="color:${r.implied_buy_m > 5 ? SPX : MUTED}"><b>${mUSD(r.implied_buy_m)}</b><br><span class="dim" style="font-size:10px">on ${r.buy_attributed_to}</span></td>` +
-        `<td style="color:${fcol}">${bUSD(r.implied_net_flow_b)}</td></tr>`;
-    }).join("");
-    L.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>` +
-      `<p class="dim" style="margin-top:6px">Each row inverts that day's actual NAV (and AUM) into the SpaceX weight, SpaceX buy (attributed to the prior close) and net flow needed to explain it. Bands span the 3/31→5/31 disclosed weightings.</p>`;
-    // interpretation lines under the table
-    const interp = d.ledger.filter((r) => r.interpretation).slice().reverse()
-      .map((r) => `<li><b>${r.date}:</b> ${r.interpretation}</li>`).join("");
-    if (interp) L.innerHTML += `<ul style="margin-top:8px">${interp}</ul>`;
-  }
+  // --- two views: ① as-of (vintage, frozen)  ② revised (all-data) ---
+  const vn = document.getElementById("recalib-views-note");
+  if (vn) vn.innerHTML = "<b>Two views.</b> " + m.two_views_note;
+  const carriedSeries = d.w_spx_series;   // mechanical no-buy carry (shared baseline)
+  const revisedImplied = d.w_spx_series.filter((x) => x.implied_w_spx_pct != null);
+  drawWChart("recalib-wchart-vintage", d.w_spx_series_vintage, carriedSeries, "as-of (frozen)", WARN);
+  drawWChart("recalib-wchart", revisedImplied, carriedSeries, "revised (all-data)", SPX);
+  drawRecalibLedger("recalib-ledger-vintage", d.vintage_ledger, true);
+  drawRecalibLedger("recalib-ledger", d.ledger, false);
 
   // --- methodology memo ---
   const meth = document.getElementById("recalib-method");
