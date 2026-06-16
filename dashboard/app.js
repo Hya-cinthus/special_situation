@@ -114,6 +114,8 @@ function render() {
     .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderDailyLog(d); }).catch(() => {});
   fetch("data/recalibration.json", { cache: "no-store" })
     .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderRecalib(d); }).catch(() => {});
+  fetch("data/long_replication.json", { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderLongRep(d); }).catch(() => {});
 }
 
 /* ---- Daily NAV-estimate log: per-basket predicted NAV vs actual ---- */
@@ -1595,6 +1597,74 @@ function renderRecalib(d) {
     }).join("");
     V.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
   }
+}
+
+/* ---- Long-horizon replication: public book (known NPORT shares) vs NAV ---- */
+function renderLongRep(d) {
+  const card = document.getElementById("longrep-card");
+  if (!card) return;
+  card.style.display = "";
+  const m = d.meta, s = d.series, st = d.stats;
+  document.getElementById("longrep-headline").innerHTML = m.method;
+  const kpi = (label, value, note, cls) =>
+    `<div class="kpi"><span class="label">${label}</span><div class="value${cls ? " " + cls : ""}">${value}</div><div class="note">${note}</div></div>`;
+  document.getElementById("longrep-kpis").innerHTML =
+    kpi("Window", m.window[0] + " → " + m.window[1], m.n_days + " trading days · " + m.n_quarters + " quarters") +
+    kpi("SpaceX weight", st.spacex_wt_start_pct + "% → " + st.spacex_wt_end_pct + "%", "NPORT-measured, of net", "spx") +
+    kpi("NAV vs public-only", st.cum_actual_idx.toFixed(0) + " vs " + st.cum_public_idx.toFixed(0), "index (start=100)") +
+    kpi("SpaceX + financing", "+" + st.cum_spacex_plus_fin_pct + "%", "cumulative gap = SpaceX contribution", "spx") +
+    kpi("Daily tracking error", st.quiet_resid_sd_bps.toFixed(0) + " bps", "quiet-day resid σ (mean " + st.quiet_resid_mean_bps + " bps)");
+
+  // event lines (SpaceX marks)
+  const shapes = (d.events || []).map((e) => ({
+    type: "line", x0: e.date, x1: e.date, yref: "paper", y0: 0, y1: 1,
+    line: { color: _rgba(SPX, 0.4), width: 1, dash: "dot" } }));
+  const anns = (d.events || []).map((e) => ({
+    x: e.date, yref: "paper", y: 1, text: e.label, showarrow: false,
+    font: { size: 8, color: MUTED }, textangle: -90, xanchor: "left", yanchor: "top" }));
+
+  // ① cumulative actual vs public-only
+  const actual = { x: s.map((p) => p.date), y: s.map((p) => p.cum_actual), type: "scatter",
+    mode: "lines", name: "actual NAV (total return)", line: { color: SPX, width: 2 } };
+  const pub = { x: s.map((p) => p.date), y: s.map((p) => p.cum_public), type: "scatter",
+    mode: "lines", name: "public book only", line: { color: ACC, width: 2 },
+    fill: "tonexty", fillcolor: _rgba(SPX, 0.07) };
+  Plotly.newPlot("longrep-cumchart", [pub, actual], baseLayout({
+    margin: { l: 48, r: 14, t: 16, b: 36 }, hovermode: "x unified",
+    showlegend: true, legend: { orientation: "h", y: 1.1, x: 0 }, shapes, annotations: anns,
+    xaxis: { gridcolor: GRID, type: "date" },
+    yaxis: { gridcolor: GRID, title: "growth index (start = 100)" },
+  }), plotConfig());
+
+  // ② SpaceX weight path (quarterly, stepped)
+  const q = d.quarters;
+  const wt = { x: q.map((x) => x.report_date), y: q.map((x) => x.wS_pct), type: "scatter",
+    mode: "lines+markers", name: "SpaceX % of net", line: { color: SPX, width: 2, shape: "hv" },
+    marker: { size: 6 } };
+  const cov = { x: q.map((x) => x.report_date), y: q.map((x) => x.coverage_pct), type: "scatter",
+    mode: "lines", name: "public mapping coverage %", line: { color: MUTED, width: 1.4, dash: "dot" }, yaxis: "y2" };
+  Plotly.newPlot("longrep-wtchart", [wt, cov], baseLayout({
+    margin: { l: 44, r: 44, t: 16, b: 36 }, hovermode: "x unified",
+    showlegend: true, legend: { orientation: "h", y: 1.14, x: 0 },
+    xaxis: { gridcolor: GRID, type: "date" },
+    yaxis: { gridcolor: GRID, title: "SpaceX % of net", ticksuffix: "%" },
+    yaxis2: { overlaying: "y", side: "right", range: [80, 100], ticksuffix: "%", showgrid: false, title: "coverage" },
+  }), plotConfig());
+
+  // quarters table
+  const Q = document.getElementById("longrep-quarters");
+  if (Q) {
+    const head = "<tr><th>Quarter</th><th>Net assets</th><th>Leverage</th><th>SpaceX % net</th>" +
+      "<th>SpaceX $</th><th>public % net</th><th>coverage</th></tr>";
+    const body = q.slice().reverse().map((x) =>
+      `<tr><td><b>${x.report_date}</b></td><td>${usd(x.net_assets)}</td><td>${x.leverage ? x.leverage.toFixed(3) + "×" : "—"}</td>` +
+      `<td style="color:${SPX};font-weight:600">${x.wS_pct}%</td><td>${usd(x.spacex_value)}</td>` +
+      `<td>${x.wP_pct}%</td><td class="${x.coverage_pct >= 90 ? "" : "dim"}">${x.coverage_pct}%</td></tr>`).join("");
+    Q.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
+  }
+  document.getElementById("longrep-method").innerHTML = "<b>Coverage.</b> " + m.coverage_note + " " + m.price_basis;
+  document.getElementById("longrep-disc").innerHTML =
+    `<span class="dim"><b>Read honestly:</b> the cumulative gap and the SpaceX weight path are robust, but the quiet-day daily tracking error is ~${st.quiet_resid_sd_bps.toFixed(0)} bps — quarter-constant weights + the held-flat 'other' bucket mean the long history pins the <i>structural</i> SpaceX picture, not a tight day-by-day weight. ${m.disclaimer}</span>`;
 }
 
 boot();

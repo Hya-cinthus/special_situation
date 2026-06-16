@@ -44,7 +44,9 @@ import urllib.request
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 _RAW_EDGAR = os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data", "raw", "edgar")
 _NAV_CSV = os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data", "processed", "nav_daily.csv")
-_PRICE_CACHE = os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data", "raw", "replication_prices.json")
+# NOTE: lives in data/ (tracked), NOT data/raw/ (gitignored) -> the cache commits so
+# the CI rebuild stays network-free instead of shipping a blank card.
+_PRICE_CACHE = os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data", "replication_prices.json")
 _OUT = os.path.join(_REPO_ROOT, "dashboard", "data", "long_replication.json")
 
 START = "2023-01-01"          # study window start

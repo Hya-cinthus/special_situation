@@ -237,6 +237,16 @@ def main(argv):
         print(f"[recalibrate] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[recalibrate] skipped: {e}")
+    # Long-horizon (3yr) public-book replication (reads cached prices; network-free).
+    try:
+        import long_replication
+        if long_replication.build_payload() is not None:
+            p = long_replication.write_json()
+            print(f"[long_replication] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+        else:
+            print("[long_replication] skipped: no price cache (run `py long_replication.py --refresh`)")
+    except Exception as e:
+        print(f"[long_replication] skipped: {e}")
     print(f"\nDone in {time.time()-t0:.1f}s. Open dashboard/index.html "
           f"(or `cd dashboard && py -m http.server 8000`).")
 
