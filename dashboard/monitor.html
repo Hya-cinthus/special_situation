@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily &amp; Studies — SpaceX / Baron Partners</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Daily &amp; Studies</h1>
+    <span class="sub">live NAV estimate · recalibration · long-horizon studies — newest info added each day</span>
+    <nav class="sitnav">
+      <a href="overview.html">Overview</a>
+      <a href="index.html">BPTIX</a>
+      <a href="monitor.html" class="active">Daily / Studies</a>
+      <a href="vcx.html">VCX</a>
+      <a href="dxyz.html">DXYZ</a>
+      <a href="rvi.html">RVI</a>
+      <a href="agix.html">AGIX</a>
+      <a href="arkvx.html">ARKVX</a>
+      <a href="ark.html">ARK IPO</a>
+      <a href="arkopt.html">ARKK Options</a>
+      <a href="hedge.html">Hedge Book</a>
+    </nav>
+  </header>
+  <div class="disclaimer">Estimates &amp; studies, not the fund's record. Every number is sourced or labelled an estimate; see each card.</div>
+
+  <main>
+    <section class="card" id="spacex-position-card" style="display:none">
+      <h2 id="spxpos-title">SpaceX position — pre-IPO holding vs the 6/12 IPO-day buy</h2>
+      <p class="desc" id="spxpos-headline"></p>
+      <div class="kpis" id="spxpos-kpis" style="margin:14px 0"></div>
+      <h3 style="margin:16px 0 6px">Where the "~$262M Friday buy" comes from — step by step</h3>
+      <div id="spxpos-derivation" class="memo"></div>
+      <h3 style="margin:18px 0 6px">At what price / how many shares</h3>
+      <div id="spxpos-buy" class="memo"></div>
+      <h3 style="margin:18px 0 6px">Current holding: pre-IPO vs the Friday add, at each daily mark</h3>
+      <div class="scroll-x" id="spxpos-table"></div>
+      <p class="desc" id="spxpos-disc" style="margin-top:10px"></p>
+    </section>
+
+    <section class="card" id="dailylog-card">
+      <h2>Daily NAV estimate — each basket weighting vs actual</h2>
+      <p class="desc" id="dailylog-note"></p>
+      <div id="dailylog-toggle" style="margin:8px 0"></div>
+      <div class="scroll-x" id="dailylog-table"></div>
+      <p class="desc" id="dailylog-src" style="margin-top:10px"></p>
+    </section>
+
+    <section class="card" id="recalib-card" style="display:none">
+      <h2>Daily recalibration — back-solving SpaceX weight, buy &amp; flow</h2>
+      <p class="desc" id="recalib-headline"></p>
+      <div id="recalib-belief" style="margin:14px 0"></div>
+      <p class="desc" id="recalib-views-note"></p>
+
+      <h3 style="margin:18px 0 6px">① As-of (vintage) — each day frozen the morning it's first known</h3>
+      <div id="recalib-wchart-vintage" style="height:320px"></div>
+      <div class="scroll-x" id="recalib-ledger-vintage"></div>
+
+      <h3 style="margin:24px 0 6px">② Revised (all-data) — whole history re-estimated each build</h3>
+      <div id="recalib-wchart" style="height:320px"></div>
+      <div class="scroll-x" id="recalib-ledger"></div>
+
+      <h3 style="margin:20px 0 6px">Why we don't free the public weights daily (degrees of freedom)</h3>
+      <div id="recalib-method" class="memo"></div>
+      <h3 style="margin:20px 0 6px">Volatility-aware drift budget — high-vol pinned, low-vol loose</h3>
+      <p class="desc" id="recalib-voltol-note"></p>
+      <div class="scroll-x" id="recalib-voltol"></div>
+      <p class="desc" id="recalib-disc" style="margin-top:10px"></p>
+    </section>
+
+    <section class="card" id="longrep-card" style="display:none">
+      <h2>Long-horizon replication — 3 years of known NPORT shares vs NAV</h2>
+      <p class="desc" id="longrep-headline"></p>
+      <div id="longrep-kpis" style="display:flex;gap:14px;flex-wrap:wrap;margin:12px 0"></div>
+      <h3 style="margin:16px 0 6px">Actual NAV vs replicated = public book + SpaceX re-marks (stacked)</h3>
+      <div id="longrep-cumchart" style="height:380px"></div>
+      <h3 style="margin:18px 0 6px">Deviation (actual − replicated) — where &amp; why they differ</h3>
+      <div id="longrep-residchart" style="height:240px"></div>
+      <h3 style="margin:18px 0 6px">SpaceX weight path — NPORT-measured each quarter</h3>
+      <div id="longrep-wtchart" style="height:260px"></div>
+      <h3 style="margin:18px 0 6px">Quarterly anchors</h3>
+      <div class="scroll-x" id="longrep-quarters"></div>
+      <p class="desc" id="longrep-method" style="margin-top:10px"></p>
+      <p class="desc" id="longrep-disc"></p>
+    </section>
+
+    <section class="card" id="ipoday-card" style="display:none">
+      <h2 id="ipoday-title">IPO day (6/12): did BPTIX buy SpaceX at the IPO? — marks vs reported AUM</h2>
+      <p class="desc" id="ipoday-intro"></p>
+      <div class="kpis" id="ipoday-kpis" style="margin:14px 0"></div>
+      <h3 style="margin:16px 0 6px">① Two growth rates — the whole story</h3>
+      <div id="ipoday-growth" class="memo"></div>
+      <h3 style="margin:18px 0 6px">② Did they add SpaceX at the IPO? — the per-share NAV test</h3>
+      <div id="ipoday-navtest" class="memo"></div>
+      <h3 style="margin:18px 0 6px">③ Solving the split: SpaceX-at-IPO vs neutral new money</h3>
+      <div id="ipoday-split" class="memo"></div>
+      <h3 style="margin:18px 0 6px">④ Bounding a buy at an unknown price — what can / can't be ruled out</h3>
+      <div id="ipoday-bounds" class="memo"></div>
+      <h3 style="margin:18px 0 6px">⑤ Counter-test: if it were ALL SpaceX, what execution price?</h3>
+      <div id="ipoday-allspx" class="memo"></div>
+      <h3 style="margin:18px 0 6px">⑥ Funding channels &amp; leverage — what's ruled out vs invisible</h3>
+      <div id="ipoday-funding" class="memo"></div>
+      <h3 style="margin:18px 0 6px">⑦ The buy-size × execution-price locus — is there a reasonable point?</h3>
+      <div id="ipoday-locus-toggle" style="margin:6px 0 4px"></div>
+      <div id="ipoday-locus" class="chart" style="height:400px"></div>
+      <p class="desc" id="ipoday-locus-note" style="margin-top:6px"></p>
+
+      <h3 style="margin:18px 0 6px">⑧ Noise check: is Friday's miss abnormal vs the basket's daily tracking error?</h3>
+      <div id="ipoday-noise-view" style="margin:6px 0 2px"></div>
+      <div id="ipoday-noise-toggle" style="margin:4px 0"></div>
+      <div id="ipoday-noise" class="chart" style="height:360px"></div>
+      <p class="desc" id="ipoday-noise-note" style="margin-top:6px"></p>
+
+      <h3 style="margin:18px 0 6px">⑨ Friday: what each holding contributed (weight × return) — why reweighting can't fix it</h3>
+      <div id="ipoday-friday" class="chart" style="height:460px"></div>
+      <p class="desc" id="ipoday-friday-note" style="margin-top:6px"></p>
+
+      <h3 style="margin:18px 0 6px">⑩ Best-fit basket — the reweight(s) that PERFECTLY explain the daily history</h3>
+      <p class="desc" id="ipoday-bestfit-intro"></p>
+      <h4 style="margin:14px 0 4px;color:#8b97a7;font-weight:600">All 23 weights: disclosed vs best-fit, with the range across ~50 perfect fits (tight = pinned, wide = free)</h4>
+      <div id="ipoday-bestfit-w" class="chart" style="height:640px"></div>
+      <h4 style="margin:14px 0 4px;color:#8b97a7;font-weight:600">Do the perfect fits cluster? — toggle the axes to explore (each dot = one perfect fit)</h4>
+      <div id="ipoday-bestfit-axes" style="margin:4px 0 6px;font-size:12px"></div>
+      <div id="ipoday-bestfit-cluster" class="chart" style="height:420px"></div>
+      <h4 style="margin:14px 0 4px;color:#8b97a7;font-weight:600">Hedging residual of the central best-fit (≈0 in-sample; Friday held out)</h4>
+      <div id="ipoday-bestfit-r" class="chart" style="height:260px"></div>
+      <p class="desc" id="ipoday-bestfit-note" style="margin-top:6px"></p>
+
+      <p class="desc" id="ipoday-conclusion" style="margin-top:12px"></p>
+      <p class="desc" id="ipoday-source" style="margin-top:8px"></p>
+    </section>
+
+    <section class="card" id="baron-funds-card">
+      <h2>SpaceX across the Baron fund family — and where the IPO allocation lands</h2>
+      <p class="desc" id="bf-intro"></p>
+
+      <div class="kpis" id="bf-kpis" style="margin:14px 0"></div>
+
+      <h3 style="margin:18px 0 6px">① The six Baron funds that hold SpaceX (SEC NPORT-P, 3/31/2026)</h3>
+      <p class="desc" id="bf-funds-note" style="margin-top:0"></p>
+      <div class="scroll-x" id="bf-funds-table"></div>
+
+      <h3 style="margin:20px 0 6px">② SpaceX held by fund, every quarter (2019 → 2026)</h3>
+      <p class="desc" style="margin-top:0">Dollars stacked (left); the line is family-total SpaceX. Baron Partners is the large majority throughout.</p>
+      <div id="bf-chart-dollars" class="chart" style="height:380px"></div>
+
+      <h3 style="margin:20px 0 6px">③ SpaceX as a % of each fund's net assets</h3>
+      <div id="bf-chart-pct" class="chart" style="height:340px"></div>
+
+      <h3 style="margin:20px 0 6px">④ Firm-wide: the public funds are under half of Baron's SpaceX</h3>
+      <p class="desc" id="bf-firm-note" style="margin-top:0"></p>
+      <div class="scroll-x" id="bf-firm-table"></div>
+
+      <h3 style="margin:20px 0 6px">⑤ The SpaceX IPO (SPCX) — key terms</h3>
+      <div id="bf-ipo" class="memo"></div>
+
+      <h3 style="margin:20px 0 6px">⑥ Baron's $1B IPO order → how much reaches Baron Partners / BPTIX?</h3>
+      <div id="bf-alloc" class="memo"></div>
+
+      <p class="desc" id="bf-source" style="margin-top:12px"></p>
+    </section>
+
+    <p class="desc" style="text-align:center;margin-top:30px">Updated daily as new closes / NAV / AUM arrive · <a href="index.html">← BPTIX situation page</a></p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

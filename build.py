@@ -237,6 +237,13 @@ def main(argv):
         print(f"[recalibrate] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[recalibrate] skipped: {e}")
+    # SpaceX position breakdown (pre-IPO vs 6/12 buy; the $262M derivation; network-free).
+    try:
+        import spacex_position
+        p = spacex_position.write_json()
+        print(f"[spacex_position] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[spacex_position] skipped: {e}")
     # Long-horizon (3yr) public-book replication (reads cached prices; network-free).
     try:
         import long_replication

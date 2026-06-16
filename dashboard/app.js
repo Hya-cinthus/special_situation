@@ -54,7 +54,11 @@ function combined(base, ipoVal, flow) {
 
 /* ------------------------------ bootstrap ------------------------------ */
 async function boot() {
-  await load(SITUATIONS[0].file);
+  if (document.getElementById("content")) {
+    await load(SITUATIONS[0].file);   // full BPTIX situation page (index.html): main + cards
+  } else {
+    loadCards();                       // monitor / studies page: just the cards it contains
+  }
 }
 
 async function load(file) {
@@ -104,18 +108,22 @@ function render() {
   renderMarksTable();
   renderGaps();
   initScenario();
-  fetch("data/nport_holdings.json", { cache: "no-store" })
-    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderRecon(d); }).catch(() => {});
-  fetch("data/baron_spacex_funds.json", { cache: "no-store" })
-    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderBaronFunds(d); }).catch(() => {});
-  fetch("data/ipo_day_recon.json", { cache: "no-store" })
-    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderIpoDay(d); }).catch(() => {});
-  fetch("data/daily_nav_log.json", { cache: "no-store" })
-    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderDailyLog(d); }).catch(() => {});
-  fetch("data/recalibration.json", { cache: "no-store" })
-    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderRecalib(d); }).catch(() => {});
-  fetch("data/long_replication.json", { cache: "no-store" })
-    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) renderLongRep(d); }).catch(() => {});
+  loadCards();
+}
+
+/* Sub-card fetches. Each render() guards its own container, so a card only paints
+ * on the page that actually has its <section> — index.html keeps the structural
+ * cards, monitor.html (daily & studies) keeps the rest. Runs on both pages. */
+function loadCards() {
+  const card = (file, fn) => fetch(file, { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : null)).then((d) => { if (d) fn(d); }).catch(() => {});
+  card("data/nport_holdings.json", renderRecon);
+  card("data/baron_spacex_funds.json", renderBaronFunds);
+  card("data/spacex_position.json", renderSpacexPosition);
+  card("data/ipo_day_recon.json", renderIpoDay);
+  card("data/daily_nav_log.json", renderDailyLog);
+  card("data/recalibration.json", renderRecalib);
+  card("data/long_replication.json", renderLongRep);
 }
 
 /* ---- Daily NAV-estimate log: per-basket predicted NAV vs actual ---- */
@@ -1610,6 +1618,44 @@ function renderRecalib(d) {
     }).join("");
     V.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
   }
+}
+
+/* ---- SpaceX position: pre-IPO holding vs the 6/12 IPO-day buy (the $262M) ---- */
+function renderSpacexPosition(d) {
+  const card = document.getElementById("spacex-position-card");
+  if (!card) return;
+  card.style.display = "";
+  const m = d.meta, fb = d.friday_buy, cur = d.current, pre = d.pre_ipo;
+  const uM = (x) => "$" + (x / 1e6).toFixed(0) + "M", uB = (x) => "$" + (x / 1e9).toFixed(2) + "B";
+  const sh = (x) => (x / 1e6).toFixed(2) + "M";
+  document.getElementById("spxpos-title").textContent = m.title;
+  document.getElementById("spxpos-headline").innerHTML = m.headline;
+  const kpi = (l, v, n, cls) =>
+    `<div class="kpi"><span class="label">${l}</span><div class="value${cls ? " " + cls : ""}">${v}</div><div class="note">${n}</div></div>`;
+  document.getElementById("spxpos-kpis").innerHTML =
+    kpi("Current SpaceX", uB(cur.total_value_usd), sh(cur.total_shares) + " sh · as of " + cur.as_of + " ($" + cur.spcx + ")", "spx") +
+    kpi("Pre-IPO (disclosed)", uB(cur.pre_ipo_value_usd), sh(pre.shares) + " sh · 3/31 NPORT") +
+    kpi("Friday IPO add", uM(cur.friday_value_usd), sh(fb.shares) + " sh · " + cur.friday_pct + "% of holding", "spx") +
+    kpi("Friday cash (est)", uM(fb.cash_low_usd) + "–" + uM(fb.cash_vwap_usd), "@ $" + fb.cash_low_price + " IPO → $" + fb.cash_vwap_price + " VWAP");
+  document.getElementById("spxpos-derivation").innerHTML =
+    "<ol style='margin:0;padding-left:20px;line-height:1.75'>" +
+    d.derivation.map((s) => `<li><b>${s.step}.</b> ${s.detail}</li>`).join("") + "</ol>";
+  document.getElementById("spxpos-buy").innerHTML =
+    `<p><b>Shares are pinned; the cash is a range.</b> The back-solve gives the Friday-<b>close</b> marked value ` +
+    `<b style="color:${SPX}">${uM(fb.close_value_usd)}</b> (band ${uM(fb.close_value_band_usd[0])}–${uM(fb.close_value_band_usd[1])}). ` +
+    `Divide by the $${fb.mark_close} close → <b>${sh(fb.shares)} shares</b> added — fixed regardless of execution price. ` +
+    `Cash deployed = shares × execution price: <b>${uM(fb.cash_low_usd)}</b> if IPO-allocated at $${fb.cash_low_price}, up to ` +
+    `<b>${uM(fb.cash_vwap_usd)}</b> at the ~$${fb.cash_vwap_price} VWAP. So "$${(fb.close_value_usd / 1e6).toFixed(0)}M" is the value that lands in the holding, ` +
+    `not necessarily the cash spent.<br><span class="dim">${fb.ipo_intraday}</span></p>`;
+  const V = document.getElementById("spxpos-table");
+  if (V) {
+    const head = "<tr><th>Date</th><th>SPCX</th><th>Pre-IPO $</th><th>Friday add $</th><th>Total SpaceX $</th><th>Friday % of holding</th></tr>";
+    const body = d.value_path.slice().reverse().map((r) =>
+      `<tr><td><b>${r.date}</b></td><td>$${r.spcx}</td><td>${uB(r.pre_ipo_usd)}</td>` +
+      `<td style="color:${SPX}">${uM(r.friday_usd)}</td><td><b>${uB(r.total_usd)}</b></td><td class="dim">${r.friday_pct}%</td></tr>`).join("");
+    V.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
+  }
+  document.getElementById("spxpos-disc").innerHTML = "<span class='dim'>" + m.disclaimer + "</span>";
 }
 
 /* ---- Long-horizon replication: actual NAV vs public book + SpaceX re-marks ---- */
