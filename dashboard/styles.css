@@ -158,11 +158,18 @@ a:hover { text-decoration: underline; }
 .badge.note     { background:#2a2f38; color:var(--muted); }
 td.spxcell { color: var(--spacex); font-weight: 600; }
 .sub2 { color: var(--muted); font-size: .7rem; }
-.gaps { font-size: .82rem; }
+/* Magazine layout: span the full card width. Intro + section headers + rules
+   stretch across; the individual gap items flow into balanced columns. */
+.gaps { font-size: .82rem; columns: 3 300px; column-gap: 30px; }
+.gaps p, .gaps h1, .gaps > h2, .gaps hr { column-span: all; }
 .gaps h1, .gaps h2, .gaps h3 { color: var(--text); }
 .gaps h1 { font-size: 1.05rem; } .gaps h2 { font-size: .95rem; margin-top: 16px; } .gaps h3 { font-size: .85rem; }
+.gaps h3 { margin-top: 14px; break-after: avoid; }
 .gaps code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-size: .9em; }
-.gaps ul { padding-left: 18px; }
+.gaps ul { padding-left: 18px; margin: 4px 0 12px; break-inside: avoid; }
+.gaps li { break-inside: avoid; }
+.gaps hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+@media (max-width: 900px) { .gaps { columns: 1; } }
 
 .loading { padding: 60px; text-align: center; color: var(--muted); }
 .error { padding: 20px; color: var(--bad); background: #2a1515; border: 1px solid #5a2020; border-radius: 8px; }
