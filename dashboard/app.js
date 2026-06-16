@@ -126,7 +126,7 @@ function renderDailyLog(d) {
   const note = document.getElementById("dailylog-note");
   if (note) note.innerHTML = d.meta.note;
   const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt</th>" +
-    ms.map((m) => `<th>${lbl[m]}</th>`).join("") + "<th>perfect-fit range</th><th>Actual NAV</th><th>best</th></tr>";
+    ms.map((m) => `<th>${lbl[m]}</th>`).join("") + "<th>perfect-fit range</th><th>Actual NAV</th><th>best</th><th>what's new this day</th></tr>";
   const body = d.rows.slice().reverse().map((r) => {
     const cells = ms.map((m) => {
       const isBest = r.best_method === m;
@@ -135,10 +135,11 @@ function renderDailyLog(d) {
       return `<td style="${isBest ? `background:${_rgba(GOOD, 0.16)};font-weight:700` : ""}">${r.preds[m].pred_nav.toFixed(2)}${errTxt}</td>`;
     }).join("");
     const pf = r.perfect_fit_range ? `<span style="color:${SPX}">${r.perfect_fit_range[0].toFixed(2)} – ${r.perfect_fit_range[1].toFixed(2)}</span>` : "—";
-    const act = r.actual_nav != null ? `<b style="color:${SPX}">${r.actual_nav.toFixed(2)}</b>` : `<span class="dim">pending</span>`;
+    const act = r.actual_nav != null ? `<b style="color:${SPX}">${r.actual_nav.toFixed(2)}</b>` : `<span class="dim">est. only</span>`;
     const best = r.best_method ? lbl[r.best_method] : "—";
+    const noteCell = r.note ? `<td style="white-space:normal;min-width:240px;max-width:340px;text-align:left;font-size:11px" class="dim">${r.note}</td>` : "<td></td>";
     return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${r.spcx_ret_pct >= 0 ? "+" : ""}${r.spcx_ret_pct}%)</span></td>` +
-      `<td>${r.spacex_weight_pct}%</td>${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td></tr>`;
+      `<td>${r.spacex_weight_pct}%</td>${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
   }).join("");
   card.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
   const src = document.getElementById("dailylog-src");

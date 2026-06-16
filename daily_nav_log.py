@@ -23,19 +23,39 @@ import fund_snapshots as fs
 
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-# Base = last fully-known day before the log starts (6/12 Fri close).
+# Base = last fully-known day before the log starts (6/12 Fri close). spacex_value
+# is the NO-BUY 6/12 mark (kept here so recalibrate.py's "prior" stays the no-buy
+# baseline); the Friday-buy ASSUMPTION below is added on top for the prediction.
 BASE = {"date": "2026-06-12", "nav": 289.98, "spcx": 160.95, "aum": 20.4e9, "spacex_value": 5.945106488e9}
+
+# NEW ASSUMPTION (2026-06-16): 6/15's actual NAV cleared every no-buy basket AND the
+# perfect-fit band, so 6/12 (Friday) DID add SpaceX. The recalibration back-solves
+# ~$262M (band $259-344M). We fold that into the predicted SpaceX value here, which
+# lifts the carried SpaceX weight from ~29.1% (no buy) to ~30.4% on 6/15 and ~35.9%
+# carried into 6/16. Adjust this one number as the calibration tightens.
+FRIDAY_SPACEX_BUY = 0.262e9
 
 # Append one dict per trading day. closes = {ticker: close} for the 23 public names
 # (Yahoo-style tickers, HEI/A -> HEI-A). spcx = SPCX close. actual_nav = BPTIX NAV
 # (None until known). aum = Morningstar Total Assets (optional; improves w_spx).
+# note = the day's "what's new" (information added / what changed in the assumptions).
 ENTRIES = [
     {"date": "2026-06-15", "spcx": 192.50, "actual_nav": 307.55, "aum": 20.7e9,
      "closes": {"ACGL": 91.50, "BIRK": 47.93, "CHH": 112.00, "CSGP": 32.04, "FDS": 235.86,
                 "FIG": 18.51, "GLPI": 46.74, "GWRE": 120.03, "H": 198.95, "HEI": 336.18,
                 "HEI-A": 248.73, "IDXX": 570.00, "IT": 142.77, "KNSL": 311.83, "MSCI": 611.17,
                 "MTN": 134.40, "ONON": 38.69, "RRR": 61.13, "SCHW": 90.95, "SHOP": 112.49,
-                "SPOT": 479.85, "TSLA": 411.15, "VRSK": 180.46}},
+                "SPOT": 479.85, "TSLA": 411.15, "VRSK": 180.46},
+     "note": "Actual NAV 307.55 + AUM 20.7B in. NEW: it cleared every no-buy basket AND the perfect-fit band "
+             "-> Friday DID buy SpaceX (~$262M); w_spx raised 29.1%->30.4%. Implied ~$0.9B Monday outflow."},
+    {"date": "2026-06-16", "spcx": 201.80, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 92.58, "BIRK": 48.97, "CHH": 116.07, "CSGP": 31.97, "FDS": 237.56,
+                "FIG": 17.98, "GLPI": 46.73, "GWRE": 117.46, "H": 197.03, "HEI": 335.53,
+                "HEI-A": 248.11, "IDXX": 573.00, "IT": 142.24, "KNSL": 312.69, "MSCI": 608.16,
+                "MTN": 136.68, "ONON": 38.06, "RRR": 60.92, "SCHW": 93.67, "SHOP": 113.23,
+                "SPOT": 469.81, "TSLA": 404.66, "VRSK": 179.61},
+     "note": "Estimate only (BPTIX NAV + Morningstar AUM land tomorrow). SPCX 201.80 (+4.8%). Carries the "
+             "post-Friday-buy SpaceX weight (~35.9%). Public basket ~flat (TSLA -1.6%, insurers up)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
@@ -90,7 +110,7 @@ def build_payload():
     methods = list(METHOD_LABELS)
     ens_tk, ens_fits = _ensemble()
     prev = {"nav": BASE["nav"], "spcx": BASE["spcx"], "aum": BASE["aum"],
-            "spx_value": BASE["spacex_value"], "closes": _base_closes(H)}
+            "spx_value": BASE["spacex_value"] + FRIDAY_SPACEX_BUY, "closes": _base_closes(H)}
     rows = []
     for e in ENTRIES:
         spx_ret = e["spcx"] / prev["spcx"] - 1
@@ -127,7 +147,8 @@ def build_payload():
         rows.append({"date": e["date"], "spcx": e["spcx"], "spcx_ret_pct": round(spx_ret * 100, 2),
                      "spacex_weight_pct": round(w_spx * 100, 2), "prior_nav": prev["nav"],
                      "preds": preds, "perfect_fit_range": pf_range,
-                     "actual_nav": actual, "errors": errs, "best_method": best})
+                     "actual_nav": actual, "errors": errs, "best_method": best,
+                     "note": e.get("note", "")})
         # chain to next day: base off ACTUAL nav if known, else the median prediction
         base_nav = actual if actual else sorted(preds[m]["pred_nav"] for m in methods)[len(methods) // 2]
         spx_value = prev["spx_value"] * (e["spcx"] / prev["spcx"])
