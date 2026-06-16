@@ -30,7 +30,7 @@ BASE = {"date": "2026-06-12", "nav": 289.98, "spcx": 160.95, "aum": 20.4e9, "spa
 # (Yahoo-style tickers, HEI/A -> HEI-A). spcx = SPCX close. actual_nav = BPTIX NAV
 # (None until known). aum = Morningstar Total Assets (optional; improves w_spx).
 ENTRIES = [
-    {"date": "2026-06-15", "spcx": 192.50, "actual_nav": None, "aum": None,
+    {"date": "2026-06-15", "spcx": 192.50, "actual_nav": 307.55, "aum": 20.7e9,
      "closes": {"ACGL": 91.50, "BIRK": 47.93, "CHH": 112.00, "CSGP": 32.04, "FDS": 235.86,
                 "FIG": 18.51, "GLPI": 46.74, "GWRE": 120.03, "H": 198.95, "HEI": 336.18,
                 "HEI-A": 248.73, "IDXX": 570.00, "IT": 142.77, "KNSL": 311.83, "MSCI": 611.17,
