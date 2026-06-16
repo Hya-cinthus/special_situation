@@ -1596,56 +1596,82 @@ function renderRecalib(d) {
   }
 }
 
-/* ---- Long-horizon replication: public book (known NPORT shares) vs NAV ---- */
+/* ---- Long-horizon replication: actual NAV vs public book + SpaceX re-marks ---- */
 function renderLongRep(d) {
   const card = document.getElementById("longrep-card");
   if (!card) return;
   card.style.display = "";
-  const m = d.meta, s = d.series, st = d.stats;
+  const m = d.meta, s = d.series, st = d.stats, ev = d.events || [];
+  const sp = (x, dd = 2) => (x == null ? "—" : (x >= 0 ? "+" : "") + Number(x).toFixed(dd));
   document.getElementById("longrep-headline").innerHTML = m.method;
   const kpi = (label, value, note, cls) =>
     `<div class="kpi"><span class="label">${label}</span><div class="value${cls ? " " + cls : ""}">${value}</div><div class="note">${note}</div></div>`;
   document.getElementById("longrep-kpis").innerHTML =
-    kpi("Window", m.window[0] + " → " + m.window[1], m.n_days + " trading days · " + m.n_quarters + " quarters") +
+    kpi("Window", m.window[0] + " → " + m.window[1], m.n_days + " days · " + m.n_quarters + " quarters") +
     kpi("SpaceX weight", st.spacex_wt_start_pct + "% → " + st.spacex_wt_end_pct + "%", "NPORT-measured, of net", "spx") +
-    kpi("NAV vs public-only", st.cum_actual_idx.toFixed(0) + " vs " + st.cum_public_idx.toFixed(0), "index (start=100)") +
-    kpi("SpaceX + financing", "+" + st.cum_spacex_plus_fin_pct + "%", "cumulative gap = SpaceX contribution", "spx") +
-    kpi("Daily tracking error", st.quiet_resid_sd_bps.toFixed(0) + " bps", "quiet-day resid σ (mean " + st.quiet_resid_mean_bps + " bps)");
+    kpi("Actual vs replicated", st.cum_actual_idx.toFixed(0) + " / " + st.cum_repl_idx.toFixed(0), "index, start=100") +
+    kpi("Private share", st.private_share_of_repl_pct + "%", "of replicated growth = SpaceX", "spx") +
+    kpi("Tracking error", st.resid_sd_bps.toFixed(0) + " bps/day", "gap " + st.replication_gap_pct + "% = fees+financing+conservative mark");
 
-  // event lines (SpaceX marks)
-  const shapes = (d.events || []).map((e) => ({
-    type: "line", x0: e.date, x1: e.date, yref: "paper", y0: 0, y1: 1,
-    line: { color: _rgba(SPX, 0.4), width: 1, dash: "dot" } }));
-  const anns = (d.events || []).map((e) => ({
-    x: e.date, yref: "paper", y: 1, text: e.label, showarrow: false,
-    font: { size: 8, color: MUTED }, textangle: -90, xanchor: "left", yanchor: "top" }));
+  // event lookups
+  const cumAt = (date) => { let v = null; for (const p of s) { if (p.date <= date) v = p.cum_actual; else break; } return v; };
+  const remarks = ev.filter((e) => e.type === "remark"), rebals = ev.filter((e) => e.type === "rebalance");
+  const shapes = remarks.map((e) => ({ type: "line", x0: e.date, x1: e.date, yref: "paper", y0: 0, y1: 1,
+      line: { color: _rgba(SPX, 0.30), width: 1 } }))
+    .concat(rebals.map((e) => ({ type: "line", x0: e.date, x1: e.date, yref: "paper", y0: 0, y1: 1,
+      line: { color: _rgba(MUTED, 0.22), width: 1, dash: "dot" } })));
 
-  // ① cumulative actual vs public-only
-  const actual = { x: s.map((p) => p.date), y: s.map((p) => p.cum_actual), type: "scatter",
-    mode: "lines", name: "actual NAV (total return)", line: { color: SPX, width: 2 } };
-  const pub = { x: s.map((p) => p.date), y: s.map((p) => p.cum_public), type: "scatter",
-    mode: "lines", name: "public book only", line: { color: ACC, width: 2 },
-    fill: "tonexty", fillcolor: _rgba(SPX, 0.07) };
-  Plotly.newPlot("longrep-cumchart", [pub, actual], baseLayout({
-    margin: { l: 48, r: 14, t: 16, b: 36 }, hovermode: "x unified",
-    showlegend: true, legend: { orientation: "h", y: 1.1, x: 0 }, shapes, annotations: anns,
+  // ① stacked: public (floor) + private (band) = replicated; actual line overlaid
+  const dts = s.map((p) => p.date);
+  const cd = s.map((p) => [p.c_pub_pct, p.c_priv_pct, p.mark, p.wP_pct, p.wS_pct, p.r_nav_pct, p.r_repl_pct]);
+  const pubArea = { x: dts, y: s.map((p) => p.cum_public), type: "scatter", mode: "lines", name: "public book",
+    line: { color: ACC, width: 1 }, fill: "tozeroy", fillcolor: _rgba(ACC, 0.18), customdata: cd,
+    hovertemplate: "<b>%{x}</b><br>public idx %{y:.1f} · public contrib %{customdata[0]:.2f}%/d<br>wP %{customdata[3]:.0f}% · wS %{customdata[4]:.0f}%<extra>public</extra>" };
+  const replArea = { x: dts, y: s.map((p) => p.cum_repl), type: "scatter", mode: "lines", name: "+ SpaceX re-marks (private)",
+    line: { color: SPX, width: 1 }, fill: "tonexty", fillcolor: _rgba(SPX, 0.16), customdata: cd,
+    hovertemplate: "<b>%{x}</b><br>replicated idx %{y:.1f}<br>SpaceX mark $%{customdata[2]:.0f}/sh · private contrib %{customdata[1]:.2f}%/d<br>repl day %{customdata[6]:.2f}% vs actual %{customdata[5]:.2f}%<extra>private</extra>" };
+  const actLine = { x: dts, y: s.map((p) => p.cum_actual), type: "scatter", mode: "lines", name: "actual NAV",
+    line: { color: TEXT, width: 2 }, hovertemplate: "<b>%{x}</b><br>actual NAV idx %{y:.1f}<extra>actual</extra>" };
+  const remarkMk = { x: remarks.map((e) => e.date), y: remarks.map((e) => cumAt(e.date)), type: "scatter",
+    mode: "markers", name: "SpaceX re-mark", marker: { color: SPX, size: 10, symbol: "triangle-up", line: { color: "#000", width: .5 } },
+    text: remarks.map((e) => `<b>SpaceX re-mark ${e.date}</b><br>mark step ${sp(e.step_pct)}% → $${e.mark}/sh`),
+    hovertemplate: "%{text}<extra></extra>" };
+  const rebalMk = { x: rebals.map((e) => e.date), y: rebals.map((e) => cumAt(e.date)), type: "scatter",
+    mode: "markers", name: "rebalance", marker: { color: ACC, size: 8, symbol: "diamond-open" },
+    text: rebals.map((e) => `<b>Rebalance ${e.date}</b><br>SpaceX ${e.wS_pct}% of net · lev ${e.leverage}×<br>`
+      + `added: ${e.added.join(", ") || "—"}<br>removed: ${e.removed.join(", ") || "—"}<br>`
+      + `big Δ: ${e.changed.map((c) => c.ticker + " " + sp(c.chg_pct, 0) + "%").join(", ") || "—"}`),
+    hovertemplate: "%{text}<extra></extra>" };
+  Plotly.newPlot("longrep-cumchart", [pubArea, replArea, actLine, remarkMk, rebalMk], baseLayout({
+    margin: { l: 50, r: 14, t: 10, b: 30 }, hovermode: "closest", shapes,
+    showlegend: true, legend: { orientation: "h", y: 1.12, x: 0 },
     xaxis: { gridcolor: GRID, type: "date" },
     yaxis: { gridcolor: GRID, title: "growth index (start = 100)" },
   }), plotConfig());
 
-  // ② SpaceX weight path (quarterly, stepped)
+  // ② deviation (actual − replicated), daily, with the biggest days flagged
+  const topDev = new Set((st.top_deviations || []).map((x) => x.date));
+  const devBar = { x: dts, y: s.map((p) => p.resid_pct), type: "bar", name: "daily deviation",
+    marker: { color: s.map((p) => topDev.has(p.date) ? SPX : _rgba(MUTED, 0.55)) },
+    hovertemplate: "<b>%{x}</b><br>actual − replicated = %{y:.2f}%/day<extra></extra>" };
+  Plotly.newPlot("longrep-residchart", [devBar], baseLayout({
+    margin: { l: 50, r: 14, t: 8, b: 30 }, hovermode: "closest", shapes,
+    xaxis: { gridcolor: GRID, type: "date" },
+    yaxis: { gridcolor: GRID, title: "actual − replicated (%/day)", ticksuffix: "%", zeroline: true, zerolinecolor: GRID },
+  }), plotConfig());
+
+  // ③ SpaceX weight path (quarterly, stepped) + mapping coverage
   const q = d.quarters;
   const wt = { x: q.map((x) => x.report_date), y: q.map((x) => x.wS_pct), type: "scatter",
-    mode: "lines+markers", name: "SpaceX % of net", line: { color: SPX, width: 2, shape: "hv" },
-    marker: { size: 6 } };
+    mode: "lines+markers", name: "SpaceX % of net", line: { color: SPX, width: 2, shape: "hv" }, marker: { size: 6 } };
   const cov = { x: q.map((x) => x.report_date), y: q.map((x) => x.coverage_pct), type: "scatter",
     mode: "lines", name: "public mapping coverage %", line: { color: MUTED, width: 1.4, dash: "dot" }, yaxis: "y2" };
   Plotly.newPlot("longrep-wtchart", [wt, cov], baseLayout({
-    margin: { l: 44, r: 44, t: 16, b: 36 }, hovermode: "x unified",
-    showlegend: true, legend: { orientation: "h", y: 1.14, x: 0 },
+    margin: { l: 44, r: 44, t: 14, b: 30 }, hovermode: "x unified",
+    showlegend: true, legend: { orientation: "h", y: 1.16, x: 0 },
     xaxis: { gridcolor: GRID, type: "date" },
     yaxis: { gridcolor: GRID, title: "SpaceX % of net", ticksuffix: "%" },
-    yaxis2: { overlaying: "y", side: "right", range: [80, 100], ticksuffix: "%", showgrid: false, title: "coverage" },
+    yaxis2: { overlaying: "y", side: "right", range: [80, 100], ticksuffix: "%", showgrid: false },
   }), plotConfig());
 
   // quarters table
@@ -1659,9 +1685,12 @@ function renderLongRep(d) {
       `<td>${x.wP_pct}%</td><td class="${x.coverage_pct >= 90 ? "" : "dim"}">${x.coverage_pct}%</td></tr>`).join("");
     Q.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
   }
-  document.getElementById("longrep-method").innerHTML = "<b>Coverage.</b> " + m.coverage_note + " " + m.price_basis;
+  document.getElementById("longrep-method").innerHTML = "<b>Method.</b> " + m.method + " <b>Coverage:</b> " + m.coverage_note;
   document.getElementById("longrep-disc").innerHTML =
-    `<span class="dim"><b>Read honestly:</b> the cumulative gap and the SpaceX weight path are robust, but the quiet-day daily tracking error is ~${st.quiet_resid_sd_bps.toFixed(0)} bps — quarter-constant weights + the held-flat 'other' bucket mean the long history pins the <i>structural</i> SpaceX picture, not a tight day-by-day weight. ${m.disclaimer}</span>`;
+    `<span class="dim"><b>Reading it:</b> the orange band is SpaceX's re-mark contribution stacked on the blue public book — together they ` +
+    `track actual to ~${st.resid_sd_bps.toFixed(0)} bps/day. The steady ~${Math.abs(st.replication_gap_pct)}% the replication runs ABOVE actual is ` +
+    `fees + leverage interest + the fund marking SpaceX more conservatively than headline tender prices; the deviation chart shows where each ` +
+    `re-mark (▲) and rebalance (◇) lands. ${m.disclaimer} ${m.price_basis}</span>`;
 }
 
 boot();
