@@ -174,7 +174,7 @@ def main(argv):
         print(f"[hedge_book] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[hedge_book] skipped: {e}")
-    # Hedge-drift (reads the BPTRX override series; no network).
+    # Hedge-drift (reads the BPTIX override series; no network).
     try:
         import hedge_drift
         p = hedge_drift.write_json()

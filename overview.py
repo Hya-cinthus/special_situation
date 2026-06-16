@@ -71,7 +71,7 @@ def _vehicle_record(key):
         return {"key": key, "ticker": meta.get("ticker", key), "missing": True}
     k = d.get("kpis", {})
     is_etf = bool(d["meta"].get("is_etf"))
-    # at-NAV vehicles: mutual fund (BPTRX), ETF (AGIX), interval fund (ARKVX)
+    # at-NAV vehicles: mutual fund (BPTIX), ETF (AGIX), interval fund (ARKVX)
     at_nav = is_etf or key == "spacex_baron" or bool(d["meta"].get("at_nav"))
 
     price = k.get("price")
@@ -92,7 +92,7 @@ def _vehicle_record(key):
 
     lt = _lookthrough(key, d)
 
-    # scenario fair NAV (per share for CEF/ETF; fund-level for BPTRX — only the
+    # scenario fair NAV (per share for CEF/ETF; fund-level for BPTIX — only the
     # RATIO matters for returns) and the implied price under a premium assumption
     base_ref = nav_mtm if nav_mtm else (price or nav_stale)
     scen = {}

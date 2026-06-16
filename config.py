@@ -107,7 +107,7 @@ PRIVATE_COMPANIES = {
 # the emitted per-vehicle JSON; these are the qualitative judgments.
 VEHICLE_META = {
     "spacex_baron": {
-        "ticker": "BPTRX", "name": "Baron Partners Fund", "type": "Open-end mutual fund",
+        "ticker": "BPTIX", "name": "Baron Partners Fund", "type": "Open-end mutual fund",
         "headline": "SpaceX", "buyable": "Mutual fund (buy at NAV daily)",
         "fee": "1.05% (+ ~0.95% interest on leverage)", "liquidity": "Daily at NAV",
         "data_confidence": "high",
@@ -181,7 +181,7 @@ VEHICLE_META = {
 
 class SpacexBaron:
     KEY = "spacex_baron"
-    TITLE = "SpaceX exposure via Baron Partners Fund (BPTRX)"
+    TITLE = "SpaceX exposure via Baron Partners Fund (BPTIX)"
 
     # Analysis window. Baron initiated SpaceX in 2017; we run from then to today.
     WINDOW_START = "2017-01-01"
@@ -189,9 +189,9 @@ class SpacexBaron:
     # --- Fund identity -----------------------------------------------------
     # One fund, multiple share classes (identical underlying portfolio):
     #   BPTRX = Retail, BPTIX = Institutional, BPTUX = R6.
-    # SpaceX % weight is identical across classes. We use BPTRX for the clean
-    # public NAV history; the user originally referenced BPTIX (same portfolio).
-    PRIMARY_TICKER = "BPTRX"
+    # SpaceX % weight is identical across classes. We use BPTIX — the institutional
+    # class the user actually holds — for NAV; BPTRX/BPTUX track the same portfolio.
+    PRIMARY_TICKER = "BPTIX"
     SHARE_CLASSES = {"BPTRX": "Retail", "BPTIX": "Institutional", "BPTUX": "R6"}
 
     # SEC EDGAR registrant: Baron Partners Fund is a series of "Baron Select Funds".
@@ -214,7 +214,7 @@ class SpacexBaron:
 
     # --- Daily NAV source --------------------------------------------------
     # Yahoo Finance chart API (no key required). Stooq now gates behind a key.
-    NAV_TICKER = "BPTRX"
+    NAV_TICKER = "BPTIX"
 
     # --- The user's assumed entry --------------------------------------------
     ENTRY_DATE = "2026-05-20"   # day the user bought; SpaceX S-1 also filed this day
@@ -249,13 +249,13 @@ class SpacexBaron:
     AUM_REPORTED = [
         {"date": "2026-04-30", "reported_total_assets_usd": 12.0e9, "confidence": "med",
          "source": "Morningstar 'Total Assets' $12.0B (4/30 month-end, lagged)",
-         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote"},
+         "source_url": "https://www.morningstar.com/funds/XNAS/BPTIX/quote"},
         {"date": "2026-05-26", "reported_total_assets_usd": 15.6e9, "confidence": "med",
          "source": "Morningstar website 'Total Assets' $15.6B (5/26)",
-         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote"},
+         "source_url": "https://www.morningstar.com/funds/XNAS/BPTIX/quote"},
         {"date": "2026-05-27", "reported_total_assets_usd": 15.9e9, "confidence": "med",
          "source": "Morningstar website 'Total Assets' $15.9B (5/27 close)",
-         "source_url": "https://www.morningstar.com/funds/XNAS/BPTRX/quote"},
+         "source_url": "https://www.morningstar.com/funds/XNAS/BPTIX/quote"},
     ]
 
     # --- SpaceX holding re-marks (private mark steps, applied post-last-filing) ---

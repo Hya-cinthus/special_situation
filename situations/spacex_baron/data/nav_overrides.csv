@@ -1,2 +1,2 @@
 date,nav,source,confidence
-2026-06-15,292.98,"DERIVED: BPTIX 6/15 NAV 307.55 = +6.059% vs 6/12 289.98; same portfolio -> BPTRX 6/12 276.24 x 1.06059 = 292.98. Yahoo BPTRX 6/15 not yet posted (lag); Yahoo wins automatically once it appears.",est
+2026-06-15,307.55,"BPTIX actual NAV 6/15 (user-reported); Yahoo BPTIX 6/15 not yet posted (lag). Yahoo wins automatically once it appears.",high

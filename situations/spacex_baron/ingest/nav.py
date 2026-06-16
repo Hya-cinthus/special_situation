@@ -1,5 +1,5 @@
 """
-Daily NAV ingestion — BPTRX from the Yahoo Finance chart API.
+Daily NAV ingestion — BPTIX from the Yahoo Finance chart API.
 
 Yahoo's chart endpoint needs no API key (Stooq now gates CSV downloads behind
 one). For a mutual fund, the daily "close" IS the NAV per share. We pull the

@@ -198,7 +198,7 @@ function renderRemark() {
   const m = REMARK.meta, o = m.observables, sc = REMARK.scenarios;
   const obs = document.getElementById("remark-obs");
   if (obs) obs.innerHTML =
-    `Observed (6/4): BPTRX NAV <b>${o.bptrx_nav_prev}→${o.bptrx_nav_now}</b> (<b style="color:${GOOD}">+${(o.nav_return * 100).toFixed(1)}%</b>) · ` +
+    `Observed (6/4): BPTIX NAV <b>${o.bptix_nav_prev}→${o.bptix_nav_now}</b> (<b style="color:${GOOD}">+${(o.nav_return * 100).toFixed(1)}%</b>) · ` +
     `public basket <b>+${(o.public_basket_return * 100).toFixed(2)}%</b> · Total Assets <b>$${(o.total_assets_prev_usd / 1e9).toFixed(1)}B → $${(o.total_assets_now_usd / 1e9).toFixed(1)}B</b> · ` +
     `base val $${(m.base_valuation_usd / 1e12).toFixed(2)}T · IPO $${(m.ipo_valuation_usd / 1e12).toFixed(2)}T`;
   const rows = sc.map((s) => {

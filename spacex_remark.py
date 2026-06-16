@@ -1,7 +1,7 @@
 """
 SpaceX 6/4 re-mark — multi-scenario reconciliation -> dashboard/data/spacex_remark.json
 
-On 2026-06-04 the fund's reported figures jumped (BPTRX NAV/share 249.82 -> 266.37,
+On 2026-06-04 the fund's reported figures jumped (BPTIX NAV/share 262.23 -> 279.60,
 +6.6%; Morningstar Total Assets 17.2B -> 18.7B) while its PUBLIC holdings barely
 moved (+0.07% value-weighted basket return). That gap is a SpaceX re-mark. But
 THREE things are genuinely uncertain, so instead of picking one we solve all three:
@@ -27,8 +27,8 @@ import datetime
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 # ---- Documented inputs (point-in-time facts, with provenance) -----------------
-BPTRX_NAV_3 = 249.82          # Yahoo close 2026-06-03
-BPTRX_NAV_4 = 266.37          # Yahoo close 2026-06-04 (+6.62%)
+BPTIX_NAV_3 = 262.23          # Yahoo close 2026-06-03 (BPTIX)
+BPTIX_NAV_4 = 279.60          # Yahoo close 2026-06-04 (BPTIX, +6.62%)
 R_PUB = 0.000741              # value-weighted return of the 23-name public basket on
                               # 6/4 (Yahoo closes, weighted at 6/3 prices) — proxy for
                               # the fund's public book
@@ -40,7 +40,7 @@ IPO_VAL = 1.77e12             # 2026-06-03 IPO priced: $135/sh, $1.77T
 TA_3 = 17.2e9                 # Morningstar Total Assets 6/3 (gross convention)
 TA_4 = 18.7e9                 # Morningstar Total Assets 6/4 (user-provided 6/5 AM)
 L0 = 1.135836786284202        # leverage = gross/net from the 3/31 NPORT-P
-NAV_RET = BPTRX_NAV_4 / BPTRX_NAV_3 - 1
+NAV_RET = BPTIX_NAV_4 / BPTIX_NAV_3 - 1
 
 
 def _val_to_usd(valuation):
@@ -124,7 +124,7 @@ def build_payload():
             "base_valuation_usd": VAL_BASE,
             "ipo_valuation_usd": IPO_VAL,
             "observables": {
-                "bptrx_nav_prev": BPTRX_NAV_3, "bptrx_nav_now": BPTRX_NAV_4,
+                "bptix_nav_prev": BPTIX_NAV_3, "bptix_nav_now": BPTIX_NAV_4,
                 "nav_return": round(NAV_RET, 4), "public_basket_return": round(R_PUB, 5),
                 "total_assets_prev_usd": TA_3, "total_assets_now_usd": TA_4,
                 "spacex_prev_usd": round(SPX_3_USD, 0), "leverage_prior": round(L0, 4),

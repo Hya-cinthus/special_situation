@@ -24,7 +24,7 @@ Legend for "enters model as": how the missing value is currently handled.
   shaded as "soft estimate" on the chart. No fake daily wiggle is manufactured.
 
 ### 2. Daily fund shares-outstanding / true daily AUM — `confidence: med`
-- **Missing:** free daily shares-outstanding for BPTRX. We have daily NAV/share
+- **Missing:** free daily shares-outstanding for BPTIX. We have daily NAV/share
   (Yahoo) and quarterly net assets (NPORT-P), but not the daily share count.
 - **Where to get it:** Baron transfer-agent data, a paid feed
   (Bloomberg `FUND_TOTAL_ASSETS`, Morningstar Direct), or N-CSR share-activity
@@ -95,4 +95,4 @@ Legend for "enters model as": how the missing value is currently handled.
   ×1.65 vs the $112→$185 tender price (×1.65); 2025-09→2025-12 rose ×1.98 vs
   $212→$421 (×1.99). The marks are display/cross-check only — they do NOT feed
   the reconstruction, which uses the filing values directly.
-- **Daily BPTRX NAV/share:** RESOLVED — Yahoo Finance chart API (no key).
+- **Daily BPTIX NAV/share:** RESOLVED — Yahoo Finance chart API (no key).

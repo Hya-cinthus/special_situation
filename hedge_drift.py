@@ -23,7 +23,7 @@ how much — and is careful to separate two very different numbers:
       grows much faster than (A) because it includes new investors' inflows you
       have no claim to. Reporting (B) as a hedge deviation overstates it ~3x.
 
-Total assets come from the SAME reconstructed daily series the BPTRX main page
+Total assets come from the SAME reconstructed daily series the BPTIX main page
 shows (no hand interpolation): the series carries total_nav_usd and
 shares_outstanding for every day, and gross = total_nav_usd * leverage_ratio
 reproduces the Morningstar override anchors exactly. So the 2026-05-20 entry is a
@@ -163,7 +163,7 @@ def build_payload():
             "assumption": ("Morningstar 'Total Assets' is NET AUM (confirmed by Baron 5/31: SpaceX 23.2%% "
                            "of net). gross = net x leverage %.4f. Inflows allocate PRO-RATA to the public "
                            "holdings; SpaceX $ is carried flat then STEPS at the 2026-06-04 IPO reprice "
-                           "($105.32->$135/sh, +28.2%%). Daily series = the BPTRX main page." % leverage),
+                           "($105.32->$135/sh, +28.2%%). Daily series = the BPTIX main page." % leverage),
             "method_note": ("PER-SHARE drift is YOUR hedge drift: you hold a FIXED share count, so fund "
                             "inflows (new shares to new investors) do not add public exposure to your "
                             "shares. FUND-level public-book growth is context; it includes inflows you have "

@@ -1,7 +1,7 @@
 """
 Morningstar AUM log ingest.
 
-The cowork browser agent runs daily, scrapes the BPTRX quote page, and APPENDS
+The cowork browser agent runs daily, scrapes the BPTIX quote page, and APPENDS
 one JSON object per line to `config.MORNINGSTAR_AUM_LOG`. This module reads that
 log (plus the committed `config.AUM_REPORTED` seed as fallback), dedupes by date
 (log wins — fresher), and applies the central gross/net switch
@@ -61,7 +61,7 @@ def resolve_aum_datapoints() -> list[dict]:
     the engine expects.
     """
     by_date: dict[str, dict] = {}
-    src_url = "https://www.morningstar.com/funds/XNAS/BPTRX/quote"
+    src_url = "https://www.morningstar.com/funds/XNAS/BPTIX/quote"
 
     # 1) Seed from config (committed fallback, in case the log is missing).
     for d in getattr(CFG, "AUM_REPORTED", []):

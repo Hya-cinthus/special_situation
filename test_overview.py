@@ -21,7 +21,7 @@ class TestOverviewModel(unittest.TestCase):
 
     def test_at_nav_vehicles_have_zero_premium(self):
         # mutual fund + ETF must never show a wrapper premium
-        for t in ("BPTRX", "AGIX"):
+        for t in ("BPTIX", "AGIX"):
             v = self.v[t]
             self.assertTrue(v["at_nav"])
             self.assertEqual(v["premium_mtm"], 0.0)
@@ -59,9 +59,9 @@ class TestOverviewModel(unittest.TestCase):
             self.assertIn(v["data_confidence"], ("high", "med", "medium", "low-med", "low"))
 
     def test_bptrx_not_confused_with_other_baron_funds(self):
-        # identity guard: BPTRX exposure is SpaceX only here
-        self.assertEqual(self.v["BPTRX"]["headline"], "SpaceX")
-        names = [h["name"] for h in self.v["BPTRX"]["lookthrough"]]
+        # identity guard: BPTIX exposure is SpaceX only here
+        self.assertEqual(self.v["BPTIX"]["headline"], "SpaceX")
+        names = [h["name"] for h in self.v["BPTIX"]["lookthrough"]]
         self.assertEqual(names, ["SpaceX"])
 
     def test_company_cleanest_is_at_nav_when_available(self):

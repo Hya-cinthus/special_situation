@@ -13,7 +13,9 @@ Interpreter on this machine is **`py`** (Python 3.14), NOT `python`.
 
 - **At/after close (day T):** the 23 public-holding closes + the **SPCX** close.
 - **Next morning (T+1):** **BPTIX actual NAV** and **Morningstar Total Assets (AUM)** for day T.
-  (Yahoo posts BPTRX/BPTIX NAV with a ~1-day lag, so derive BPTRX — see step 4.)
+  (Yahoo posts BPTIX NAV with a ~1-day lag, so the user's reported NAV is the stop-gap — see step 4.)
+
+The whole stack is on **BPTIX** (the class the user holds): `NAV_TICKER = "BPTIX"`, all NAVs, labels, charts.
 
 ---
 
@@ -32,8 +34,8 @@ is present — so just fill `actual_nav` next morning and rebuild.
 
 ### 2. `situations/spacex_baron/data/morningstar_aum_log.jsonl` — append one line
 ```json
-{"as_of_date_iso":"YYYY-MM-DD","ticker":"BPTRX","total_assets_raw":"20.7B",
- "total_assets_usd":20700000000,"nav_per_share":<BPTRX NAV>,"nav_as_of":"YYYY-MM-DD",
+{"as_of_date_iso":"YYYY-MM-DD","ticker":"BPTIX","total_assets_raw":"20.7B",
+ "total_assets_usd":20700000000,"nav_per_share":<BPTIX NAV>,"nav_as_of":"YYYY-MM-DD",
  "captured_at":"<approx ISO now>","source":"...","blocked":false,"notes":"..."}
 ```
 This is the **AUM true-up** that extends the reconstructed-AUM / weight charts past the
@@ -52,13 +54,13 @@ re-mark marks the **disclosed 3/31 share count only**. Any estimated IPO/Friday 
 stays in the recalibration card as an estimate — **never** booked into this hard mark.
 This step drives the **SpaceX fair value** and the daily **SpaceX weight** re-mark.
 
-### 4. `situations/spacex_baron/data/nav_overrides.csv` — only if Yahoo hasn't posted BPTRX NAV
-Yahoo lags, so the morning after day T it usually lacks BPTRX's NAV. Derive it from BPTIX
-(identical portfolio → identical daily return) and add a row:
+### 4. `situations/spacex_baron/data/nav_overrides.csv` — only if Yahoo hasn't posted BPTIX NAV
+Yahoo lags, so the morning after day T it usually lacks BPTIX's NAV. The user already gives you
+the **actual BPTIX NAV**, so just add it as a row:
 ```
-BPTRX_T = BPTRX_{T-1} * (BPTIX_T / BPTIX_{T-1})
+YYYY-MM-DD,<BPTIX NAV>,"BPTIX actual (user-reported); Yahoo BPTIX pending",high
 ```
-e.g. `2026-06-15,292.98,"DERIVED: BPTIX +6.059%; 276.24 x 1.06059",est`. **Why this file:**
+e.g. `2026-06-15,307.55,"BPTIX actual; Yahoo pending",high`. **Why this file:**
 `emit._load_nav_csv` merges it into the NAV series, and **Yahoo always wins on shared
 dates** — so once Yahoo posts the real NAV the override is ignored automatically. It lives
 in `emit` (not the fetcher) so it **survives the CI rebuild**, which re-fetches and
@@ -115,6 +117,6 @@ rate-limit on CI and ship blank sections).
 | input | files touched | charts / cards refreshed |
 |---|---|---|
 | 23 closes + SPCX | `daily_nav_log.ENTRIES` | Daily NAV estimate; recalibration (auto) |
-| BPTIX NAV (T) | `daily_nav_log` actual_nav; `nav_overrides.csv` (derived BPTRX); `morningstar_aum_log` | recalibration; main NAV/weight series |
+| BPTIX NAV (T) | `daily_nav_log` actual_nav; `nav_overrides.csv` (BPTIX actual); `morningstar_aum_log` | recalibration; main NAV/weight series |
 | Morningstar AUM (T) | `morningstar_aum_log.jsonl`; `daily_nav_log` aum | reconstructed AUM; SpaceX weight; recalibration flow |
 | SPCX close (T) | `config.SPACEX_REMARKS` | SpaceX fair value; SpaceX weight re-mark; what-moved-the-weight |

@@ -16,7 +16,7 @@ So this module exposes the manually-curated marks that *are* sourced from
 Baron/press narrative (the pre-2019 anchor and the forward IPO scenario), read
 from data/spacex_marks.csv, and leaves a documented hook for a future scraper.
 
-If you fill the gap later: parse the BPTRX product page "Top 10 Holdings" table
+If you fill the gap later: parse the BPTIX product page "Top 10 Holdings" table
 and the quarterly letter PDFs, and emit rows shaped like read_external_marks().
 """
 
@@ -49,7 +49,7 @@ def read_external_marks() -> list[dict]:
 
 
 def scrape_top_holdings():  # pragma: no cover - future hook
-    """TODO: parse the BPTRX product page top-holdings table as an NPORT cross-check."""
+    """TODO: parse the BPTIX product page top-holdings table as an NPORT cross-check."""
     raise NotImplementedError("Baron site scraper not implemented; see data_gaps.md item #1.")
 
 

@@ -579,7 +579,7 @@ function renderRecon(NP) {
     `<li>Common: ${usd(sx.value_common_3_31)} × (135/105.32) = <b>${usd(sx.classes.filter(c => c.kind === "common").reduce((a, c) => a + c.value_remark, 0))}</b></li>` +
     `<li>Preferred: ${usd(sx.value_preferred_3_31)} × (6,750/5,265.9) = <b>${usd(sx.classes.filter(c => c.kind === "preferred").reduce((a, c) => a + c.value_remark, 0))}</b></li>` +
     `<li><b>Both ×${sx.remark_factor.toFixed(4)} (+${((sx.remark_factor - 1) * 100).toFixed(1)}%)</b> → SpaceX holding ${usd(sx.value_3_31)} → <b style="color:${SPX}">${usd(sx.value_remark_6_4)}</b></li>` +
-    `</ul><p class="dim">This +28.2% exactly explains the +6.6% jump in BPTRX NAV on 6/4.</p>`;
+    `</ul><p class="dim">This +28.2% exactly explains the +6.6% jump in BPTIX NAV on 6/4.</p>`;
 
   // (3) cap-table tie-out: ONE additive bridge ($1.25T -> $1.77T) + source breakdown
   const dl = ct.dilution, M = (x) => (x / 1e6).toFixed(1) + "M";
@@ -795,7 +795,7 @@ function secFilingUrl(accession) {
   const cik = String(parseInt(DATA.meta.edgar_cik, 10));
   return `https://www.sec.gov/Archives/edgar/data/${cik}/${nod}/`;
 }
-const YAHOO = "https://finance.yahoo.com/quote/BPTRX";
+const YAHOO = "https://finance.yahoo.com/quote/BPTIX";
 
 /* Rich hover text for a measured quarterly NPORT-P anchor (used on both the
  * weight chart and the SpaceX-value step chart). Says exactly what the mark is. */
@@ -834,7 +834,6 @@ function renderKpis() {
   const la = DATA.anchors[DATA.anchors.length - 1];           // latest measured filing
   const lt = DATA.lookthrough || null;                        // per-share SpaceX look-through
   const ltX = lt && lt.per_share ? lt.per_share.BPTIX : null;
-  const ltR = lt && lt.per_share ? lt.per_share.BPTRX : null;
   const filingUrl = secFilingUrl(la.accession);
   const lastNavPt = [...DATA.series].reverse().find((p) => p.nav_per_share != null);
   const navTxt = lastNavPt ? "$" + lastNavPt.nav_per_share.toFixed(2) : "–";
@@ -920,9 +919,7 @@ function renderKpis() {
         + (ltX ? ltX.spacex_usd.toFixed(2) : "–") + " of SpaceX). At the reported AUM of "
         + usd(lt ? lt.fund_aum_usd : 0) + " (" + (lt ? lt.as_of : "") + "), the fund holds ~"
         + (lt ? (lt.spacex_shares_held / 1e6).toFixed(2) : "–") + "M SpaceX shares total. "
-        + "Per <b>BPTRX</b> share it's " + (ltR ? ltR.spacex_shares.toFixed(3) : "–")
-        + " (lower NAV $" + (ltR ? ltR.nav.toFixed(2) : "–") + "). "
-        + "<span class='conf'>Confidence: MED — SpaceX $ measured & carried at the $135 mark; AUM is the reported figure; class NAVs from Yahoo.</span>",
+        + "<span class='conf'>Confidence: MED — SpaceX $ measured & carried at the $135 mark; AUM is the reported figure; BPTIX NAV from Yahoo.</span>",
       sources: ov ? [S_AUM, S_EDGAR, S_YAHOO] : [S_EDGAR, S_YAHOO] },
 
     { label: "Reconstructed fund AUM", value: usd(k.total_nav_usd),
@@ -935,7 +932,7 @@ function renderKpis() {
         + "<span class='conf'>Confidence: MED — post-filing AUM is a manually-sourced datapoint, not SEC.</span>",
       sources: ov ? [S_AUM, S_EDGAR, S_YAHOO] : [S_YAHOO, S_EDGAR] },
 
-    { label: "BPTRX NAV / share (latest)", value: navTxt,
+    { label: "BPTIX NAV / share (latest)", value: navTxt,
       note: lastNavPt ? "as of " + lastNavPt.date + " · measured close" : "",
       tip: "A mutual fund's daily closing price IS its NAV per share. Pulled from the Yahoo Finance "
         + "chart API (no key). This is the actual price basis you transact at. "

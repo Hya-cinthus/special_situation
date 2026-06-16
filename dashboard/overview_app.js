@@ -170,13 +170,13 @@ function renderMemo() {
   const worst = cef.slice().sort((a, b) => (b.premium_stale || 0) - (a.premium_stale || 0))[0];
   document.getElementById("memo").innerHTML = `
     <p><b>The one-line take.</b> The only vehicles with clean risk/reward are the ones that trade
-    <b>at NAV</b> — <b>BPTRX</b> (large SpaceX, ~28% of fund) and <b>AGIX</b> (small but verifiable, low-fee
+    <b>at NAV</b> — <b>BPTIX</b> (large SpaceX, ~28% of fund) and <b>AGIX</b> (small but verifiable, low-fee
     Anthropic). The three closed-end funds (VCX, DXYZ, RVI) trade at premiums so large that they
     <b>lose money in the bear AND base cases and barely gain in the bull</b> — you can be right on the
     underlying AI names and still lose, because the premium dominates.</p>
     <p><b>What looks most attractive.</b> ${atnav.map((v) => v.ticker).join(" and ")} give honest, at-NAV
-    exposure. BPTRX additionally carries an un-realized SpaceX IPO re-rate (the $1.25T mark is stale-low),
-    so its bull case (${pctRaw((vof("BPTRX").scenarios.bull || {}).return_from_price)}) is real optionality
+    exposure. BPTIX additionally carries an un-realized SpaceX IPO re-rate (the $1.25T mark is stale-low),
+    so its bull case (${pctRaw((vof("BPTIX").scenarios.bull || {}).return_from_price)}) is real optionality
     rather than premium hope.</p>
     <p><b>What looks too expensive.</b> ${worst ? worst.ticker : "VCX"} is the most overheated:
     ${worst ? pctAbs(worst.premium_stale) : ""} above its published NAV (${pctAbs((worst || {}).premium_mtm)}

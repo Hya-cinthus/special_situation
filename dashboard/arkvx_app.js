@@ -97,7 +97,7 @@ function renderThesis() {
   document.getElementById("thesis-body").innerHTML = `
     <div class="mark-callout" style="border-left-color:${SPX}">
       <b>A new structure: the interval fund.</b> ARKVX is neither a premium-laden closed-end fund nor a
-      simple ETF. It's <b>actively managed</b> and transacts <b>at NAV</b> — so, like BPTRX/AGIX, there's
+      simple ETF. It's <b>actively managed</b> and transacts <b>at NAV</b> — so, like BPTIX/AGIX, there's
       <b>no wrapper premium to overpay</b>. The catch is the opposite of liquidity: redemptions are
       <b>gated</b> to quarterly tenders capped near 5%, so in a rush for the exits you may be stuck or
       forced to sell below NAV — a <b>liquidity discount</b>, not a premium. What you get for that lock-up

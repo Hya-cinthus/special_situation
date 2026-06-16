@@ -45,7 +45,7 @@ def _load_anchors_csv():
 
 
 def _load_nav_csv():
-    """BPTRX daily NAV from Yahoo (nav_daily.csv), MERGED with manual overrides.
+    """BPTIX daily NAV from Yahoo (nav_daily.csv), MERGED with manual overrides.
 
     Yahoo posts the mutual-fund NAV with a lag, so on the morning after a close the
     latest day is missing. nav_overrides.csv supplies a stop-gap NAV (e.g. derived
@@ -155,17 +155,17 @@ def _lookthrough(recon: dict) -> dict | None:
     How much SpaceX $ — and how many SpaceX shares — sit behind one fund share.
     SpaceX $ is carried at the latest private mark ($135 post 5-for-1 split); the
     fund's SpaceX share count = SpaceX $ ÷ that mark (carried flat from 3/31, since
-    a private holding can't be added with daily cash). Per-class figures use each
-    share class's own NAV: SpaceX shares / class-share = weight × class_NAV ÷ mark.
+    a private holding can't be added with daily cash). Per BPTIX share: SpaceX shares
+    / share = weight × BPTIX_NAV ÷ mark (BPTIX is the primary class the user holds).
     """
     ov_list = recon.get("aum_overrides") or []
     series = [p for p in recon["series"] if p.get("total_nav_usd")]
     if ov_list:
         a = ov_list[-1]
-        aum, spx, bptrx_nav, as_of = a["net_assets_usd"], a["spacex_value_usd"], a["nav_at_report"], a["report_date"]
+        aum, spx, primary_nav, as_of = a["net_assets_usd"], a["spacex_value_usd"], a["nav_at_report"], a["report_date"]
     elif series:
         a = series[-1]
-        aum, spx, bptrx_nav, as_of = a["total_nav_usd"], a["spacex_value_usd"], a["nav_per_share"], a["date"]
+        aum, spx, primary_nav, as_of = a["total_nav_usd"], a["spacex_value_usd"], a["nav_per_share"], a["date"]
     else:
         return None
     remarks = sorted(getattr(CFG, "SPACEX_REMARKS", []), key=lambda r: r["date"])
@@ -174,7 +174,6 @@ def _lookthrough(recon: dict) -> dict | None:
     if not (weight and mark):
         return None
     nav_date = series[-1]["date"] if series else None
-    bptix_nav, bptix_date = _latest_bptix_nav()
 
     def _per(nav):
         return {"nav": round(nav, 2), "spacex_usd": round(weight * nav, 2),
@@ -188,8 +187,7 @@ def _lookthrough(recon: dict) -> dict | None:
         "spacex_mark_per_share": mark,
         "spacex_shares_held": round(spx / mark, 0),
         "per_share": {
-            "BPTRX": {**(_per(bptrx_nav) or {}), "nav_as_of": nav_date} if bptrx_nav else None,
-            "BPTIX": {**_per(bptix_nav), "nav_as_of": bptix_date} if bptix_nav else None,
+            "BPTIX": {**(_per(primary_nav) or {}), "nav_as_of": nav_date} if primary_nav else None,
         },
     }
 
