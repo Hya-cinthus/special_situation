@@ -45,10 +45,28 @@ def _load_anchors_csv():
 
 
 def _load_nav_csv():
+    """BPTRX daily NAV from Yahoo (nav_daily.csv), MERGED with manual overrides.
+
+    Yahoo posts the mutual-fund NAV with a lag, so on the morning after a close the
+    latest day is missing. nav_overrides.csv supplies a stop-gap NAV (e.g. derived
+    from BPTIX's identical-portfolio return) for dates Yahoo hasn't posted yet.
+    Yahoo ALWAYS wins on shared dates, so once it catches up the override is ignored
+    automatically. This merge lives here (not in the fetch) so it survives the CI
+    rebuild, which re-fetches and overwrites nav_daily.csv from Yahoo every push.
+    """
     path = os.path.join(_PROCESSED, "nav_daily.csv")
+    nav = {}
     with open(path, encoding="utf-8") as f:
-        return [{"date": r["date"], "nav": float(r["nav"]) if r["nav"] else None}
-                for r in csv.DictReader(f)]
+        for r in csv.DictReader(f):
+            if r.get("nav"):
+                nav[r["date"]] = float(r["nav"])
+    ov = os.path.join(_SIT, "data", "nav_overrides.csv")
+    if os.path.exists(ov):
+        with open(ov, encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                if r.get("nav") and r["date"] not in nav:   # only fill dates Yahoo lacks
+                    nav[r["date"]] = float(r["nav"])
+    return [{"date": d, "nav": nav[d]} for d in sorted(nav)]
 
 
 def _project_aum(recon: dict, cur_val: float, spacex_value: float) -> dict:

@@ -35,10 +35,17 @@ _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 ORDER_CAP = 1_000_000_000   # Baron's news-confirmed ~$1B firm-wide SpaceX IPO order (BPTIX <= this)
 LEV_CAP = 1.25              # leverage ceiling 1.25x (user-specified working cap; mandate max is 1.5x)
 
+# This card is specifically about the SpaceX first-trade day. PIN it to 6/12 so it
+# does not drift as later daily AUM points / re-marks (6/15, 6/16, ...) are added.
+IPO_DAY = CFG.IPO_FIRST_TRADE_DATE   # "2026-06-12"
 
-def _two_anchor_days(sbx):
-    """Latest two daily points carrying a reported (external_aum) AUM."""
-    pts = [p for p in sbx["series"] if p.get("source") == "external_aum" and p.get("total_nav_usd")]
+
+def _two_anchor_days(sbx, cap=None):
+    """The two daily points carrying a reported (external_aum) AUM straddling the
+    pinned day: the last two on/before `cap` (-> 6/11, 6/12), not the global last
+    two (which would slide to 6/12, 6/15 once newer days are logged)."""
+    pts = [p for p in sbx["series"] if p.get("source") == "external_aum" and p.get("total_nav_usd")
+           and (cap is None or p["date"] <= cap)]
     return (pts[-2], pts[-1]) if len(pts) >= 2 else (None, None)
 
 
@@ -67,7 +74,7 @@ def _ohlc(tk, day):
 
 def build_payload():
     sbx = json.load(open(os.path.join(_REPO_ROOT, "dashboard", "data", "spacex_baron.json"), encoding="utf-8"))
-    prev, cur = _two_anchor_days(sbx)
+    prev, cur = _two_anchor_days(sbx, cap=IPO_DAY)
     if not cur:
         raise RuntimeError("need two AUM-anchored days")
 
@@ -77,8 +84,9 @@ def build_payload():
     spx0_val = prev["spacex_value_usd"]                 # SpaceX $ at the prior ($135) mark
     w_spx0 = spx0_val / aum0                            # SpaceX weight entering the day
 
-    # SpaceX per-share step from the marks (prior mark -> SPCX first close)
-    remarks = CFG.SPACEX_REMARKS
+    # SpaceX per-share step from the marks (prior mark -> SPCX first close). Pinned
+    # to <= IPO_DAY so later re-marks (6/15 $192.50, ...) don't shift this step.
+    remarks = [r for r in CFG.SPACEX_REMARKS if r["date"] <= IPO_DAY]
     spx_px_new = remarks[-1]["per_share_new"]           # 160.95
     spx_px_old = remarks[-2]["per_share_new"] if len(remarks) > 1 else remarks[-1]["per_share_old_split_adj"]
     spx_ret = spx_px_new / spx_px_old - 1               # +19.22%

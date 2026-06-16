@@ -286,6 +286,16 @@ class SpacexBaron:
                    "unchanged (no confirmed IPO add yet)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-06-15",
+         "spacex_value_usd": 3.89026788e9 * (192.50 / 105.32),  # ~$7.111B
+         "per_share_old_split_adj": 105.32, "per_share_new": 192.50,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $192.50 on 2026-06-15 (+19.6% vs 6/12 $160.95). Holding marks to the "
+                   "live market: per-share $105.32->$192.50 (+82.8% off the 3/31 split-adj basis). "
+                   "Marks the DISCLOSED 3/31 share count only; a ~$260M Friday SpaceX add is an "
+                   "ESTIMATE that lives in the recalibration card, NOT booked into this hard mark."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
