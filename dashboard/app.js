@@ -119,15 +119,32 @@ function render() {
 }
 
 /* ---- Daily NAV-estimate log: per-basket predicted NAV vs actual ---- */
+let DAILYLOG_DATA = null, DAILYLOG_VIEW = "revised";   // "revised" | "asof"
 function renderDailyLog(d) {
-  const card = document.getElementById("dailylog-table");
-  if (!card) return;
-  const ms = d.meta.methods, lbl = d.meta.method_labels;
+  DAILYLOG_DATA = d;
   const note = document.getElementById("dailylog-note");
-  if (note) note.innerHTML = d.meta.note;
-  const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt</th>" +
+  if (note) note.innerHTML = d.meta.note + (d.meta.two_views_note ? "<br><b>Two views.</b> " + d.meta.two_views_note : "");
+  const tg = document.getElementById("dailylog-toggle");
+  if (tg) {
+    const btn = (v, label) =>
+      `<button data-v="${v}" style="background:${DAILYLOG_VIEW === v ? _rgba(SPX, 0.22) : "var(--panel-2)"};` +
+      `color:${DAILYLOG_VIEW === v ? TEXT : MUTED};border:1px solid ${DAILYLOG_VIEW === v ? SPX : GRID};` +
+      `border-radius:7px;padding:5px 12px;font-size:.8rem;cursor:pointer;margin-right:8px">${label}</button>`;
+    tg.innerHTML = btn("revised", "Revised (current assumptions)") + btn("asof", "As-of (frozen, what we estimated then)");
+    tg.querySelectorAll("button").forEach((b) => (b.onclick = () => { DAILYLOG_VIEW = b.dataset.v; renderDailyLog(DAILYLOG_DATA); }));
+  }
+  drawDailyLogTable();
+  const src = document.getElementById("dailylog-src");
+  if (src) src.innerHTML = "<span class='dim'>Cells = predicted BPTIX NAV under each weighting (green = closest to actual; small number = error vs actual). " + d.meta.disclaimer + "</span>";
+}
+function drawDailyLogTable() {
+  const d = DAILYLOG_DATA, card = document.getElementById("dailylog-table");
+  if (!d || !card) return;
+  const ms = d.meta.methods, lbl = d.meta.method_labels;
+  const rows = DAILYLOG_VIEW === "asof" ? (d.vintage_rows || []) : d.rows;
+  const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt · lev</th>" +
     ms.map((m) => `<th>${lbl[m]}</th>`).join("") + "<th>perfect-fit range</th><th>Actual NAV</th><th>best</th><th>what's new this day</th></tr>";
-  const body = d.rows.slice().reverse().map((r) => {
+  const body = rows.slice().reverse().map((r) => {
     const cells = ms.map((m) => {
       const isBest = r.best_method === m;
       const err = r.errors && r.errors[m] != null ? r.errors[m] : null;
@@ -139,11 +156,9 @@ function renderDailyLog(d) {
     const best = r.best_method ? lbl[r.best_method] : "—";
     const noteCell = r.note ? `<td style="white-space:normal;min-width:240px;max-width:340px;text-align:left;font-size:11px" class="dim">${r.note}</td>` : "<td></td>";
     return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${r.spcx_ret_pct >= 0 ? "+" : ""}${r.spcx_ret_pct}%)</span></td>` +
-      `<td>${r.spacex_weight_pct}%</td>${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
+      `<td>${r.spacex_weight_pct}% <span class="dim">L${(r.leverage || 1).toFixed(2)}</span></td>${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
   }).join("");
   card.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
-  const src = document.getElementById("dailylog-src");
-  if (src) src.innerHTML = "<span class='dim'>Cells = predicted BPTIX NAV under each weighting (green = closest to actual; small number = error vs actual). " + d.meta.disclaimer + "</span>";
 }
 
 /* ---- IPO-day reconciliation card (SpaceX first trade: marks vs AUM) ---- */

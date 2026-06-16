@@ -35,6 +35,19 @@ BASE = {"date": "2026-06-12", "nav": 289.98, "spcx": 160.95, "aum": 20.4e9, "spa
 # carried into 6/16. Adjust this one number as the calibration tightens.
 FRIDAY_SPACEX_BUY = 0.262e9
 
+# START-OF-DAY leverage assumption = gross holdings / net assets entering the day
+# (BEFORE that day's redemptions, which are forward-priced at the close and don't
+# touch the day's return). Public sleeve weight of net = LEVERAGE - w_spx; the
+# remainder (1 - LEVERAGE) is net cash earning ~0. 0.968 = the 5/31 disclosed level
+# (slightly NET CASH). Adjust as fresher leverage is known. With LEVERAGE = 1.0 this
+# reduces to the old (1 - w_spx) public weight.
+LEVERAGE_ASSUMPTION = 0.968
+
+# Append-only AS-OF (vintage) log: each day's estimate frozen as first reported, so
+# revising an assumption (Friday buy, leverage, ...) never erases what we estimated
+# that day. Seeded with 6/15 (no-buy) + 6/16 (pre-leverage); future days auto-freeze.
+_VINTAGE_PATH = os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data", "daily_nav_vintage.jsonl")
+
 # Append one dict per trading day. closes = {ticker: close} for the 23 public names
 # (Yahoo-style tickers, HEI/A -> HEI-A). spcx = SPCX close. actual_nav = BPTIX NAV
 # (None until known). aum = Morningstar Total Assets (optional; improves w_spx).
@@ -125,7 +138,7 @@ def build_payload():
                     num += w * (b / a - 1)
                     den += w
             br = num / den if den else 0.0
-            navret = w_spx * spx_ret + (1 - w_spx) * br
+            navret = w_spx * spx_ret + (LEVERAGE_ASSUMPTION - w_spx) * br
             preds[m] = {"basket_ret_pct": round(br * 100, 3),
                         "nav_return_pct": round(navret * 100, 3),
                         "pred_nav": round(prev["nav"] * (1 + navret), 2)}
@@ -139,14 +152,14 @@ def build_payload():
                     num += w * (b / a - 1)
                     den += w
             br = num / den if den else 0.0
-            ens_navs.append(prev["nav"] * (1 + w_spx * spx_ret + (1 - w_spx) * br))
+            ens_navs.append(prev["nav"] * (1 + w_spx * spx_ret + (LEVERAGE_ASSUMPTION - w_spx) * br))
         pf_range = [round(min(ens_navs), 2), round(max(ens_navs), 2)] if ens_navs else None
         actual = e.get("actual_nav")
         errs = ({m: round(preds[m]["pred_nav"] - actual, 2) for m in methods} if actual else {})
         best = min(errs, key=lambda m: abs(errs[m])) if errs else None
         rows.append({"date": e["date"], "spcx": e["spcx"], "spcx_ret_pct": round(spx_ret * 100, 2),
-                     "spacex_weight_pct": round(w_spx * 100, 2), "prior_nav": prev["nav"],
-                     "preds": preds, "perfect_fit_range": pf_range,
+                     "spacex_weight_pct": round(w_spx * 100, 2), "leverage": LEVERAGE_ASSUMPTION,
+                     "prior_nav": prev["nav"], "preds": preds, "perfect_fit_range": pf_range,
                      "actual_nav": actual, "errors": errs, "best_method": best,
                      "note": e.get("note", "")})
         # chain to next day: base off ACTUAL nav if known, else the median prediction
@@ -155,18 +168,50 @@ def build_payload():
         aum = float(e["aum"]) if e.get("aum") else prev["aum"] * (base_nav / prev["nav"])
         prev = {"nav": base_nav, "spcx": e["spcx"], "aum": aum, "spx_value": spx_value, "closes": e["closes"]}
 
+    vintage_rows = _freeze_vintage(rows)
     return {
         "meta": {
             "title": "Daily BPTIX NAV estimate — per basket-weighting vs actual",
             "method_labels": METHOD_LABELS, "methods": methods, "base": BASE,
+            "friday_spacex_buy_usd": FRIDAY_SPACEX_BUY, "leverage": LEVERAGE_ASSUMPTION,
             "note": ("Each day's predicted BPTIX NAV under every basket weighting we've tested, vs the actual. "
-                     "NAV_t = NAV_{t-1} x (1 + w_spx x SPCX_return + (1-w_spx) x basket_return); SpaceX marked to "
-                     "live SPCX; public weights drop SPY and renormalize over the 23 names. Chained off the prior "
-                     "ACTUAL NAV where known (else the median prediction). Paste closes daily to append a row."),
-            "disclaimer": "Estimate, not the fund's record. Excludes leverage drift, fees, flows, intraday timing.",
+                     "NAV_t = NAV_{t-1} x (1 + w_spx x SPCX_return + (LEVERAGE - w_spx) x basket_return); SpaceX "
+                     "marked to live SPCX; public weights drop SPY and renormalize over the 23 names. w_spx folds "
+                     "in the assumed Friday SpaceX buy ($%.0fM); LEVERAGE is the start-of-day gross/net (%.3f, "
+                     "pre-redemption). Chained off the prior ACTUAL NAV where known (else the median prediction)."
+                     % (FRIDAY_SPACEX_BUY / 1e6, LEVERAGE_ASSUMPTION)),
+            "two_views_note": ("AS-OF (vintage): each day's estimate FROZEN as first reported — what we thought "
+                               "that day. REVISED: recomputed now with the current assumptions (Friday buy + "
+                               "leverage). Toggle to compare; the gap is the assumption update."),
+            "disclaimer": "Estimate, not the fund's record. Excludes fees, intraday timing, mid-day flows.",
         },
-        "rows": rows,
+        "rows": rows,                 # REVISED (current assumptions)
+        "vintage_rows": vintage_rows, # AS-OF (frozen as first reported)
     }
+
+
+def _freeze_vintage(rows):
+    """Append-only: freeze each day's estimate the first time it is built; never
+    revise a frozen day. Returns the frozen rows in date order (idempotent)."""
+    frozen, order = {}, []
+    if os.path.exists(_VINTAGE_PATH):
+        for line in open(_VINTAGE_PATH, encoding="utf-8"):
+            line = line.strip()
+            if line:
+                r = json.loads(line)
+                frozen[r["date"]] = r
+                order.append(r["date"])
+    added = []
+    for r in rows:
+        if r["date"] not in frozen:
+            frozen[r["date"]] = r
+            order.append(r["date"])
+            added.append(r)
+    if added:
+        with open(_VINTAGE_PATH, "a", encoding="utf-8") as f:
+            for r in added:
+                f.write(json.dumps(r, ensure_ascii=False, allow_nan=False) + "\n")
+    return [frozen[d] for d in sorted(set(order))]
 
 
 def write_json():

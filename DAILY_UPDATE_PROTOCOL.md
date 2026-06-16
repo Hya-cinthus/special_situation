@@ -28,9 +28,14 @@ Append (or, next morning, complete) one dict for day T:
  "aum":<Morningstar Total Assets or None>,
  "closes":{... 23 tickers ...}}   # Yahoo tickers; HEI/A -> HEI-A; SPY intentionally dropped
 ```
-Drives the **Daily NAV estimate** card. `recalibrate.py` reads this automatically and
-freezes the day's estimate into the append-only vintage log the first time `actual_nav`
-is present — so just fill `actual_nav` next morning and rebuild.
+Drives the **Daily NAV estimate** card (which has an **As-of / Revised toggle**: each day's
+estimate is auto-frozen to `daily_nav_vintage.jsonl` the first build, so revising an
+assumption never erases what we estimated that day). `recalibrate.py` also reads this and
+freezes its own vintage when `actual_nav` first lands — so just fill `actual_nav` next morning
+and rebuild. Two assumption knobs at the top of `daily_nav_log.py`, both surfaced in the table:
+- `FRIDAY_SPACEX_BUY` — assumed 6/12 SpaceX add ($262M) folded into the predicted SpaceX weight.
+- `LEVERAGE_ASSUMPTION` — **start-of-day** gross/net (0.968 = 5/31 disclosed, pre-redemption);
+  public sleeve weight = LEVERAGE − w_spx, remainder is net cash. Update as fresher leverage is known.
 
 ### 2. `situations/spacex_baron/data/morningstar_aum_log.jsonl` — append one line
 ```json
