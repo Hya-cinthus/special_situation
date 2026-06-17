@@ -280,31 +280,38 @@ def _interpret(r):
 
 
 def _belief(B, ledger):
-    """Prior (pre-data) vs posterior (after the latest recalibration) on the
-    headline question: did Friday buy SpaceX, and how big is the redemption?"""
-    last = next((r for r in reversed(ledger) if r.get("implied_w_spx_pct") is not None), None)
-    if not last:
+    """Prior (no-buy) vs posterior. Keeps the Friday (6/12) buy PINNED to the row
+    that attributes to 6/12 (so later days don't relabel a noisy daily wobble as
+    'the Friday buy'); uses the LATEST row only for the current weight + flow."""
+    implied = [r for r in ledger if r.get("implied_w_spx_pct") is not None]
+    if not implied:
         return None
+    friday = next((r for r in implied if r.get("buy_attributed_to") == B["date"]), None)
+    latest = implied[-1]
+    base_w = round(B["spacex_value"] / B["aum"] * 100, 1)
+    fb = friday["implied_buy_m"] if friday else None
+    fbb = friday["implied_buy_band_m"] if friday else None
     return {
-        "as_of": last["date"],
-        "question": "Did 6/12 (Friday) buy SpaceX, and how large was the 6/15 redemption?",
-        "prior": {"label": "Before %s data (mechanical no-buy carry)" % last["date"],
-                  "w_spx_pct": round(B["spacex_value"] / B["aum"] * 100, 2),
-                  "friday_buy_m": 0, "redemption_b": None},
-        "posterior": {"label": "After %s NAV+AUM" % last["date"],
-                      "w_spx_pct": last["implied_w_spx_pct"],
-                      "w_spx_band_pct": last["implied_w_spx_band_pct"],
-                      "friday_buy_m": last["implied_buy_m"],
-                      "friday_buy_band_m": last["implied_buy_band_m"],
-                      "redemption_b": last["implied_net_flow_b"]},
-        "takeaway": ("6/15 NAV (%.2f) clears every public basket AND the perfect-fit band, so the beat is "
-                     "SpaceX-side, not public-side. It is consistent with a Friday SpaceX BUY of ~$%.0fM "
-                     "(raising the start-of-Monday SpaceX weight to ~%.1f%% from %.1f%%) plus a Monday net "
-                     "outflow of ~$%.2fB met by trimming public holdings. Both rest on coarse 0.1B AUM "
-                     "prints, so the buy/redemption sizes carry wide bands and will tighten as more days land."
-                     % (last["actual_nav"], last["implied_buy_m"], last["implied_w_spx_pct"],
-                        round(B["spacex_value"] / B["aum"] * 100, 1),
-                        -(last["implied_net_flow_b"] or 0))),
+        "as_of": latest["date"],
+        "question": "Did 6/12 (Friday) buy SpaceX, how big, and how is the SpaceX weight evolving?",
+        "prior": {"label": "Before any actual NAV (mechanical no-buy carry)",
+                  "w_spx_pct": base_w, "friday_buy_m": 0, "redemption_b": None},
+        "posterior": {"label": "After %s NAV+AUM" % latest["date"],
+                      "friday_date": B["date"], "friday_buy_m": fb, "friday_buy_band_m": fbb,
+                      "w_spx_pct": latest["implied_w_spx_pct"],            # CURRENT weight (latest day)
+                      "w_spx_band_pct": latest["implied_w_spx_band_pct"],
+                      "current_date": latest["date"],
+                      "redemption_b": latest["implied_net_flow_b"]},       # latest day's flow
+        "takeaway": ("The Friday (6/12) buy is pinned by 6/15's NAV at ~$%(fb).0fM (band $%(lo).0f-%(hi).0fM): that "
+                     "day's NAV cleared every public basket AND the perfect-fit band, so the beat was SpaceX-side. "
+                     "Carrying it forward, %(cd)s implies a SpaceX weight of ~%(cw).1f%%%% of net (band %(cwlo).1f-%(cwhi).1f) "
+                     "and a ~$%(flow).2fB outflow that day. The weight keeps climbing from the SPCX re-mark PLUS "
+                     "redemptions met by trimming public (which lifts SpaceX's share). No clear evidence of further "
+                     "buying beyond 6/12 -- the daily wobbles sit inside the basket/AUM-rounding noise band."
+                     % {"fb": fb or 0, "lo": (fbb or [0, 0])[0], "hi": (fbb or [0, 0])[1],
+                        "cd": latest["date"], "cw": latest["implied_w_spx_pct"],
+                        "cwlo": latest["implied_w_spx_band_pct"][0], "cwhi": latest["implied_w_spx_band_pct"][1],
+                        "flow": -(latest["implied_net_flow_b"] or 0)}),
     }
 
 

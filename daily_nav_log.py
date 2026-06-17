@@ -61,14 +61,15 @@ ENTRIES = [
                 "SPOT": 479.85, "TSLA": 411.15, "VRSK": 180.46},
      "note": "Actual NAV 307.55 + AUM 20.7B in. NEW: it cleared every no-buy basket AND the perfect-fit band "
              "-> Friday DID buy SpaceX (~$262M); w_spx raised 29.1%->30.4%. Implied ~$0.9B Monday outflow."},
-    {"date": "2026-06-16", "spcx": 201.80, "actual_nav": None, "aum": None,
+    {"date": "2026-06-16", "spcx": 201.80, "actual_nav": 312.60, "aum": 20.6e9,
      "closes": {"ACGL": 92.58, "BIRK": 48.97, "CHH": 116.07, "CSGP": 31.97, "FDS": 237.56,
                 "FIG": 17.98, "GLPI": 46.73, "GWRE": 117.46, "H": 197.03, "HEI": 335.53,
                 "HEI-A": 248.11, "IDXX": 573.00, "IT": 142.24, "KNSL": 312.69, "MSCI": 608.16,
                 "MTN": 136.68, "ONON": 38.06, "RRR": 60.92, "SCHW": 93.67, "SHOP": 113.23,
                 "SPOT": 469.81, "TSLA": 404.66, "VRSK": 179.61},
-     "note": "Estimate only (BPTIX NAV + Morningstar AUM land tomorrow). SPCX 201.80 (+4.8%). Carries the "
-             "post-Friday-buy SpaceX weight (~35.9%). Public basket ~flat (TSLA -1.6%, insurers up)."},
+     "note": "Actual NAV 312.60 in (our estimate was 312.5 — nailed it). SPCX +4.8% = Bloomberg $201.80; "
+             "Yahoo's $192.50 is STALE (the +1.64% NAV on a ~flat public basket can only come from SpaceX rising). "
+             "AUM 20.7B->20.6B vs NAV +1.64% => ~$0.44B outflow (redemptions continue; public trimmed)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

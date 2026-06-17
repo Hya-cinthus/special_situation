@@ -1578,9 +1578,9 @@ function renderRecalib(d) {
       `<div>Friday SpaceX buy <b>$0</b> <span class="dim">(assumed none)</span></div>` +
       `<div>Redemption <b>unknown</b></div>`, MUTED);
     const post = box("POSTERIOR · " + b.posterior.label,
-      `<div>SpaceX weight <b style="color:${SPX}">${b.posterior.w_spx_pct}%</b> <span class="dim">(${b.posterior.w_spx_band_pct[0]}–${b.posterior.w_spx_band_pct[1]}%)</span></div>` +
-      `<div>Friday SpaceX buy <b style="color:${SPX}">${mUSD(b.posterior.friday_buy_m)}</b> <span class="dim">(${mUSD(b.posterior.friday_buy_band_m[0])} to ${mUSD(b.posterior.friday_buy_band_m[1])})</span></div>` +
-      `<div>Monday net flow <b style="color:${b.posterior.redemption_b < 0 ? BAD : GOOD}">${bUSD(b.posterior.redemption_b)}</b></div>`, SPX);
+      `<div>Friday (${b.posterior.friday_date}) SpaceX buy <b style="color:${SPX}">${mUSD(b.posterior.friday_buy_m)}</b> <span class="dim">(${mUSD(b.posterior.friday_buy_band_m[0])} to ${mUSD(b.posterior.friday_buy_band_m[1])})</span></div>` +
+      `<div>SpaceX weight @ ${b.posterior.current_date} <b style="color:${SPX}">${b.posterior.w_spx_pct}%</b> <span class="dim">(${b.posterior.w_spx_band_pct[0]}–${b.posterior.w_spx_band_pct[1]}%)</span></div>` +
+      `<div>Net flow @ ${b.posterior.current_date} <b style="color:${b.posterior.redemption_b < 0 ? BAD : GOOD}">${bUSD(b.posterior.redemption_b)}</b></div>`, SPX);
     document.getElementById("recalib-belief").innerHTML =
       `<div style="font-weight:600;margin-bottom:8px">${b.question}</div>` +
       `<div style="display:flex;gap:12px;align-items:stretch;flex-wrap:wrap">${prior}` +

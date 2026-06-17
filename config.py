@@ -296,6 +296,15 @@ class SpacexBaron:
                    "ESTIMATE that lives in the recalibration card, NOT booked into this hard mark."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-06-16",
+         "spacex_value_usd": 3.89026788e9 * (201.80 / 105.32),  # ~$7.454B
+         "per_share_old_split_adj": 105.32, "per_share_new": 201.80,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $201.80 on 2026-06-16 (+4.8% vs 6/15 $192.50), per Bloomberg; Yahoo's $192.50 "
+                   "print is stale (the +1.64% BPTIX NAV on a ~flat public basket confirms SpaceX rose). Marks "
+                   "the DISCLOSED 3/31 share count; the ~$262M Friday add stays an estimate in recalibration."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
