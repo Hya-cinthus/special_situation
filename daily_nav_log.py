@@ -70,6 +70,15 @@ ENTRIES = [
      "note": "Actual NAV 312.60 in (our estimate was 312.5 — nailed it). SPCX +4.8% = Bloomberg $201.80; "
              "Yahoo's $192.50 is STALE (the +1.64% NAV on a ~flat public basket can only come from SpaceX rising). "
              "AUM 20.7B->20.6B vs NAV +1.64% => ~$0.44B outflow (redemptions continue; public trimmed)."},
+    {"date": "2026-06-17", "spcx": 191.82, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 92.37, "BIRK": 46.95, "CHH": 113.79, "CSGP": 30.46, "FDS": 228.30,
+                "FIG": 18.65, "GLPI": 45.26, "GWRE": 111.17, "H": 201.88, "HEI": 337.33,
+                "HEI-A": 248.14, "IDXX": 546.09, "IT": 133.58, "KNSL": 309.22, "MSCI": 596.89,
+                "MTN": 129.93, "ONON": 37.72, "RRR": 59.13, "SCHW": 94.51, "SHOP": 108.09,
+                "SPOT": 455.60, "TSLA": 396.38, "VRSK": 175.35},
+     "note": "Estimate only (BPTIX NAV + AUM tomorrow). First BIG-MOVE basket day: public down hard "
+             "(TSLA -2.0%, IDXX/IT/GWRE/FDS -4 to -6%, SHOP/SPOT/BIRK/MTN -3 to -5%; only H/SCHW/HEI up) AND "
+             "SPCX -4.9% (201.80->191.82). Both sleeves down -> tomorrow's actual finally lets us pin LEVERAGE."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
