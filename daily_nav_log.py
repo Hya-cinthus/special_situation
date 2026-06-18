@@ -38,10 +38,13 @@ FRIDAY_SPACEX_BUY = 0.262e9
 # START-OF-DAY leverage assumption = gross holdings / net assets entering the day
 # (BEFORE that day's redemptions, which are forward-priced at the close and don't
 # touch the day's return). Public sleeve weight of net = LEVERAGE - w_spx; the
-# remainder (1 - LEVERAGE) is net cash earning ~0. 0.968 = the 5/31 disclosed level
-# (slightly NET CASH). Adjust as fresher leverage is known. With LEVERAGE = 1.0 this
-# reduces to the old (1 - w_spx) public weight.
-LEVERAGE_ASSUMPTION = 0.968
+# remainder (1 - LEVERAGE) is net cash earning ~0.
+# 1.00 — DATA-CONFIRMED 2026-06-17: the first big-basket-move day's actual NAV
+# (302.28) matched the L=1.0 estimate (302.3), NOT the old 5/31-disclosed 0.968
+# (which predicted 302.5); implied L = 1.009. The ~3.2% net-cash buffer was
+# consumed by the ~$1.7B of cumulative redemptions since 6/12, lifting leverage
+# from 0.968 to ~1.0 (fund now ~fully invested). Revisit if a fresh disclosure lands.
+LEVERAGE_ASSUMPTION = 1.00
 
 # Append-only AS-OF (vintage) log: each day's estimate frozen as first reported, so
 # revising an assumption (Friday buy, leverage, ...) never erases what we estimated
@@ -70,15 +73,16 @@ ENTRIES = [
      "note": "Actual NAV 312.60 in (our estimate was 312.5 — nailed it). SPCX +4.8% = Bloomberg $201.80; "
              "Yahoo's $192.50 is STALE (the +1.64% NAV on a ~flat public basket can only come from SpaceX rising). "
              "AUM 20.7B->20.6B vs NAV +1.64% => ~$0.44B outflow (redemptions continue; public trimmed)."},
-    {"date": "2026-06-17", "spcx": 191.82, "actual_nav": None, "aum": None,
+    {"date": "2026-06-17", "spcx": 191.82, "actual_nav": 302.28, "aum": 19.6e9,
      "closes": {"ACGL": 92.37, "BIRK": 46.95, "CHH": 113.79, "CSGP": 30.46, "FDS": 228.30,
                 "FIG": 18.65, "GLPI": 45.26, "GWRE": 111.17, "H": 201.88, "HEI": 337.33,
                 "HEI-A": 248.14, "IDXX": 546.09, "IT": 133.58, "KNSL": 309.22, "MSCI": 596.89,
                 "MTN": 129.93, "ONON": 37.72, "RRR": 59.13, "SCHW": 94.51, "SHOP": 108.09,
                 "SPOT": 455.60, "TSLA": 396.38, "VRSK": 175.35},
-     "note": "Estimate only (BPTIX NAV + AUM tomorrow). First BIG-MOVE basket day: public down hard "
-             "(TSLA -2.0%, IDXX/IT/GWRE/FDS -4 to -6%, SHOP/SPOT/BIRK/MTN -3 to -5%; only H/SCHW/HEI up) AND "
-             "SPCX -4.9% (201.80->191.82). Both sleeves down -> tomorrow's actual finally lets us pin LEVERAGE."},
+     "note": "Actual NAV 302.28 in. LEVERAGE PINNED: on this first big-down-basket day the actual matched the "
+             "L=1.0 estimate (302.3), NOT L=0.968 (302.5) -> implied L=1.009, so leverage is now ~1.0 (net-cash "
+             "buffer consumed by redemptions). AUM 20.6B->19.6B vs NAV -3.30% => ~$0.32B more outflow "
+             "(cumulative ~$1.7B since 6/12). w_spx now ~38%."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

@@ -305,6 +305,16 @@ class SpacexBaron:
                    "the DISCLOSED 3/31 share count; the ~$262M Friday add stays an estimate in recalibration."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-06-17",
+         "spacex_value_usd": 3.89026788e9 * (191.82 / 105.32),  # ~$7.087B
+         "per_share_old_split_adj": 105.32, "per_share_new": 191.82,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $191.82 on 2026-06-17 (-4.9% vs 6/16 $201.80), per Bloomberg. Marks the DISCLOSED "
+                   "3/31 share count. This first big-down-basket day pinned the fund's leverage at ~1.0 (actual "
+                   "NAV 302.28 matched the L=1.0 estimate, not L=0.968), confirming the net-cash buffer was "
+                   "consumed by redemptions."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
