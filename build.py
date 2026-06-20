@@ -244,6 +244,13 @@ def main(argv):
         print(f"[spacex_position] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
     except Exception as e:
         print(f"[spacex_position] skipped: {e}")
+    # RONB cross-reference (Baron's daily-transparent ETF as a BPTIX proxy; reads cache; network-free).
+    try:
+        import ronb_crossref
+        p = ronb_crossref.write_json()
+        print(f"[ronb_crossref] Wrote {p} ({os.path.getsize(p)/1024:.0f} KB)")
+    except Exception as e:
+        print(f"[ronb_crossref] skipped: {e}")
     # Long-horizon (3yr) public-book replication (reads cached prices; network-free).
     try:
         import long_replication

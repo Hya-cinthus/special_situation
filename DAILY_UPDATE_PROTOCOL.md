@@ -109,6 +109,18 @@ rate-limit on CI and ship blank sections).
 
 ---
 
+## RONB cross-reference (extra daily data point)
+
+`ronb_crossref.py` uses **RONB (Baron First Principles ETF)** — Baron's daily-transparent ETF run
+alongside BPTIX (holds SpaceX directly + the same public names). Post-IPO RONB↔BPTIX daily returns
+correlate **0.997** with BPTIX ≈ **1.3× RONB**, and RONB prints its close the same day **before** BPTIX's
+NAV posts → a leading cross-check, plus daily holdings (new-name watch: IBKR/MORN/ABNB/LYV; BPTIX-only:
+CoStar). Not identical — unlevered, diverged pre-IPO, different SpaceX weight (RONB ~31% vs BPTIX ~37%).
+- **Update:** the holdings seed is `RONB_SEED` in `ronb_crossref.py` (from Baron's daily CSV, as-of dated);
+  refresh prices + re-cache with `py ronb_crossref.py --refresh` (commits `situations/spacex_baron/data/ronb.json`).
+  When the teammate supplies a fresher RONB holdings snapshot, update `RONB_SEED` (ticker, weight) and its as_of.
+- **Use it as a sanity check:** after estimating BPTIX's NAV, confirm RONB's same-day return × ~1.3 ≈ your move.
+
 ## Weekly / occasional
 
 - **`long_replication.py`** (3-yr public-book replication): prices are cached in

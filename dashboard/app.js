@@ -120,6 +120,7 @@ function loadCards() {
   card("data/nport_holdings.json", renderRecon);
   card("data/baron_spacex_funds.json", renderBaronFunds);
   card("data/spacex_position.json", renderSpacexPosition);
+  card("data/ronb_crossref.json", renderRonb);
   card("data/ipo_day_recon.json", renderIpoDay);
   card("data/daily_nav_log.json", renderDailyLog);
   card("data/recalibration.json", renderRecalib);
@@ -1617,6 +1618,53 @@ function renderRecalib(d) {
         `<td style="color:${col}">${r.pinned ? "pinned (tight)" : "loose"}</td></tr>`;
     }).join("");
     V.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
+  }
+}
+
+/* ---- RONB cross-reference: Baron's daily-transparent ETF as a BPTIX proxy ---- */
+function renderRonb(d) {
+  const card = document.getElementById("ronb-card");
+  if (!card) return;
+  card.style.display = "";
+  const m = d.meta, bt = d.backtest, ib = d.implied_bptix, sc = d.spacex_check, cmp = d.compare;
+  const sp = (x) => (x == null ? "—" : (x >= 0 ? "+" : "") + Number(x).toFixed(2));
+  document.getElementById("ronb-title").textContent = m.title;
+  document.getElementById("ronb-what").innerHTML = m.what + " <span class='dim'>Holdings as of " + m.as_of + ".</span>";
+  document.getElementById("ronb-caveat").innerHTML = "<span class='dim'><b>Caveat.</b> " + m.caveat + "</span>";
+  const kpi = (l, v, n, cls) =>
+    `<div class="kpi"><span class="label">${l}</span><div class="value${cls ? " " + cls : ""}">${v}</div><div class="note">${n}</div></div>`;
+  document.getElementById("ronb-kpis").innerHTML =
+    kpi("Post-IPO corr", bt.post_ipo.corr, "RONB↔BPTIX daily return (" + bt.post_ipo.n + " days)", "spx") +
+    kpi("BPTIX / RONB beta", (bt.post_ipo.beta || "—") + "×", "BPTIX amplifies RONB (SpaceX wt + leverage)") +
+    (ib ? kpi("RONB → implied BPTIX", sp(ib.implied_bptix_ret_pct) + "%", ib.date + ": RONB " + sp(ib.ronb_ret_pct) + "% × β (leading, same-day)", "spx") : "") +
+    (sc ? kpi("RONB SpaceX wt", sc.ronb_spacex_pct + "%", "unlevered, direct shares vs BPTIX ~37% levered") : "");
+
+  const B = document.getElementById("ronb-backtest");
+  if (B) {
+    const row = (lbl, s) => `<tr><td><b>${lbl}</b></td><td>${s.n}</td><td>${s.corr == null ? "—" : s.corr}</td>` +
+      `<td>${s.beta == null ? "—" : s.beta + "×"}</td><td class="dim">${s.vol_ronb_pct || "—"}%</td><td class="dim">${s.vol_bptix_pct || "—"}%</td></tr>`;
+    B.innerHTML = "<table class='data'><tr><th>Regime</th><th>days</th><th>corr</th><th>beta (BPTIX/RONB)</th><th>RONB vol</th><th>BPTIX vol</th></tr><tbody>" +
+      row("Pre-IPO", bt.pre_ipo) + row("Post-IPO (6/12+)", bt.post_ipo) + row("All", bt.all) + "</tbody></table>" +
+      `<p class="dim" style="margin-top:6px">Pre-IPO they diverged (RONB took heavy subscriptions, different SpaceX weight); post-IPO they move in near-lockstep with BPTIX ≈ ${bt.post_ipo.beta}× RONB. ${ib ? ib.note : ""}</p>`;
+  }
+  const cdiv = document.getElementById("ronb-compare");
+  if (cdiv) {
+    const tag = (t, col) => `<span class="pill" style="background:${_rgba(col, 0.18)};color:${col};margin:2px 3px">${t}</span>`;
+    cdiv.innerHTML =
+      `<p><b>Shared (${cmp.shared.length})</b> — RONB proxies these directly:<br>${cmp.shared.map((t) => tag(t, MUTED)).join("")}</p>` +
+      `<p style="margin-top:8px"><b style="color:${SPX}">RONB-only (${cmp.ronb_only.length})</b> — ${cmp.ronb_only_note}<br>${cmp.ronb_only.map((t) => tag(t, SPX)).join("")}</p>` +
+      `<p style="margin-top:8px"><b style="color:${ACC}">BPTIX-only (${cmp.bptix_only.length})</b> — ${cmp.bptix_only_note}<br>${cmp.bptix_only.map((t) => tag(t, ACC)).join("")}</p>` +
+      (sc ? `<p style="margin-top:8px">${sc.note}</p>` : "");
+  }
+  const H = document.getElementById("ronb-holdings");
+  if (H) {
+    const body = d.holdings.map((h) => {
+      const col = h.private ? SPX : (h.cash ? MUTED : (cmp.ronb_only.includes(h.ticker) ? SPX : TEXT));
+      const note = h.private ? "SpaceX (direct)" : h.cash ? "cash" : (cmp.ronb_only.includes(h.ticker) ? "not in BPTIX 5/31" : "shared");
+      return `<tr><td><b style="color:${col}">${h.ticker}</b></td><td style="text-align:left">${h.name}</td>` +
+        `<td>${h.weight}%</td><td class="dim" style="text-align:left">${note}</td></tr>`;
+    }).join("");
+    H.innerHTML = "<table class='data'><tr><th>Ticker</th><th style='text-align:left'>Name</th><th>Weight</th><th style='text-align:left'>vs BPTIX</th></tr><tbody>" + body + "</tbody></table>";
   }
 }
 
