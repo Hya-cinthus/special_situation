@@ -194,13 +194,18 @@ def build_payload():
         actual = e.get("actual_nav")
         errs = ({m: round(preds[m]["pred_nav"] - actual, 2) for m in methods} if actual else {})
         best = min(errs, key=lambda m: abs(errs[m])) if errs else None
+        # SpaceX shares behind one BPTIX share = (SpaceX $ per share) / SpaceX price
+        #   = w_spx x NAV / SPCX  (NAV: actual if known, else the median prediction)
+        nav_used = actual if actual else sorted(preds[m]["pred_nav"] for m in methods)[len(methods) // 2]
+        spx_sh_per_bptix = round(w_spx * nav_used / e["spcx"], 4) if e["spcx"] else None
         rows.append({"date": e["date"], "spcx": e["spcx"], "spcx_ret_pct": round(spx_ret * 100, 2),
                      "spacex_weight_pct": round(w_spx * 100, 2), "leverage": LEVERAGE_ASSUMPTION,
+                     "spx_shares_per_bptix": spx_sh_per_bptix,
                      "prior_nav": prev["nav"], "preds": preds, "perfect_fit_range": pf_range,
                      "actual_nav": actual, "errors": errs, "best_method": best,
                      "note": e.get("note", "")})
         # chain to next day: base off ACTUAL nav if known, else the median prediction
-        base_nav = actual if actual else sorted(preds[m]["pred_nav"] for m in methods)[len(methods) // 2]
+        base_nav = nav_used
         spx_value = prev["spx_value"] * (e["spcx"] / prev["spcx"])
         aum = float(e["aum"]) if e.get("aum") else prev["aum"] * (base_nav / prev["nav"])
         prev = {"nav": base_nav, "spcx": e["spcx"], "aum": aum, "spx_value": spx_value, "closes": e["closes"]}

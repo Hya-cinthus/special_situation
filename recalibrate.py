@@ -144,7 +144,10 @@ def _freeze_vintage(ledger):
 
 def build_payload():
     WS, H = dl._weightings()
-    methods = list(dl.METHOD_LABELS)
+    # Band spans BPTIX's OWN disclosed weightings only. Exclude 'ronb' (a DIFFERENT
+    # fund's book) — it belongs in the daily-NAV cross-check, not in BPTIX's own
+    # weight-uncertainty band (it was wrongly widening the implied-weight/buy band).
+    methods = [m for m in dl.METHOD_LABELS if m != "ronb"]
     B = dl.BASE
     prev = {"nav": B["nav"], "spcx": B["spcx"], "aum": B["aum"],
             "spx_value": B["spacex_value"], "closes": dl._base_closes(H)}

@@ -151,21 +151,24 @@ function drawDailyLogTable() {
   if (!d || !card) return;
   const ms = d.meta.methods, lbl = d.meta.method_labels;
   const rows = DAILYLOG_VIEW === "asof" ? (d.vintage_rows || []) : d.rows;
-  const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt · lev</th>" +
+  const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt · lev</th><th>SpaceX sh / BPTIX sh</th>" +
     ms.map((m) => `<th>${lbl[m]}</th>`).join("") + "<th>perfect-fit range</th><th>Actual NAV</th><th>best</th><th>what's new this day</th></tr>";
   const body = rows.slice().reverse().map((r) => {
     const cells = ms.map((m) => {
+      const p = r.preds[m];
+      if (!p) return `<td class="dim" title="this method didn't exist when this day was frozen">—</td>`;
       const isBest = r.best_method === m;
       const err = r.errors && r.errors[m] != null ? r.errors[m] : null;
       const errTxt = err != null ? `<br><span class="dim" style="font-size:10px">${err >= 0 ? "+" : ""}${err}</span>` : "";
-      return `<td style="${isBest ? `background:${_rgba(GOOD, 0.16)};font-weight:700` : ""}">${r.preds[m].pred_nav.toFixed(2)}${errTxt}</td>`;
+      return `<td style="${isBest ? `background:${_rgba(GOOD, 0.16)};font-weight:700` : ""}">${p.pred_nav.toFixed(2)}${errTxt}</td>`;
     }).join("");
     const pf = r.perfect_fit_range ? `<span style="color:${SPX}">${r.perfect_fit_range[0].toFixed(2)} – ${r.perfect_fit_range[1].toFixed(2)}</span>` : "—";
     const act = r.actual_nav != null ? `<b style="color:${SPX}">${r.actual_nav.toFixed(2)}</b>` : `<span class="dim">est. only</span>`;
     const best = r.best_method ? lbl[r.best_method] : "—";
     const noteCell = r.note ? `<td style="white-space:normal;min-width:240px;max-width:340px;text-align:left;font-size:11px" class="dim">${r.note}</td>` : "<td></td>";
+    const spxSh = r.spx_shares_per_bptix != null ? `<td style="color:${SPX}">${r.spx_shares_per_bptix.toFixed(3)}</td>` : `<td class="dim">—</td>`;
     return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${r.spcx_ret_pct >= 0 ? "+" : ""}${r.spcx_ret_pct}%)</span></td>` +
-      `<td>${r.spacex_weight_pct}% <span class="dim">L${(r.leverage || 1).toFixed(2)}</span></td>${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
+      `<td>${r.spacex_weight_pct}% <span class="dim">L${(r.leverage || 1).toFixed(2)}</span></td>${spxSh}${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
   }).join("");
   card.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
 }
