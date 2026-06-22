@@ -39,12 +39,13 @@ FRIDAY_SPACEX_BUY = 0.262e9
 # (BEFORE that day's redemptions, which are forward-priced at the close and don't
 # touch the day's return). Public sleeve weight of net = LEVERAGE - w_spx; the
 # remainder (1 - LEVERAGE) is net cash earning ~0.
-# 1.00 — DATA-CONFIRMED 2026-06-17: the first big-basket-move day's actual NAV
-# (302.28) matched the L=1.0 estimate (302.3), NOT the old 5/31-disclosed 0.968
-# (which predicted 302.5); implied L = 1.009. The ~3.2% net-cash buffer was
-# consumed by the ~$1.7B of cumulative redemptions since 6/12, lifting leverage
-# from 0.968 to ~1.0 (fund now ~fully invested). Revisit if a fresh disclosure lands.
-LEVERAGE_ASSUMPTION = 1.00
+# SCHEDULE (not a constant): the 5/31-disclosed leverage was 0.968 (a ~3.2% net-cash
+# buffer, ~$0.65B). The FIRST big redemption (6/15's ~$0.94B) exceeded that buffer, so
+# cash was exhausted during 6/15 and leverage stepped to ~1.0 from 6/16 on. The 6/17
+# big-basket day independently CONFIRMED ~1.0 (actual NAV matched L=1.0, not 0.968).
+# So leverage entering 6/15 = 0.968 (buffer present); 6/16 onward = 1.00 (buffer gone).
+def LEVERAGE_FOR(date):
+    return 0.968 if date <= "2026-06-15" else 1.00
 
 # Append-only AS-OF (vintage) log: each day's estimate frozen as first reported, so
 # revising an assumption (Friday buy, leverage, ...) never erases what we estimated
@@ -175,6 +176,7 @@ def build_payload():
     for e in ENTRIES:
         spx_ret = e["spcx"] / prev["spcx"] - 1
         w_spx = prev["spx_value"] / prev["aum"]
+        lev = LEVERAGE_FOR(e["date"])      # 0.968 (cash buffer) <= 6/15, else 1.00
         preds = {}
         for m in methods:
             W = WS[m]
@@ -185,7 +187,7 @@ def build_payload():
                     num += w * (b / a - 1)
                     den += w
             br = num / den if den else 0.0
-            navret = w_spx * spx_ret + (LEVERAGE_ASSUMPTION - w_spx) * br
+            navret = w_spx * spx_ret + (lev - w_spx) * br
             preds[m] = {"basket_ret_pct": round(br * 100, 3),
                         "nav_return_pct": round(navret * 100, 3),
                         "pred_nav": round(prev["nav"] * (1 + navret), 2)}
@@ -199,7 +201,7 @@ def build_payload():
                     num += w * (b / a - 1)
                     den += w
             br = num / den if den else 0.0
-            ens_navs.append(prev["nav"] * (1 + w_spx * spx_ret + (LEVERAGE_ASSUMPTION - w_spx) * br))
+            ens_navs.append(prev["nav"] * (1 + w_spx * spx_ret + (lev - w_spx) * br))
         pf_range = [round(min(ens_navs), 2), round(max(ens_navs), 2)] if ens_navs else None
         actual = e.get("actual_nav")
         errs = ({m: round(preds[m]["pred_nav"] - actual, 2) for m in methods} if actual else {})
@@ -216,7 +218,7 @@ def build_payload():
         bptix_shares_out = aum_end / nav_used if nav_used else None
         flow_b = round((aum_end - prev["aum"] * (nav_used / prev["nav"])) / 1e9, 3) if e.get("aum") else None
         rows.append({"date": e["date"], "spcx": e["spcx"], "spcx_ret_pct": round(spx_ret * 100, 2),
-                     "spacex_weight_pct": round(w_spx * 100, 2), "leverage": LEVERAGE_ASSUMPTION,
+                     "spacex_weight_pct": round(w_spx * 100, 2), "leverage": lev,
                      "spx_shares_per_bptix": spx_sh_per_bptix,
                      "spx_shares_held_m": round(spx_shares_held / 1e6, 2),
                      "bptix_shares_out_m": round(bptix_shares_out / 1e6, 2) if bptix_shares_out else None,
@@ -238,13 +240,14 @@ def build_payload():
         "meta": {
             "title": "Daily BPTIX NAV estimate — per basket-weighting vs actual",
             "method_labels": METHOD_LABELS, "methods": methods, "base": BASE,
-            "friday_spacex_buy_usd": FRIDAY_SPACEX_BUY, "leverage": LEVERAGE_ASSUMPTION,
+            "friday_spacex_buy_usd": FRIDAY_SPACEX_BUY, "leverage_schedule": "0.968 (cash buffer) thru 6/15, 1.00 after",
             "note": ("Each day's predicted BPTIX NAV under every basket weighting we've tested, vs the actual. "
                      "NAV_t = NAV_{t-1} x (1 + w_spx x SPCX_return + (LEVERAGE - w_spx) x basket_return); SpaceX "
                      "marked to live SPCX; public weights drop SPY and renormalize over the 23 names. w_spx folds "
-                     "in the assumed Friday SpaceX buy ($%.0fM); LEVERAGE is the start-of-day gross/net (%.3f, "
-                     "pre-redemption). Chained off the prior ACTUAL NAV where known (else the median prediction)."
-                     % (FRIDAY_SPACEX_BUY / 1e6, LEVERAGE_ASSUMPTION)),
+                     "in the assumed Friday SpaceX buy ($%.0fM); LEVERAGE is the start-of-day gross/net: 0.968 (the "
+                     "5/31-disclosed ~3.2%% net-cash buffer) entering 6/15, then 1.00 from 6/16 once the first "
+                     "redemption consumed the buffer. Chained off the prior ACTUAL NAV where known."
+                     % (FRIDAY_SPACEX_BUY / 1e6,)),
             "two_views_note": ("AS-OF (vintage): each day's estimate FROZEN as first reported. REVISED: recomputed "
                                "with the current assumptions. The two differ ONLY where an assumption changed AFTER "
                                "a day was frozen — so far: 6/15 (the Friday-buy assumption moved the WEIGHT 29.1%->"

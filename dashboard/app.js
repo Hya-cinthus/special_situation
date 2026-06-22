@@ -157,8 +157,8 @@ function _spxShPerBptix(r) {
  * views; vintage rows carry their frozen leverage, so as-of shows the buffer that the
  * later leverage pin revealed was already gone). >0 = cash buffer; <0 = borrowing. */
 function _netCashB(r) {
-  const L = r.leverage != null ? r.leverage : 1.0;
-  if (r.bptix_shares_out_m == null) return null;
+  if (r.leverage == null || r.bptix_shares_out_m == null) return null;   // leverage not modeled that day -> "—"
+  const L = r.leverage;
   let nav = r.actual_nav;
   if (nav == null && r.preds) {
     const v = Object.values(r.preds).map((p) => p.pred_nav).filter((x) => x != null).sort((a, b) => a - b);
@@ -223,7 +223,7 @@ function drawDailyLogTable() {
       : (r.spacex_weight_pct != null && r.spcx_ret_pct != null ? r.spacex_weight_pct / 100 * r.spcx_ret_pct : null);
     const cCell = cVal != null ? `<td style="color:${cVal >= 0 ? GOOD : BAD}">${cVal >= 0 ? "+" : ""}${cVal.toFixed(2)}%</td>` : `<td class="dim">—</td>`;
     return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${r.spcx_ret_pct >= 0 ? "+" : ""}${r.spcx_ret_pct}%)</span></td>` +
-      `<td>${r.spacex_weight_pct}% <span class="dim">L${(r.leverage || 1).toFixed(2)}</span></td>${spxSh}${outCell}${cashCell}${cCell}${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
+      `<td>${r.spacex_weight_pct}% <span class="dim">L${r.leverage != null ? r.leverage.toFixed(2) : "—"}</span></td>${spxSh}${outCell}${cashCell}${cCell}${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
   }).join("");
   card.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
 }
