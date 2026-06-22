@@ -315,6 +315,15 @@ class SpacexBaron:
                    "consumed by redemptions."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-06-18",
+         "spacex_value_usd": 3.89026788e9 * (185.00 / 105.32),  # ~$6.834B
+         "per_share_old_split_adj": 105.32, "per_share_new": 185.00,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $185.00 on 2026-06-18 (-3.6% vs 6/17 $191.82), per Bloomberg. Marks the DISCLOSED "
+                   "3/31 share count. (6/19 = Juneteenth market holiday.) BPTIX NAV 298.47 (our estimate 298.36). "
+                   "Cross-checked by RONB (Baron's daily-transparent ETF), which moved in line."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

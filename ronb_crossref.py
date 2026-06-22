@@ -67,14 +67,64 @@ def _yahoo(tk, days=320):
     return {time.strftime("%Y-%m-%d", time.gmtime(t)): round(c[i], 4) for i, t in enumerate(ts) if c[i] is not None}
 
 
+_PRODUCT_URL = "https://www.baroncapitalgroup.com/product-detail/baron-first-principles-etf-ronb"
+_BROWSER_HDR = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+                "Accept": "text/csv,text/html,*/*", "Accept-Language": "en-US,en;q=0.9",
+                "Referer": _PRODUCT_URL}
+# Ticker normalization to our convention (match BPTIX names).
+_TK_FIX = {"HEI.A": "HEI-A"}
+
+
+def fetch_holdings():
+    """Scrape Baron's product page for the latest daily-holdings CSV link, download
+    and parse it -> {as_of, holdings:[...]}. Returns RONB_SEED on any failure."""
+    import csv as _csv
+    import io
+    import re
+    import urllib.request
+    try:
+        html = urllib.request.urlopen(urllib.request.Request(_PRODUCT_URL, headers=_BROWSER_HDR), timeout=30).read().decode("utf-8", "replace")
+        m = re.search(r'(/api/product/media/csv/RONB-HOLDINGS-\d{8}-0\.csv\?[^"\'\s\\]*)', html)
+        if not m:
+            return RONB_SEED
+        csv_url = "https://www.baroncapitalgroup.com" + m.group(1).replace("&amp;", "&")
+        raw = urllib.request.urlopen(urllib.request.Request(csv_url, headers=_BROWSER_HDR), timeout=30).read().decode("utf-8", "replace")
+    except Exception:
+        return RONB_SEED
+    holdings, as_of = [], None
+    for row in _csv.reader(io.StringIO(raw)):
+        if not row or row[0] == "Holding":
+            continue
+        name = row[0].strip()
+        if name.lower().startswith("as of"):
+            as_of = row[1].strip() if len(row) > 1 else None
+            continue
+        if name.lower().startswith("other assets"):
+            continue
+        try:
+            wt = round(float(row[2].replace("%", "").strip()), 4)
+        except (ValueError, IndexError):
+            continue
+        tk = (row[1] or "").strip()
+        tk = _TK_FIX.get(tk, tk)
+        h = {"ticker": tk or "CASH", "name": " ".join(name.split()).title(), "weight": wt}
+        if "space exploration" in name.lower():
+            h["private"] = True
+        elif name.lower().startswith("cash"):
+            h["cash"] = True
+        holdings.append(h)
+    return {"as_of": as_of or RONB_SEED["as_of"], "holdings": holdings} if holdings else RONB_SEED
+
+
 def refresh(verbose=True):
-    """Fetch RONB + BPTIX daily closes -> cache (network). Holdings come from the
-    committed seed (or a future daily-CSV ingest)."""
-    cache = {"holdings": RONB_SEED, "ronb_px": _yahoo("RONB"), "bptix_px": _yahoo("BPTIX")}
+    """Fetch RONB daily holdings (Baron site) + RONB/BPTIX closes (Yahoo) -> cache."""
+    cache = {"holdings": fetch_holdings(), "ronb_px": _yahoo("RONB"), "bptix_px": _yahoo("BPTIX")}
     with open(_CACHE, "w", encoding="utf-8") as f:
         json.dump(cache, f, separators=(",", ":"))
     if verbose:
-        print("cached RONB", len(cache["ronb_px"]), "BPTIX", len(cache["bptix_px"]), "->", _CACHE)
+        print("cached holdings as-of", cache["holdings"]["as_of"], "(%d names)" % len(cache["holdings"]["holdings"]),
+              "| RONB px", len(cache["ronb_px"]), "BPTIX px", len(cache["bptix_px"]), "->", _CACHE)
     return _CACHE
 
 
