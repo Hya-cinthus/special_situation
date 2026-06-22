@@ -146,6 +146,21 @@ function renderDailyLog(d) {
   const src = document.getElementById("dailylog-src");
   if (src) src.innerHTML = "<span class='dim'>Cells = predicted BPTIX NAV under each weighting (green = closest to actual; small number = error vs actual). " + d.meta.disclaimer + "</span>";
 }
+/* SpaceX shares behind one BPTIX share, derived from a row's OWN fields
+ * (w_spx x NAV / SPCX). For as-of/vintage rows this uses the FROZEN weight, the
+ * frozen NAV (actual if it was known, else that day's median prediction) and the
+ * frozen SPCX — i.e. what we'd have said that day. Never recomputed with today's
+ * assumptions; the frozen file is never modified. Revised rows carry the field. */
+function _spxShPerBptix(r) {
+  if (r.spx_shares_per_bptix != null) return r.spx_shares_per_bptix;
+  if (r.spacex_weight_pct == null || !r.spcx || !r.preds) return null;
+  let nav = r.actual_nav;
+  if (nav == null) {
+    const v = Object.values(r.preds).map((p) => p.pred_nav).filter((x) => x != null).sort((a, b) => a - b);
+    nav = v.length ? v[Math.floor(v.length / 2)] : null;
+  }
+  return nav ? (r.spacex_weight_pct / 100) * nav / r.spcx : null;
+}
 function drawDailyLogTable() {
   const d = DAILYLOG_DATA, card = document.getElementById("dailylog-table");
   if (!d || !card) return;
@@ -166,7 +181,8 @@ function drawDailyLogTable() {
     const act = r.actual_nav != null ? `<b style="color:${SPX}">${r.actual_nav.toFixed(2)}</b>` : `<span class="dim">est. only</span>`;
     const best = r.best_method ? lbl[r.best_method] : "—";
     const noteCell = r.note ? `<td style="white-space:normal;min-width:240px;max-width:340px;text-align:left;font-size:11px" class="dim">${r.note}</td>` : "<td></td>";
-    const spxSh = r.spx_shares_per_bptix != null ? `<td style="color:${SPX}">${r.spx_shares_per_bptix.toFixed(3)}</td>` : `<td class="dim">—</td>`;
+    const spxShVal = _spxShPerBptix(r);
+    const spxSh = spxShVal != null ? `<td style="color:${SPX}">${spxShVal.toFixed(3)}</td>` : `<td class="dim">—</td>`;
     return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${r.spcx_ret_pct >= 0 ? "+" : ""}${r.spcx_ret_pct}%)</span></td>` +
       `<td>${r.spacex_weight_pct}% <span class="dim">L${(r.leverage || 1).toFixed(2)}</span></td>${spxSh}${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
   }).join("");
