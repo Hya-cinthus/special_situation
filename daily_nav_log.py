@@ -92,6 +92,16 @@ ENTRIES = [
      "note": "Actual NAV 298.47 (our estimate 298.36, err +0.11). AUM 19.6B->19.1B vs NAV -1.26% => ~$0.25B "
              "more outflow (cumulative ~$1.95B since 6/12; redemptions continue). SPCX -3.6% (185.00). RONB "
              "cross-check agreed. 6/19 = Juneteenth holiday (no trading)."},
+    {"date": "2026-06-22", "spcx": 154.60, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 92.04, "BIRK": 43.30, "CHH": 109.88, "CSGP": 29.22, "FDS": 218.62,
+                "FIG": 19.08, "GLPI": 44.19, "GWRE": 102.69, "H": 196.33, "HEI": 331.15,
+                "HEI-A": 242.12, "IDXX": 545.73, "IT": 125.79, "KNSL": 295.05, "MSCI": 580.85,
+                "MTN": 141.67, "ONON": 36.21, "RRR": 60.45, "SCHW": 92.03, "SHOP": 107.98,
+                "SPOT": 459.34, "TSLA": 405.05, "VRSK": 168.99},
+     "note": "Estimate only (BPTIX NAV + AUM tomorrow). BIG DOWN day: SPCX -16.4% (185.00->154.60, SpaceX "
+             "cratered after the Juneteenth break) + public basket broadly down (BIRK -7.8%, GWRE/KNSL -4.5%, "
+             "IDXX/VRSK/CHH ~-3%; TSLA/SPOT/MSCI ~flat). Ignored 7 non-BPTIX tickers in the paste "
+             "(AAPL/AMZN/AVGO/GOOG/MU/NVDA/ORCL — not fund holdings)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
@@ -194,10 +204,13 @@ def build_payload():
         actual = e.get("actual_nav")
         errs = ({m: round(preds[m]["pred_nav"] - actual, 2) for m in methods} if actual else {})
         best = min(errs, key=lambda m: abs(errs[m])) if errs else None
-        # SpaceX shares behind one BPTIX share = (SpaceX $ per share) / SpaceX price
-        #   = w_spx x NAV / SPCX  (NAV: actual if known, else the median prediction)
+        # SpaceX shares behind one BPTIX share = fund SpaceX shares / BPTIX shares out
+        #   = (SpaceX_$/SPCX) / (AUM/NAV) = shares x NAV / AUM.  Use END-of-day AUM so a
+        #   big SPCX move doesn't distort it (the holding's share count is ~constant).
         nav_used = actual if actual else sorted(preds[m]["pred_nav"] for m in methods)[len(methods) // 2]
-        spx_sh_per_bptix = round(w_spx * nav_used / e["spcx"], 4) if e["spcx"] else None
+        spx_shares_held = prev["spx_value"] / prev["spcx"]          # the holding (constant across the carry)
+        aum_end = float(e["aum"]) if e.get("aum") else prev["aum"] * (nav_used / prev["nav"])
+        spx_sh_per_bptix = round(spx_shares_held * nav_used / aum_end, 4) if aum_end else None
         rows.append({"date": e["date"], "spcx": e["spcx"], "spcx_ret_pct": round(spx_ret * 100, 2),
                      "spacex_weight_pct": round(w_spx * 100, 2), "leverage": LEVERAGE_ASSUMPTION,
                      "spx_shares_per_bptix": spx_sh_per_bptix,

@@ -146,20 +146,12 @@ function renderDailyLog(d) {
   const src = document.getElementById("dailylog-src");
   if (src) src.innerHTML = "<span class='dim'>Cells = predicted BPTIX NAV under each weighting (green = closest to actual; small number = error vs actual). " + d.meta.disclaimer + "</span>";
 }
-/* SpaceX shares behind one BPTIX share, derived from a row's OWN fields
- * (w_spx x NAV / SPCX). For as-of/vintage rows this uses the FROZEN weight, the
- * frozen NAV (actual if it was known, else that day's median prediction) and the
- * frozen SPCX — i.e. what we'd have said that day. Never recomputed with today's
- * assumptions; the frozen file is never modified. Revised rows carry the field. */
+/* SpaceX shares behind one BPTIX share = fund SpaceX shares / BPTIX shares out
+ * (shares × NAV / AUM, end-of-day so a big SPCX move doesn't distort it).
+ * Precomputed per row in the backend (revised) and backfilled into the frozen
+ * vintage rows — read directly here (no recompute; that was the start/end bug). */
 function _spxShPerBptix(r) {
-  if (r.spx_shares_per_bptix != null) return r.spx_shares_per_bptix;
-  if (r.spacex_weight_pct == null || !r.spcx || !r.preds) return null;
-  let nav = r.actual_nav;
-  if (nav == null) {
-    const v = Object.values(r.preds).map((p) => p.pred_nav).filter((x) => x != null).sort((a, b) => a - b);
-    nav = v.length ? v[Math.floor(v.length / 2)] : null;
-  }
-  return nav ? (r.spacex_weight_pct / 100) * nav / r.spcx : null;
+  return r.spx_shares_per_bptix != null ? r.spx_shares_per_bptix : null;
 }
 function drawDailyLogTable() {
   const d = DAILYLOG_DATA, card = document.getElementById("dailylog-table");
