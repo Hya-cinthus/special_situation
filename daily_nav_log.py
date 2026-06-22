@@ -83,15 +83,15 @@ ENTRIES = [
              "L=1.0 estimate (302.3), NOT L=0.968 (302.5) -> implied L=1.009, so leverage is now ~1.0 (net-cash "
              "buffer consumed by redemptions). AUM 20.6B->19.6B vs NAV -3.30% => ~$0.32B more outflow "
              "(cumulative ~$1.7B since 6/12). w_spx now ~38%."},
-    {"date": "2026-06-18", "spcx": 185.00, "actual_nav": 298.47, "aum": None,
+    {"date": "2026-06-18", "spcx": 185.00, "actual_nav": 298.47, "aum": 19.1e9,
      "closes": {"ACGL": 91.18, "BIRK": 46.11, "CHH": 115.00, "CSGP": 30.12, "FDS": 221.29,
                 "FIG": 18.88, "GLPI": 44.59, "GWRE": 107.86, "H": 202.09, "HEI": 337.10,
                 "HEI-A": 247.58, "IDXX": 562.09, "IT": 127.49, "KNSL": 308.85, "MSCI": 581.19,
                 "MTN": 144.78, "ONON": 38.88, "RRR": 61.33, "SCHW": 91.70, "SHOP": 108.85,
                 "SPOT": 468.08, "TSLA": 400.49, "VRSK": 173.80},
-     "note": "Actual NAV 298.47 in (our estimate 298.36, err +0.11 — nailed again). SPCX -3.6% (185.00). RONB "
-             "cross-check agreed (RONB -0.91% x 1.3 = -1.19% vs actual -1.26%). AUM still PENDING (need 6/18 "
-             "Morningstar). 6/19 = Juneteenth holiday (no trading)."},
+     "note": "Actual NAV 298.47 (our estimate 298.36, err +0.11). AUM 19.6B->19.1B vs NAV -1.26% => ~$0.25B "
+             "more outflow (cumulative ~$1.95B since 6/12; redemptions continue). SPCX -3.6% (185.00). RONB "
+             "cross-check agreed. 6/19 = Juneteenth holiday (no trading)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
