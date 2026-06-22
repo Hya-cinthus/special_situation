@@ -87,6 +87,18 @@ def build_payload():
     cur = value_path[-1]
     total_shares = PRE_SHARES + buy_shares
 
+    # per-BPTIX-share look-through: how many SpaceX shares back one BPTIX share.
+    # BPTIX shares outstanding = AUM / NAV (latest day where both are known).
+    au = nv = audate = None
+    for e in dl.ENTRIES:
+        if e.get("aum") and e.get("actual_nav"):
+            au, nv, audate = float(e["aum"]), e["actual_nav"], e["date"]
+    if au is None:
+        au, nv, audate = dl.BASE["aum"], dl.BASE["nav"], dl.BASE["date"]
+    bptix_shares_out = au / nv
+    spx_per_bptix = total_shares / bptix_shares_out          # SpaceX shares per 1 BPTIX share
+    usd_per_bptix = spx_per_bptix * cur_mark                 # $ of SpaceX per BPTIX share (latest mark)
+
     return {
         "meta": {
             "title": "SpaceX position — pre-IPO holding vs the 6/12 IPO-day buy",
@@ -110,7 +122,9 @@ def build_payload():
         "current": {"as_of": cur_date, "spcx": cur_mark, "total_shares": round(total_shares, 0),
                     "total_value_usd": round(cur["total_usd"], 0),
                     "pre_ipo_value_usd": round(cur["pre_ipo_usd"], 0), "friday_value_usd": round(cur["friday_usd"], 0),
-                    "friday_pct": cur["friday_pct"]},
+                    "friday_pct": cur["friday_pct"],
+                    "spx_shares_per_bptix": round(spx_per_bptix, 4), "usd_per_bptix": round(usd_per_bptix, 2),
+                    "lookthrough_basis": "%s AUM $%.1fB / NAV $%.2f = %.1fM BPTIX shares" % (audate, au / 1e9, nv, bptix_shares_out / 1e6)},
         "value_path": value_path,
     }
 

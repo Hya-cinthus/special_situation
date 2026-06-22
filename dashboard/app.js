@@ -1684,6 +1684,8 @@ function renderSpacexPosition(d) {
     kpi("Current SpaceX", uB(cur.total_value_usd), sh(cur.total_shares) + " sh · as of " + cur.as_of + " ($" + cur.spcx + ")", "spx") +
     kpi("Pre-IPO (disclosed)", uB(cur.pre_ipo_value_usd), sh(pre.shares) + " sh · 3/31 NPORT") +
     kpi("Friday IPO add", uM(cur.friday_value_usd), sh(fb.shares) + " sh · " + cur.friday_pct + "% of holding", "spx") +
+    kpi("SpaceX shares per BPTIX share", (cur.spx_shares_per_bptix != null ? cur.spx_shares_per_bptix.toFixed(3) : "—"),
+        (cur.usd_per_bptix != null ? "$" + cur.usd_per_bptix.toFixed(0) + " of SpaceX per BPTIX share · " + cur.lookthrough_basis : ""), "spx") +
     kpi("Friday cash (est)", uM(fb.cash_low_usd) + "–" + uM(fb.cash_vwap_usd), "@ $" + fb.cash_low_price + " IPO → $" + fb.cash_vwap_price + " VWAP");
   document.getElementById("spxpos-derivation").innerHTML =
     "<ol style='margin:0;padding-left:20px;line-height:1.75'>" +
