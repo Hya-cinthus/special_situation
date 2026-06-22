@@ -64,7 +64,9 @@ def _series(tk, start, end):
 
 
 def build_payload():
-    end = (datetime.date(2026, 6, 13) + datetime.timedelta(days=1)).isoformat()
+    # Auto-extend to the latest trading day (was hardcoded to 6/13, which froze the
+    # hedge book at 6/12). today()+1 makes the Yahoo window include the latest close.
+    end = (datetime.date.today() + datetime.timedelta(days=1)).isoformat()
     px = {tk: _series(tk, ENTRY, end) for tk in POSITIONS}
     # merge manual points (only where Yahoo doesn't already have the day)
     for tk, days in MANUAL_PX.items():

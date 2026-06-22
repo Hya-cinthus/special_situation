@@ -95,13 +95,27 @@ ENTRIES = [
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
-                 "fund_5_31": "fund 5/31", "blend": "blend 4/30+5/31", "optimal": "optimal (min-var)"}
+                 "fund_5_31": "fund 5/31", "blend": "blend 4/30+5/31", "optimal": "optimal (min-var)",
+                 "ronb": "RONB ETF (daily)"}
 
 
 def _nospy(W):
     w = {k: v for k, v in W.items() if k != "SPY"}
     s = sum(w.values()) or 1
     return {k: v / s for k, v in w.items()}
+
+
+def _ronb_weights():
+    """RONB's public-book weights (ex SpaceX, ex cash) from the daily holdings cache
+    -> the one DAILY-fresh basket weighting (the others are static NPORT snapshots).
+    Names RONB holds but we lack closes for (IBKR/MORN/ABNB/LYV) drop out in the
+    basket sum; the shared names renormalize. Empty if the cache is missing."""
+    try:
+        h = json.load(open(os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data", "ronb.json"),
+                           encoding="utf-8"))["holdings"]["holdings"]
+        return {x["ticker"]: x["weight"] for x in h if not x.get("private") and not x.get("cash")}
+    except Exception:
+        return {}
 
 
 def _weightings():
@@ -119,7 +133,7 @@ def _weightings():
         "actual": renorm(comps.get("actual", {})),
         "fund_3_31": _nospy(fs.WEIGHTS_3_31), "fund_4_30": _nospy(fs.WEIGHTS_4_30),
         "fund_5_31": _nospy(fs.WEIGHTS_5_31), "blend": _nospy(blend),
-        "optimal": renorm(comps.get("optimal", {})),
+        "optimal": renorm(comps.get("optimal", {})), "ronb": renorm(_ronb_weights()),
     }, H
 
 

@@ -43,6 +43,8 @@ header.topbar .sitnav a {
 }
 header.topbar .sitnav a:hover { border-color: var(--accent); text-decoration: none; }
 header.topbar .sitnav a.active { color: var(--text); border-color: #3a5d86; background: #16263a; }
+/* divider between the BPTIX cluster (BPTIX · Daily/Studies · Hedge Book) and the other vehicles */
+header.topbar .sitnav .navsep { width: 1px; align-self: stretch; background: var(--border); margin: 2px 6px; }
 
 .disclaimer {
   background: #1d1a0e; border-bottom: 1px solid #3a3115; color: #d8c98a;
