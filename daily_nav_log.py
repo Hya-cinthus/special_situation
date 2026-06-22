@@ -326,6 +326,9 @@ def build_payload():
             "method_labels": METHOD_LABELS, "methods": methods, "base": BASE,
             "window_start": BASE["date"], "backfill_dates": sorted(BACKFILL_DATES),
             "compositions": compositions,
+            # latest day's public closes -> lets the composition panel convert a basket's
+            # weights into shares / shares-per-BPTIX / $ / total-share allocations.
+            "ref_closes": {"date": ENTRIES[-1]["date"], "closes": ENTRIES[-1]["closes"]},
             "friday_spacex_buy_usd": FRIDAY_SPACEX_BUY, "leverage_schedule": "0.968 (cash buffer) thru 6/15, 1.00 after",
             "note": ("Each day's predicted BPTIX NAV under every basket weighting we've tested, vs the actual — now "
                      "walked back through the IPO week (6/8 onward). NAV_t = NAV_{t-1} x (1 + w_spx x SPCX_return + "

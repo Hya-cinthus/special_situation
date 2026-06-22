@@ -130,6 +130,7 @@ function loadCards() {
 /* ---- Daily NAV-estimate log: per-basket predicted NAV vs actual ---- */
 let DAILYLOG_DATA = null, DAILYLOG_VIEW = "revised";   // "revised" | "asof"
 let BASKETDRIFT_METHOD = "actual";                     // selected basket for the drift card
+let BASKETDRIFT_UNIT = "weight";                       // composition unit: weight|aum|shares_per|shares_total
 function renderDailyLog(d) {
   DAILYLOG_DATA = d;
   const note = document.getElementById("dailylog-note");
@@ -242,39 +243,92 @@ function drawBasketDrift() {
   const m = BASKETDRIFT_METHOD;
   const rows = DAILYLOG_VIEW === "asof" ? (d.vintage_rows || []) : d.rows;
 
+  const UNITS = [
+    { k: "weight", label: "% of fund (incl cash)" },
+    { k: "aum", label: "$ allocation" },
+    { k: "shares_per", label: "shares / BPTIX sh" },
+    { k: "shares_total", label: "total shares" },
+  ];
+  const U = BASKETDRIFT_UNIT;
   const ctl = document.getElementById("basketdrift-controls");
   if (ctl) {
     const opts = ms.map((x) => `<option value="${x}"${x === m ? " selected" : ""}>${lbl[x]}</option>`).join("");
+    const ubtn = (u) =>
+      `<button data-u="${u.k}" style="background:${U === u.k ? _rgba(ACC, 0.22) : "var(--panel-2)"};` +
+      `color:${U === u.k ? TEXT : MUTED};border:1px solid ${U === u.k ? ACC : GRID};border-radius:6px;` +
+      `padding:4px 9px;font-size:.76rem;cursor:pointer;margin-right:6px">${u.label}</button>`;
     ctl.innerHTML =
       `<label style="font-size:.85rem;color:${MUTED}">Basket weighting:&nbsp;` +
       `<select id="basketdrift-select" style="background:var(--panel-2);color:${TEXT};border:1px solid ${GRID};border-radius:6px;padding:4px 8px;font-size:.85rem">${opts}</select></label>` +
-      `<span style="font-size:.78rem;color:${MUTED}">View follows the toggle above → currently <b style="color:${TEXT}">${DAILYLOG_VIEW === "asof" ? "as-of" : "revised"}</b>.</span>`;
+      `<span style="display:inline-flex;flex-wrap:wrap;align-items:center"><span style="font-size:.78rem;color:${MUTED};margin-right:5px">show:</span>${UNITS.map(ubtn).join("")}</span>` +
+      `<span style="font-size:.78rem;color:${MUTED}">view: <b style="color:${TEXT}">${DAILYLOG_VIEW === "asof" ? "as-of" : "revised"}</b> (toggle above)</span>`;
     const sel = document.getElementById("basketdrift-select");
     if (sel) sel.onchange = () => { BASKETDRIFT_METHOD = sel.value; drawBasketDrift(); };
+    ctl.querySelectorAll("button[data-u]").forEach((b) => (b.onclick = () => { BASKETDRIFT_UNIT = b.dataset.u; drawBasketDrift(); }));
   }
   const note = document.getElementById("basketdrift-note");
   if (note) note.innerHTML =
-    "Pick ONE public-hedge basket and freeze its weights. We re-predict BPTIX NAV every day with that fixed basket " +
-    "(SpaceX still marked to the live SPCX), compounding the predicted returns and NEVER re-anchoring to the actual NAV — " +
-    "so the gap to actual accumulates. That cumulative gap is how far you'd drift if you held this basket and never " +
-    "corrected. The composition is the PUBLIC sleeve only (the SpaceX private leg is tracked separately above).";
+    "Pick ONE public-hedge basket and freeze its weights. <b>Left:</b> its composition — toggle the unit between % of the " +
+    "WHOLE fund (incl. cash), $ allocation, shares behind one BPTIX share, or total shares held; SpaceX &amp; cash are the " +
+    "fund's real sleeves, only the public names are split by the chosen weighting. <b>Right:</b> we re-predict BPTIX NAV " +
+    "daily with that fixed basket (SpaceX marked live), compounding the predicted returns and NEVER re-anchoring to actual — " +
+    "the running gap is how far you'd drift holding this basket unchanged.";
 
-  // composition bars
-  const comp = (d.meta.compositions[m] || []).slice();
-  const cmax = comp.length ? comp[0].weight_pct : 1;
+  // ---- composition in the selected UNIT (public names split by the basket; SpaceX & cash real) ----
   const compDiv = document.getElementById("basketdrift-comp");
   if (compDiv) {
-    const bars = comp.map((c) => {
-      const w = Math.max(2, (c.weight_pct / cmax) * 100);
-      return `<div style="display:flex;align-items:center;gap:8px;margin:2px 0;font-size:11px">` +
-        `<span style="width:54px;text-align:right;color:${TEXT}">${c.ticker}</span>` +
-        `<span style="flex:1;background:var(--panel-2);border-radius:3px;height:13px;position:relative">` +
-        `<span style="position:absolute;left:0;top:0;bottom:0;width:${w}%;background:${_rgba(SPX, 0.55)};border-radius:3px"></span></span>` +
-        `<span style="width:46px;color:${MUTED}">${c.weight_pct.toFixed(1)}%</span></div>`;
-    }).join("");
-    compDiv.innerHTML =
-      `<div style="font-size:.82rem;color:${TEXT};margin-bottom:6px"><b>${lbl[m]}</b> — ${comp.length} public names ` +
-      `<span class="dim">(weights renormalized to 100%, SpaceX excluded)</span></div>` + bars;
+    const ref = rows.length ? rows[rows.length - 1] : null;
+    if (!ref) { compDiv.innerHTML = ""; }
+    else {
+      const net = (ref.aum_used_b || 0) * 1e9;
+      const bptixSh = (ref.bptix_shares_out_m || 0) * 1e6;
+      const wSpx = (ref.spacex_weight_pct || 0) / 100;
+      const L = ref.leverage != null ? ref.leverage : 1;
+      const Vpub = (L - wSpx) * net;             // gross public-sleeve value
+      const cashVal = (1 - L) * net;             // >0 cash, <0 borrowing
+      const prices = (d.meta.ref_closes && d.meta.ref_closes.closes) || {};
+      const pub = (d.meta.compositions[m] || []).map((c) => {
+        const val = (c.weight_pct / 100) * Vpub;
+        const px = prices[c.ticker];
+        const shares = px ? val / px : null;
+        return { t: c.ticker, val, shares, shPer: shares != null ? shares / bptixSh : null, pct: net ? (val / net) * 100 : null, kind: "pub" };
+      });
+      const spx = { t: "SpaceX", val: wSpx * net, shares: (ref.spx_shares_held_m || 0) * 1e6, shPer: ref.spx_shares_per_bptix, pct: wSpx * 100, kind: "spx" };
+      const cash = { t: "Cash", val: cashVal, shares: null, shPer: null, pct: net ? (cashVal / net) * 100 : null, kind: "cash" };
+      const valOf = (it) => U === "weight" ? it.pct : U === "aum" ? it.val : U === "shares_per" ? it.shPer : it.shares;
+      const isShareView = U === "shares_per" || U === "shares_total";
+      let list = isShareView ? [...pub, spx] : [...pub, spx, cash];   // cash has no shares
+      list.sort((a, b) => (Math.abs(valOf(b) ?? -1e18)) - (Math.abs(valOf(a) ?? -1e18)));
+      const maxAbs = Math.max(...list.map((it) => Math.abs(valOf(it) || 0)), 1e-9);
+      const fmt = (it) => {
+        const v = valOf(it);
+        if (v == null) return "—";
+        if (U === "weight") return v.toFixed(2) + "%";
+        if (U === "aum") return (v < 0 ? "−$" : "$") + (Math.abs(v) >= 1e9 ? (Math.abs(v) / 1e9).toFixed(2) + "B" : (Math.abs(v) / 1e6).toFixed(0) + "M");
+        if (U === "shares_per") return v.toFixed(4);
+        return (v / 1e6).toFixed(2) + "M";
+      };
+      const barCol = (it) => it.kind === "spx" ? _rgba(SPX, 0.75) : it.kind === "cash" ? _rgba((valOf(it) || 0) >= 0 ? GOOD : BAD, 0.6) : _rgba(ACC, 0.5);
+      const nameCol = (it) => it.kind === "spx" ? SPX : it.kind === "cash" ? ((valOf(it) || 0) >= 0 ? GOOD : WARN) : TEXT;
+      const bars = list.map((it) => {
+        const v = valOf(it);
+        const w = v == null ? 0 : Math.max(2, (Math.abs(v) / maxAbs) * 100);
+        return `<div style="display:flex;align-items:center;gap:8px;margin:2px 0;font-size:11px">` +
+          `<span style="width:58px;text-align:right;color:${nameCol(it)};font-weight:${it.kind !== "pub" ? 700 : 400}">${it.t}</span>` +
+          `<span style="flex:1;background:var(--panel-2);border-radius:3px;height:13px;position:relative">` +
+          `<span style="position:absolute;left:0;top:0;bottom:0;width:${w}%;background:${barCol(it)};border-radius:3px"></span></span>` +
+          `<span style="width:66px;text-align:right;color:${MUTED}">${fmt(it)}</span></div>`;
+      }).join("");
+      const uLabel = (UNITS.find((u) => u.k === U) || {}).label;
+      const estTag = ref.actual_nav == null ? " (est.)" : "";
+      const foot = `<div class="dim" style="font-size:10.5px;margin-top:7px">As of ${ref.date}${estTag}: net AUM $${(net / 1e9).toFixed(1)}B · ` +
+        `${(bptixSh / 1e6).toFixed(1)}M BPTIX shares · leverage ${L.toFixed(3)} (cash ${cashVal >= 0 ? "$" : "−$"}${Math.abs(cashVal / 1e9).toFixed(2)}B). ` +
+        (isShareView ? "Public names without a daily close (RONB-only) show —. Cash omitted (no shares)." :
+          (U === "weight" ? "Sums to 100% of net assets." : "Sums to net AUM (borrowing shows as negative cash).")) + "</div>";
+      compDiv.innerHTML =
+        `<div style="font-size:.82rem;color:${TEXT};margin-bottom:6px"><b>${lbl[m]}</b> basket — ` +
+        `<span class="dim">${uLabel}</span></div>` + bars + foot;
+    }
   }
 
   // drift: compound predicted one-day returns from the BASE nav, never re-anchoring
