@@ -166,7 +166,10 @@ function drawDailyLogTable() {
   if (!d || !card) return;
   const ms = d.meta.methods, lbl = d.meta.method_labels;
   const rows = DAILYLOG_VIEW === "asof" ? (d.vintage_rows || []) : d.rows;
-  const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt · lev</th><th>SpaceX sh / BPTIX sh</th>" +
+  const shTip = "SpaceX shares behind one BPTIX share = SpaceX weight × NAV ÷ SPCX price. SpaceX-side metric — " +
+    "it does NOT depend on the basket-weighting columns (those only change the public return). Uses the " +
+    "with-Friday-buy weight; the BPTIX page KPI uses disclosed 3/31 shares only (~0.577), the gap being the ~$262M IPO-day add.";
+  const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt · lev</th><th title=\"" + shTip + "\">SpaceX sh / BPTIX sh ⓘ</th>" +
     ms.map((m) => `<th>${lbl[m]}</th>`).join("") + "<th>perfect-fit range</th><th>Actual NAV</th><th>best</th><th>what's new this day</th></tr>";
   const body = rows.slice().reverse().map((r) => {
     const cells = ms.map((m) => {
