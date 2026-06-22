@@ -221,6 +221,9 @@ def build_payload():
                      "spx_shares_held_m": round(spx_shares_held / 1e6, 2),
                      "bptix_shares_out_m": round(bptix_shares_out / 1e6, 2) if bptix_shares_out else None,
                      "aum_used_b": round(aum_end / 1e9, 2), "flow_b": flow_b,
+                     # SpaceX-side NAV contribution = w_spx x SPCX return. IDENTICAL for every
+                     # basket method -> the per-method NAV spread is purely the PUBLIC basket.
+                     "spx_contrib_pct": round(w_spx * spx_ret * 100, 3),
                      "prior_nav": prev["nav"], "preds": preds, "perfect_fit_range": pf_range,
                      "actual_nav": actual, "errors": errs, "best_method": best,
                      "note": e.get("note", "")})

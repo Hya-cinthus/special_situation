@@ -153,6 +153,20 @@ function renderDailyLog(d) {
 function _spxShPerBptix(r) {
   return r.spx_shares_per_bptix != null ? r.spx_shares_per_bptix : null;
 }
+/* Net cash ($B) ≈ (1 − leverage) × AUM. AUM = BPTIX shares out × NAV (works for both
+ * views; vintage rows carry their frozen leverage, so as-of shows the buffer that the
+ * later leverage pin revealed was already gone). >0 = cash buffer; <0 = borrowing. */
+function _netCashB(r) {
+  const L = r.leverage != null ? r.leverage : 1.0;
+  if (r.bptix_shares_out_m == null) return null;
+  let nav = r.actual_nav;
+  if (nav == null && r.preds) {
+    const v = Object.values(r.preds).map((p) => p.pred_nav).filter((x) => x != null).sort((a, b) => a - b);
+    nav = v.length ? v[Math.floor(v.length / 2)] : null;
+  }
+  if (nav == null) return null;
+  return (1 - L) * (r.bptix_shares_out_m * nav / 1000);   // M sh × $/sh = $M → /1000 = $B
+}
 function drawDailyLogTable() {
   const d = DAILYLOG_DATA, card = document.getElementById("dailylog-table");
   if (!d || !card) return;
@@ -161,7 +175,18 @@ function drawDailyLogTable() {
   const shTip = "SpaceX shares behind one BPTIX share = SpaceX weight × NAV ÷ SPCX price. SpaceX-side metric — " +
     "it does NOT depend on the basket-weighting columns (those only change the public return). Uses the " +
     "with-Friday-buy weight; the BPTIX page KPI uses disclosed 3/31 shares only (~0.577), the gap being the ~$262M IPO-day add.";
+  const outTip = "BPTIX shares outstanding = AUM ÷ NAV. Shrinking as net redemptions pull money out — which is what " +
+    "concentrates SpaceX into each remaining share (the fund's SpaceX share count is ~constant).";
+  const cTip = "SpaceX contribution to the day's NAV return = SpaceX weight × SPCX return. IDENTICAL for every basket " +
+    "column — so the differences between the basket NAVs come ONLY from the public sleeve (each weighting averages the " +
+    "23 public stocks differently). NAV return = this SpaceX part + the public part.";
+  const cashTip = "Net cash ≈ (1 − leverage) × AUM. ~$0 now: the ~3% buffer (≈$0.65B at the 5/31 disclosure) was " +
+    "consumed by ~$1.95B of redemptions, lifting leverage to ~1.0. With no cash, redemptions are met by SELLING public " +
+    "holdings — at ~market/close prices; the exact securities & prices aren't disclosed until the next NPORT, and NAV/" +
+    "share is flow-neutral so it doesn't affect our estimate. Selling to meet redemptions KEEPS leverage ~1.0 (holdings " +
+    "& net assets both fall by the redemption); borrowing instead would push leverage above 1.0. >0 = cash, <0 = borrowing.";
   const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt · lev</th><th title=\"" + shTip + "\">SpaceX sh / BPTIX sh ⓘ</th>" +
+    "<th title=\"" + outTip + "\">BPTIX sh out ⓘ</th><th title=\"" + cashTip + "\">net cash ⓘ</th><th title=\"" + cTip + "\">SpaceX contrib ⓘ</th>" +
     ms.map((m) => `<th>${lbl[m]}</th>`).join("") + "<th>perfect-fit range</th><th>Actual NAV</th><th>best</th><th>what's new this day</th></tr>";
   const body = rows.slice().reverse().map((r) => {
     const cells = ms.map((m) => {
@@ -189,8 +214,16 @@ function drawDailyLogTable() {
     const spxSh = spxShVal != null
       ? `<td style="color:${SPX}" title="${spxShTip}">${spxShVal.toFixed(3)}${spxShTip ? " ⓘ" : ""}</td>`
       : `<td class="dim">—</td>`;
+    const outCell = r.bptix_shares_out_m != null ? `<td>${r.bptix_shares_out_m.toFixed(1)}M</td>` : `<td class="dim">—</td>`;
+    const cashV = _netCashB(r);
+    const cashCell = cashV != null
+      ? `<td style="color:${Math.abs(cashV) < 0.05 ? MUTED : (cashV > 0 ? GOOD : WARN)}">${cashV >= 0 ? "$" : "−$"}${Math.abs(cashV).toFixed(2)}B</td>`
+      : `<td class="dim">—</td>`;
+    const cVal = r.spx_contrib_pct != null ? r.spx_contrib_pct
+      : (r.spacex_weight_pct != null && r.spcx_ret_pct != null ? r.spacex_weight_pct / 100 * r.spcx_ret_pct : null);
+    const cCell = cVal != null ? `<td style="color:${cVal >= 0 ? GOOD : BAD}">${cVal >= 0 ? "+" : ""}${cVal.toFixed(2)}%</td>` : `<td class="dim">—</td>`;
     return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${r.spcx_ret_pct >= 0 ? "+" : ""}${r.spcx_ret_pct}%)</span></td>` +
-      `<td>${r.spacex_weight_pct}% <span class="dim">L${(r.leverage || 1).toFixed(2)}</span></td>${spxSh}${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
+      `<td>${r.spacex_weight_pct}% <span class="dim">L${(r.leverage || 1).toFixed(2)}</span></td>${spxSh}${outCell}${cashCell}${cCell}${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
   }).join("");
   card.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
 }
