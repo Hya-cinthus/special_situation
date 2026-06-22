@@ -211,9 +211,16 @@ def build_payload():
         spx_shares_held = prev["spx_value"] / prev["spcx"]          # the holding (constant across the carry)
         aum_end = float(e["aum"]) if e.get("aum") else prev["aum"] * (nav_used / prev["nav"])
         spx_sh_per_bptix = round(spx_shares_held * nav_used / aum_end, 4) if aum_end else None
+        # driver of the day-over-day change in spx_sh_per_bptix: SpaceX share count is
+        # ~constant, so it moves with BPTIX shares outstanding = AUM/NAV (net flows).
+        bptix_shares_out = aum_end / nav_used if nav_used else None
+        flow_b = round((aum_end - prev["aum"] * (nav_used / prev["nav"])) / 1e9, 3) if e.get("aum") else None
         rows.append({"date": e["date"], "spcx": e["spcx"], "spcx_ret_pct": round(spx_ret * 100, 2),
                      "spacex_weight_pct": round(w_spx * 100, 2), "leverage": LEVERAGE_ASSUMPTION,
                      "spx_shares_per_bptix": spx_sh_per_bptix,
+                     "spx_shares_held_m": round(spx_shares_held / 1e6, 2),
+                     "bptix_shares_out_m": round(bptix_shares_out / 1e6, 2) if bptix_shares_out else None,
+                     "aum_used_b": round(aum_end / 1e9, 2), "flow_b": flow_b,
                      "prior_nav": prev["nav"], "preds": preds, "perfect_fit_range": pf_range,
                      "actual_nav": actual, "errors": errs, "best_method": best,
                      "note": e.get("note", "")})
@@ -235,9 +242,11 @@ def build_payload():
                      "in the assumed Friday SpaceX buy ($%.0fM); LEVERAGE is the start-of-day gross/net (%.3f, "
                      "pre-redemption). Chained off the prior ACTUAL NAV where known (else the median prediction)."
                      % (FRIDAY_SPACEX_BUY / 1e6, LEVERAGE_ASSUMPTION)),
-            "two_views_note": ("AS-OF (vintage): each day's estimate FROZEN as first reported — what we thought "
-                               "that day. REVISED: recomputed now with the current assumptions (Friday buy + "
-                               "leverage). Toggle to compare; the gap is the assumption update."),
+            "two_views_note": ("AS-OF (vintage): each day's estimate FROZEN as first reported. REVISED: recomputed "
+                               "with the current assumptions. The two differ ONLY where an assumption changed AFTER "
+                               "a day was frozen — so far: 6/15 (the Friday-buy assumption moved the WEIGHT 29.1%->"
+                               "30.4%) and 6/17 (the LEVERAGE pin 0.968->1.0, which moves NAV but NOT weight or "
+                               "shares). Days frozen with the current assumptions (6/16, 6/18, 6/22) are identical."),
             "disclaimer": "Estimate, not the fund's record. Excludes fees, intraday timing, mid-day flows.",
         },
         "rows": rows,                 # REVISED (current assumptions)

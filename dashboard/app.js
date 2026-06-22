@@ -177,7 +177,18 @@ function drawDailyLogTable() {
     const best = r.best_method ? lbl[r.best_method] : "—";
     const noteCell = r.note ? `<td style="white-space:normal;min-width:240px;max-width:340px;text-align:left;font-size:11px" class="dim">${r.note}</td>` : "<td></td>";
     const spxShVal = _spxShPerBptix(r);
-    const spxSh = spxShVal != null ? `<td style="color:${SPX}">${spxShVal.toFixed(3)}</td>` : `<td class="dim">—</td>`;
+    let spxShTip = "";
+    if (spxShVal != null && r.spx_shares_held_m != null && r.bptix_shares_out_m != null) {
+      const drv = r.flow_b == null ? "AUM pending (estimate)"
+        : r.flow_b < -0.05 ? "net OUTFLOW ~$" + Math.abs(r.flow_b) + "B — redemptions shrink BPTIX shares, so SpaceX concentrates ↑"
+        : r.flow_b > 0.05 ? "net INFLOW ~$" + r.flow_b + "B — new shares dilute SpaceX ↓"
+        : "~flat flows";
+      spxShTip = `${r.spx_shares_held_m}M SpaceX shares ÷ ${r.bptix_shares_out_m}M BPTIX shares out (AUM $${r.aum_used_b}B / NAV). `
+        + `Day's move driven by: ${drv}. (SpaceX share count is ~constant — only the 6/12 IPO buy changed it.)`;
+    }
+    const spxSh = spxShVal != null
+      ? `<td style="color:${SPX}" title="${spxShTip}">${spxShVal.toFixed(3)}${spxShTip ? " ⓘ" : ""}</td>`
+      : `<td class="dim">—</td>`;
     return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${r.spcx_ret_pct >= 0 ? "+" : ""}${r.spcx_ret_pct}%)</span></td>` +
       `<td>${r.spacex_weight_pct}% <span class="dim">L${(r.leverage || 1).toFixed(2)}</span></td>${spxSh}${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
   }).join("");
