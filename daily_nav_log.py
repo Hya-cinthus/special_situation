@@ -23,16 +23,27 @@ import fund_snapshots as fs
 
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-# Base = last fully-known day before the log starts (6/12 Fri close). spacex_value
-# is the NO-BUY 6/12 mark (kept here so recalibrate.py's "prior" stays the no-buy
-# baseline); the Friday-buy ASSUMPTION below is added on top for the prediction.
-BASE = {"date": "2026-06-12", "nav": 289.98, "spcx": 160.95, "aum": 20.4e9, "spacex_value": 5.945106488e9}
+# Base = last fully-known day BEFORE the backtest window (6/5 Fri close, the Friday
+# before the IPO week). spcx here is the $135 IPO-price mark (SpaceX was still PRIVATE
+# 6/5-6/11, held flat at the 6/4 re-mark), and spacex_value is that $135 mark off the
+# 3/31 disclosed share count. The window then walks 6/8 -> 6/22 (the IPO week + after);
+# the IPO first trade (6/12) and the Friday buy are injected on 6/12 below, NOT here.
+BASE = {"date": "2026-06-05", "nav": 276.32, "spcx": 135.0, "aum": 18.6e9,
+        "spacex_value": 3.89026788e9 * (135.0 / 105.32)}   # ~$4.987B, the 6/4 IPO-price mark
+
+# Days backfilled from contemporaneous records (git commits + the Morningstar AUM log),
+# NOT real-time daily-log vintages. Public closes are reconstructed from hedge_book.json
+# (entry_px + the day's short-leg PnL/shares — EXACT, validated against the 6/15 paste);
+# BPTIX NAV from nav_daily.csv; AUM from the Morningstar log. These get an as-of seed
+# (below) so as-of vs revised diverge correctly on 6/12.
+BACKFILL_DATES = {"2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12"}
 
 # NEW ASSUMPTION (2026-06-16): 6/15's actual NAV cleared every no-buy basket AND the
 # perfect-fit band, so 6/12 (Friday) DID add SpaceX. The recalibration back-solves
-# ~$262M (band $259-344M). We fold that into the predicted SpaceX value here, which
-# lifts the carried SpaceX weight from ~29.1% (no buy) to ~30.4% on 6/15 and ~35.9%
-# carried into 6/16. Adjust this one number as the calibration tightens.
+# ~$262M (band $259-344M). It is injected ON 6/12 (the day it happened) via that entry's
+# `spacex_buy_usd`, lifting end-of-day SpaceX shares ~36.9M -> ~38.6M and the carried
+# weight 29.1% (no buy) -> 30.4% into 6/15. The as-of seed books NO buy (we didn't know
+# until 6/16), so 6/12 as-of vs revised differ. Adjust this as the calibration tightens.
 FRIDAY_SPACEX_BUY = 0.262e9
 
 # START-OF-DAY leverage assumption = gross holdings / net assets entering the day
@@ -57,6 +68,59 @@ _VINTAGE_PATH = os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data", "
 # (None until known). aum = Morningstar Total Assets (optional; improves w_spx).
 # note = the day's "what's new" (information added / what changed in the assumptions).
 ENTRIES = [
+    # ---- BACKFILL: the IPO week (6/8-6/12). Pre-IPO (6/8-6/11) SpaceX is PRIVATE, held
+    # flat at the $135 IPO-price mark -> SPCX "price" = 135 (0% SpaceX return), so these
+    # days test the PUBLIC basket alone. 6/12 = IPO first trade (SPCX $160.95) + the
+    # Friday buy. Closes reconstructed from hedge_book.json; NAV from nav_daily.csv (BPTIX);
+    # AUM from the Morningstar log. -----------------------------------------------------
+    {"date": "2026-06-08", "spcx": 135.0, "actual_nav": 276.38, "aum": 18.6e9,
+     "closes": {"ACGL": 89.61, "BIRK": 43.66, "CHH": 105.42, "CSGP": 33.39, "FDS": 246.38,
+                "FIG": 21.10, "GLPI": 46.55, "GWRE": 127.19, "H": 193.72, "HEI": 323.50,
+                "HEI-A": 239.50, "IDXX": 561.17, "IT": 160.35, "KNSL": 299.07, "MSCI": 602.94,
+                "MTN": 137.21, "ONON": 37.11, "RRR": 58.09, "SCHW": 88.08, "SHOP": 110.78,
+                "SPOT": 503.13, "TSLA": 408.95, "VRSK": 178.97},
+     "note": "BACKFILL (pre-IPO). SpaceX still PRIVATE, held flat at the $135 IPO-price mark "
+             "(first public trade is 6/12) -> this day tests the PUBLIC basket alone. NAV +0.02% "
+             "(~flat: TSLA +4.6% offset by others). AUM 18.6B (NET). What we knew then: SpaceX wt "
+             "~26.8%, leverage 0.968 (the 5/31 disclosure)."},
+    {"date": "2026-06-09", "spcx": 135.0, "actual_nav": 275.97, "aum": 18.8e9,
+     "closes": {"ACGL": 90.41, "BIRK": 45.20, "CHH": 108.58, "CSGP": 33.93, "FDS": 246.07,
+                "FIG": 20.49, "GLPI": 47.82, "GWRE": 124.51, "H": 194.08, "HEI": 326.42,
+                "HEI-A": 241.83, "IDXX": 578.89, "IT": 157.40, "KNSL": 303.25, "MSCI": 607.54,
+                "MTN": 131.26, "ONON": 38.25, "RRR": 59.77, "SCHW": 88.77, "SHOP": 110.42,
+                "SPOT": 496.22, "TSLA": 396.68, "VRSK": 182.55},
+     "note": "BACKFILL (pre-IPO). SpaceX flat at $135. NAV -0.15%. AUM 18.6B->18.8B (inflows "
+             "continuing). Public basket alone."},
+    {"date": "2026-06-10", "spcx": 135.0, "actual_nav": 273.78, "aum": 18.7e9,
+     "closes": {"ACGL": 91.31, "BIRK": 43.95, "CHH": 104.23, "CSGP": 34.23, "FDS": 249.08,
+                "FIG": 19.79, "GLPI": 48.41, "GWRE": 116.59, "H": 190.63, "HEI": 320.88,
+                "HEI-A": 237.45, "IDXX": 556.94, "IT": 154.91, "KNSL": 313.57, "MSCI": 608.52,
+                "MTN": 135.89, "ONON": 38.00, "RRR": 62.08, "SCHW": 89.27, "SHOP": 108.20,
+                "SPOT": 503.10, "TSLA": 381.59, "VRSK": 183.13},
+     "note": "BACKFILL (pre-IPO). SpaceX flat at $135. NAV -0.79% (TSLA -3.7% led it down). "
+             "AUM 18.8B->18.7B. Public basket alone."},
+    {"date": "2026-06-11", "spcx": 135.0, "actual_nav": 274.89, "aum": 19.0e9,
+     "closes": {"ACGL": 91.13, "BIRK": 46.21, "CHH": 107.41, "CSGP": 32.65, "FDS": 236.64,
+                "FIG": 19.34, "GLPI": 47.87, "GWRE": 118.52, "H": 197.86, "HEI": 339.22,
+                "HEI-A": 251.05, "IDXX": 557.91, "IT": 148.81, "KNSL": 310.66, "MSCI": 594.31,
+                "MTN": 136.34, "ONON": 39.21, "RRR": 62.32, "SCHW": 88.70, "SHOP": 110.47,
+                "SPOT": 486.00, "TSLA": 399.15, "VRSK": 182.00},
+     "note": "BACKFILL (pre-IPO). SpaceX flat at $135 — the LAST private day (first trade is "
+             "tomorrow). NAV +0.41%. AUM 18.7B->19.0B (inflows). Carried SpaceX wt ~26.25%."},
+    {"date": "2026-06-12", "spcx": 160.95, "actual_nav": 289.98, "aum": 20.4e9,
+     "spacex_buy_usd": FRIDAY_SPACEX_BUY,
+     "closes": {"ACGL": 91.66, "BIRK": 48.75, "CHH": 109.56, "CSGP": 32.84, "FDS": 241.16,
+                "FIG": 18.54, "GLPI": 47.47, "GWRE": 122.56, "H": 199.36, "HEI": 331.61,
+                "HEI-A": 247.09, "IDXX": 560.88, "IT": 148.17, "KNSL": 311.38, "MSCI": 599.12,
+                "MTN": 133.31, "ONON": 38.58, "RRR": 63.11, "SCHW": 91.10, "SHOP": 108.24,
+                "SPOT": 482.00, "TSLA": 406.43, "VRSK": 183.80},
+     "note": "BACKFILL — IPO FRIDAY. SpaceX (SPCX) first public trade, closed $160.95 (+19.2% vs "
+             "the $135 IPO) -> the SpaceX leg now marks to the live market. NAV +5.49%, almost all "
+             "the SpaceX re-mark; AUM 19.0B->20.4B. AS-OF vs REVISED DIVERGE HERE: at the time we "
+             "booked NO IPO add; the 6/16 recalibration later back-solved a ~$262M Friday SpaceX "
+             "buy. Revised folds it in (end-of-day shares 36.9M->38.6M; carried weight 29.1%->30.4% "
+             "into 6/15); as-of leaves it out. The day's ENTERING weight (26.25%) is the same either "
+             "way — the buy executes at the close, so it only changes shares-out and the carry."},
     {"date": "2026-06-15", "spcx": 192.50, "actual_nav": 307.55, "aum": 20.7e9,
      "closes": {"ACGL": 91.50, "BIRK": 47.93, "CHH": 112.00, "CSGP": 32.04, "FDS": 235.86,
                 "FIG": 18.51, "GLPI": 46.74, "GWRE": 120.03, "H": 198.95, "HEI": 336.18,
@@ -166,14 +230,15 @@ def _ensemble():
         return [], []
 
 
-def build_payload():
-    WS, H = _weightings()
-    methods = list(METHOD_LABELS)
-    ens_tk, ens_fits = _ensemble()
+def _build_rows(WS, H, methods, ens_tk, ens_fits, apply_buy=True):
+    """One forward chain BASE(6/5) -> 6/22. apply_buy=True is the REVISED view (the
+    $262M Friday buy is booked on 6/12); apply_buy=False is the AS-OF view (no buy —
+    what we knew before the 6/16 recalibration), used to seed the 6/8-6/12 vintage."""
     prev = {"nav": BASE["nav"], "spcx": BASE["spcx"], "aum": BASE["aum"],
-            "spx_value": BASE["spacex_value"] + FRIDAY_SPACEX_BUY, "closes": _base_closes(H)}
+            "spx_value": BASE["spacex_value"], "closes": _base_closes(H)}
     rows = []
     for e in ENTRIES:
+        buy = (e.get("spacex_buy_usd", 0.0) or 0.0) if apply_buy else 0.0
         spx_ret = e["spcx"] / prev["spcx"] - 1
         w_spx = prev["spx_value"] / prev["aum"]
         lev = LEVERAGE_FOR(e["date"])      # 0.968 (cash buffer) <= 6/15, else 1.00
@@ -210,9 +275,11 @@ def build_payload():
         #   = (SpaceX_$/SPCX) / (AUM/NAV) = shares x NAV / AUM.  Use END-of-day AUM so a
         #   big SPCX move doesn't distort it (the holding's share count is ~constant).
         nav_used = actual if actual else sorted(preds[m]["pred_nav"] for m in methods)[len(methods) // 2]
-        spx_shares_held = prev["spx_value"] / prev["spcx"]          # the holding (constant across the carry)
+        spx_shares_enter = prev["spx_value"] / prev["spcx"]         # shares entering the day (pre-buy)
+        bought_shares = (buy / e["spcx"]) if (buy and e["spcx"]) else 0.0
+        spx_shares_end = spx_shares_enter + bought_shares          # end-of-day count (a Friday buy ADDS shares)
         aum_end = float(e["aum"]) if e.get("aum") else prev["aum"] * (nav_used / prev["nav"])
-        spx_sh_per_bptix = round(spx_shares_held * nav_used / aum_end, 4) if aum_end else None
+        spx_sh_per_bptix = round(spx_shares_end * nav_used / aum_end, 4) if aum_end else None
         # driver of the day-over-day change in spx_sh_per_bptix: SpaceX share count is
         # ~constant, so it moves with BPTIX shares outstanding = AUM/NAV (net flows).
         bptix_shares_out = aum_end / nav_used if nav_used else None
@@ -220,7 +287,8 @@ def build_payload():
         rows.append({"date": e["date"], "spcx": e["spcx"], "spcx_ret_pct": round(spx_ret * 100, 2),
                      "spacex_weight_pct": round(w_spx * 100, 2), "leverage": lev,
                      "spx_shares_per_bptix": spx_sh_per_bptix,
-                     "spx_shares_held_m": round(spx_shares_held / 1e6, 2),
+                     "spx_shares_held_m": round(spx_shares_end / 1e6, 2),
+                     "spacex_buy_usd": (buy or None), "backfilled": e["date"] in BACKFILL_DATES,
                      "bptix_shares_out_m": round(bptix_shares_out / 1e6, 2) if bptix_shares_out else None,
                      "aum_used_b": round(aum_end / 1e9, 2), "flow_b": flow_b,
                      # SpaceX-side NAV contribution = w_spx x SPCX return. IDENTICAL for every
@@ -231,28 +299,51 @@ def build_payload():
                      "note": e.get("note", "")})
         # chain to next day: base off ACTUAL nav if known, else the median prediction
         base_nav = nav_used
-        spx_value = prev["spx_value"] * (e["spcx"] / prev["spcx"])
+        spx_value = prev["spx_value"] * (e["spcx"] / prev["spcx"]) + buy   # mark move + any Friday buy (at close)
         aum = float(e["aum"]) if e.get("aum") else prev["aum"] * (base_nav / prev["nav"])
         prev = {"nav": base_nav, "spcx": e["spcx"], "aum": aum, "spx_value": spx_value, "closes": e["closes"]}
+    return rows
 
-    vintage_rows = _freeze_vintage(rows)
+
+def build_payload():
+    WS, H = _weightings()
+    methods = list(METHOD_LABELS)
+    ens_tk, ens_fits = _ensemble()
+    rows = _build_rows(WS, H, methods, ens_tk, ens_fits, apply_buy=True)             # REVISED (buy on)
+    # AS-OF seed for the IPO-week backfill: rebuild with the buy OFF and freeze 6/8-6/12
+    # so as-of vs revised diverge on 6/12 (we didn't know about the buy until 6/16).
+    asof_seed = [r for r in _build_rows(WS, H, methods, ens_tk, ens_fits, apply_buy=False)
+                 if r["date"] in BACKFILL_DATES]
+    vintage_rows = _freeze_vintage(rows, seed=asof_seed)
+    # full per-method holdings weights (the renormalized ex-SPY weights the model uses)
+    # for the basket-composition + fixed-basket-drift table.
+    compositions = {m: sorted([{"ticker": t, "weight_pct": round(w * 100, 2)}
+                               for t, w in WS[m].items() if w], key=lambda x: -x["weight_pct"])
+                    for m in methods}
     return {
         "meta": {
             "title": "Daily BPTIX NAV estimate — per basket-weighting vs actual",
             "method_labels": METHOD_LABELS, "methods": methods, "base": BASE,
+            "window_start": BASE["date"], "backfill_dates": sorted(BACKFILL_DATES),
+            "compositions": compositions,
             "friday_spacex_buy_usd": FRIDAY_SPACEX_BUY, "leverage_schedule": "0.968 (cash buffer) thru 6/15, 1.00 after",
-            "note": ("Each day's predicted BPTIX NAV under every basket weighting we've tested, vs the actual. "
-                     "NAV_t = NAV_{t-1} x (1 + w_spx x SPCX_return + (LEVERAGE - w_spx) x basket_return); SpaceX "
-                     "marked to live SPCX; public weights drop SPY and renormalize over the 23 names. w_spx folds "
-                     "in the assumed Friday SpaceX buy ($%.0fM); LEVERAGE is the start-of-day gross/net: 0.968 (the "
-                     "5/31-disclosed ~3.2%% net-cash buffer) entering 6/15, then 1.00 from 6/16 once the first "
-                     "redemption consumed the buffer. Chained off the prior ACTUAL NAV where known."
+            "note": ("Each day's predicted BPTIX NAV under every basket weighting we've tested, vs the actual — now "
+                     "walked back through the IPO week (6/8 onward). NAV_t = NAV_{t-1} x (1 + w_spx x SPCX_return + "
+                     "(LEVERAGE - w_spx) x basket_return); SpaceX marked to live SPCX once public, held flat at the "
+                     "$135 IPO-price mark before (6/8-6/11 are pure PUBLIC-basket tests). Public weights drop SPY and "
+                     "renormalize over the 23 names. The ~$%.0fM Friday SpaceX buy is booked on 6/12 (the day it "
+                     "happened); LEVERAGE is the start-of-day gross/net: 0.968 (the 5/31-disclosed ~3.2%% net-cash "
+                     "buffer) thru 6/15, then 1.00 from 6/16 once the first redemption consumed it. Chained off the "
+                     "prior ACTUAL NAV where known. 6/8-6/12 are BACKFILLED from contemporaneous records (git commits "
+                     "+ the Morningstar AUM log + hedge-book-reconstructed closes), not real-time daily-log vintages."
                      % (FRIDAY_SPACEX_BUY / 1e6,)),
-            "two_views_note": ("AS-OF (vintage): each day's estimate FROZEN as first reported. REVISED: recomputed "
-                               "with the current assumptions. The two differ ONLY where an assumption changed AFTER "
-                               "a day was frozen — so far: 6/15 (the Friday-buy assumption moved the WEIGHT 29.1%->"
-                               "30.4%) and 6/17 (the LEVERAGE pin 0.968->1.0, which moves NAV but NOT weight or "
-                               "shares). Days frozen with the current assumptions (6/16, 6/18, 6/22) are identical."),
+            "two_views_note": ("AS-OF (vintage): each day's estimate FROZEN as first reported (the IPO week is the "
+                               "as-of we reconstructed from the day's own records). REVISED: recomputed with the "
+                               "current assumptions. The two differ ONLY where an assumption changed AFTER a day was "
+                               "frozen: 6/12 (the ~$262M Friday buy, found on 6/16 — revised lifts end-of-day SpaceX "
+                               "shares 36.9M->38.6M; the day's entering weight is unchanged), 6/15 (that buy carried "
+                               "in moves the WEIGHT 29.1%->30.4%), and 6/17 (the LEVERAGE pin 0.968->1.0, which moves "
+                               "NAV but not weight/shares). Every other day is identical across the two views."),
             "disclaimer": "Estimate, not the fund's record. Excludes fees, intraday timing, mid-day flows.",
         },
         "rows": rows,                 # REVISED (current assumptions)
@@ -260,9 +351,10 @@ def build_payload():
     }
 
 
-def _freeze_vintage(rows):
-    """Append-only: freeze each day's estimate the first time it is built; never
-    revise a frozen day. Returns the frozen rows in date order (idempotent)."""
+def _freeze_vintage(rows, seed=None):
+    """Append-only: freeze each day's estimate the first time it is built; never revise
+    a frozen day. `seed` rows (the as-of IPO-week backfill, built with the buy OFF) are
+    considered FIRST so they win for 6/8-6/12 over the revised rows. Idempotent."""
     frozen, order = {}, []
     if os.path.exists(_VINTAGE_PATH):
         for line in open(_VINTAGE_PATH, encoding="utf-8"):
@@ -272,7 +364,7 @@ def _freeze_vintage(rows):
                 frozen[r["date"]] = r
                 order.append(r["date"])
     added = []
-    for r in rows:
+    for r in (list(seed or []) + list(rows)):   # seed (as-of backfill) before revised
         if r["date"] not in frozen:
             frozen[r["date"]] = r
             order.append(r["date"])

@@ -129,6 +129,7 @@ function loadCards() {
 
 /* ---- Daily NAV-estimate log: per-basket predicted NAV vs actual ---- */
 let DAILYLOG_DATA = null, DAILYLOG_VIEW = "revised";   // "revised" | "asof"
+let BASKETDRIFT_METHOD = "actual";                     // selected basket for the drift card
 function renderDailyLog(d) {
   DAILYLOG_DATA = d;
   const note = document.getElementById("dailylog-note");
@@ -143,6 +144,7 @@ function renderDailyLog(d) {
     tg.querySelectorAll("button").forEach((b) => (b.onclick = () => { DAILYLOG_VIEW = b.dataset.v; renderDailyLog(DAILYLOG_DATA); }));
   }
   drawDailyLogTable();
+  drawBasketDrift();
   const src = document.getElementById("dailylog-src");
   if (src) src.innerHTML = "<span class='dim'>Cells = predicted BPTIX NAV under each weighting (green = closest to actual; small number = error vs actual). " + d.meta.disclaimer + "</span>";
 }
@@ -226,6 +228,95 @@ function drawDailyLogTable() {
       `<td>${r.spacex_weight_pct}% <span class="dim">L${r.leverage != null ? r.leverage.toFixed(2) : "—"}</span></td>${spxSh}${outCell}${cashCell}${cCell}${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
   }).join("");
   card.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
+}
+
+/* ---- Fixed-basket composition & drift: pick ONE basket, freeze its weights, and
+ * compound the predicted NAV WITHOUT re-anchoring to actual -> the cumulative gap is
+ * how far you'd drift holding that basket unchanged since the 6/5 base. Honors the
+ * same as-of/revised toggle as the daily log. ---- */
+function drawBasketDrift() {
+  const d = DAILYLOG_DATA, card = document.getElementById("basketdrift-table");
+  if (!d || !card || !d.meta.compositions) return;
+  const ms = d.meta.methods, lbl = d.meta.method_labels;
+  if (!ms.includes(BASKETDRIFT_METHOD)) BASKETDRIFT_METHOD = ms[0];
+  const m = BASKETDRIFT_METHOD;
+  const rows = DAILYLOG_VIEW === "asof" ? (d.vintage_rows || []) : d.rows;
+
+  const ctl = document.getElementById("basketdrift-controls");
+  if (ctl) {
+    const opts = ms.map((x) => `<option value="${x}"${x === m ? " selected" : ""}>${lbl[x]}</option>`).join("");
+    ctl.innerHTML =
+      `<label style="font-size:.85rem;color:${MUTED}">Basket weighting:&nbsp;` +
+      `<select id="basketdrift-select" style="background:var(--panel-2);color:${TEXT};border:1px solid ${GRID};border-radius:6px;padding:4px 8px;font-size:.85rem">${opts}</select></label>` +
+      `<span style="font-size:.78rem;color:${MUTED}">View follows the toggle above → currently <b style="color:${TEXT}">${DAILYLOG_VIEW === "asof" ? "as-of" : "revised"}</b>.</span>`;
+    const sel = document.getElementById("basketdrift-select");
+    if (sel) sel.onchange = () => { BASKETDRIFT_METHOD = sel.value; drawBasketDrift(); };
+  }
+  const note = document.getElementById("basketdrift-note");
+  if (note) note.innerHTML =
+    "Pick ONE public-hedge basket and freeze its weights. We re-predict BPTIX NAV every day with that fixed basket " +
+    "(SpaceX still marked to the live SPCX), compounding the predicted returns and NEVER re-anchoring to the actual NAV — " +
+    "so the gap to actual accumulates. That cumulative gap is how far you'd drift if you held this basket and never " +
+    "corrected. The composition is the PUBLIC sleeve only (the SpaceX private leg is tracked separately above).";
+
+  // composition bars
+  const comp = (d.meta.compositions[m] || []).slice();
+  const cmax = comp.length ? comp[0].weight_pct : 1;
+  const compDiv = document.getElementById("basketdrift-comp");
+  if (compDiv) {
+    const bars = comp.map((c) => {
+      const w = Math.max(2, (c.weight_pct / cmax) * 100);
+      return `<div style="display:flex;align-items:center;gap:8px;margin:2px 0;font-size:11px">` +
+        `<span style="width:54px;text-align:right;color:${TEXT}">${c.ticker}</span>` +
+        `<span style="flex:1;background:var(--panel-2);border-radius:3px;height:13px;position:relative">` +
+        `<span style="position:absolute;left:0;top:0;bottom:0;width:${w}%;background:${_rgba(SPX, 0.55)};border-radius:3px"></span></span>` +
+        `<span style="width:46px;color:${MUTED}">${c.weight_pct.toFixed(1)}%</span></div>`;
+    }).join("");
+    compDiv.innerHTML =
+      `<div style="font-size:.82rem;color:${TEXT};margin-bottom:6px"><b>${lbl[m]}</b> — ${comp.length} public names ` +
+      `<span class="dim">(weights renormalized to 100%, SpaceX excluded)</span></div>` + bars;
+  }
+
+  // drift: compound predicted one-day returns from the BASE nav, never re-anchoring
+  let cum = d.meta.base.nav;
+  const trows = rows.map((r) => {
+    const p = r.preds ? r.preds[m] : null;
+    cum = cum * (1 + (p ? p.nav_return_pct / 100 : 0));
+    const drift = r.actual_nav != null ? (cum / r.actual_nav - 1) * 100 : null;
+    return { r, p, cum, drift };
+  });
+  const dcol = (v) => (Math.abs(v) < 0.5 ? GOOD : Math.abs(v) < 1.5 ? WARN : BAD);
+  const lastA = [...trows].reverse().find((t) => t.r.actual_nav != null);
+  const hl = document.getElementById("basketdrift-headline");
+  if (hl) hl.innerHTML = lastA
+    ? `Holding the <b>${lbl[m]}</b> basket fixed since ${d.meta.base.date} (base $${d.meta.base.nav}) and never re-marking, ` +
+      `our NAV estimate would now read <b>$${lastA.cum.toFixed(2)}</b> vs the actual <b style="color:${SPX}">$${lastA.r.actual_nav.toFixed(2)}</b> — ` +
+      `a cumulative drift of <b style="color:${dcol(lastA.drift)}">${lastA.drift >= 0 ? "+" : ""}${lastA.drift.toFixed(2)}%</b> ` +
+      `over ${trows.filter((t) => t.r.actual_nav != null).length} trading days.`
+    : "";
+
+  const head = `<tr><th>Date</th><th>basket ret</th><th title="re-anchored to the prior actual each day → one-day error only">1-day pred NAV</th>` +
+    `<th>actual NAV</th><th>1-day err</th>` +
+    `<th title="compounded predicted NAV with NO re-anchoring, from the ${d.meta.base.date} base ($${d.meta.base.nav})">held-fixed NAV</th>` +
+    `<th title="held-fixed NAV vs actual = cumulative drift of never re-marking">cum drift</th></tr>`;
+  const body = trows.slice().reverse().map((t) => {
+    const r = t.r, p = t.p;
+    const bf = r.backfilled ? ` <span class="dim" title="backfilled from contemporaneous records (git + Morningstar log + hedge-book closes)">·bf</span>` : "";
+    if (!p) return `<tr><td><b>${r.date}</b>${bf}</td><td colspan="6" class="dim">— (${lbl[m]} not in this frozen day)</td></tr>`;
+    const err = r.errors && r.errors[m] != null ? r.errors[m] : null;
+    const errC = err != null ? `<span style="color:${Math.abs(err) < 0.5 ? GOOD : Math.abs(err) < 1.5 ? MUTED : WARN}">${err >= 0 ? "+" : ""}${err}</span>` : "—";
+    const act = r.actual_nav != null ? `<b style="color:${SPX}">${r.actual_nav.toFixed(2)}</b>` : `<span class="dim">est.</span>`;
+    const driftC = t.drift != null ? `<span style="color:${dcol(t.drift)}">${t.drift >= 0 ? "+" : ""}${t.drift.toFixed(2)}%</span>` : "—";
+    return `<tr><td><b>${r.date}</b>${bf}</td><td style="color:${p.basket_ret_pct >= 0 ? GOOD : BAD}">${p.basket_ret_pct >= 0 ? "+" : ""}${p.basket_ret_pct}%</td>` +
+      `<td>${p.pred_nav.toFixed(2)}</td><td>${act}</td><td>${errC}</td><td>${t.cum.toFixed(2)}</td><td>${driftC}</td></tr>`;
+  }).join("");
+  card.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
+
+  const src = document.getElementById("basketdrift-src");
+  if (src) src.innerHTML =
+    `<span class="dim">"1-day pred NAV" re-anchors to the prior actual each day (its error is one-day only); ` +
+    `"held-fixed NAV" compounds the predicted returns from the ${d.meta.base.date} base ($${d.meta.base.nav}) and never re-anchors — ` +
+    `its running gap to actual is the cumulative drift of holding this basket unchanged. ${d.meta.disclaimer}</span>`;
 }
 
 /* ---- IPO-day reconciliation card (SpaceX first trade: marks vs AUM) ---- */
