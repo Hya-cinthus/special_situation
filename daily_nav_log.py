@@ -170,6 +170,16 @@ ENTRIES = [
              "since 6/12). Leverage holds ~1.0: this big-down day matched the L=1.0 estimate (had the fund levered "
              "UP to meet redemptions, the actual would print BELOW it). Ignored 7 non-BPTIX tickers in the paste "
              "(AAPL/AMZN/AVGO/GOOG/MU/NVDA/ORCL — not fund holdings)."},
+    {"date": "2026-06-23", "spcx": 156.11, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 93.71, "BIRK": 42.35, "CHH": 111.60, "CSGP": 30.26, "FDS": 218.15,
+                "FIG": 18.99, "GLPI": 44.71, "GWRE": 109.63, "H": 198.05, "HEI": 334.17,
+                "HEI-A": 246.24, "IDXX": 541.31, "IT": 129.18, "KNSL": 304.48, "MSCI": 581.51,
+                "MTN": 142.39, "ONON": 35.14, "RRR": 61.02, "SCHW": 93.17, "SHOP": 107.68,
+                "SPOT": 455.50, "TSLA": 381.61, "VRSK": 174.76},
+     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Est NAV ~277.4 (~flat vs 6/22's 277.76; range 276.9-278.0). "
+             "SPCX +0.98% (154.60->156.11, SpaceX steadied after the 6/22 crater) = +0.33% contribution, roughly "
+             "offsetting the public basket ~-0.7%: dragged by TSLA -5.8% (the ~28% weight) but cushioned by GWRE "
+             "+6.8%, VRSK +3.4%, KNSL +3.2%, IT +2.7%, ACGL +1.8%; ONON -3.0%, BIRK -2.2% on the other side."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
