@@ -332,6 +332,9 @@ def build_payload():
             # latest day's public closes -> lets the composition panel convert a basket's
             # weights into shares / shares-per-BPTIX / $ / total-share allocations.
             "ref_closes": {"date": ENTRIES[-1]["date"], "closes": ENTRIES[-1]["closes"]},
+            # 6/5 base closes + base leverage -> the composition "difference" view sizes a
+            # held-fixed (never-adjusted-since-6/5) basket and compares it to today's target.
+            "base_closes": _base_closes(H), "base_leverage": LEVERAGE_FOR(BASE["date"]),
             "friday_spacex_buy_usd": FRIDAY_SPACEX_BUY, "leverage_schedule": "0.968 (cash buffer) thru 6/15, 1.00 after",
             "note": ("Each day's predicted BPTIX NAV under every basket weighting we've tested, vs the actual — now "
                      "walked back through the IPO week (6/8 onward). NAV_t = NAV_{t-1} x (1 + w_spx x SPCX_return + "
