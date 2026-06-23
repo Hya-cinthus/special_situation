@@ -157,15 +157,18 @@ ENTRIES = [
      "note": "Actual NAV 298.47 (our estimate 298.36, err +0.11). AUM 19.6B->19.1B vs NAV -1.26% => ~$0.25B "
              "more outflow (cumulative ~$1.95B since 6/12; redemptions continue). SPCX -3.6% (185.00). RONB "
              "cross-check agreed. 6/19 = Juneteenth holiday (no trading)."},
-    {"date": "2026-06-22", "spcx": 154.60, "actual_nav": None, "aum": None,
+    {"date": "2026-06-22", "spcx": 154.60, "actual_nav": 277.76, "aum": 17.7e9,
      "closes": {"ACGL": 92.04, "BIRK": 43.30, "CHH": 109.88, "CSGP": 29.22, "FDS": 218.62,
                 "FIG": 19.08, "GLPI": 44.19, "GWRE": 102.69, "H": 196.33, "HEI": 331.15,
                 "HEI-A": 242.12, "IDXX": 545.73, "IT": 125.79, "KNSL": 295.05, "MSCI": 580.85,
                 "MTN": 141.67, "ONON": 36.21, "RRR": 60.45, "SCHW": 92.03, "SHOP": 107.98,
                 "SPOT": 459.34, "TSLA": 405.05, "VRSK": 168.99},
-     "note": "Estimate only (BPTIX NAV + AUM tomorrow). BIG DOWN day: SPCX -16.4% (185.00->154.60, SpaceX "
-             "cratered after the Juneteenth break) + public basket broadly down (BIRK -7.8%, GWRE/KNSL -4.5%, "
-             "IDXX/VRSK/CHH ~-3%; TSLA/SPOT/MSCI ~flat). Ignored 7 non-BPTIX tickers in the paste "
+     "note": "Actuals in: BPTIX NAV 277.76 (our estimate ~277.8 — nailed it; fund 5/31 exact, optimal +0.03), "
+             "AUM 17.7B. BIG DOWN day: SPCX -16.4% (185.00->154.60, SpaceX cratered after the Juneteenth break) + "
+             "public basket broadly down (BIRK -7.8%, GWRE/KNSL -4.5%, IDXX/VRSK/CHH ~-3%; TSLA/SPOT/MSCI ~flat). "
+             "AUM 19.1B->17.7B vs NAV -6.94% => only ~$0.08B net OUTFLOW (redemptions SLOWING; cumulative ~$2.0B "
+             "since 6/12). Leverage holds ~1.0: this big-down day matched the L=1.0 estimate (had the fund levered "
+             "UP to meet redemptions, the actual would print BELOW it). Ignored 7 non-BPTIX tickers in the paste "
              "(AAPL/AMZN/AVGO/GOOG/MU/NVDA/ORCL — not fund holdings)."},
 ]
 

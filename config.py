@@ -324,6 +324,16 @@ class SpacexBaron:
                    "Cross-checked by RONB (Baron's daily-transparent ETF), which moved in line."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-06-22",
+         "spacex_value_usd": 3.89026788e9 * (154.60 / 105.32),  # ~$5.712B
+         "per_share_old_split_adj": 105.32, "per_share_new": 154.60,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $154.60 on 2026-06-22 (-16.4% vs 6/18 $185.00) — SpaceX cratered on the first "
+                   "session after the 6/19 Juneteenth holiday. Marks the DISCLOSED 3/31 share count. BPTIX NAV "
+                   "277.76 (our estimate ~277.8; fund-5/31 weighting exact). AUM 19.1B->17.7B vs NAV -6.94% => only "
+                   "~$0.08B net outflow (redemptions slowing). Leverage holds ~1.0."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
