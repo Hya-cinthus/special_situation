@@ -1566,5 +1566,117 @@
     ],
     "source": "measured",
     "confidence": "high"
+  },
+  {
+    "report_date": "2026-04-30",
+    "filing_date": "2026-06-23",
+    "accession": "0000940400-26-025087",
+    "net_assets_usd": 862446918.77,
+    "total_assets_usd": 864296315.97,
+    "n_holdings": 114,
+    "tracked_value_usd": {
+      "SpaceX": 95100648.38,
+      "OpenAI": 72512628.43,
+      "Anthropic": 23083672.92
+    },
+    "tracked_pct": {
+      "SpaceX": 11.0268,
+      "OpenAI": 8.4078,
+      "Anthropic": 2.6765
+    },
+    "top_holdings": [
+      {
+        "name": "GOLDMAN SACHS TRUST",
+        "valUSD": 80058694.06,
+        "pctVal": 9.282738719059
+      },
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 75624900.09,
+        "pctVal": 8.768644010909
+      },
+      {
+        "name": "OpenAI Group PBC, Series C",
+        "valUSD": 49999651.44,
+        "pctVal": 5.797417829645
+      },
+      {
+        "name": "Figure AI Inc.",
+        "valUSD": 25527960.0,
+        "pctVal": 2.959945643542
+      },
+      {
+        "name": "Ayar Labs, Inc.",
+        "valUSD": 24999933.35,
+        "pctVal": 2.898721394431
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 23083672.92,
+        "pctVal": 2.676532597846
+      },
+      {
+        "name": "Space Exploration Technologies Corp.",
+        "valUSD": 19475748.29,
+        "pctVal": 2.258196749983
+      },
+      {
+        "name": "Kalshi Inc.",
+        "valUSD": 18856580.64,
+        "pctVal": 2.186404778034
+      },
+      {
+        "name": "Neuralink Corp.",
+        "valUSD": 16512407.89,
+        "pctVal": 1.914599905296
+      },
+      {
+        "name": "X-ENERGY INC",
+        "valUSD": 16370966.58,
+        "pctVal": 1.898199903519
+      },
+      {
+        "name": "Hydra Host, Inc.",
+        "valUSD": 15000008.2,
+        "pctVal": 1.739238424249
+      },
+      {
+        "name": "Zipline International Inc.",
+        "valUSD": 14999995.46,
+        "pctVal": 1.739236947056
+      },
+      {
+        "name": "Kalshi Inc.",
+        "valUSD": 14999978.94,
+        "pctVal": 1.739235031576
+      },
+      {
+        "name": "ABSCI CORP",
+        "valUSD": 14990500.85,
+        "pctVal": 1.738136054956
+      },
+      {
+        "name": "BEAM THERAPEUTICS INC",
+        "valUSD": 14440022.01,
+        "pctVal": 1.674308493164
+      },
+      {
+        "name": "Boom Technology, Inc.",
+        "valUSD": 14206457.19,
+        "pctVal": 1.647226847335
+      },
+      {
+        "name": "Replit, Inc.",
+        "valUSD": 13563996.2,
+        "pctVal": 1.572734032065
+      },
+      {
+        "name": "TEMPUS AI INC",
+        "valUSD": 13359861.4,
+        "pctVal": 1.549064772479
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
   }
 ]
