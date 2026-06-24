@@ -182,6 +182,16 @@ ENTRIES = [
              "VRSK +3.4%, KNSL +3.2%, IT +2.7%, ACGL +1.8%; ONON -3.0%, BIRK -2.2% the other way. AUM 17.7B->17.5B "
              "vs NAV +0.02% => ~$0.2B net OUTFLOW (redemptions continue, modest; cumulative ~$2.2B since 6/12). "
              "Leverage holds ~1.0 (flat-NAV day isn't a strong test, but the estimate matched)."},
+    {"date": "2026-06-24", "spcx": 154.54, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 94.92, "BIRK": 45.09, "CHH": 112.04, "CSGP": 29.81, "FDS": 216.45,
+                "FIG": 18.64, "GLPI": 45.37, "GWRE": 110.33, "H": 197.32, "HEI": 335.30,
+                "HEI-A": 245.97, "IDXX": 549.16, "IT": 130.47, "KNSL": 310.39, "MSCI": 577.29,
+                "MTN": 144.24, "ONON": 36.92, "RRR": 62.50, "SCHW": 91.39, "SHOP": 114.17,
+                "SPOT": 455.01, "TSLA": 375.53, "VRSK": 180.06},
+     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Est NAV ~277.3 (~flat vs 6/23's 277.81; range 276.9-278.2). "
+             "SPCX -1.01% (156.11->154.54, SpaceX edged back down) = -0.35% contribution, ~offset by a slightly "
+             "POSITIVE public basket (~+0.3%): TSLA -1.6% (the ~28% weight), SCHW -1.9%, CSGP -1.5% down, but BIRK "
+             "+6.5%, SHOP +6.0%, ONON +5.1%, VRSK +3.0%, RRR +2.4%, KNSL +1.9%, IDXX +1.5% up."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
