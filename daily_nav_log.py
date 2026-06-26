@@ -206,6 +206,19 @@ ENTRIES = [
              "— with a possible small leverage uptick; one high-dispersion day can't separate the two. Keeping L=1.0 "
              "(won't refit on one ambiguous day); watch the next down-basket day. AUM 17.4B->17.0B vs NAV -1.62% => "
              "~$0.12B net outflow (cumulative ~$2.4B since 6/12)."},
+    {"date": "2026-06-26", "spcx": 153.23, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 97.54, "BIRK": 44.42, "CHH": 112.72, "CSGP": 30.25, "FDS": 231.74,
+                "FIG": 18.62, "GLPI": 45.88, "GWRE": 121.48, "H": 197.68, "HEI": 345.21,
+                "HEI-A": 254.74, "IDXX": 551.50, "IT": 134.96, "KNSL": 328.43, "MSCI": 554.85,
+                "MTN": 137.94, "ONON": 37.07, "RRR": 67.26, "SCHW": 90.67, "SHOP": 116.86,
+                "SPOT": 460.02, "TSLA": 379.71, "VRSK": 182.18},
+     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Est NAV ~278.9 (UP ~+2.1% vs 6/25's 273.22; range 277.8-"
+             "279.1, perfect-fit 279.2-280.0). SPCX +0.15% (153.00->153.23, ~flat). Strong PUBLIC REBOUND "
+             "after the 6/25 drop: FDS +11.0%, FIG +10.6%, GWRE +10.3%, IT +6.6%, KNSL +6.5%, RRR +5.8%, SHOP +4.7%, "
+             "SPOT +4.3%, ACGL/MTN +3.4%, VRSK +2.9%, MSCI +1.9%, TSLA +1.2%; only IDXX -0.6%, BIRK -0.2% down. "
+             "MIRROR TEST for the 6/25 miss: many names that cratered 6/25 (FDS, FIG, MSCI, MTN, IT) rebound hardest "
+             "here, so if tomorrow's actual comes in ABOVE our estimate (every basket too LOW), 6/25 was basket DRIFT "
+             "toward these names, not leverage; if it lands on the estimate, 6/25 was leverage/slippage."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
