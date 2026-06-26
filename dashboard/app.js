@@ -189,8 +189,12 @@ function drawDailyLogTable() {
     "holdings — at ~market/close prices; the exact securities & prices aren't disclosed until the next NPORT, and NAV/" +
     "share is flow-neutral so it doesn't affect our estimate. Selling to meet redemptions KEEPS leverage ~1.0 (holdings " +
     "& net assets both fall by the redemption); borrowing instead would push leverage above 1.0. >0 = cash, <0 = borrowing.";
+  const flowTip = "Daily net flow in dollars = AUM_end − AUM_prev × (NAV_end ÷ NAV_prev). NEGATIVE = net REDEMPTIONS " +
+    "(the day's redemption amount; shares cancelled at the close NAV); POSITIVE = net subscriptions. It strips out the " +
+    "market move, so it equals Δ(BPTIX shares outstanding) × NAV — the pure flow. AS-OF shows '—' for days frozen " +
+    "BEFORE that next-morning AUM print: we couldn't know the redemption until the AUM landed (REVISED shows it once known).";
   const head = "<tr><th>Date</th><th>SPCX</th><th>SpaceX wt · lev</th><th title=\"" + shTip + "\">SpaceX sh / BPTIX sh ⓘ</th>" +
-    "<th title=\"" + outTip + "\">BPTIX sh out ⓘ</th><th title=\"" + cashTip + "\">net cash ⓘ</th><th title=\"" + cTip + "\">SpaceX contrib ⓘ</th>" +
+    "<th title=\"" + outTip + "\">BPTIX sh out ⓘ</th><th title=\"" + flowTip + "\">net flow ⓘ</th><th title=\"" + cashTip + "\">net cash ⓘ</th><th title=\"" + cTip + "\">SpaceX contrib ⓘ</th>" +
     ms.map((m) => `<th>${lbl[m]}</th>`).join("") + "<th>perfect-fit range</th><th>Actual NAV</th><th>best</th><th>what's new this day</th></tr>";
   const body = rows.slice().reverse().map((r) => {
     const cells = ms.map((m) => {
@@ -219,6 +223,10 @@ function drawDailyLogTable() {
       ? `<td style="color:${SPX}" title="${spxShTip}">${spxShVal.toFixed(3)}${spxShTip ? " ⓘ" : ""}</td>`
       : `<td class="dim">—</td>`;
     const outCell = r.bptix_shares_out_m != null ? `<td>${r.bptix_shares_out_m.toFixed(1)}M</td>` : `<td class="dim">—</td>`;
+    const fb = r.flow_b;
+    const flowCell = fb == null ? `<td class="dim" title="frozen before the AUM print — redemption not knowable yet">—</td>`
+      : Math.abs(fb) < 0.01 ? `<td style="color:${MUTED}">~$0</td>`
+      : `<td style="color:${fb < 0 ? WARN : GOOD}">${fb < 0 ? "−" : "+"}${Math.abs(fb) >= 1 ? "$" + Math.abs(fb).toFixed(2) + "B" : "$" + (Math.abs(fb) * 1000).toFixed(0) + "M"}</td>`;
     const cashV = _netCashB(r);
     const cashCell = cashV != null
       ? `<td style="color:${Math.abs(cashV) < 0.05 ? MUTED : (cashV > 0 ? GOOD : WARN)}">${cashV >= 0 ? "$" : "−$"}${Math.abs(cashV).toFixed(2)}B</td>`
@@ -227,7 +235,7 @@ function drawDailyLogTable() {
       : (r.spacex_weight_pct != null && r.spcx_ret_pct != null ? r.spacex_weight_pct / 100 * r.spcx_ret_pct : null);
     const cCell = cVal != null ? `<td style="color:${cVal >= 0 ? GOOD : BAD}">${cVal >= 0 ? "+" : ""}${cVal.toFixed(2)}%</td>` : `<td class="dim">—</td>`;
     return `<tr><td><b>${r.date}</b></td><td>$${r.spcx} <span class="dim">(${r.spcx_ret_pct >= 0 ? "+" : ""}${r.spcx_ret_pct}%)</span></td>` +
-      `<td>${r.spacex_weight_pct}% <span class="dim">L${r.leverage != null ? r.leverage.toFixed(2) : "—"}</span></td>${spxSh}${outCell}${cashCell}${cCell}${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
+      `<td>${r.spacex_weight_pct}% <span class="dim">L${r.leverage != null ? r.leverage.toFixed(2) : "—"}</span></td>${spxSh}${outCell}${flowCell}${cashCell}${cCell}${cells}<td>${pf}</td><td>${act}</td><td class="dim">${best}</td>${noteCell}</tr>`;
   }).join("");
   card.innerHTML = `<table class="data">${head}<tbody>${body}</tbody></table>`;
 }
