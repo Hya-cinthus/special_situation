@@ -353,6 +353,17 @@ class SpacexBaron:
                    "17.4B vs flat NAV => ~$0.1B net outflow (modest; cumulative ~$2.3B since 6/12). Leverage ~1.0."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-06-25",
+         "spacex_value_usd": 3.89026788e9 * (153.00 / 105.32),  # ~$5.652B
+         "per_share_old_split_adj": 105.32, "per_share_new": 153.00,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $153.00 on 2026-06-25 (-1.00% vs 6/24 $154.54). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 273.22 (-1.62%, a down-basket day). AUM 17.4B->17.0B vs NAV -1.62% => ~$0.12B "
+                   "net outflow (cumulative ~$2.4B since 6/12). NOTABLE: actual fell ~0.8 BELOW our L=1.0 median "
+                   "(274.0) and just under the perfect-fit floor - likely basket drift toward the day's big losers "
+                   "(MSCI/MTN/FIG) vs the stale NPORT snapshots, +/- a small leverage uptick; keeping L=1.0 for now."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

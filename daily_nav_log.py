@@ -192,17 +192,20 @@ ENTRIES = [
              "SPCX -1.01% (156.11->154.54) = -0.35% contribution, ~offset by a slightly POSITIVE public basket "
              "(BIRK +6.5%, SHOP +6.0%, ONON +5.1%, VRSK/RRR/KNSL/IDXX up vs TSLA -1.6%, SCHW -1.9%). AUM 17.5B->"
              "17.4B vs flat NAV => ~$0.1B net OUTFLOW (modest; cumulative ~$2.3B since 6/12). Leverage holds ~1.0."},
-    {"date": "2026-06-25", "spcx": 153.00, "actual_nav": None, "aum": None,
+    {"date": "2026-06-25", "spcx": 153.00, "actual_nav": 273.22, "aum": 17.0e9,
      "closes": {"ACGL": 94.33, "BIRK": 44.52, "CHH": 111.18, "CSGP": 28.64, "FDS": 208.84,
                 "FIG": 16.84, "GLPI": 45.06, "GWRE": 110.10, "H": 197.01, "HEI": 342.45,
                 "HEI-A": 257.47, "IDXX": 554.94, "IT": 126.63, "KNSL": 308.43, "MSCI": 544.56,
                 "MTN": 133.34, "ONON": 36.58, "RRR": 63.57, "SCHW": 89.44, "SHOP": 111.62,
                 "SPOT": 441.21, "TSLA": 375.12, "VRSK": 177.04},
-     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Est NAV ~274.0 (DOWN ~1.3% vs 6/24's 277.73; range 273.9-"
-             "274.4). First genuine down day in a while — BOTH legs negative: SPCX -1.00% (154.54->153.00) = -0.34% "
-             "contribution AND a broadly-down public basket ~-1.5% (MSCI -5.7%, MTN -7.6%, FIG -9.7%, CSGP -3.9%, "
-             "FDS -3.5%, SPOT -3.0%, IT -2.9%, SHOP -2.2%, SCHW -2.1%; only HEI +2.1%, HEI-A +4.7%, IDXX/RRR up; "
-             "TSLA ~flat). A down-basket day = a cleaner leverage test once the actual NAV lands."},
+     "note": "Actuals in: BPTIX NAV 273.22 (-1.62%), AUM 17.0B. NOTABLE — first clearly one-directional miss: actual "
+             "came in ~0.8 BELOW our L=1.0 median (274.0) and just under the perfect-fit floor (273.4); EVERY basket "
+             "overestimated. On this high-dispersion down day (MSCI -5.7%, MTN -7.6%, FIG -9.7%) the likeliest cause "
+             "is the fund being tilted toward the day's big LOSERS more than the stale 3/31-5/31 NPORT snapshots "
+             "capture (basket drift) — for L=1.0 the true public sleeve would need ~-1.9% vs our snapshots' -1.3/-1.6% "
+             "— with a possible small leverage uptick; one high-dispersion day can't separate the two. Keeping L=1.0 "
+             "(won't refit on one ambiguous day); watch the next down-basket day. AUM 17.4B->17.0B vs NAV -1.62% => "
+             "~$0.12B net outflow (cumulative ~$2.4B since 6/12)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
