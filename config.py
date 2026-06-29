@@ -364,6 +364,17 @@ class SpacexBaron:
                    "(MSCI/MTN/FIG) vs the stale NPORT snapshots, +/- a small leverage uptick; keeping L=1.0 for now."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-06-26",
+         "spacex_value_usd": 3.89026788e9 * (153.23 / 105.32),  # ~$5.659B
+         "per_share_old_split_adj": 105.32, "per_share_new": 153.23,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $153.23 on 2026-06-26 (+0.15% vs 6/25 $153.00, ~flat). Marks the DISCLOSED 3/31 "
+                   "share count. BPTIX NAV 279.94 (+2.46%, strong public rebound). AUM 17.0B->17.4B on the rebound "
+                   "=> ~flat flow (-$18M; redemptions essentially stopped). MIRROR TEST: every basket underestimated "
+                   "today (mirror of 6/25's overestimate), same names (FDS/FIG/GWRE/IT/KNSL) -> confirms BASKET DRIFT "
+                   "(fund overweight these vs stale snapshots), NOT leverage (6/17/6/18 matched L=1.0). L stays ~1.0."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
