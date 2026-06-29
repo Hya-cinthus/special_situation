@@ -221,6 +221,20 @@ ENTRIES = [
              "are weight drift toward the high-dispersion names (which only show up on days they move a lot). "
              "AUM 17.0B->17.4B vs NAV +2.46% => ~FLAT flow (-$18M; redemptions essentially STOPPED on the rebound; "
              "cumulative ~$2.4B since 6/12)."},
+    {"date": "2026-06-29", "spcx": 164.19, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 98.06, "BIRK": 43.41, "CHH": 111.97, "CSGP": 29.32, "FDS": 233.62,
+                "FIG": 19.08, "GLPI": 45.91, "GWRE": 120.87, "H": 196.77, "HEI": 350.44,
+                "HEI-A": 254.48, "IDXX": 535.93, "IT": 132.79, "KNSL": 332.02, "MSCI": 558.00,
+                "MTN": 135.20, "ONON": 35.42, "RRR": 65.89, "SCHW": 90.55, "SHOP": 114.21,
+                "SPOT": 462.29, "TSLA": 411.84, "VRSK": 179.21},
+     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Est NAV ~289.6 (UP ~+3.5% vs 6/26's 279.94; range 288.7-"
+             "290.6, perfect-fit 289.1-290.7). BIG UP day, BOTH legs: SPCX +7.15% (153.23->164.19, SpaceX rebounded "
+             "hard) = +2.43% contribution, AND a strong public basket led by TSLA +8.5% (411.84, the ~28% weight; "
+             "HEI +1.5%, KNSL +1.1%, FIG +2.5%; IDXX -2.8%, MTN -2.0%, ONON -3.2% the other way). Per-method spread "
+             "is wider today (~1.8pt) because the baskets weight TSLA differently (30% 3/31 vs 23% 5/31) -> the "
+             "actual pins the effective TSLA weight. NOTE for the basket-drift watch: today's move is TSLA+SpaceX "
+             "driven, the high-dispersion drift names (FDS/GWRE/IT/MSCI) are ~calm, so the estimate should track "
+             "WELL (drift only bites when those names move)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
