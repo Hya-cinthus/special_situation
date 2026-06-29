@@ -19,7 +19,7 @@ The whole stack is on **BPTIX** (the class the user holds): `NAV_TICKER = "BPTIX
 
 ---
 
-## The five files to edit each day  (in this order)
+## The files to edit each day  (in this order)
 
 ### 1. `daily_nav_log.py` — `ENTRIES`
 Append (or, next morning, complete) one dict for day T:
@@ -33,11 +33,17 @@ estimate is auto-frozen to `daily_nav_vintage.jsonl` the first build, so revisin
 assumption never erases what we estimated that day). `recalibrate.py` also reads this and
 freezes its own vintage when `actual_nav` first lands — so just fill `actual_nav` next morning
 and rebuild. Two assumption knobs at the top of `daily_nav_log.py`, both surfaced in the table:
-- `FRIDAY_SPACEX_BUY` — assumed 6/12 SpaceX add ($262M) folded into the predicted SpaceX weight.
-- `LEVERAGE_ASSUMPTION` — **start-of-day** gross/net (now **1.00**, data-confirmed 6/17: the first big-down
-  basket day's actual NAV matched L=1.0 not the 5/31-disclosed 0.968 → the net-cash buffer was consumed by
-  redemptions). Public sleeve weight = LEVERAGE − w_spx, remainder net cash. To re-test: a big-basket day where
-  the actual NAV sits above the L=current estimate ⇒ leverage fell; below ⇒ rose. Revisit on fresh disclosures.
+- `FRIDAY_SPACEX_BUY` — assumed 6/12 SpaceX add ($262M); booked ON 6/12 (the day it happened) via that
+  entry's `spacex_buy_usd`, not folded into the base.
+- `LEVERAGE_FOR(date)` — **start-of-day** gross/net, now a SCHEDULE not a constant: **0.968 thru 6/15**
+  (the 5/31-disclosed ~3.2% net-cash buffer, ~$0.65B) then **1.00 from 6/16** (the first redemption consumed
+  the buffer; 6/17 confirmed L=1.0). Public sleeve weight = LEVERAGE − w_spx, remainder net cash. To re-test:
+  on a big-basket day actual NAV below the L=1.0 estimate ⇒ leverage rose (or basket drift); above ⇒ fell.
+  **Basket-drift finding (6/26):** the 6/25 (every basket too HIGH) / 6/26 (every basket too LOW) mirror —
+  same names (FDS/FIG/GWRE/IT/KNSL) — showed the misses are WEIGHT DRIFT (fund overweight high-dispersion
+  names vs the stale NPORT snapshots), NOT leverage (6/17/6/18 matched L=1.0). So on a high-dispersion day a
+  one-directional miss is drift, not a leverage signal — keep L=1.0 unless ALL basket-move days shift together.
+  The 6/30 NPORT (≈ Aug 27, see below) settles it.
 
 ### 2. `situations/spacex_baron/data/morningstar_aum_log.jsonl` — append one line
 ```json
@@ -78,6 +84,22 @@ overwrites `nav_daily.csv` from Yahoo on every push. Check first:
 It is **pinned to the 6/12 IPO day** (`IPO_DAY = CFG.IPO_FIRST_TRADE_DATE`): `_two_anchor_days`
 caps at IPO_DAY and the re-mark step filters `<= IPO_DAY`. Adding 6/15+ AUM/re-marks will
 NOT shift it. If you ever change the IPO-day card, keep the cap.
+
+### 6. `py make_daily_log.py` — write the append-only daily journal
+Creates `daily_log/<day>.md` (one file per trading day, **never edited after creation**) — the
+as-of trace trail. Run it after editing `daily_nav_log.py` (so the day's estimate/actual is in
+the JSON). It skips files that already exist, so it can never overwrite a frozen day. See
+[`daily_log/README.md`](daily_log/README.md).
+
+> The daily NAV table also now carries columns the build emits automatically (no manual step):
+> SpaceX sh/BPTIX, BPTIX sh out, **net flow** (daily redemption $), net cash, SpaceX contrib,
+> plus the fixed-basket composition/drift card (4 unit toggles + Absolute/Difference mode).
+
+### Next public holdings filing — the 6/30/2026 NPORT-P (≈ Aug 27, 2026)
+The 6/30/2026 NPORT-P is the next full holdings disclosure. Historical filing lag is 51–61 days
+(6/30/2025 → 2025-08-27 = 58d; 3/31/2026 → 2026-05-22 = 52d) → **expect ~2026-08-27 (Aug 20–30)**.
+When it lands, verify our theory: basket drift (overweight FDS/FIG/GWRE/IT/KNSL?), SpaceX share
+count (~36.94M + ~$262M buy ⇒ ~38.57M?), leverage ≈ 1.0, cash ~gone. (See `daily_log/README.md`.)
 
 ---
 
