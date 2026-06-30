@@ -237,6 +237,20 @@ ENTRIES = [
              "(underweight). Takeaway: RONB is now the best LIVE proxy; the NPORT snapshots lag. AUM 17.4B->17.9B "
              "vs NAV +3.13% => ~flat flow (-$44M; redemptions still stopped; cumulative ~$2.45B). The 6/30 NPORT "
              "(~Aug 27) gives the true current weights."},
+    {"date": "2026-06-30", "spcx": 170.86, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 97.06, "BIRK": 43.03, "CHH": 110.27, "CSGP": 28.32, "FDS": 230.08,
+                "FIG": 18.09, "GLPI": 44.53, "GWRE": 123.05, "H": 193.84, "HEI": 356.19,
+                "HEI-A": 257.91, "IDXX": 526.44, "IT": 129.62, "KNSL": 329.81, "MSCI": 560.04,
+                "MTN": 136.15, "ONON": 35.42, "RRR": 65.06, "SCHW": 92.27, "SHOP": 114.18,
+                "SPOT": 459.13, "TSLA": 420.60, "VRSK": 179.53},
+     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Est NAV ~293.0 (UP ~+1.5% vs 6/29's 288.69; range 292.7-"
+             "293.3, tightly clustered — public ~flat + mild TSLA, so TSLA-weight differences barely matter today). "
+             "**QUARTER-END** — today IS the 6/30 NPORT snapshot date "
+             "(filing ~Aug 27, our basket-drift verification). SPCX +4.06% (164.19->170.86, SpaceX up again) = "
+             "+1.44% contribution (nearly the whole move). Public basket MIXED, ~flat: TSLA +2.1% (420.60), SCHW +1.9%, GWRE +1.8%, HEI "
+             "+1.6% up, but FIG -5.2%, CSGP -3.4%, IT -2.4%, IDXX -1.8%, FDS -1.5% down. Per 6/29: expect RONB "
+             "(current weights) to track best; the high-TSLA NPORT snapshots overshoot on TSLA-up days (today TSLA "
+             "only +2.1%, so the bias is milder than 6/29). Watch FIG -5.2% (a suspected overweight/drift name)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
