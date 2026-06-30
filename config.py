@@ -375,6 +375,17 @@ class SpacexBaron:
                    "(fund overweight these vs stale snapshots), NOT leverage (6/17/6/18 matched L=1.0). L stays ~1.0."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-06-29",
+         "spacex_value_usd": 3.89026788e9 * (164.19 / 105.32),  # ~$6.065B
+         "per_share_old_split_adj": 105.32, "per_share_new": 164.19,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $164.19 on 2026-06-29 (+7.15% vs 6/26 $153.23, big rebound). Marks the DISCLOSED "
+                   "3/31 share count. BPTIX NAV 288.69 (+3.13%). AUM 17.4B->17.9B on the up day => ~flat flow "
+                   "(-$44M). BASKET DRIFT sharpened: on a SpaceX +7% AND TSLA +8.5% day every stale-NPORT basket "
+                   "OVERestimated (~289.6 vs 288.69) but RONB (current, lower-TSLA weights) nailed it (err -0.05) "
+                   "-> fund UNDERWEIGHT TSLA vs the snapshots (Baron 'less Tesla' trim). RONB now best live proxy."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

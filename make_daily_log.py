@@ -67,6 +67,26 @@ def _est(row, methods):
     return _median(navs), min(navs), max(navs)
 
 
+def _outcome_block(rev, methods, lbl, filled):
+    """An APPEND-ONLY addendum: once a day's actual NAV is known (next morning), append the
+    outcome below the frozen as-of estimate — the estimate content above is never touched."""
+    errs = rev.get("errors") or {}
+    best = rev.get("best_method")
+    lines = ["", "## Outcome — filled %s (append)" % filled, ""]
+    lines.append("- Actual **%.2f**. Per-basket error: %s." % (
+        rev["actual_nav"], ", ".join("%s %s%.2f" % (lbl[m], "+" if errs[m] >= 0 else "", errs[m])
+                                      for m in methods if m in errs)))
+    if best:
+        lines.append("- Best basket: **%s** (%s%.2f)." % (lbl[best], "+" if errs.get(best, 0) >= 0 else "", errs.get(best, 0)))
+    fb = rev.get("flow_b")
+    if fb is not None:
+        amt = ("$%.2fB" % abs(fb)) if abs(fb) >= 1 else ("$%dM" % round(abs(fb) * 1000))
+        lines.append("- Net flow: **%s%s** (%s)." % ("−" if fb < 0 else "+", amt, "net redemption" if fb < 0 else "net subscription"))
+    if rev.get("note"):
+        lines.append("- Completion note: %s" % rev["note"])
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def render(date, rev, aso, ms, commits, methods, lbl, compiled):
     wd = datetime.date.fromisoformat(date).strftime("%a")
     backfilled = rev.get("backfilled")
@@ -163,19 +183,28 @@ def main():
     commits = _commits_by_date()
     compiled = datetime.date.today().isoformat()
 
-    written, skipped = [], []
+    written, appended, skipped = [], [], []
     for date in sorted(rev_by):
         path = os.path.join(_OUT_DIR, date + ".md")
-        if os.path.exists(path):
-            skipped.append(date)
-            continue
         rev = rev_by[date]
+        if os.path.exists(path):
+            # append-only: if the file was estimate-only and the actual is now known, append
+            # the outcome below the frozen as-of estimate (never edits the existing content).
+            cur = open(path, encoding="utf-8").read()
+            if "## Outcome" not in cur and rev.get("actual_nav") is not None and rev.get("errors"):
+                with open(path, "a", encoding="utf-8") as f:
+                    f.write(_outcome_block(rev, methods, lbl, compiled))
+                appended.append(date)
+            else:
+                skipped.append(date)
+            continue
         aso = aso_by.get(date, rev)
         md = render(date, rev, aso, ms_by.get(date), commits.get(date, []), methods, lbl, compiled)
         with open(path, "w", encoding="utf-8") as f:
             f.write(md)
         written.append(date)
-    print("daily_log: wrote %d (%s), skipped %d existing" % (len(written), ", ".join(written) or "none", len(skipped)))
+    print("daily_log: wrote %d (%s); appended outcome to %d (%s); skipped %d" % (
+        len(written), ", ".join(written) or "none", len(appended), ", ".join(appended) or "none", len(skipped)))
 
 
 if __name__ == "__main__":
