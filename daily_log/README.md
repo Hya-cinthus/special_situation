@@ -14,6 +14,15 @@ narrative, and that day's commits are all there. This is the trace trail that pr
   never overwrite a frozen day). Run it after each daily update; it creates that day's file.
 - Earlier project history (pre-IPO dashboard build, 6/5–6/8 feature work) lives in git.
 
+## Analyses (one-off diagnostics, dated, filed here)
+
+Named `YYYY-MM-DD-analysis-<topic>.md` (distinct from the `YYYY-MM-DD.md` daily entries), append-only.
+
+- [2026-07-02 — drift diagnosis](2026-07-02-analysis-drift-diagnosis.md): why the daily estimate
+  misses. Firm conclusion — it's **public-basket composition drift (underweight TSLA + overweight
+  the mid-caps)**, NOT leverage and NOT the SpaceX weight (each ruled out by a specific day).
+  Reproduce with `py analyze_drift.py`.
+
 ## Daily-update checklist (what to touch each market day)
 
 The authoritative, detailed version is [`../DAILY_UPDATE_PROTOCOL.md`](../DAILY_UPDATE_PROTOCOL.md).
