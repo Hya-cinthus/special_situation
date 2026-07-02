@@ -397,6 +397,18 @@ class SpacexBaron:
                    "FIG -5.2%, dragged the public sleeve below our baskets today). L stays ~1.0."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-07-01",
+         "spacex_value_usd": 3.89026788e9 * (157.54 / 105.32),  # ~$5.819B
+         "per_share_old_split_adj": 105.32, "per_share_new": 157.54,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $157.54 on 2026-07-01 (-7.79% vs 6/30 $170.86, big drop). Marks the DISCLOSED 3/31 "
+                   "share count. BPTIX NAV 289.36 (-1.11%; split day, SPCX down vs public +2%). AUM 18.1B->17.8B "
+                   "=> ~$0.10B net outflow. DRIFT TEST CONFIRMED: actual came in ABOVE every basket (est ~288.2, "
+                   "+1.20) -> fund overweight the mid-cap winners (FDS/FIG/GWRE/KNSL) vs stale snapshots (implied "
+                   "public sleeve ~+2.7% vs our +2.0-2.3%). Also fits our SpaceX weight being a few % high. Both -> "
+                   "weights are stale; 6/30 NPORT (~Aug 27) settles it. L stays ~1.0."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

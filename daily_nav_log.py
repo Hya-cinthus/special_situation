@@ -251,19 +251,22 @@ ENTRIES = [
              "lags when the fund's mid-cap overweights fall; the through-line is still that the fund's true weights "
              "sit between our snapshots, settled by the 6/30 NPORT (~Aug 27, whose snapshot IS today). AUM 17.9B->"
              "18.1B vs NAV +1.35% => ~flat flow (-$42M; redemptions still stopped; cumulative ~$2.49B)."},
-    {"date": "2026-07-01", "spcx": 157.54, "actual_nav": None, "aum": None,
+    {"date": "2026-07-01", "spcx": 157.54, "actual_nav": 289.36, "aum": 17.8e9,
      "closes": {"ACGL": 98.55, "BIRK": 44.03, "CHH": 109.27, "CSGP": 29.36, "FDS": 245.55,
                 "FIG": 19.49, "GLPI": 43.69, "GWRE": 127.65, "H": 190.86, "HEI": 359.70,
                 "HEI-A": 261.65, "IDXX": 537.58, "IT": 133.76, "KNSL": 345.27, "MSCI": 582.03,
                 "MTN": 136.35, "ONON": 35.56, "RRR": 64.19, "SCHW": 95.78, "SHOP": 121.63,
                 "SPOT": 472.48, "TSLA": 425.30, "VRSK": 183.72},
-     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Est NAV ~288.2 (DOWN ~-1.5% vs 6/30's 292.60; range 287.9-"
-             "288.6, perfect-fit 288.4-289.3). SPLIT day, legs OPPOSE: SPCX -7.79% (170.86->157.54, big "
-             "SpaceX drop) = -2.84% contribution, AGAINST a strongly UP public basket (~+2%): FDS +6.7%, FIG +7.7%, "
-             "SHOP +6.5%, KNSL +4.7%, MSCI +3.9%, SCHW +3.8%, GWRE +3.7%; TSLA +1.1% (mild). GOOD DRIFT TEST: the "
-             "suspected overweight/drift names (FDS/FIG/GWRE/KNSL) are the ones ripping today, so if the fund IS "
-             "overweight them the actual public sleeve beats our snapshots -> actual NAV lands ABOVE our median "
-             "(estimate underestimates the public part). TSLA only +1.1% so the TSLA-underweight bias is small today."},
+     "note": "Actuals in: BPTIX NAV 289.36 (-1.11%; our estimate ~288.2, +1.20 — actual came in ABOVE EVERY basket), "
+             "AUM 17.8B. DRIFT TEST CONFIRMED: the fund fell LESS than predicted, exactly as called — the mid-cap "
+             "'drift' names (FDS/FIG/GWRE/KNSL) that ripped today are overweight vs our stale snapshots, so the "
+             "implied public sleeve did ~+2.7% vs our +2.0-2.3% baskets. Best fund_5/31 (-0.74); all underestimated; "
+             "RONB worst (-1.49, understated the winners most). CAVEAT — a 2nd reading fits equally: our SpaceX "
+             "weight (36.4%) may be a few % HIGH. On a SpaceX-DOWN day a lower true weight = less drag = higher NAV; "
+             "that also explains 6/29 (SpaceX UP -> we overshot -> actual below) and today (SpaceX DOWN -> actual "
+             "above). Both readings (mid-cap overweight + SpaceX-weight-slightly-high) say the SAME thing: our "
+             "weights are stale — settled by the 6/30 NPORT (~Aug 27). AUM 18.1B->17.8B vs NAV -1.11% => ~$0.10B "
+             "net outflow (modest; redemptions ticked back up; cumulative ~$2.59B)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
