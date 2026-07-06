@@ -281,6 +281,20 @@ ENTRIES = [
              "actual ABOVE the snapshots). Strongest confirmation yet: both drift legs aligned, no confounds. AUM "
              "17.8B->18.0B vs NAV +1.18% => ~flat flow (-$10M; redemptions ~stopped; cumulative ~$2.6B). Next full "
              "weights: the 6/30 NPORT (~Aug 27)."},
+    {"date": "2026-07-06", "spcx": 160.42, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 101.81, "BIRK": 46.16, "CHH": 107.67, "CSGP": 28.70, "FDS": 252.20,
+                "FIG": 21.08, "GLPI": 43.54, "GWRE": 137.59, "H": 193.48, "HEI": 365.31,
+                "HEI-A": 262.63, "IDXX": 564.98, "IT": 135.11, "KNSL": 347.23, "MSCI": 614.04,
+                "MTN": 142.12, "ONON": 36.87, "RRR": 65.04, "SCHW": 100.62, "SHOP": 120.14,
+                "SPOT": 483.01, "TSLA": 419.77, "VRSK": 187.79},
+     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Model median ~295.4 (+0.9% vs 7/2's 292.78; range 294.8-"
+             "296.0), but DRIFT-ADJUSTED best guess ~294.8-295.0 (below median, toward optimal; perfect-fit band "
+             "294.3-294.9 agrees). SPCX -0.98% (162.00->160.42, small). MIRROR OF 7/2: today "
+             "TSLA is the big mover the OTHER way — TSLA +6.7% (393.45->419.77) UP, mid-caps mixed/small (SCHW +3.7%, "
+             "GWRE +2.3%, MSCI +1.8% up; CHH -4.2%, CSGP -4.3%, KNSL -2.1% down). Per the drift diagnosis (fund "
+             "UNDERWEIGHT TSLA), on a TSLA-UP day our high-TSLA snapshots OVERestimate the fund -> actual should land "
+             "BELOW our median, with fund_3/31 (30% TSLA) overestimating MOST and RONB/optimal (low TSLA) closest. So "
+             "the model median will read high; DRIFT-ADJUSTED best guess leans to the RONB/optimal (low) end."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
