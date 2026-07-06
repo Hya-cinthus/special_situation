@@ -409,6 +409,17 @@ class SpacexBaron:
                    "weights are stale; 6/30 NPORT (~Aug 27) settles it. L stays ~1.0."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-07-02",
+         "spacex_value_usd": 3.89026788e9 * (162.00 / 105.32),  # ~$5.984B
+         "per_share_old_split_adj": 105.32, "per_share_new": 162.00,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $162.00 on 2026-07-02 (+2.83% vs 7/1 $157.54; 7/3 Independence-Day holiday). Marks "
+                   "the DISCLOSED 3/31 share count. BPTIX NAV 292.78 (+1.18%). AUM 17.8B->18.0B => ~flat flow "
+                   "(-$10M). DRIFT DIAGNOSIS CONFIRMED out-of-sample: clean test (TSLA -7.5% DOWN vs mid-caps "
+                   "ripping); actual came in ABOVE every basket, errors ordered EXACTLY by TSLA weight (fund_3/31 "
+                   "-1.71 worst, optimal -0.09 best) -> fund underweight TSLA + overweight mid-caps. L stays ~1.0."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

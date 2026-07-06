@@ -267,22 +267,20 @@ ENTRIES = [
              "above). Both readings (mid-cap overweight + SpaceX-weight-slightly-high) say the SAME thing: our "
              "weights are stale — settled by the 6/30 NPORT (~Aug 27). AUM 18.1B->17.8B vs NAV -1.11% => ~$0.10B "
              "net outflow (modest; redemptions ticked back up; cumulative ~$2.59B)."},
-    {"date": "2026-07-02", "spcx": 162.00, "actual_nav": None, "aum": None,
+    {"date": "2026-07-02", "spcx": 162.00, "actual_nav": 292.78, "aum": 18.0e9,
      "closes": {"ACGL": 102.20, "BIRK": 45.99, "CHH": 112.37, "CSGP": 30.00, "FDS": 250.09,
                 "FIG": 21.34, "GLPI": 43.95, "GWRE": 134.47, "H": 191.28, "HEI": 362.09,
                 "HEI-A": 261.70, "IDXX": 557.80, "IT": 136.32, "KNSL": 354.85, "MSCI": 603.11,
                 "MTN": 140.68, "ONON": 36.83, "RRR": 65.60, "SCHW": 97.00, "SHOP": 119.46,
                 "SPOT": 485.97, "TSLA": 393.45, "VRSK": 188.35},
-     "note": "Estimate only (next actual after the 7/3 Independence-Day holiday). Est NAV: model median ~291.9 (+0.9% "
-             "vs 7/1's 289.36; wide range 291.1-292.7 as the baskets weight TSLA very differently), but DRIFT-ADJUSTED "
-             "best guess ~292.4-292.7 (lean to RONB/optimal, the low-TSLA/high-mid baskets). SPCX +2.83% (157.54->"
-             "162.00) = +0.97% contribution. CLEANEST DRIFT TEST YET: within the public book TSLA and the mid-caps moved "
-             "OPPOSITE — TSLA -7.5% (425.30->393.45) DOWN, but the mid-caps RIPPED (FIG +9.5%, GWRE +5.3%, BIRK "
-             "+4.5%, IDXX +3.8%, ACGL +3.7%, MSCI +3.6%, SPOT +2.9%, KNSL +2.8%). Per the 7/2 drift diagnosis (fund "
-             "UNDERWEIGHT TSLA + OVERWEIGHT mid-caps), BOTH legs push the SAME way today: the fund should fall less "
-             "on TSLA AND gain more on the mid-caps than our stale snapshots -> actual should land ABOVE our median, "
-             "and the high-TSLA snapshots (fund 3/31) should underestimate MOST while RONB (low TSLA) is closest. A "
-             "strong out-of-sample check of the conclusion."},
+     "note": "Actuals in (after the 7/3 holiday): BPTIX NAV 292.78 (+1.18%; model median 291.94, +0.84 ABOVE — every "
+             "basket UNDERestimated), AUM 18.0B. DRIFT DIAGNOSIS CONFIRMED OUT-OF-SAMPLE: on this clean test (TSLA "
+             "-7.5% DOWN, mid-caps RIPPING) the errors ordered EXACTLY by TSLA weight — fund_3/31 (30% TSLA) "
+             "underestimated MOST (-1.71), the low-TSLA baskets were closest (optimal -0.09 BEST, RONB -0.34) — "
+             "precisely as the 7/2 diagnosis predicted (fund UNDERWEIGHT TSLA + OVERWEIGHT mid-caps -> both legs push "
+             "actual ABOVE the snapshots). Strongest confirmation yet: both drift legs aligned, no confounds. AUM "
+             "17.8B->18.0B vs NAV +1.18% => ~flat flow (-$10M; redemptions ~stopped; cumulative ~$2.6B). Next full "
+             "weights: the 6/30 NPORT (~Aug 27)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
