@@ -295,6 +295,21 @@ ENTRIES = [
              "ordering flips with TSLA's direction, exactly as the thesis requires. Best optimal (-0.24). AUM 18.0B->"
              "18.1B vs NAV +0.77% => ~flat flow (-$39M; redemptions ~minimal; cumulative ~$2.64B). 6/30 NPORT "
              "(~Aug 27) quantifies the true TSLA/mid-cap weights."},
+    {"date": "2026-07-07", "spcx": 149.47, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 102.85, "BIRK": 45.56, "CHH": 110.95, "CSGP": 29.87, "FDS": 258.30,
+                "FIG": 22.19, "GLPI": 44.07, "GWRE": 137.06, "H": 193.16, "HEI": 358.02,
+                "HEI-A": 257.57, "IDXX": 570.25, "IT": 140.80, "KNSL": 348.73, "MSCI": 608.09,
+                "MTN": 143.16, "ONON": 36.62, "RRR": 66.16, "SCHW": 101.93, "SHOP": 121.88,
+                "SPOT": 493.95, "TSLA": 402.90, "VRSK": 192.25},
+     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Model median ~287.9 (-2.4% vs 7/6's 295.04; range 287.5-"
+             "288.4), DRIFT-ADJUSTED best guess ~288.4 (toward optimal; the v1 mark basket values to 288.6 at "
+             "today's closes). SPCX -6.83% (160.42->149.47, big SpaceX drop) = -2.33% "
+             "contribution. Public MIXED, TSLA vs mid-caps again OPPOSE: TSLA -4.0% (419.77->402.90) DOWN, but the "
+             "mid-caps mostly UP (FIG +5.3%, IT +4.2%, CSGP +4.1%, FDS +2.4%, SPOT/VRSK +2.4%; HEI -2.0% down). Per "
+             "the drift (fund underweight TSLA + overweight mid-caps), on this TSLA-down/mid-up day BOTH push actual "
+             "ABOVE the snapshot median, with high-TSLA fund_3/31 underestimating most and RONB/optimal closest -> "
+             "DRIFT-ADJUSTED best guess leans to the high (RONB/optimal) end. Also a clean SpaceX-weight re-check "
+             "(big -6.8% SPCX move)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
