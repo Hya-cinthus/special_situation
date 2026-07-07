@@ -281,20 +281,20 @@ ENTRIES = [
              "actual ABOVE the snapshots). Strongest confirmation yet: both drift legs aligned, no confounds. AUM "
              "17.8B->18.0B vs NAV +1.18% => ~flat flow (-$10M; redemptions ~stopped; cumulative ~$2.6B). Next full "
              "weights: the 6/30 NPORT (~Aug 27)."},
-    {"date": "2026-07-06", "spcx": 160.42, "actual_nav": None, "aum": None,
+    {"date": "2026-07-06", "spcx": 160.42, "actual_nav": 295.04, "aum": 18.1e9,
      "closes": {"ACGL": 101.81, "BIRK": 46.16, "CHH": 107.67, "CSGP": 28.70, "FDS": 252.20,
                 "FIG": 21.08, "GLPI": 43.54, "GWRE": 137.59, "H": 193.48, "HEI": 365.31,
                 "HEI-A": 262.63, "IDXX": 564.98, "IT": 135.11, "KNSL": 347.23, "MSCI": 614.04,
                 "MTN": 142.12, "ONON": 36.87, "RRR": 65.04, "SCHW": 100.62, "SHOP": 120.14,
                 "SPOT": 483.01, "TSLA": 419.77, "VRSK": 187.79},
-     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Model median ~295.4 (+0.9% vs 7/2's 292.78; range 294.8-"
-             "296.0), but DRIFT-ADJUSTED best guess ~294.8-295.0 (below median, toward optimal; perfect-fit band "
-             "294.3-294.9 agrees). SPCX -0.98% (162.00->160.42, small). MIRROR OF 7/2: today "
-             "TSLA is the big mover the OTHER way — TSLA +6.7% (393.45->419.77) UP, mid-caps mixed/small (SCHW +3.7%, "
-             "GWRE +2.3%, MSCI +1.8% up; CHH -4.2%, CSGP -4.3%, KNSL -2.1% down). Per the drift diagnosis (fund "
-             "UNDERWEIGHT TSLA), on a TSLA-UP day our high-TSLA snapshots OVERestimate the fund -> actual should land "
-             "BELOW our median, with fund_3/31 (30% TSLA) overestimating MOST and RONB/optimal (low TSLA) closest. So "
-             "the model median will read high; DRIFT-ADJUSTED best guess leans to the RONB/optimal (low) end."},
+     "note": "Actuals in: BPTIX NAV 295.04 (+0.77%; model median 295.39, -0.35 BELOW — as the drift-adjusted guess "
+             "called), AUM 18.1B. MIRROR OF 7/2 CONFIRMED: on this TSLA-UP day (+6.7%) the high-TSLA baskets "
+             "OVERestimated most (fund_3/31 +0.97) and the low-TSLA were closest (optimal -0.24 BEST, fund_5/31 "
+             "+0.25) — the EXACT OPPOSITE ordering of 7/2 (TSLA down, high-TSLA underestimated most). So the "
+             "UNDERWEIGHT-TSLA drift is now confirmed on BOTH a TSLA-down (7/2) AND a TSLA-up (7/6) day: the error "
+             "ordering flips with TSLA's direction, exactly as the thesis requires. Best optimal (-0.24). AUM 18.0B->"
+             "18.1B vs NAV +0.77% => ~flat flow (-$39M; redemptions ~minimal; cumulative ~$2.64B). 6/30 NPORT "
+             "(~Aug 27) quantifies the true TSLA/mid-cap weights."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

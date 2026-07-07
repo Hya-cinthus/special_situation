@@ -420,6 +420,17 @@ class SpacexBaron:
                    "-1.71 worst, optimal -0.09 best) -> fund underweight TSLA + overweight mid-caps. L stays ~1.0."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-07-06",
+         "spacex_value_usd": 3.89026788e9 * (160.42 / 105.32),  # ~$5.925B
+         "per_share_old_split_adj": 105.32, "per_share_new": 160.42,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $160.42 on 2026-07-06 (-0.98% vs 7/2 $162.00). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 295.04 (+0.77%). AUM 18.0B->18.1B => ~flat flow (-$39M). MIRROR OF 7/2: on this "
+                   "TSLA-UP day (+6.7%) actual came in BELOW median (295.39, -0.35); high-TSLA baskets overestimated "
+                   "most (fund_3/31 +0.97), low-TSLA closest (optimal -0.24) - opposite of 7/2. Underweight-TSLA "
+                   "drift now confirmed on BOTH a TSLA-down and TSLA-up day. L stays ~1.0."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
