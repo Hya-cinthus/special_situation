@@ -22,6 +22,10 @@ Named `YYYY-MM-DD-analysis-<topic>.md` (distinct from the `YYYY-MM-DD.md` daily 
   misses. Firm conclusion — it's **public-basket composition drift (underweight TSLA + overweight
   the mid-caps)**, NOT leverage and NOT the SpaceX weight (each ruled out by a specific day).
   Reproduce with `py analyze_drift.py`.
+- [2026-07-07 — position-mark basket v1](2026-07-07-basket-mark-v1.md): the current best fixed basket
+  for marking BPTIX P&L (0.60 SPCX + 23 public stocks + ~$0 cash, priced 7/6). SEC-disclosed names,
+  freshest weights, one validated tilt (TSLA 24.7%→22%), no overfit. CSV:
+  `situations/spacex_baron/data/position_mark_basket_2026-07-06.csv`. Rebuild as v2 at the 6/30 NPORT (~Aug 27).
 
 ## Daily-update checklist (what to touch each market day)
 
