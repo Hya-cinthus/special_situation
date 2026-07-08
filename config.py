@@ -431,6 +431,18 @@ class SpacexBaron:
                    "drift now confirmed on BOTH a TSLA-down and TSLA-up day. L stays ~1.0."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-07-07",
+         "spacex_value_usd": 3.89026788e9 * (149.47 / 105.32),  # ~$5.521B
+         "per_share_old_split_adj": 105.32, "per_share_new": 149.47,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $149.47 on 2026-07-07 (-6.83% vs 7/6 $160.42, big drop). Marks the DISCLOSED 3/31 "
+                   "share count. BPTIX NAV 288.70 (-2.15%). AUM 18.1B->17.7B => ~flat flow (-$11M). DRIFT confirmed "
+                   "again (TSLA-down/mid-up): actual +0.85 above median; errors ordered by TSLA weight. The v1 mark "
+                   "basket valued 7/7 to 288.64 vs actual 288.70 (proxy error -0.06). Since the basket has the SAME "
+                   "SpaceX (~34%) but low TSLA and nailed it, the miss is TSLA not SpaceX - SpaceX weight "
+                   "re-confirmed on this big -6.8% SPCX move. L stays ~1.0."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
