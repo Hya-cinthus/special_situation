@@ -309,6 +309,20 @@ ENTRIES = [
              "the snapshots but TSLA trimmed to 22%, and it nailed the NAV while the high-TSLA snapshots missed +0.84 "
              "-> the entire miss is the TSLA overweight, NOT SpaceX (re-confirmed on this big -6.8% SPCX day). AUM "
              "18.1B->17.7B vs NAV -2.15% => ~flat flow (-$11M; redemptions ~stopped; cumulative ~$2.65B)."},
+    {"date": "2026-07-08", "spcx": 148.30, "actual_nav": None, "aum": None,
+     "closes": {"ACGL": 102.01, "BIRK": 44.24, "CHH": 106.39, "CSGP": 29.34, "FDS": 247.82,
+                "FIG": 21.67, "GLPI": 42.91, "GWRE": 135.74, "H": 187.40, "HEI": 347.78,
+                "HEI-A": 251.03, "IDXX": 555.67, "IT": 134.68, "KNSL": 345.96, "MSCI": 604.23,
+                "MTN": 143.63, "ONON": 36.38, "RRR": 63.32, "SCHW": 101.70, "SHOP": 119.22,
+                "SPOT": 485.22, "TSLA": 394.06, "VRSK": 189.67},
+     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Est NAV ~284.0 (-1.6% vs 7/7's 288.70; VERY tight range "
+             "283.9-284.1 — confirms the drift-cancel reasoning below; v1 mark basket marks to 283.87). BROAD DOWN "
+             "day. SPCX -0.78% (149.47->148.30, small) = "
+             "~-0.27% contribution. Public basket broadly DOWN ~-2%: TSLA -2.2% (402.90->394.06) AND the mid-caps "
+             "also down (IT -4.3%, RRR -4.3%, FDS -4.1%, CHH -4.1%, H -3.0%, HEI/BIRK -2.9%, IDXX -2.6%). NOTE: "
+             "today the drift signals CONFLICT — underweight-TSLA HELPS (TSLA down) but overweight-mid-caps HURTS "
+             "(mid-caps down), so they ~cancel -> expect the estimate to sit NEAR the snapshot median (little "
+             "drift-adjustment needed), and the per-basket spread to be tight."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
