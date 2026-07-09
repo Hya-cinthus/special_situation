@@ -50,23 +50,25 @@ FRIDAY_SPACEX_BUY = 0.262e9
 # (BEFORE that day's redemptions, which are forward-priced at the close and don't
 # touch the day's return). Public sleeve weight of net = LEVERAGE - w_spx; the
 # remainder (1 - LEVERAGE) is net cash earning ~0.
-# SCHEDULE (not a constant, and time-VARYING): 3 regimes.
-#   <=6/15  : 0.968 — the 5/31-disclosed ~3.2% net-cash buffer (~$0.65B).
-#   6/16-6/25: 1.00 — the first redemption (6/15 ~$0.94B) exhausted the buffer; 6/17
-#             independently confirmed L=1.0 (actual matched 1.0, not 0.968).
-#   >=6/26  : 1.06 — the fund RE-LEVERED back toward its ~1.13 mandate once redemptions
-#             slowed. Nailed two independent ways: (a) the 6/30 website disclosure
-#             (SpaceX 32.9% of GROSS vs ~34.9% of NET => gross/net ~1.06), and (b) an
-#             OLS of actual NAV returns on [SpaceX ret, 6/30-basket ret] over the last
-#             ~10 days => SpaceX wt 0.335 + public 0.733 = L 1.068, residual sd 0.10%.
-# Leverage is a SINGLE fund-level number (gross/net) applied to EVERY basket weighting
-# on a given day — the weighting is the public split, leverage is the scale.
-def LEVERAGE_FOR(date):
+# Leverage is a SINGLE fund-level number (gross/net) applied to EVERY basket weighting on a
+# given day. It is TIME-VARYING, and the STABLE quantity is the BORROWINGS $ (the debt), not L:
+# a redemption met by SELLING holdings drops gross and net by the same $, so borrowings are
+# unchanged and L = 1 + Borrowings/Net DRIFTS UP as redemptions shrink net.
+#   <=6/15   : 0.968 — the 5/31-disclosed ~3.2% net-cash buffer (~$0.65B).
+#   6/16-6/25: 1.00  — the first redemption (6/15 ~$0.94B) exhausted the buffer (6/17 confirmed).
+#   >=6/26   : 1 + BORROWINGS/net — the fund RE-LEVERED (drew ~$1.15B debt) back toward its
+#             ~1.13 mandate. BORROWINGS pinned two ways that agree: (a) 6/30 gross-net =
+#             SpaceX$/0.329 - net ~$1.08B; (b) an OLS of NAV returns on [SPCX ret, 6/30-basket
+#             ret] => L 1.068 over recent net ~$17.8B => ~$1.2B. Central ~$1.15B (band $1.0-1.4B).
+BORROWINGS_USD = 1.15e9
+def LEVERAGE_FOR(date, net_aum=None):
     if date <= "2026-06-15":
         return 0.968
     if date <= "2026-06-25":
         return 1.00
-    return 1.06
+    if net_aum:
+        return 1.0 + BORROWINGS_USD / net_aum   # drifts up as redemptions shrink net
+    return 1.06                                  # fallback if net unknown
 
 # Append-only AS-OF (vintage) log: each day's estimate frozen as first reported, so
 # revising an assumption (Friday buy, leverage, ...) never erases what we estimated
@@ -422,7 +424,7 @@ def _build_rows(WS, H, methods, ens_tk, ens_fits, apply_buy=True):
         buy = (e.get("spacex_buy_usd", 0.0) or 0.0) if apply_buy else 0.0
         spx_ret = e["spcx"] / prev["spcx"] - 1
         w_spx = prev["spx_value"] / prev["aum"]
-        lev = LEVERAGE_FOR(e["date"])      # 0.968 (cash buffer) <= 6/15, else 1.00
+        lev = LEVERAGE_FOR(e["date"], prev["aum"])   # start-of-day net; >=6/26 = 1 + borrowings/net
         preds = {}
         for m in methods:
             W = WS[m]

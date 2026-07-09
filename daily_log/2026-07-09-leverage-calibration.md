@@ -61,3 +61,28 @@ share, anchored 7/8, NAV $283.37):
 **Use v2.1 for marking.** Caveats: L is ~1.06 ± a touch (band ~1.05–1.10 depending on the exact
 SpaceX share count / net-AUM figure); the 6/30 **NPORT-P (~Aug 27, net + total assets)** gives the
 exact leverage. If it lands materially different, that's a v2.2 re-anchor.
+
+## Addendum — leverage drifts DAILY with redemptions (model it via borrowings)
+
+The user's point: L was read off a single AUM snapshot, but redemptions change AUM daily, so daily L
+differs. Right — and the clean way is to estimate the STABLE quantity and derive L each day:
+
+- A redemption met by **selling holdings** drops gross AND net by the same $, so **borrowings (the
+  $ debt) are unchanged** — it's L that moves: `L_t = 1 + Borrowings / Net_t`. As redemptions shrink
+  Net, L drifts UP.
+- **Borrowings ≈ $1.15B** (6/30 gross−net ≈ $1.08B; the return-scale regression ≈ $1.2B — they agree).
+- So the daily leverage is small-drifting, NOT swinging:
+
+| Net (AUM) | $18.1B | $17.7B | $17.3B | ($15B) | ($12B) |
+|---|---|---|---|---|---|
+| **L = 1 + 1.15/Net** | 1.064 | 1.065 | 1.067 | 1.077 | 1.096 |
+
+Across the actual recent range (18.1→17.3B) L moved only **±0.001**. Even a further big drawdown to
+$15B only lifts L to ~1.08. **So we can be confident: L ≈ 1.06–1.07 now**, edging up slowly as the
+fund shrinks — the redemption-driven daily variation is negligible for marking.
+
+Implemented: `LEVERAGE_FOR(date, net_aum)` now returns `1 + BORROWINGS_USD/net_aum` (BORROWINGS_USD
+= $1.15B) for dates ≥ 6/26, using each day's start-of-day net — so the model's leverage auto-drifts
+with AUM. **The real thing to watch is not the redemption drift but whether the fund keeps drawing
+MORE debt** (borrowings rising toward ~$2.3B = the 1.13 mandate) — that would show as L trending up
+independent of AUM; so far borrowings look stable ~$1.15B. The NPORT (~Aug 27) confirms the exact $.
