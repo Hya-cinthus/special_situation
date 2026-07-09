@@ -474,6 +474,9 @@ def _build_rows(WS, H, methods, ens_tk, ens_fits, apply_buy=True):
                      "spacex_buy_usd": (buy or None), "backfilled": e["date"] in BACKFILL_DATES,
                      "bptix_shares_out_m": round(bptix_shares_out / 1e6, 2) if bptix_shares_out else None,
                      "aum_used_b": round(aum_end / 1e9, 2), "flow_b": flow_b,
+                     # borrowings ($B) = (leverage - 1) x net assets. The STABLE quantity; leverage
+                     # drifts because net shrinks with redemptions while borrowings stay ~constant.
+                     "borrowings_b": round((lev - 1) * aum_end / 1e9, 3),
                      # SpaceX-side NAV contribution = w_spx x SPCX return. IDENTICAL for every
                      # basket method -> the per-method NAV spread is purely the PUBLIC basket.
                      "spx_contrib_pct": round(w_spx * spx_ret * 100, 3),
@@ -486,6 +489,46 @@ def _build_rows(WS, H, methods, ens_tk, ens_fits, apply_buy=True):
         aum = float(e["aum"]) if e.get("aum") else prev["aum"] * (base_nav / prev["nav"])
         prev = {"nav": base_nav, "spcx": e["spcx"], "aum": aum, "spx_value": spx_value, "closes": e["closes"]}
     return rows
+
+
+SPX_SHARES_DISCLOSED = 3.89026788e9 / 105.32   # 3/31 NPORT SpaceX share count (~36.94M, split-adj)
+
+
+def _lookthrough(rows, w6):
+    """Current best per-BPTIX-share LOOK-THROUGH: what 1 BPTIX share owns = shares of each holding
+    + a borrowing line. The SLOW layer (holdings weights) updates only at a disclosure (6/30, then
+    ~9/30); the FAST layer (per-BPTIX share counts, leverage, borrow) drifts DAILY off AUM/NAV. Uses
+    the freshest disclosed weights (6/30) for the public split, the disclosed SpaceX count, and the
+    borrowings-leverage. Mark 1 BPTIX share = sum(sh_i x price_i) - borrow_per_bptix."""
+    r = rows[-1]
+    if r.get("actual_nav"):
+        nav = r["actual_nav"]
+    else:
+        pn = sorted(p["pred_nav"] for p in r["preds"].values())
+        nav = pn[len(pn) // 2]
+    N = (r.get("bptix_shares_out_m") or 0) * 1e6
+    L = r.get("leverage") or 1.0
+    aum = (r.get("aum_used_b") or 0) * 1e9
+    prices = ENTRIES[-1]["closes"]
+    spx_sh = (SPX_SHARES_DISCLOSED / N) if N else 0.0
+    spx_val = spx_sh * r["spcx"]
+    pub_val = L * nav - spx_val
+    borrow_pb = (L - 1) * nav
+    holdings = [{"ticker": "SpaceX (SPCX)", "sh_per_bptix": round(spx_sh, 4), "price": r["spcx"],
+                 "pct_nav": round(spx_val / nav * 100, 2)}]
+    for t, w in sorted(w6.items(), key=lambda x: -x[1]):
+        px = prices.get(t)
+        if not px or not w:
+            continue
+        val = w * pub_val
+        holdings.append({"ticker": t, "sh_per_bptix": round(val / px, 6), "price": px,
+                         "pct_nav": round(val / nav * 100, 2)})
+    holdings.append({"ticker": "Cash (borrow)", "sh_per_bptix": None, "price": None,
+                     "usd_per_bptix": round(-borrow_pb, 2), "pct_nav": round(-borrow_pb / nav * 100, 2)})
+    return {"date": r["date"], "is_estimate": r.get("actual_nav") is None, "nav": round(nav, 2),
+            "aum_b": round(aum / 1e9, 2), "bptix_shares_out_m": round(N / 1e6, 2), "leverage": round(L, 4),
+            "borrowings_b": round((L - 1) * aum / 1e9, 3), "borrow_per_bptix": round(borrow_pb, 2),
+            "position_shares": 130000, "holdings": holdings}
 
 
 def build_payload():
@@ -503,12 +546,13 @@ def build_payload():
     compositions = {m: sorted([{"ticker": t, "weight_pct": round(w * 100, 2)}
                                for t, w in WS[m].items() if w], key=lambda x: -x["weight_pct"])
                     for m in methods}
+    lookthrough = _lookthrough(rows, WS.get("fund_6_30", {}))
     return {
         "meta": {
             "title": "Daily BPTIX NAV estimate — per basket-weighting vs actual",
             "method_labels": METHOD_LABELS, "methods": methods, "base": BASE,
             "window_start": BASE["date"], "backfill_dates": sorted(BACKFILL_DATES),
-            "compositions": compositions,
+            "compositions": compositions, "lookthrough": lookthrough,
             # latest day's public closes -> lets the composition panel convert a basket's
             # weights into shares / shares-per-BPTIX / $ / total-share allocations.
             "ref_closes": {"date": ENTRIES[-1]["date"], "closes": ENTRIES[-1]["closes"]},

@@ -147,8 +147,69 @@ function renderDailyLog(d) {
   }
   drawDailyLogTable();
   drawBasketDrift();
+  drawLookthrough();
   const src = document.getElementById("dailylog-src");
   if (src) src.innerHTML = "<span class='dim'>Cells = predicted BPTIX NAV under each weighting (green = closest to actual; small number = error vs actual). " + d.meta.disclaimer + "</span>";
+}
+
+/* ---- Fund look-through per BPTIX share = the mark basket (current best): shares of each
+ * underlier + a borrowing line, from the 6/30 weights (slow layer) x daily AUM/NAV/leverage
+ * (fast layer). Plus the daily state (leverage/borrowings/AUM/redemption) history. ---- */
+function drawLookthrough() {
+  const d = DAILYLOG_DATA, lt = d && d.meta && d.meta.lookthrough;
+  const card = document.getElementById("lookthrough-table");
+  if (!lt || !card) return;
+  const POS = lt.position_shares || 130000;
+  const note = document.getElementById("lookthrough-note");
+  if (note) note.innerHTML =
+    "What ONE BPTIX share owns, look-through: shares of each underlier + a borrowing line. TWO layers — the " +
+    "<b>holdings weights</b> update only at a disclosure (now 6/30, next ~9/30), while the <b>per-BPTIX share counts, " +
+    "leverage &amp; borrowing</b> drift DAILY off AUM/NAV (redemptions shrink the fund, so leverage edges up). Mark = " +
+    "Σ(shares × live price) − borrow; × " + POS.toLocaleString() + " for the position. Highest-confidence single basket " +
+    "(6/30 weights + borrowings-leverage) — the mark object, separate from the multi-basket experiment below.";
+  const kp = document.getElementById("lookthrough-kpis");
+  if (kp) {
+    const kpi = (label, val, sub) =>
+      `<div style="flex:1 1 130px;min-width:120px;background:var(--panel-2);border:1px solid ${GRID};border-radius:8px;padding:8px 12px">` +
+      `<div style="font-size:.72rem;color:${MUTED}">${label}</div><div style="font-size:1.15rem;color:${TEXT};font-weight:700">${val}</div>` +
+      `<div style="font-size:.7rem;color:${MUTED}">${sub}</div></div>`;
+    kp.innerHTML = `<div style="display:flex;gap:10px;flex-wrap:wrap">` +
+      kpi("NAV", "$" + lt.nav.toFixed(2), (lt.is_estimate ? "est. " : "") + lt.date) +
+      kpi("AUM", "$" + lt.aum_b.toFixed(1) + "B", lt.bptix_shares_out_m.toFixed(1) + "M shares") +
+      kpi("Leverage", lt.leverage.toFixed(3), "gross / net") +
+      kpi("Borrowings", "$" + lt.borrowings_b.toFixed(2) + "B", "$" + lt.borrow_per_bptix.toFixed(2) + " / BPTIX sh") + `</div>`;
+  }
+  const body = lt.holdings.map((h) => {
+    const isBorrow = h.ticker.indexOf("Cash") === 0, isSpx = h.ticker.indexOf("SpaceX") === 0;
+    const sh = h.sh_per_bptix != null ? h.sh_per_bptix.toFixed(h.sh_per_bptix >= 0.1 ? 4 : 6)
+      : (h.usd_per_bptix != null ? (h.usd_per_bptix < 0 ? "−$" : "$") + Math.abs(h.usd_per_bptix).toFixed(2) : "—");
+    const sh130 = h.sh_per_bptix != null ? Math.round(h.sh_per_bptix * POS).toLocaleString()
+      : (h.usd_per_bptix != null ? (h.usd_per_bptix < 0 ? "−$" : "$") + Math.abs(Math.round(h.usd_per_bptix * POS)).toLocaleString() : "0");
+    const col = isSpx ? SPX : isBorrow ? (h.pct_nav < 0 ? BAD : GOOD) : TEXT;
+    return `<tr><td style="color:${col};font-weight:${isSpx || isBorrow ? 700 : 400}">${h.ticker}</td><td>${sh}</td>` +
+      `<td>${sh130}</td><td>${h.price != null ? "$" + h.price : "—"}</td><td>${h.pct_nav.toFixed(2)}%</td></tr>`;
+  }).join("");
+  card.innerHTML = `<div style="font-size:.85rem;color:${TEXT};margin-bottom:6px"><b>Look-through</b> — per BPTIX share, as of ${lt.date}${lt.is_estimate ? " (est.)" : ""}</div>` +
+    `<table class="data"><tr><th>holding</th><th>sh / BPTIX</th><th>× ${POS / 1000}k</th><th>price</th><th>% NAV</th></tr><tbody>${body}</tbody></table>`;
+  const hist = document.getElementById("lookthrough-history");
+  if (hist) {
+    const hr = (d.rows || []).filter((r) => r.aum_used_b != null).slice(-12);
+    const hb = hr.slice().reverse().map((r) => {
+      const fb = r.flow_b;
+      const flow = fb == null ? "—" : (fb < 0 ? "−" : "+") + (Math.abs(fb) >= 1 ? "$" + Math.abs(fb).toFixed(2) + "B" : "$" + Math.round(Math.abs(fb) * 1000) + "M");
+      const fc = fb == null || Math.abs(fb) < 0.01 ? MUTED : fb < 0 ? WARN : GOOD;
+      return `<tr><td><b>${r.date}</b></td><td>${r.leverage != null ? r.leverage.toFixed(3) : "—"}</td>` +
+        `<td>${r.borrowings_b != null ? "$" + r.borrowings_b.toFixed(2) + "B" : "—"}</td><td>$${r.aum_used_b.toFixed(1)}B</td>` +
+        `<td style="color:${fc}">${flow}</td><td style="color:${SPX}">${r.spx_shares_per_bptix != null ? r.spx_shares_per_bptix.toFixed(3) : "—"}</td></tr>`;
+    }).join("");
+    hist.innerHTML = `<div style="font-size:.85rem;color:${TEXT};margin-bottom:6px"><b>Daily state</b> — leverage · borrowings · AUM · net flow · SpaceX/BPTIX</div>` +
+      `<table class="data"><tr><th>date</th><th>lev</th><th>borrow</th><th>AUM</th><th>net flow</th><th>SpX/sh</th></tr><tbody>${hb}</tbody></table>`;
+  }
+  const src = document.getElementById("lookthrough-src");
+  if (src) src.innerHTML =
+    `<span class="dim">Borrowings ≈ (leverage−1)×AUM ~$1.15B and ~constant; leverage = 1 + borrowings/net drifts UP as ` +
+    `redemptions shrink net. SpaceX shares/BPTIX = disclosed 3/31 count ÷ BPTIX shares out (rises as the fund shrinks). ` +
+    `Holdings weights are the 6/30 disclosure — next update is the ~9/30 book. Estimate, not the fund's record.</span>`;
 }
 /* SpaceX shares behind one BPTIX share = fund SpaceX shares / BPTIX shares out
  * (shares × NAV / AUM, end-of-day so a big SPCX move doesn't distort it).
