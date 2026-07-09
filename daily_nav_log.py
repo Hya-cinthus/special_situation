@@ -50,13 +50,23 @@ FRIDAY_SPACEX_BUY = 0.262e9
 # (BEFORE that day's redemptions, which are forward-priced at the close and don't
 # touch the day's return). Public sleeve weight of net = LEVERAGE - w_spx; the
 # remainder (1 - LEVERAGE) is net cash earning ~0.
-# SCHEDULE (not a constant): the 5/31-disclosed leverage was 0.968 (a ~3.2% net-cash
-# buffer, ~$0.65B). The FIRST big redemption (6/15's ~$0.94B) exceeded that buffer, so
-# cash was exhausted during 6/15 and leverage stepped to ~1.0 from 6/16 on. The 6/17
-# big-basket day independently CONFIRMED ~1.0 (actual NAV matched L=1.0, not 0.968).
-# So leverage entering 6/15 = 0.968 (buffer present); 6/16 onward = 1.00 (buffer gone).
+# SCHEDULE (not a constant, and time-VARYING): 3 regimes.
+#   <=6/15  : 0.968 — the 5/31-disclosed ~3.2% net-cash buffer (~$0.65B).
+#   6/16-6/25: 1.00 — the first redemption (6/15 ~$0.94B) exhausted the buffer; 6/17
+#             independently confirmed L=1.0 (actual matched 1.0, not 0.968).
+#   >=6/26  : 1.06 — the fund RE-LEVERED back toward its ~1.13 mandate once redemptions
+#             slowed. Nailed two independent ways: (a) the 6/30 website disclosure
+#             (SpaceX 32.9% of GROSS vs ~34.9% of NET => gross/net ~1.06), and (b) an
+#             OLS of actual NAV returns on [SpaceX ret, 6/30-basket ret] over the last
+#             ~10 days => SpaceX wt 0.335 + public 0.733 = L 1.068, residual sd 0.10%.
+# Leverage is a SINGLE fund-level number (gross/net) applied to EVERY basket weighting
+# on a given day — the weighting is the public split, leverage is the scale.
 def LEVERAGE_FOR(date):
-    return 0.968 if date <= "2026-06-15" else 1.00
+    if date <= "2026-06-15":
+        return 0.968
+    if date <= "2026-06-25":
+        return 1.00
+    return 1.06
 
 # Append-only AS-OF (vintage) log: each day's estimate frozen as first reported, so
 # revising an assumption (Friday buy, leverage, ...) never erases what we estimated
@@ -503,7 +513,7 @@ def build_payload():
             # 6/5 base closes + base leverage -> the composition "difference" view sizes a
             # held-fixed (never-adjusted-since-6/5) basket and compares it to today's target.
             "base_closes": _base_closes(H), "base_leverage": LEVERAGE_FOR(BASE["date"]),
-            "friday_spacex_buy_usd": FRIDAY_SPACEX_BUY, "leverage_schedule": "0.968 (cash buffer) thru 6/15, 1.00 after",
+            "friday_spacex_buy_usd": FRIDAY_SPACEX_BUY, "leverage_schedule": "0.968 thru 6/15, 1.00 (6/16-6/25), 1.06 from 6/26 (re-levered; 6/30 disclosure + regression)",
             "note": ("Each day's predicted BPTIX NAV under every basket weighting we've tested, vs the actual — now "
                      "walked back through the IPO week (6/8 onward). NAV_t = NAV_{t-1} x (1 + w_spx x SPCX_return + "
                      "(LEVERAGE - w_spx) x basket_return); SpaceX marked to live SPCX once public, held flat at the "

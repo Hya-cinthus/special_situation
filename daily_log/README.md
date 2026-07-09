@@ -29,8 +29,12 @@ Named `YYYY-MM-DD-analysis-<topic>.md` (distinct from the `YYYY-MM-DD.md` daily 
   L~1.0. WRONG/over-read: "overweight mid-caps" (really just the TSLA trim, redeployed into new names AMZN/
   GOOG/LLY/MRNA/MORN we couldn't see). SEC 6/30 NPORT-P still pending (~Aug 27).
 - [2026-07-09 — position-mark basket v2](2026-07-09-basket-mark-v2.md): rebuilt from the ACTUAL 6/30 weights
-  (all 29 names incl the 6 new ones), priced 7/8. CSV: `situations/spacex_baron/data/position_mark_basket_v2_2026-07-08.csv`.
-  Also added `fund_6_30` as a daily NAV-log weighting (freshest disclosed; beats fund_5_31 on most days).
+  (all 29 names incl the 6 new ones), priced 7/8. Also added `fund_6_30` as a daily NAV-log weighting.
+- [2026-07-09 — leverage calibration](2026-07-09-leverage-calibration.md): solved leverage empirically —
+  OLS of NAV returns on [SPCX ret, 6/30-basket ret] gives **L ≈ 1.06–1.07** (resid 0.10%) + SpaceX wt ~0.335,
+  matching the 6/30 structural estimate. Fund re-levered from ~1.0 to ~1.07 in late June. Updated LEVERAGE_FOR
+  (0.968 / 1.00 / **1.06 from 6/26**) and rebuilt the basket as **v2.1 at L=1.06** (public +8.7% + a −$17/BPTIX
+  borrow line): `situations/spacex_baron/data/position_mark_basket_v2_1_2026-07-08.csv` — **use this for marking.**
 
 ## Daily-update checklist (what to touch each market day)
 
