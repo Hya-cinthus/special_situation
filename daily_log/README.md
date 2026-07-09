@@ -34,7 +34,12 @@ Named `YYYY-MM-DD-analysis-<topic>.md` (distinct from the `YYYY-MM-DD.md` daily 
   OLS of NAV returns on [SPCX ret, 6/30-basket ret] gives **L ≈ 1.06–1.07** (resid 0.10%) + SpaceX wt ~0.335,
   matching the 6/30 structural estimate. Fund re-levered from ~1.0 to ~1.07 in late June. Updated LEVERAGE_FOR
   (0.968 / 1.00 / **1.06 from 6/26**) and rebuilt the basket as **v2.1 at L=1.06** (public +8.7% + a −$17/BPTIX
-  borrow line): `situations/spacex_baron/data/position_mark_basket_v2_1_2026-07-08.csv` — **use this for marking.**
+  borrow line) — later refined to the daily-drifting borrowings model (L = 1 + $1.15B/net).
+- [2026-07-09 — look-through design + error attribution](2026-07-09-lookthrough-and-error-attribution.md):
+  records the per-BPTIX look-through mark card, and decomposes our OLD errors with the corrected model —
+  **SpaceX accurate (~0)**, TSLA-weight 0.09% + leverage 0.07% (both now fixed), residual 0.12% (public mid-cap
+  intra-quarter drift). Corrected-model typical error ~0.1% of NAV. Latest mark basket:
+  `situations/spacex_baron/data/position_mark_basket_v2_2_2026-07-08.csv`.
 
 ## Daily-update checklist (what to touch each market day)
 
