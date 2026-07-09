@@ -22,10 +22,15 @@ Named `YYYY-MM-DD-analysis-<topic>.md` (distinct from the `YYYY-MM-DD.md` daily 
   misses. Firm conclusion — it's **public-basket composition drift (underweight TSLA + overweight
   the mid-caps)**, NOT leverage and NOT the SpaceX weight (each ruled out by a specific day).
   Reproduce with `py analyze_drift.py`.
-- [2026-07-07 — position-mark basket v1](2026-07-07-basket-mark-v1.md): the current best fixed basket
-  for marking BPTIX P&L (0.60 SPCX + 23 public stocks + ~$0 cash, priced 7/6). SEC-disclosed names,
-  freshest weights, one validated tilt (TSLA 24.7%→22%), no overfit. CSV:
-  `situations/spacex_baron/data/position_mark_basket_2026-07-06.csv`. Rebuild as v2 at the 6/30 NPORT (~Aug 27).
+- [2026-07-07 — position-mark basket v1](2026-07-07-basket-mark-v1.md): first fixed basket for marking
+  BPTIX P&L (0.60 SPCX + 23 public stocks + ~$0 cash, priced 7/6; TSLA guessed at 22%). **Superseded by v2.**
+- [2026-07-09 — verification vs the 6/30 holdings](2026-07-09-verification-6-30-holdings.md): our theory
+  checked against Baron's actual 6/30 book. RIGHT: SpaceX ~33%, underweight-TSLA (nearly exact 21% vs our 22%),
+  L~1.0. WRONG/over-read: "overweight mid-caps" (really just the TSLA trim, redeployed into new names AMZN/
+  GOOG/LLY/MRNA/MORN we couldn't see). SEC 6/30 NPORT-P still pending (~Aug 27).
+- [2026-07-09 — position-mark basket v2](2026-07-09-basket-mark-v2.md): rebuilt from the ACTUAL 6/30 weights
+  (all 29 names incl the 6 new ones), priced 7/8. CSV: `situations/spacex_baron/data/position_mark_basket_v2_2026-07-08.csv`.
+  Also added `fund_6_30` as a daily NAV-log weighting (freshest disclosed; beats fund_5_31 on most days).
 
 ## Daily-update checklist (what to touch each market day)
 

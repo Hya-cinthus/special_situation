@@ -327,8 +327,8 @@ ENTRIES = [
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
-                 "fund_5_31": "fund 5/31", "blend": "blend 4/30+5/31", "optimal": "optimal (min-var)",
-                 "ronb": "RONB ETF (daily)"}
+                 "fund_5_31": "fund 5/31", "fund_6_30": "fund 6/30 (latest)", "blend": "blend 4/30+5/31",
+                 "optimal": "optimal (min-var)", "ronb": "RONB ETF (daily)"}
 
 
 def _nospy(W):
@@ -364,7 +364,7 @@ def _weightings():
     return {
         "actual": renorm(comps.get("actual", {})),
         "fund_3_31": _nospy(fs.WEIGHTS_3_31), "fund_4_30": _nospy(fs.WEIGHTS_4_30),
-        "fund_5_31": _nospy(fs.WEIGHTS_5_31), "blend": _nospy(blend),
+        "fund_5_31": _nospy(fs.WEIGHTS_5_31), "fund_6_30": _nospy(fs.WEIGHTS_6_30), "blend": _nospy(blend),
         "optimal": renorm(comps.get("optimal", {})), "ronb": renorm(_ronb_weights()),
     }, H
 

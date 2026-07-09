@@ -85,6 +85,20 @@ WEIGHTS_5_31 = {
     'HEI-A': 0.002717,
 }
 
+# Baron's website holdings as of 2026-06-30 (% of TOTAL INVESTMENTS = gross), ex-SpaceX
+# (SpaceX 32.9% of gross). Published ahead of the 6/30 NPORT-P (expected ~Aug 27). This is the
+# FRESHEST disclosed public book. NEW names vs the 3/31-5/31 book: MORN/AMZN/MRNA/GOOG/LLY/GOOGL
+# (~3.8% of gross) — the fund trimmed TSLA (14.1% gross = ~21% of public, vs 5/31's ~24.7%) and
+# added these mega/large-caps. `_nospy` renormalizes over the public names; names without a daily
+# close in ENTRIES drop out of the daily basket return (add them to the paste to close the gap).
+WEIGHTS_6_30 = {
+    'TSLA': 0.141, 'SCHW': 0.040, 'H': 0.040, 'MSCI': 0.039, 'SHOP': 0.037, 'ACGL': 0.033,
+    'SPOT': 0.031, 'FDS': 0.026, 'IT': 0.025, 'MTN': 0.023, 'VRSK': 0.023, 'IDXX': 0.023,
+    'CHH': 0.023, 'CSGP': 0.023, 'GWRE': 0.022, 'RRR': 0.019, 'BIRK': 0.018, 'KNSL': 0.017,
+    'ONON': 0.016, 'MORN': 0.015, 'AMZN': 0.008, 'MRNA': 0.007, 'GLPI': 0.004, 'GOOG': 0.004,
+    'FIG': 0.004, 'LLY': 0.003, 'HEI': 0.003, 'HEI-A': 0.002, 'GOOGL': 0.001,
+}
+
 IMPLIED_SHARES_5_31 = {
     'CSGP': 13539810,
     'ONON': 8215842,
