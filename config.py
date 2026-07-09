@@ -443,6 +443,18 @@ class SpacexBaron:
                    "re-confirmed on this big -6.8% SPCX move. L stays ~1.0."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-07-08",
+         "spacex_value_usd": 3.89026788e9 * (148.30 / 105.32),  # ~$5.478B
+         "per_share_old_split_adj": 105.32, "per_share_new": 148.30,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $148.30 on 2026-07-08 (-0.78% vs 7/7 $149.47). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 283.37 (-1.85%, broad down day). AUM 17.7B->17.3B => ~$0.07B net outflow "
+                   "(ticked up; cumulative ~$2.72B). Drift ~cancelled (tight consensus) but the mid-cap-down edged "
+                   "out the TSLA-down help: actual -0.59 below median, errors UNIFORM (not TSLA-ordered) -> a "
+                   "mid-cap effect (IT/RRR/FDS/CHH ~-4% vs TSLA -2.2%). v1 basket 283.87 vs actual 283.37 (+0.50). "
+                   "L stays ~1.0."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

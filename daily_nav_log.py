@@ -309,20 +309,21 @@ ENTRIES = [
              "the snapshots but TSLA trimmed to 22%, and it nailed the NAV while the high-TSLA snapshots missed +0.84 "
              "-> the entire miss is the TSLA overweight, NOT SpaceX (re-confirmed on this big -6.8% SPCX day). AUM "
              "18.1B->17.7B vs NAV -2.15% => ~flat flow (-$11M; redemptions ~stopped; cumulative ~$2.65B)."},
-    {"date": "2026-07-08", "spcx": 148.30, "actual_nav": None, "aum": None,
+    {"date": "2026-07-08", "spcx": 148.30, "actual_nav": 283.37, "aum": 17.3e9,
      "closes": {"ACGL": 102.01, "BIRK": 44.24, "CHH": 106.39, "CSGP": 29.34, "FDS": 247.82,
                 "FIG": 21.67, "GLPI": 42.91, "GWRE": 135.74, "H": 187.40, "HEI": 347.78,
                 "HEI-A": 251.03, "IDXX": 555.67, "IT": 134.68, "KNSL": 345.96, "MSCI": 604.23,
                 "MTN": 143.63, "ONON": 36.38, "RRR": 63.32, "SCHW": 101.70, "SHOP": 119.22,
                 "SPOT": 485.22, "TSLA": 394.06, "VRSK": 189.67},
-     "note": "Estimate only (BPTIX NAV + AUM tomorrow). Est NAV ~284.0 (-1.6% vs 7/7's 288.70; VERY tight range "
-             "283.9-284.1 — confirms the drift-cancel reasoning below; v1 mark basket marks to 283.87). BROAD DOWN "
-             "day. SPCX -0.78% (149.47->148.30, small) = "
-             "~-0.27% contribution. Public basket broadly DOWN ~-2%: TSLA -2.2% (402.90->394.06) AND the mid-caps "
-             "also down (IT -4.3%, RRR -4.3%, FDS -4.1%, CHH -4.1%, H -3.0%, HEI/BIRK -2.9%, IDXX -2.6%). NOTE: "
-             "today the drift signals CONFLICT — underweight-TSLA HELPS (TSLA down) but overweight-mid-caps HURTS "
-             "(mid-caps down), so they ~cancel -> expect the estimate to sit NEAR the snapshot median (little "
-             "drift-adjustment needed), and the per-basket spread to be tight."},
+     "note": "Actuals in: BPTIX NAV 283.37 (-1.85%; model median 283.96, -0.59 — every basket slightly "
+             "OVERestimated), AUM 17.3B. The drift ~cancelled as called (tight consensus, small miss), but the "
+             "mid-cap-DOWN effect edged out the TSLA-DOWN help: the overweight mid-caps fell HARDER (IT/RRR/FDS/CHH "
+             "~-4%) than TSLA (-2.2%), so the fund fell a touch more than the snapshots. Errors were UNIFORM "
+             "(~+0.55-0.72, NOT TSLA-ordered) -> a mid-cap effect, not a TSLA one. v1 mark basket 283.87 vs actual "
+             "283.37 = +0.50 (0.18%): v1 also overestimated, exposing its ONE known weakness — the TSLA trim is "
+             "spread PRO-RATA, so it under-captures the CONCENTRATED overweight in the specific mid-caps (IT/FDS/RRR) "
+             "that fell hardest (the deliberate no-overfit tradeoff; the 6/30 NPORT fixes it). AUM 17.7B->17.3B vs "
+             "NAV -1.85% => ~$0.07B net outflow (ticked up; cumulative ~$2.72B)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
