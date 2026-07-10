@@ -34,6 +34,29 @@ FDS 0.0354 vs 0.0356) — the small residuals are rounding + his k-scaling.
   so SpaceX-per-BPTIX RISES (0.597 at 6/30 → ~0.607 now). A fixed number (either team's ~0.60) slowly
   understates it; our look-through recomputes it daily.
 
+## Empirical arbiter — daily tracking vs the ACTUAL NAV moves (not Baron's stated weights)
+
+The right judge isn't the methodology argument, it's: does `Σ shares × daily price change` reproduce
+the ACTUAL daily ΔNAV? (This is robust to Baron's posting being imprecise — reality is the ground
+truth.) Tested both teams' exact share counts, day-over-day 6/30→7/9 (per BPTIX $):
+
+| day | actual ΔNAV | Leon err | ours err |
+|---|---|---|---|
+| 7/1 | −3.24 | −0.03 | −0.18 |
+| 7/2 | +3.42 | +0.00 | **−0.43** |
+| 7/6 | +2.26 | +0.01 | +0.20 |
+| 7/7 | −6.34 | +0.10 | −0.13 |
+| 7/8 | −5.33 | +0.11 | +0.06 |
+| 7/9 | +4.45 | −0.06 | +0.08 |
+| **RMS** | | **$0.067** | **$0.218** |
+
+**Leon's basket reproduces the real daily BPTIX move ~3× more accurately** ($0.067 vs $0.218 per
+BPTIX; on 30k BPTIX that's ~$2/day vs ~$6.5/day of tracking noise). So it's not just methodologically
+cleaner — it's empirically better against the actual NAV. And because Leon's (built from Baron's 6/30
+weights) tracks reality to ~$0.07/day, **Baron's 6/30 posting is validated** — the weights are accurate.
+Leon's small residual is a **+$0.022/day upward drift = the fund's financing cost** (it pays interest on
+~$1.15B of borrowings; a fixed basket doesn't) — known, ~1 bp/day, and subtractable if we want.
+
 ## v3 = adopt the 6/30 anchor (recommended for marking)
 
 `situations/spacex_baron/data/position_mark_basket_v3_2026-06-30.csv` — public shares anchored at 6/30
