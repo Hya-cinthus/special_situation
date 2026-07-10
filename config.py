@@ -455,6 +455,16 @@ class SpacexBaron:
                    "L stays ~1.0."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-07-09",
+         "spacex_value_usd": 3.89026788e9 * (152.16 / 105.32),  # ~$5.622B
+         "per_share_old_split_adj": 105.32, "per_share_new": 152.16,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $152.16 on 2026-07-09 (+2.60% vs 7/8 $148.30). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 287.82 (+1.57%). AUM 17.3B->17.5B => ~$0.07B net outflow (cumulative ~$2.8B). "
+                   "First completion on the full 29-name book: model median NAILED it (287.83 vs 287.82, err -0.01); "
+                   "fund_6/30 +0.16, optimal best -0.04. Leverage 1.067 (borrowings model, entering net $17.3B)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

@@ -337,19 +337,18 @@ ENTRIES = [
              "spread PRO-RATA, so it under-captures the CONCENTRATED overweight in the specific mid-caps (IT/FDS/RRR) "
              "that fell hardest (the deliberate no-overfit tradeoff; the 6/30 NPORT fixes it). AUM 17.7B->17.3B vs "
              "NAV -1.85% => ~$0.07B net outflow (ticked up; cumulative ~$2.72B)."},
-    {"date": "2026-07-09", "spcx": 152.16, "actual_nav": None, "aum": None,
+    {"date": "2026-07-09", "spcx": 152.16, "actual_nav": 287.82, "aum": 17.5e9,
      "closes": {"ACGL": 101.70, "BIRK": 45.32, "CHH": 109.61, "CSGP": 29.19, "FDS": 241.90,
                 "FIG": 22.26, "GLPI": 43.04, "GWRE": 135.05, "H": 189.95, "HEI": 352.13,
                 "HEI-A": 253.27, "IDXX": 558.60, "IT": 132.69, "KNSL": 338.58, "MSCI": 603.35,
                 "MTN": 147.49, "ONON": 36.77, "RRR": 63.49, "SCHW": 101.91, "SHOP": 123.17,
                 "SPOT": 485.88, "TSLA": 406.55, "VRSK": 187.01,
                 "AMZN": 247.04, "GOOGL": 358.89, "GOOG": 356.24, "LLY": 1216.95, "MRNA": 76.56, "MORN": 165.55},
-     "note": "Estimate only (BPTIX NAV + AUM tomorrow). FIRST day with the full 29-name book — the 6 new "
-             "names (AMZN/GOOGL/GOOG/LLY/MRNA/MORN) are now in the paste, so fund_6/30 uses the COMPLETE 6/30 book. "
-             "SPCX +2.60% (148.30->152.16) = ~+0.9% contribution; TSLA +3.17% (394.06->406.55) UP too. Public mixed "
-             "(MTN +2.7%, SHOP/FIG +2.7%, H +1.4% up; FDS -2.4%, KNSL -2.1%, IT -1.5% down). Both SpaceX & TSLA up "
-             "-> NAV up; TSLA-up means the high-TSLA snapshots overestimate, so watch fund_6/30 (real weights) to "
-             "track best."},
+     "note": "Actuals in: BPTIX NAV 287.82 (+1.57%; model median 287.83 — NAILED it, err -0.01), AUM 17.5B. First "
+             "completion on the FULL 29-name book (the 6 new names now in the paste): fund_6/30 +0.16 (good), optimal "
+             "best (-0.04), median exact; high-TSLA fund_3/31 +0.33 over (TSLA-up day). SPCX +2.60% (148.30->152.16) "
+             "= +0.86% contribution; TSLA +3.17% UP too. AUM 17.3B->17.5B vs NAV +1.57% => ~$0.07B net outflow "
+             "(cumulative ~$2.8B since 6/12). Leverage 1.067 (borrowings model on entering net $17.3B)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
