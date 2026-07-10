@@ -57,6 +57,27 @@ weights) tracks reality to ~$0.07/day, **Baron's 6/30 posting is validated** —
 Leon's small residual is a **+$0.022/day upward drift = the fund's financing cost** (it pays interest on
 ~$1.15B of borrowings; a fixed basket doesn't) — known, ~1 bp/day, and subtractable if we want.
 
+## Does a redemption adjustment help? NO — it makes tracking WORSE (tested)
+
+Intuition: redemptions shrink the fund daily, so SpaceX-per-BPTIX rises and leverage edges up — adjust
+the basket daily for it. Tested it (dynamic SpaceX = disclosed ÷ N_t, dynamic borrow = $1.15B ÷ N_t,
+N_t from the daily AUM):
+
+| basket | RMS daily error | drift/day |
+|---|---|---|
+| **Leon STATIC** (fixed shares + fixed borrow) | **$0.067** | +$0.022 |
+| + redemption adj (dynamic off daily AUM) | **$0.282** | +$0.242 |
+| + financing accrual | $0.279 | +$0.239 |
+
+**It gets ~4× WORSE.** Why: the daily AUM figure (Morningstar, rounded to $0.1B ≈ 0.55% of $18B, ~1-day
+lagged) is too noisy — recomputing SpaceX-shares and borrow off it each day injects ~$0.25/day of
+*rounding* noise, which swamps the real redemption effect (~$0.02/day). The theory is right but the
+input is too coarse to exploit daily. Financing accrual also barely moves the drift (so the +$0.022/day
+isn't mainly interest — it's intra-quarter weight drift). **Conclusion: keep the STATIC basket; do NOT
+adjust daily off AUM. Re-anchor only at a fresh disclosure (or if AUM moves large and cleanly).** (Note:
+this is specific to the MARK basket. The daily NAV-log's dynamic leverage is fine there because it
+re-anchors to prior actual each day.)
+
 ## v3 = adopt the 6/30 anchor (recommended for marking)
 
 `situations/spacex_baron/data/position_mark_basket_v3_2026-06-30.csv` — public shares anchored at 6/30
