@@ -9,11 +9,25 @@ Interpreter on this machine is **`py`** (Python 3.14), NOT `python`.
 
 ---
 
-## What the user provides
+## What the user provides  (workflow changed 2026-07-13)
 
-- **At/after close (day T):** the 23 public-holding closes + the **SPCX** close.
-- **Next morning (T+1):** **BPTIX actual NAV** and **Morningstar Total Assets (AUM)** for day T.
-  (Yahoo posts BPTIX NAV with a ~1-day lag, so the user's reported NAV is the stop-gap — see step 4.)
+- **The user now provides ONLY the Morningstar Total Assets (AUM)** for day T — one number per day
+  (e.g. "7/13 AUM 17.0B"), except in unusual situations.
+- **Everything else I fetch myself, T+1** (the next day), from Yahoo's chart API:
+  - the **29 public-holding closes** + the **SPCX** close (for the as-of NAV estimate), and
+  - the **BPTIX actual NAV** (day-T close from Yahoo — no longer needs a user-reported stop-gap).
+
+**No-look-ahead rule (critical):** when reconstructing day T's estimate T+1, use **only day-T's
+closes** (and prior days' info) — never any price from after day T. The frozen as-of estimate must
+equal what we could have computed at day-T close. (I *may* fetch several days at once when catching
+up, but each day's estimate is built from that day's closes alone.) Then score it vs the actual NAV.
+Timeliness is relaxed: we no longer need a same-day close estimate (the user self-marks off the latest
+basket) — only **watch for a clearly widening deviation**, which is the trigger to re-anchor / investigate.
+
+Fetch mechanism: the Yahoo chart endpoint (`query1.finance.yahoo.com/v8/finance/chart/<ticker>`,
+`User-Agent: Mozilla/5.0`, stdlib `urllib`) — same one `situations/spacex_baron/ingest/nav.py` uses.
+Loop the 29 tickers (Yahoo style: `HEI-A`, and `SPCX`), pick the day-T close for each. Local fetch is
+fine; **this is NOT part of the CI rebuild** (which stays network-free except the known nav fetch).
 
 The whole stack is on **BPTIX** (the class the user holds): `NAV_TICKER = "BPTIX"`, all NAVs, labels, charts.
 

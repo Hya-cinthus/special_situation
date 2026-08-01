@@ -46,20 +46,20 @@ Named `YYYY-MM-DD-analysis-<topic>.md` (distinct from the `YYYY-MM-DD.md` daily 
 The authoritative, detailed version is [`../DAILY_UPDATE_PROTOCOL.md`](../DAILY_UPDATE_PROTOCOL.md).
 Quick list:
 
-**At/after close (day T)** — user pastes the 23 public closes + the SPCX close:
-1. `daily_nav_log.py` `ENTRIES` — append day T (`actual_nav: None, aum: None`, closes, spcx, note).
-2. `py make_daily_log.py` — write `daily_log/T.md` (the as-of journal entry).
+**Workflow changed 2026-07-13:** the user now gives **only the Morningstar AUM** for day T; I fetch
+the 29 closes + SPCX + BPTIX NAV myself, **T+1**, from Yahoo. **No look-ahead** — build day T's estimate
+from **day-T closes only**, then score vs actual. Everything happens in one T+1 pass:
 
-**Next morning (T+1)** — user gives BPTIX NAV + Morningstar AUM for day T:
-1. `daily_nav_log.py` — fill T's `actual_nav` + `aum`, update the note (scoring, flow, leverage read).
-2. `situations/spacex_baron/data/morningstar_aum_log.jsonl` — append one line (AUM + NAV).
+0. **Fetch** day-T closes (29 names + `SPCX`) + BPTIX NAV from Yahoo (only day-T prices for day-T's estimate).
+1. `daily_nav_log.py` `ENTRIES` — append day T **complete** (`spcx`, `closes`, `actual_nav`, `aum`, note w/ scoring+flow+leverage).
+2. `situations/spacex_baron/data/morningstar_aum_log.jsonl` — append one line (AUM + NAV, source "fetched T+1").
 3. `config.py` `SpacexBaron.SPACEX_REMARKS` — append T's re-mark (SPCX close → SpaceX value).
-4. `nav_overrides.csv` — only if Yahoo hasn't posted BPTIX NAV yet (usually it has by T+1).
+4. `py daily_nav_log.py` → `py make_daily_log.py` — regenerate JSON + freeze vintage + write `daily_log/T.md`.
+   ⚠️ If a note was still a placeholder when the vintage first froze: drop that day's line from
+   `daily_nav_vintage.jsonl` + delete `T.md`, fix the note, and re-run. Same-cycle housekeeping on a
+   just-created artifact — **not** a rewrite of a prior frozen day.
 5. `py build.py` (with fetch) — refreshes `nav_daily.csv` + all JSON.
-6. `py make_daily_log.py` — the T file already exists (estimate); it stays frozen. (The T+1
-   completion is captured in T's `## Outcome` only if you re-run before T.md was created;
-   normally the scoring lives in the next estimate day's notes + git.)
-7. **Do NOT touch** `ipo_day_recon.py` (pinned to 6/12).
+6. **Do NOT touch** `ipo_day_recon.py` (pinned to 6/12).
 
 Then: commit → `git pull --rebase` (on conflicts: `git checkout --theirs dashboard/data/*.json`,
 `git add -A`, `GIT_EDITOR=true git rebase --continue`) → rebuild → push.

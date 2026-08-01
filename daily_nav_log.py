@@ -349,6 +349,235 @@ ENTRIES = [
              "best (-0.04), median exact; high-TSLA fund_3/31 +0.33 over (TSLA-up day). SPCX +2.60% (148.30->152.16) "
              "= +0.86% contribution; TSLA +3.17% UP too. AUM 17.3B->17.5B vs NAV +1.57% => ~$0.07B net outflow "
              "(cumulative ~$2.8B since 6/12). Leverage 1.067 (borrowings model on entering net $17.3B)."},
+    {"date": "2026-07-10", "spcx": 145.30, "actual_nav": 283.97, "aum": 17.2e9,
+     "closes": {"ACGL": 101.06, "BIRK": 45.48, "CHH": 109.72, "CSGP": 28.39, "FDS": 247.11,
+                "FIG": 21.11, "GLPI": 43.18, "GWRE": 136.13, "H": 191.14, "HEI": 350.92,
+                "HEI-A": 254.07, "IDXX": 563.57, "IT": 133.24, "KNSL": 340.57, "MSCI": 604.71,
+                "MTN": 150.14, "ONON": 38.54, "RRR": 64.21, "SCHW": 103.12, "SHOP": 122.54,
+                "SPOT": 479.77, "TSLA": 407.76, "VRSK": 185.39,
+                "AMZN": 245.34, "GOOGL": 357.18, "GOOG": 355.03, "LLY": 1188.58, "MRNA": 68.27, "MORN": 165.18},
+     "note": "Fri 7/10. Closes fetched T+1 (Yahoo) per new workflow (user stopped pasting daily closes on 7/13; I "
+             "fetch prev-day closes myself, no look-ahead). SPCX -4.51% (152.16->145.30) => SpaceX ~$5.37B (disclosed "
+             "shares). BPTIX NAV 283.97 (-1.34%), AUM 17.2B. Scoring: SpaceX-down day, estimates tightly clustered "
+             "~284.1-284.2 vs actual 283.97 => most methods +0.1-0.2 over; fund_6/30 -0.15, fund_5/31 best (+0.14), "
+             "ronb worst (+0.63). AUM 17.5B->17.2B vs NAV -1.34% => ~-$0.07B net outflow (cumulative ~$2.9B since "
+             "6/12). Leverage 1.066 (borrowings model, entering net $17.5B)."},
+    {"date": "2026-07-13", "spcx": 139.14, "actual_nav": 281.09, "aum": 17.0e9,
+     "closes": {"ACGL": 103.06, "BIRK": 44.63, "CHH": 108.74, "CSGP": 28.77, "FDS": 263.11,
+                "FIG": 23.65, "GLPI": 44.04, "GWRE": 140.31, "H": 184.72, "HEI": 344.11,
+                "HEI-A": 249.30, "IDXX": 564.21, "IT": 141.31, "KNSL": 344.96, "MSCI": 620.23,
+                "MTN": 151.47, "ONON": 37.92, "RRR": 64.41, "SCHW": 102.38, "SHOP": 124.74,
+                "SPOT": 479.84, "TSLA": 394.76, "VRSK": 193.73,
+                "AMZN": 247.31, "GOOGL": 352.51, "GOOG": 350.67, "LLY": 1181.87, "MRNA": 67.01, "MORN": 173.55},
+     "note": "Mon 7/13. Closes fetched T+1 (Yahoo). SPCX -4.24% (145.30->139.14) => SpaceX ~$5.14B (disclosed "
+             "shares). BPTIX NAV 281.09 (-1.01%), AUM 17.0B. Scoring: TSLA-down (-3.19%) + SpaceX-down day; ALL "
+             "methods UNDER (actual came in above every basket): optimal -0.34 and fund_6/30 -0.35 best, high-TSLA "
+             "fund_3/31 -1.00 + ronb -1.20 worst => errors ordered by TSLA weight, re-confirming underweight-TSLA "
+             "drift. Best-basket miss -0.35 (-0.12% NAV), a touch wider than the ~0.1% norm but not alarming; watch "
+             "if it persists. AUM 17.2B->17.0B vs NAV -1.01% => ~-$0.03B net outflow (cumulative ~$2.9B). Leverage "
+             "1.067 (borrowings model, entering net $17.2B)."},
+    {"date": "2026-07-14", "spcx": 136.08, "actual_nav": 277.12, "aum": 16.7e9,
+     "closes": {"ACGL": 101.53, "BIRK": 44.36, "CHH": 108.32, "CSGP": 27.68, "FDS": 252.61,
+                "FIG": 23.86, "GLPI": 43.84, "GWRE": 140.71, "H": 189.70, "HEI": 345.61,
+                "HEI-A": 249.70, "IDXX": 540.68, "IT": 132.97, "KNSL": 337.14, "MSCI": 611.43,
+                "MTN": 147.64, "ONON": 37.74, "RRR": 64.00, "SCHW": 101.10, "SHOP": 125.68,
+                "SPOT": 481.06, "TSLA": 396.18, "VRSK": 190.54,
+                "AMZN": 247.49, "GOOGL": 359.51, "GOOG": 357.33, "LLY": 1152.54, "MRNA": 67.44, "MORN": 170.48},
+     "note": "Tue 7/14. Closes fetched T+1 (Yahoo). SPCX -2.20% (139.14->136.08) => SpaceX ~$5.03B (disclosed "
+             "shares). BPTIX NAV 277.12 (-1.41%), AUM 16.7B. Scoring: estimates NAILED it - tight cluster 277.1-277.3 "
+             "vs actual 277.12; fund_3/31 best (+0.01), fund_6/30 +0.19, optimal -0.15, ronb +0.86 worst. The 7/13 "
+             "-0.35 under did NOT persist -> reverted to ~0. AUM 17.0B->16.7B vs NAV -1.41% => ~-$0.06B net outflow "
+             "(cumulative ~$2.95B). Leverage 1.068 (borrowings model, entering net $17.0B). SpaceX weight down to "
+             "31.6% (SPCX falling faster than the fund)."},
+    {"date": "2026-07-15", "spcx": 135.27, "actual_nav": 276.80, "aum": 16.7e9,
+     "closes": {"ACGL": 98.54, "BIRK": 42.86, "CHH": 109.10, "CSGP": 28.49, "FDS": 251.19,
+                "FIG": 23.50, "GLPI": 44.03, "GWRE": 140.54, "H": 191.00, "HEI": 351.59,
+                "HEI-A": 253.20, "IDXX": 557.02, "IT": 133.76, "KNSL": 319.61, "MSCI": 621.77,
+                "MTN": 148.03, "ONON": 37.46, "RRR": 65.51, "SCHW": 102.79, "SHOP": 123.55,
+                "SPOT": 485.38, "TSLA": 394.46, "VRSK": 191.94,
+                "AMZN": 254.96, "GOOGL": 370.92, "GOOG": 370.21, "LLY": 1156.63, "MRNA": 68.28, "MORN": 169.25},
+     "note": "Wed 7/15. Closes fetched T+1 (Yahoo). SPCX -0.60% (136.08->135.27) => SpaceX ~$5.00B (disclosed "
+             "shares). BPTIX NAV 276.80 (-0.12%), AUM 16.7B. Scoring: model NAILED it again - all methods within "
+             "+/-0.13 of actual 276.80; fund_6/30 +0.02 (best-in-class), actual -0.01, fund_5/31 -0.13. Two clean "
+             "days after 7/13 confirm no drift. AUM flat 16.7B; flow ~+$0.02B (negligible inflow). Leverage 1.069 "
+             "(borrowings model, entering net $16.7B). SpaceX weight 31.4%."},
+    {"date": "2026-07-16", "spcx": 131.11, "actual_nav": 277.52, "aum": 16.7e9,
+     "closes": {"ACGL": 100.04, "BIRK": 44.31, "CHH": 111.29, "CSGP": 30.37, "FDS": 262.46,
+                "FIG": 23.41, "GLPI": 45.17, "GWRE": 148.91, "H": 188.76, "HEI": 344.03,
+                "HEI-A": 250.24, "IDXX": 576.07, "IT": 142.89, "KNSL": 335.52, "MSCI": 637.24,
+                "MTN": 149.13, "ONON": 38.20, "RRR": 66.73, "SCHW": 102.80, "SHOP": 125.06,
+                "SPOT": 476.08, "TSLA": 391.06, "VRSK": 201.49,
+                "AMZN": 249.89, "GOOGL": 354.46, "GOOG": 353.81, "LLY": 1169.17, "MRNA": 63.15, "MORN": 173.90},
+     "note": "Thu 7/16. Closes fetched T+1 (Yahoo). SPCX -3.08% (135.27->131.11) => SpaceX ~$4.84B (disclosed "
+             "shares). BPTIX NAV 277.52 (+0.26%), AUM 16.7B. Scoring: most methods slightly UNDER (actual above "
+             "baskets); fund_5/31 NAILED it (0.00), blend -0.09, optimal +0.17, fund_6/30 -0.39, ronb -0.94 worst. "
+             "HEDGE IN ACTION: SPCX -3.1% but NAV +0.26% -> public mid-caps ripped (IT +6.8%, GWRE +6.0%, CSGP +6.6%, "
+             "VRSK +5.7%, FDS +4.5%) and more than offset SpaceX. AUM flat 16.7B vs NAV +0.26% => ~-$0.04B net outflow "
+             "(cumulative ~$3.0B). Leverage 1.069 (borrowings model, entering net $16.7B). SpaceX weight 31.2%."},
+    {"date": "2026-07-17", "spcx": 123.99, "actual_nav": 270.95, "aum": 16.3e9,
+     "closes": {"ACGL": 101.35, "BIRK": 44.36, "CHH": 111.84, "CSGP": 29.78, "FDS": 258.09,
+                "FIG": 23.95, "GLPI": 45.08, "GWRE": 150.02, "H": 190.65, "HEI": 342.66,
+                "HEI-A": 250.07, "IDXX": 567.44, "IT": 140.19, "KNSL": 343.99, "MSCI": 628.66,
+                "MTN": 147.86, "ONON": 37.20, "RRR": 64.75, "SCHW": 101.56, "SHOP": 123.56,
+                "SPOT": 478.14, "TSLA": 380.84, "VRSK": 200.68,
+                "AMZN": 247.23, "GOOGL": 346.77, "GOOG": 346.12, "LLY": 1179.11, "MRNA": 61.82, "MORN": 172.48},
+     "note": "Fri 7/17. Closes fetched T+1 (Yahoo). SPCX -5.43% (131.11->123.99) => SpaceX ~$4.58B (disclosed "
+             "shares). BPTIX NAV 270.95 (-2.37%), AUM 16.3B. Scoring: all methods slightly UNDER but modest; optimal "
+             "-0.07 best, fund_6/30 -0.14, fund_3/31 -0.47 worst. Big down day: SPCX -5.4% + TSLA -2.6% "
+             "(391.06->380.84) both dragged. AUM 16.7B->16.3B vs NAV -2.37% => ~-$0.01B net outflow (nearly all "
+             "market; cumulative ~$3.0B). Leverage 1.069 (borrowings model, entering net $16.7B). SpaceX weight "
+             "30.3%. Watch: baskets under-predicted on this week's SpaceX-down days (7/13/16/17) -> weak hint the "
+             "SpaceX weight may run a touch high, but not consistent (7/14 was over) -> no action yet."},
+    {"date": "2026-07-20", "spcx": 119.85, "actual_nav": 267.08, "aum": 16.3e9,
+     "closes": {"ACGL": 101.83, "BIRK": 42.77, "CHH": 109.96, "CSGP": 29.68, "FDS": 255.79,
+                "FIG": 24.02, "GLPI": 44.66, "GWRE": 149.19, "H": 189.55, "HEI": 340.44,
+                "HEI-A": 248.18, "IDXX": 563.81, "IT": 141.06, "KNSL": 350.13, "MSCI": 625.11,
+                "MTN": 146.08, "ONON": 37.65, "RRR": 64.94, "SCHW": 102.54, "SHOP": 124.48,
+                "SPOT": 492.32, "TSLA": 369.57, "VRSK": 201.79,
+                "AMZN": 249.99, "GOOGL": 351.99, "GOOG": 351.37, "LLY": 1146.90, "MRNA": 59.49, "MORN": 171.76},
+     "note": "Mon 7/20. Closes fetched T+1 (Yahoo). SPCX -3.34% (123.99->119.85) => SpaceX ~$4.43B (disclosed "
+             "shares). BPTIX NAV 267.08 (-1.43%), AUM 16.3B. Scoring: all methods slightly under; fund_6/30 best "
+             "(-0.12), fund_5/31 -0.28, fund_3/31 -0.76 worst. AUM flat 16.3B vs NAV -1.43% => model reads ~+$0.23B "
+             "inflow (but $0.1B AUM rounding ~+/-$0.1B noise; likely ~flat-to-small-in). Leverage 1.071 (borrowings "
+             "model, entering net $16.3B). SpaceX weight 29.3%."},
+    {"date": "2026-07-21", "spcx": 123.54, "actual_nav": 265.85, "aum": 15.9e9,
+     "closes": {"ACGL": 100.55, "BIRK": 42.22, "CHH": 108.13, "CSGP": 28.50, "FDS": 246.95,
+                "FIG": 21.93, "GLPI": 44.51, "GWRE": 142.53, "H": 189.51, "HEI": 340.40,
+                "HEI-A": 247.64, "IDXX": 552.46, "IT": 134.77, "KNSL": 339.46, "MSCI": 561.74,
+                "MTN": 147.41, "ONON": 37.24, "RRR": 64.22, "SCHW": 99.96, "SHOP": 123.03,
+                "SPOT": 493.23, "TSLA": 378.93, "VRSK": 195.25,
+                "AMZN": 247.55, "GOOGL": 347.15, "GOOG": 346.19, "LLY": 1175.41, "MRNA": 59.66, "MORN": 165.70},
+     "note": "Tue 7/21. Closes fetched T+1 (Yahoo). SPCX +3.08% (119.85->123.54) => SpaceX ~$4.56B (disclosed "
+             "shares). BPTIX NAV 265.85 (-0.46%), AUM 15.9B. Scoring: all methods OVER (actual below baskets); "
+             "optimal +0.41 best, fund_5/31 +0.44, fund_6/30 +0.56, fund_3/31 +1.22 worst. REVERSE HEDGE: SpaceX "
+             "+3.1% and TSLA +2.5% UP, yet NAV -0.46% -> public mid-caps got crushed (MSCI -10.1%, FIG -8.7%, GWRE "
+             "-4.5%, IT -4.5%, FDS -3.5%) = classic mid-cap dispersion miss (fund overweight those vs snapshot), NOT "
+             "SpaceX. AUM 16.3B->15.9B => ~-$0.33B net outflow. Leverage 1.071 (borrowings model, entering net "
+             "$16.3B). SpaceX weight 28.4%."},
+    {"date": "2026-07-22", "spcx": 115.26, "actual_nav": 257.64, "aum": 15.3e9,
+     "closes": {"ACGL": 98.63, "BIRK": 42.97, "CHH": 108.00, "CSGP": 27.69, "FDS": 245.21,
+                "FIG": 21.47, "GLPI": 44.71, "GWRE": 133.97, "H": 187.43, "HEI": 335.24,
+                "HEI-A": 244.25, "IDXX": 545.00, "IT": 132.10, "KNSL": 325.64, "MSCI": 570.95,
+                "MTN": 144.93, "ONON": 36.65, "RRR": 63.89, "SCHW": 100.80, "SHOP": 118.42,
+                "SPOT": 474.16, "TSLA": 374.01, "VRSK": 192.28,
+                "AMZN": 244.85, "GOOGL": 342.09, "GOOG": 341.91, "LLY": 1163.01, "MRNA": 58.07, "MORN": 166.83},
+     "note": "Wed 7/22. Closes fetched T+1 (Yahoo). SPCX -6.70% (123.54->115.26) => SpaceX ~$4.26B (disclosed "
+             "shares). BPTIX NAV 257.64 (-3.09%), AUM 15.3B. Scoring: fund_6/30 NAILED it (257.64 = actual, 0.00). "
+             "KEY: this was the week's BIGGEST SpaceX move (-6.7%) and fund_6/30 was EXACT -> kills the 'SpaceX weight "
+             "runs high' worry from last week (that would show max under here). fund_6/30 over 7/13-7/22 is UNBIASED "
+             "(mean -0.03, sd 0.29, n=8); misses are mid-cap dispersion (7/16 rip, 7/21 crash), not SpaceX/leverage. "
+             "Broad down day: SPCX -6.7% + public weak (GWRE -6.0%, KNSL -4.1%). AUM 15.9B->15.3B => ~-$0.11B net "
+             "outflow (cumulative ~$3.2B). Leverage 1.072 (borrowings model, entering net $15.9B). SpaceX weight "
+             "30.0%. Basket healthy -> no v3.1 change needed."},
+    {"date": "2026-07-23", "spcx": 118.24, "actual_nav": 251.41, "aum": None,
+     "closes": {"ACGL": 100.10, "BIRK": 40.61, "CHH": 108.00, "CSGP": 27.14, "FDS": 243.96,
+                "FIG": 20.00, "GLPI": 44.42, "GWRE": 131.38, "H": 183.62, "HEI": 340.54,
+                "HEI-A": 248.87, "IDXX": 539.37, "IT": 133.69, "KNSL": 332.28, "MSCI": 552.51,
+                "MTN": 144.06, "ONON": 34.84, "RRR": 62.78, "SCHW": 101.61, "SHOP": 112.00,
+                "SPOT": 468.99, "TSLA": 319.69, "VRSK": 193.17,
+                "AMZN": 233.66, "GOOGL": 317.69, "GOOG": 318.34, "LLY": 1185.87, "MRNA": 57.02, "MORN": 167.57},
+     "note": "Thu 7/23. Closes fetched T+1 (Yahoo). AUM NOT CAPTURED (Morningstar only shows current; the 7/23 "
+             "snapshot was missed) -> aum=None, so AUM/flow are model carry-forward estimates (~$14.93B, which "
+             "happens to match 7/24's reported 14.9B -> validates the carry-forward), NOT reported figures; backfill "
+             "if found. SPCX +2.59% (115.26->118.24) => SpaceX ~$4.37B (disclosed shares). BPTIX NAV 251.41 (-2.42%). "
+             "Scoring: TSLA-CRASH day = textbook underweight-TSLA confirmation - errors ordered by TSLA weight: "
+             "fund_3/31 (high TSLA) -2.16 (huge under), fund_6/30 -0.21, optimal +0.11 best; using 6/30 weights "
+             "saved ~2 pts vs 3/31. THE DRIVER: TSLA -14.5% (319.69 vs 374.01, earnings) + growth selloff (GOOGL "
+             "-7.1%, AMZN -4.6%, SHOP -5.4%); SpaceX UP +2.6% couldn't offset. Leverage ~1.075 (borrowings model, "
+             "entering net $15.3B). SpaceX weight 29.1%."},
+    {"date": "2026-07-24", "spcx": 115.07, "actual_nav": 252.42, "aum": 14.9e9,
+     "closes": {"ACGL": 103.36, "BIRK": 40.63, "CHH": 110.52, "CSGP": 27.66, "FDS": 254.36,
+                "FIG": 21.12, "GLPI": 45.17, "GWRE": 138.23, "H": 187.13, "HEI": 349.61,
+                "HEI-A": 253.40, "IDXX": 544.32, "IT": 140.50, "KNSL": 349.10, "MSCI": 550.79,
+                "MTN": 145.72, "ONON": 35.82, "RRR": 63.92, "SCHW": 101.97, "SHOP": 113.75,
+                "SPOT": 482.66, "TSLA": 313.03, "VRSK": 201.34,
+                "AMZN": 232.11, "GOOGL": 319.74, "GOOG": 319.09, "LLY": 1196.03, "MRNA": 54.07, "MORN": 172.61},
+     "note": "Fri 7/24. Closes fetched T+1 (Yahoo). SPCX -2.68% (118.24->115.07) => SpaceX ~$4.25B (disclosed "
+             "shares). BPTIX NAV 252.42 (+0.40%), AUM 14.9B. Scoring: all methods slightly under; optimal -0.36 best, "
+             "fund_6/30 -0.61, fund_3/31 -1.12 worst (still TSLA-ordered). HEDGE AGAIN: SPCX -2.7% but NAV +0.40% -> "
+             "public rebounded (KNSL +5.1%, GWRE +5.2%, VRSK +4.2%, FDS +4.3%) as TSLA bled a bit more (-2.1%). AUM "
+             "14.9B (flow ~-$0.09B, approx due to 7/23 gap). Leverage 1.077 (borrowings model, entering est net "
+             "~$14.9B). SpaceX weight 30.5%. fund_6/30 over 7/13-7/24: mean -0.11, sd 0.31 (n=10) - still healthy; "
+             "slight under-bias from the TSLA-crash-regime days."},
+    {"date": "2026-07-27", "spcx": 113.50, "actual_nav": 257.38, "aum": 15.2e9,
+     "closes": {"ACGL": 103.88, "BIRK": 41.55, "CHH": 113.12, "CSGP": 29.17, "FDS": 265.90,
+                "FIG": 22.94, "GLPI": 45.04, "GWRE": 149.28, "H": 191.18, "HEI": 357.15,
+                "HEI-A": 259.42, "IDXX": 556.20, "IT": 147.45, "KNSL": 361.55, "MSCI": 571.03,
+                "MTN": 148.28, "ONON": 37.06, "RRR": 65.07, "SCHW": 104.18, "SHOP": 126.88,
+                "SPOT": 494.72, "TSLA": 309.22, "VRSK": 206.66,
+                "AMZN": 231.39, "GOOGL": 326.56, "GOOG": 326.57, "LLY": 1197.53, "MRNA": 55.63, "MORN": 182.43},
+     "note": "Mon 7/27. Closes fetched T+1 (Yahoo). (IT close was null in Yahoo's daily bar -- a data glitch; used "
+             "the meta regularMarketPrice 147.45, timestamped 7/27 16:00 ET = the actual close, not a proxy.) SPCX "
+             "-1.36% (115.07->113.50) => SpaceX ~$4.19B (disclosed shares). BPTIX NAV 257.38 (+1.97%), AUM 15.2B. "
+             "Scoring: ALL methods UNDER by a lot; fund_6/30 -0.80 best, fund_3/31 -2.07 worst (TSLA-ordered). HEDGE "
+             "AGAIN (4th in 2 wks): SPCX -1.4% & TSLA -1.2% DOWN but NAV +1.97% -> public ripped (SHOP +11.5%, GWRE "
+             "+8.0%, MORN +5.7%, IT +4.9%, FDS +4.5%). AUM 14.9B->15.2B => ~+$0.01B (flat flow; rise is ~all market). "
+             "Leverage 1.077 (borrowings model, entering net $14.9B). SpaceX weight 29.8%. WATCH: fund_6/30 now UNDER "
+             "3 straight & growing (7/23 -0.21, 7/24 -0.61, 7/27 -0.80; 11-day mean -0.17) -> public sleeve "
+             "outperforming the 6/30 snapshot (intra-quarter drift toward the winning mid-caps), NOT SpaceX/leverage. "
+             "If it persists ~5d or mean bias > -0.3, refresh public weights (lean on recalibrate-implied / optimal); "
+             "else hold 6/30 until the 9/30 NPORT."},
+    {"date": "2026-07-28", "spcx": 116.41, "actual_nav": 264.20, "aum": 15.5e9,
+     "closes": {"ACGL": 106.48, "BIRK": 41.85, "CHH": 114.64, "CSGP": 30.33, "FDS": 283.87,
+                "FIG": 24.38, "GLPI": 45.85, "GWRE": 159.40, "H": 188.83, "HEI": 363.44,
+                "HEI-A": 263.25, "IDXX": 569.54, "IT": 155.84, "KNSL": 370.26, "MSCI": 579.39,
+                "MTN": 157.08, "ONON": 37.89, "RRR": 66.13, "SCHW": 105.97, "SHOP": 130.28,
+                "SPOT": 511.56, "TSLA": 307.44, "VRSK": 212.26,
+                "AMZN": 230.86, "GOOGL": 333.71, "GOOG": 332.60, "LLY": 1220.66, "MRNA": 55.81, "MORN": 194.12},
+     "note": "Tue 7/28. Closes fetched T+1 (Yahoo). SPCX +2.56% (113.50->116.41) => SpaceX ~$4.30B (disclosed "
+             "shares). BPTIX NAV 264.20 (+2.65%), AUM 15.5B. Scoring: all methods UNDER again; optimal -0.56 best, "
+             "fund_6/30 -0.69, fund_3/31 -1.20 worst. BROAD RALLY (both sleeves): SPCX +2.6% AND public ripped again "
+             "(FDS +6.8%, GWRE +6.8%, MORN +6.4%, MTN +5.9%, IT +5.7%); only TSLA -0.6%. AUM 15.2B->15.5B vs NAV "
+             "+2.65% => ~-$0.10B net outflow. Leverage 1.076 (borrowings model, entering net $15.2B). SpaceX weight "
+             "28.8%. WATCH ESCALATING: fund_6/30 UNDER 4 straight (7/23 -0.21, 7/24 -0.61, 7/27 -0.80, 7/28 -0.69; "
+             "12-day mean -0.21, nearing the -0.3 trigger). Fits a mid-cap rally where the fund (buy-and-hold, lets "
+             "winners run) out-runs our DAILY-REBALANCED constant-6/30-weight basket. Investigating whether making "
+             "fund_6/30 buy-and-hold (drift 6/30 SHARES, not re-impose weights) removes it -- same hold-shares "
+             "insight as v3/Leon."},
+    {"date": "2026-07-29", "spcx": 112.55, "actual_nav": 261.52, "aum": None,
+     "closes": {"ACGL": 104.55, "BIRK": 41.53, "CHH": 115.65, "CSGP": 29.83, "FDS": 282.04,
+                "FIG": 24.76, "GLPI": 46.01, "GWRE": 167.26, "H": 186.02, "HEI": 355.23,
+                "HEI-A": 257.36, "IDXX": 569.77, "IT": 165.65, "KNSL": 376.67, "MSCI": 582.92,
+                "MTN": 160.01, "ONON": 37.91, "RRR": 65.61, "SCHW": 104.47, "SHOP": 129.17,
+                "SPOT": 524.01, "TSLA": 298.32, "VRSK": 213.15,
+                "AMZN": 226.65, "GOOGL": 336.71, "GOOG": 335.76, "LLY": 1210.02, "MRNA": 54.49, "MORN": 198.66},
+     "note": "Wed 7/29. Closes fetched T+1 (Yahoo). AUM NOT PROVIDED (user gave 7/30 not 7/29) -> aum=None; AUM/flow "
+             "are carry-forward estimates (~$15.34B), NOT reported; backfill if available. SPCX -3.32% "
+             "(116.41->112.55) => SpaceX ~$4.16B (disclosed shares). BPTIX NAV 261.52 (-1.01%). Scoring: all methods "
+             "under; optimal -0.47 best, fund_6/30 -0.59, fund_3/31 -1.25 worst (5th straight fund_6/30 under). SPCX "
+             "-3.3% + TSLA -3.0% dragged; mid-caps still up (IT +6.3%, GWRE +4.9%). Leverage 1.074 (borrowings model, "
+             "entering net $15.5B). SpaceX weight 29.0%."},
+    {"date": "2026-07-30", "spcx": 112.20, "actual_nav": 255.92, "aum": 15.4e9,
+     "closes": {"ACGL": 101.14, "BIRK": 40.49, "CHH": 111.66, "CSGP": 29.46, "FDS": 263.03,
+                "FIG": 23.76, "GLPI": 44.71, "GWRE": 153.21, "H": 176.68, "HEI": 354.17,
+                "HEI-A": 256.15, "IDXX": 558.80, "IT": 152.92, "KNSL": 355.87, "MSCI": 575.74,
+                "MTN": 152.82, "ONON": 37.10, "RRR": 64.93, "SCHW": 104.33, "SHOP": 122.40,
+                "SPOT": 522.61, "TSLA": 308.85, "VRSK": 200.35,
+                "AMZN": 235.50, "GOOGL": 333.66, "GOOG": 333.68, "LLY": 1154.97, "MRNA": 57.92, "MORN": 193.12},
+     "note": "Thu 7/30. Closes fetched T+1 (Yahoo). SPCX -0.31% (112.55->112.20) => SpaceX ~$4.15B (disclosed "
+             "shares). BPTIX NAV 255.92 (-2.14%), AUM 15.4B. Scoring: ALL methods massively OVER (+1.05 to +2.45); "
+             "optimal +1.05 best, fund_6/30 +1.60, fund_3/31 +2.45 worst. MID-CAP WINNERS REVERSED HARD: the names "
+             "that ripped all week retraced (GWRE -8.4%, IT -7.7%, FDS -6.7%, VRSK -6.0%, KNSL -5.5%, H -5.0%); TSLA "
+             "+3.5% & AMZN +3.9% bounced; SPCX flat. KEY: fund_6/30 flipped -0.59 (under, rally) -> +1.60 (over, "
+             "reversal) => the error is TWO-DIRECTIONAL, constant-weight mis-tracking the concentrated winners BOTH "
+             "ways (under-captures the run-up AND the crash). STRENGTHENS the buy-and-hold fix (14-day SD jumped to "
+             "0.59). FLOW: 7/28->7/30 AUM 15.5->15.4B while NAV fell ~3.1% => ~+$0.38B net INFLOW over 2 days (first "
+             "real inflow in weeks; can't split 7/29 vs 7/30 due to the 7/29 gap). Leverage 1.075 (borrowings model, "
+             "entering est net ~$15.34B). SpaceX weight 28.3%."},
+    {"date": "2026-07-31", "spcx": 108.37, "actual_nav": 251.24, "aum": 14.7e9,
+     "closes": {"ACGL": 100.53, "BIRK": 38.72, "CHH": 111.49, "CSGP": 28.76, "FDS": 263.20,
+                "FIG": 24.32, "GLPI": 44.79, "GWRE": 151.94, "H": 174.06, "HEI": 356.36,
+                "HEI-A": 257.28, "IDXX": 559.07, "IT": 151.02, "KNSL": 356.42, "MSCI": 572.24,
+                "MTN": 149.38, "ONON": 36.24, "RRR": 64.44, "SCHW": 105.24, "SHOP": 117.15,
+                "SPOT": 499.94, "TSLA": 311.21, "VRSK": 194.85,
+                "AMZN": 271.58, "GOOGL": 356.13, "GOOG": 356.65, "LLY": 1148.84, "MRNA": 54.82, "MORN": 192.57},
+     "note": "Fri 7/31. Closes fetched T+1 (Yahoo). SPCX -3.41% (112.20->108.37, under $110) => SpaceX ~$4.00B "
+             "(disclosed shares). BPTIX NAV 251.24 (-1.83%), AUM 14.7B. Scoring: all methods slightly OVER; ronb "
+             "+0.26 best, fund_5/31 +0.47, fund_6/30 +0.79, fund_3/31 +1.12 worst (2nd straight over -> constant-"
+             "weight variance, BH fix pending). SpaceX drag + mixed public: AMZN +15.3% & GOOGL +6.7% RIPPED "
+             "(earnings) but SHOP -4.3%, BIRK -4.4%, VRSK -2.7%, H -1.5% offset. FLOW: AUM 15.4B->14.7B vs NAV -1.83% "
+             "=> ~-$0.42B net outflow (the 7/29-30 inflow reversed; redemptions back). Leverage 1.075 (borrowings "
+             "model, entering net $15.4B). SpaceX weight 28.1%."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

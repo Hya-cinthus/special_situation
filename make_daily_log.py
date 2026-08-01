@@ -103,10 +103,16 @@ def render(date, rev, aso, ms, commits, methods, lbl, compiled):
     # --- inputs ---
     spx_ret = rev.get("spcx_ret_pct")
     lines.append("## Inputs")
-    lines.append("- **SPCX** $%.2f (%s%.2f%%); 23 public closes in." % (
+    lines.append("- **SPCX** $%.2f (%s%.2f%%); public closes in." % (
         rev["spcx"], "+" if (spx_ret or 0) >= 0 else "", spx_ret or 0))
     if rev.get("actual_nav") is not None:
-        aum = ("$%.1fB" % rev["aum_used_b"]) if rev.get("aum_used_b") is not None else "n/a"
+        if rev.get("aum_used_b") is None:
+            aum = "n/a"
+        elif rev.get("flow_b") is None:
+            # AUM not reported that day -> engine carried prior AUM forward scaled by NAV
+            aum = "~$%.1fB (est, carry-forward - AUM not captured)" % rev["aum_used_b"]
+        else:
+            aum = "$%.1fB" % rev["aum_used_b"]
         lines.append("- **BPTIX NAV** %.2f (actual); **Morningstar AUM** %s." % (rev["actual_nav"], aum))
     else:
         lines.append("- Actual NAV + AUM: _pending next morning_ (estimate-only day).")

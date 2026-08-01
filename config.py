@@ -465,6 +465,171 @@ class SpacexBaron:
                    "fund_6/30 +0.16, optimal best -0.04. Leverage 1.067 (borrowings model, entering net $17.3B)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX",
          "confidence": "high"},
+        {"date": "2026-07-10",
+         "spacex_value_usd": 3.89026788e9 * (145.30 / 105.32),  # ~$5.367B
+         "per_share_old_split_adj": 105.32, "per_share_new": 145.30,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $145.30 on 2026-07-10 (-4.51% vs 7/9 $152.16). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 283.97 (-1.34%). AUM 17.5B->17.2B => ~$0.07B net outflow (cumulative ~$2.9B). "
+                   "Closes fetched T+1 (Yahoo) per new workflow (no look-ahead). SpaceX-down day; estimates clustered "
+                   "~284.1 vs actual 283.97; fund_6/30 -0.15, fund_5/31 best +0.14. Leverage 1.066 (entering net "
+                   "$17.5B)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-13",
+         "spacex_value_usd": 3.89026788e9 * (139.14 / 105.32),  # ~$5.140B
+         "per_share_old_split_adj": 105.32, "per_share_new": 139.14,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $139.14 on 2026-07-13 (-4.24% vs 7/10 $145.30). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 281.09 (-1.01%). AUM 17.2B->17.0B => ~$0.03B net outflow (cumulative ~$2.9B). "
+                   "TSLA-down (-3.19%) + SpaceX-down; ALL methods UNDER actual: optimal -0.34 / fund_6/30 -0.35 best, "
+                   "high-TSLA fund_3/31 -1.00 worst -> errors ordered by TSLA weight (underweight-TSLA re-confirmed). "
+                   "Best miss -0.35 (-0.12% NAV), slightly wide; watch. Leverage 1.067 (entering net $17.2B)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-14",
+         "spacex_value_usd": 3.89026788e9 * (136.08 / 105.32),  # ~$5.027B
+         "per_share_old_split_adj": 105.32, "per_share_new": 136.08,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $136.08 on 2026-07-14 (-2.20% vs 7/13 $139.14). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 277.12 (-1.41%). AUM 17.0B->16.7B => ~$0.06B net outflow (cumulative ~$2.95B). "
+                   "Closes fetched T+1 (Yahoo). Estimates NAILED it (277.1-277.3 vs 277.12); fund_3/31 best +0.01, "
+                   "fund_6/30 +0.19; the 7/13 -0.35 under reverted -> no drift. Leverage 1.068 (entering net $17.0B). "
+                   "SpaceX weight 31.6% (SPCX falling faster than fund)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-15",
+         "spacex_value_usd": 3.89026788e9 * (135.27 / 105.32),  # ~$4.997B
+         "per_share_old_split_adj": 105.32, "per_share_new": 135.27,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $135.27 on 2026-07-15 (-0.60% vs 7/14 $136.08). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 276.80 (-0.12%). AUM flat 16.7B => ~+$0.02B (negligible). Closes fetched T+1. "
+                   "Model NAILED it again (all within +/-0.13 of 276.80); fund_6/30 +0.02 best. Two clean days after "
+                   "7/13 confirm no drift. Leverage 1.069 (entering net $16.7B). SpaceX weight 31.4%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-16",
+         "spacex_value_usd": 3.89026788e9 * (131.11 / 105.32),  # ~$4.843B
+         "per_share_old_split_adj": 105.32, "per_share_new": 131.11,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $131.11 on 2026-07-16 (-3.08% vs 7/15 $135.27). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 277.52 (+0.26%). AUM flat 16.7B => ~$0.04B net outflow (cumulative ~$3.0B). "
+                   "HEDGE IN ACTION: SPCX -3.1% but NAV +0.26% -> public mid-caps ripped (IT/GWRE/CSGP/VRSK/FDS "
+                   "+4.5-6.8%) and offset SpaceX. fund_5/31 nailed it (0.00); fund_6/30 -0.39 (under, mid-cap-rip "
+                   "day). Leverage 1.069 (entering net $16.7B). SpaceX weight 31.2%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-17",
+         "spacex_value_usd": 3.89026788e9 * (123.99 / 105.32),  # ~$4.580B
+         "per_share_old_split_adj": 105.32, "per_share_new": 123.99,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $123.99 on 2026-07-17 (-5.43% vs 7/16 $131.11). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 270.95 (-2.37%). AUM 16.7B->16.3B => ~$0.01B net outflow (nearly all market; "
+                   "cumulative ~$3.0B). Big down day: SPCX -5.4% + TSLA -2.6% both dragged. All methods slightly "
+                   "under; optimal -0.07 best, fund_6/30 -0.14. Leverage 1.069 (entering net $16.7B). SpaceX weight "
+                   "30.3% (down from ~35% at 6/30 as SPCX bled)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-20",
+         "spacex_value_usd": 3.89026788e9 * (119.85 / 105.32),  # ~$4.427B
+         "per_share_old_split_adj": 105.32, "per_share_new": 119.85,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $119.85 on 2026-07-20 (-3.34% vs 7/17 $123.99). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 267.08 (-1.43%). AUM flat 16.3B (model ~+$0.23B but AUM rounding noisy). All "
+                   "methods slightly under; fund_6/30 best -0.12. Leverage 1.071 (entering net $16.3B). SpaceX "
+                   "weight 29.3%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-21",
+         "spacex_value_usd": 3.89026788e9 * (123.54 / 105.32),  # ~$4.563B
+         "per_share_old_split_adj": 105.32, "per_share_new": 123.54,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $123.54 on 2026-07-21 (+3.08% vs 7/20 $119.85). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 265.85 (-0.46%). AUM 16.3B->15.9B => ~-$0.33B net outflow. REVERSE HEDGE: SpaceX "
+                   "+3.1% & TSLA +2.5% UP but NAV down -> mid-caps crushed (MSCI -10.1%, FIG -8.7%); all methods OVER "
+                   "(optimal +0.41, fund_6/30 +0.56) = mid-cap dispersion, not SpaceX. Leverage 1.071 (entering net "
+                   "$16.3B). SpaceX weight 28.4%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-22",
+         "spacex_value_usd": 3.89026788e9 * (115.26 / 105.32),  # ~$4.258B
+         "per_share_old_split_adj": 105.32, "per_share_new": 115.26,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $115.26 on 2026-07-22 (-6.70% vs 7/21 $123.54). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 257.64 (-3.09%). AUM 15.9B->15.3B => ~-$0.11B net outflow (cumulative ~$3.2B). "
+                   "fund_6/30 NAILED it (0.00) on the week's biggest SpaceX move -> kills 'SpaceX weight high' worry; "
+                   "fund_6/30 unbiased 7/13-7/22 (mean -0.03, sd 0.29). SPCX now $115.26 = -24% from 7/9 $152.16. "
+                   "Leverage 1.072 (entering net $15.9B). SpaceX weight 30.0%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-23",
+         "spacex_value_usd": 3.89026788e9 * (118.24 / 105.32),  # ~$4.368B
+         "per_share_old_split_adj": 105.32, "per_share_new": 118.24,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $118.24 on 2026-07-23 (+2.59% vs 7/22 $115.26). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 251.41 (-2.42%). AUM NOT captured (Morningstar snapshot missed; carry-forward "
+                   "~$14.93B). TSLA CRASHED -14.5% (earnings) + growth selloff dragged NAV even as SpaceX rose +2.6%. "
+                   "Textbook underweight-TSLA: fund_3/31 -2.16 vs fund_6/30 -0.21. Leverage ~1.075 (entering net "
+                   "$15.3B). SpaceX weight 29.1%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-24",
+         "spacex_value_usd": 3.89026788e9 * (115.07 / 105.32),  # ~$4.251B
+         "per_share_old_split_adj": 105.32, "per_share_new": 115.07,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $115.07 on 2026-07-24 (-2.68% vs 7/23 $118.24). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 252.42 (+0.40%). AUM 14.9B => ~-$0.09B net outflow (approx; 7/23 gap). HEDGE "
+                   "AGAIN: SPCX -2.7% but NAV +0.40% -> public rebounded (KNSL/GWRE/VRSK/FDS +4-5%) as TSLA bled "
+                   "another -2.1%. optimal -0.36 best, fund_6/30 -0.61. Leverage 1.077 (entering est net ~$14.9B). "
+                   "SpaceX weight 30.5%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-27",
+         "spacex_value_usd": 3.89026788e9 * (113.50 / 105.32),  # ~$4.193B
+         "per_share_old_split_adj": 105.32, "per_share_new": 113.50,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $113.50 on 2026-07-27 (-1.36% vs 7/24 $115.07). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 257.38 (+1.97%). AUM 14.9B->15.2B (~+$0.01B flat flow; rise ~all market). HEDGE "
+                   "AGAIN: SPCX -1.4% & TSLA -1.2% DOWN but NAV +1.97% -> public ripped (SHOP +11.5%, GWRE +8.0%, "
+                   "MORN +5.7%, IT +4.9%). All methods UNDER (fund_6/30 -0.80 best); fund_6/30 now under 3 straight "
+                   "(intra-quarter drift toward the winning mid-caps -> watch). Leverage 1.077 (entering net "
+                   "$14.9B). SpaceX weight 29.8%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-28",
+         "spacex_value_usd": 3.89026788e9 * (116.41 / 105.32),  # ~$4.300B
+         "per_share_old_split_adj": 105.32, "per_share_new": 116.41,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $116.41 on 2026-07-28 (+2.56% vs 7/27 $113.50). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 264.20 (+2.65%). AUM 15.2B->15.5B => ~-$0.10B net outflow (rise is market). "
+                   "BROAD RALLY both sleeves: SPCX +2.6% AND public ripped (FDS +6.8%, GWRE +6.8%, MORN +6.4%). All "
+                   "methods UNDER (optimal -0.56, fund_6/30 -0.69); fund_6/30 now under 4 straight (12-day mean "
+                   "-0.21) -> likely a constant-weight-rebalance vs buy-and-hold artifact during the mid-cap rally; "
+                   "under investigation. Leverage 1.076 (entering net $15.2B). SpaceX weight 28.8%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-29",
+         "spacex_value_usd": 3.89026788e9 * (112.55 / 105.32),  # ~$4.158B
+         "per_share_old_split_adj": 105.32, "per_share_new": 112.55,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $112.55 on 2026-07-29 (-3.32% vs 7/28 $116.41). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 261.52 (-1.01%). AUM NOT provided for 7/29 (carry-forward ~$15.34B). SPCX -3.3% "
+                   "+ TSLA -3.0% dragged; mid-caps still up. fund_6/30 -0.59 (5th straight under). Leverage 1.074 "
+                   "(entering net $15.5B). SpaceX weight 29.0%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
+        {"date": "2026-07-30",
+         "spacex_value_usd": 3.89026788e9 * (112.20 / 105.32),  # ~$4.145B
+         "per_share_old_split_adj": 105.32, "per_share_new": 112.20,
+         "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX closed $112.20 on 2026-07-30 (-0.31% vs 7/29 $112.55). Marks the DISCLOSED 3/31 share "
+                   "count. BPTIX NAV 255.92 (-2.14%). 7/28->7/30 AUM 15.5->15.4B vs NAV -3.1% => ~+$0.38B net inflow "
+                   "over 2 days (first in weeks). MID-CAP WINNERS REVERSED (GWRE -8.4%, IT -7.7%, FDS -6.7%); all "
+                   "methods OVER (+1.05 to +2.45, fund_6/30 +1.60). fund_6/30 flipped under->over -> constant-weight "
+                   "mis-tracks concentrated winners both ways; buy-and-hold fix cuts 7/20-7/30 tracking sd 0.72->0.16. "
+                   "Leverage 1.075 (entering est net ~$15.34B). SpaceX weight 28.3%."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX",
+         "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
