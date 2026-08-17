@@ -167,6 +167,39 @@ function drawLookthrough() {
     "leverage &amp; borrowing</b> drift DAILY off AUM/NAV (redemptions shrink the fund, so leverage edges up). Mark = " +
     "Σ(shares × live price) − borrow; × " + POS.toLocaleString() + " for the position. Highest-confidence single basket " +
     "(6/30 weights + borrowings-leverage) — the mark object, separate from the multi-basket experiment below.";
+  const mb = d && d.meta && d.meta.mark_basket;
+  if (note && mb) note.innerHTML +=
+    `<div style="margin-top:10px;padding:8px 12px;border:1px solid ${GRID};border-left:3px solid ${SPX};` +
+    `border-radius:6px;background:var(--panel-2);font-size:.8rem;color:${TEXT}">` +
+    `<b>Mark basket ${mb.version} — re-anchored to the 7/31 disclosure.</b> Leverage <b>${mb.leverage.toFixed(2)}</b> ` +
+    `(long 110% / cash −10% of NET; stocks = 110% of net = 100% of gross). SpaceX = 36.94M disclosed sh ÷ shares-out = ` +
+    `<b>${mb.spx_sh_per_bptix.toFixed(4)}</b> sh/BPTIX (${mb.spx_pct_gross}% of GROSS = 27.2% of net); borrow ` +
+    `−$${mb.borrow_per_bptix.toFixed(2)}/BPTIX. Top-10 = disclosed 7/31 weights, tail = 6/30 scaled. ` +
+    `<b>Forward accuracy (8/3+): RMS $${mb.rms_forward.toFixed(2)}/BPTIX (~${mb.rms_forward_pct_nav}% of NAV)</b> — ` +
+    `vs a stale-v3 (un-updated) basket now at RMS $${mb.rms_stale_v3.toFixed(2)}. Clean split v3→v4 at <b>${mb.clean_split_date}</b>.</div>`;
+  const sv = d && d.meta && d.meta.slow_vars;
+  if (note && sv && sv.latest) {
+    const L = sv.latest, sh = L.shift, on = sv.alert;
+    const live = sv.series.filter((s) => s.L_est);
+    const spark = live.slice(-30).map((s) => s.L_est_adj != null ? s.L_est_adj : s.L_est);
+    const lo = Math.min.apply(null, spark), hi = Math.max.apply(null, spark);
+    const bars = spark.map((v) => {
+      const h = hi > lo ? 4 + 16 * (v - lo) / (hi - lo) : 10;
+      return `<span style="display:inline-block;width:4px;height:${h.toFixed(0)}px;background:${SPX};` +
+             `opacity:.75;margin-right:1px;vertical-align:bottom"></span>`;
+    }).join("");
+    note.innerHTML +=
+      `<div style="margin-top:8px;padding:8px 12px;border:1px solid ${GRID};border-left:3px solid ${on ? BAD : GOOD};` +
+      `border-radius:6px;background:var(--panel-2);font-size:.8rem;color:${TEXT}">` +
+      `<b>Slow-variable tracker</b> ${on ? `<span style="color:${BAD};font-weight:700">⚠ LEVERAGE SHIFT</span>` : `<span style="color:${GOOD}">✓ stable</span>`} — ` +
+      `the two drivers of basket drift that <i>don't</i> need a disclosure. ` +
+      `<b>SpaceX/BPTIX ${L.spx_sh_per_bptix != null ? L.spx_sh_per_bptix.toFixed(4) : "—"}</b> (exact: 36.94M ÷ AUM/NAV). ` +
+      `<b>Leverage ${L.L_est_adj != null ? L.L_est_adj.toFixed(3) : L.L_est.toFixed(3)}</b> ` +
+      `(fit w/ w_spx pinned, calibrated −${sv.bias_vs_disclosed} vs the 7/31 disclosed 1.10) vs model <b>${L.L_model.toFixed(3)}</b>. ` +
+      (sh != null ? `Shift vs own trailing baseline <b>${sh >= 0 ? "+" : ""}${sh.toFixed(3)}</b> for <b>${L.alert_streak}</b> straight days. ` : "") +
+      `<span style="color:${MUTED}">Shift is bias-immune, so it fires BEFORE a disclosure exists — it flagged July's 1.07→1.10 re-levering on 7/21, ~3 weeks early.</span>` +
+      `<div style="margin-top:6px">${bars} <span style="color:${MUTED};font-size:.7rem">L (calibrated), last ${spark.length} obs: ${lo.toFixed(3)}–${hi.toFixed(3)}</span></div></div>`;
+  }
   const kp = document.getElementById("lookthrough-kpis");
   if (kp) {
     const kpi = (label, val, sub) =>
