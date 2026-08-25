@@ -1,0 +1,32 @@
+component,shares_per_bptix,shares_for_30000,value_per_bptix_7_31,pct_of_nav,pct_of_gross,price_2026_07_31,source
+SPCX (SpaceX),0.631306,18939.18,68.4146,27.231,24.755,108.37,disclosed 36.94M sh / 58.51M shares-out
+TSLA,0.110116,3303.48,34.2692,13.64,12.4,311.21,disclosed 7/31 wt
+SCHW,0.13918,4175.4,14.6473,5.83,5.3,105.24,disclosed 7/31 wt
+MSCI,0.022699,680.97,12.9893,5.17,4.7,572.24,disclosed 7/31 wt
+SHOP,0.103799,3113.97,12.1601,4.84,4.4,117.15,disclosed 7/31 wt
+H,0.068273,2048.19,11.8836,4.73,4.3,174.06,disclosed 7/31 wt
+ACGL,0.109963,3298.89,11.0546,4.4,4.0,100.53,disclosed 7/31 wt
+SPOT,0.021559,646.77,10.7782,4.29,3.9,499.94,disclosed 7/31 wt
+FDS,0.038851,1165.53,10.2256,4.07,3.7,263.2,disclosed 7/31 wt
+GWRE,0.058205,1746.15,8.8437,3.52,3.2,151.94,disclosed 7/31 wt
+IT,0.056998,1709.94,8.6078,3.426,3.115,151.02,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+MTN,0.049922,1497.66,7.4573,2.968,2.698,149.38,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+VRSK,0.037860,1135.8,7.377,2.936,2.669,194.85,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+IDXX,0.012911,387.33,7.2182,2.873,2.612,559.07,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+CSGP,0.240008,7200.24,6.9026,2.747,2.498,28.76,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+CHH,0.061640,1849.2,6.8722,2.735,2.487,111.49,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+RRR,0.086303,2589.09,5.5614,2.214,2.012,64.44,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+MORN,0.028413,852.39,5.4715,2.178,1.98,192.57,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+KNSL,0.015232,456.96,5.429,2.161,1.964,356.42,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+ONON,0.133493,4004.79,4.8378,1.926,1.751,36.24,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+BIRK,0.123620,3708.6,4.7866,1.905,1.732,38.72,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+AMZN,0.009919,297.57,2.6938,1.072,0.975,271.58,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+FIG,0.065344,1960.32,1.5892,0.633,0.575,24.32,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+MRNA,0.023550,706.5,1.291,0.514,0.467,54.82,implied from the 8/19 MRNA +177% move (back-solved; v4.1 was +25% too high)
+GOOG,0.003345,100.35,1.193,0.475,0.432,356.65,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+GLPI,0.026546,796.38,1.189,0.473,0.43,44.79,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+HEI,0.002489,74.67,0.887,0.353,0.321,356.36,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+LLY,0.000740,22.2,0.8501,0.338,0.308,1148.84,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+HEI-A,0.002291,68.73,0.5894,0.235,0.213,257.28,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+GOOGL,0.000827,24.81,0.2945,0.117,0.107,356.13,"6/30 SHARES x 0.9396 (buy-and-hold, uniform fit) +MRNA-freed prorata"
+CASH (borrow),,,-25.124,-10.0,-9.091,,L=1.10 -> cash -10% of net

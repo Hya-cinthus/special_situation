@@ -38,16 +38,16 @@
       <section class="card">
         <h2>Daily P&L — Long vs Short vs Total (entered 2026-05-20)</h2>
         <p class="desc">
-          Long 130,000 BPTIX, short its public holdings (Arch, CoStar, Tesla, Hyatt, Schwab, …) at fixed
+          Long <span class="pos-sh">30,000</span> BPTIX, short its public holdings (Arch, CoStar, Tesla, Hyatt, Schwab, …) at fixed
           share counts — a delta-1 hedge to <b>strip out the public book and isolate the private (SpaceX)
           exposure</b> inside the fund. The long and short legs should track closely; the <b>Total</b> (orange)
           is the residual — i.e. what you actually earn on the un-hedgeable SpaceX/private slice. Two accounts,
           shown as combined total.
         </p>
         <p class="desc" style="margin:2px 0 8px">
-          <b>Basket method</b> — the long (130k BPTIX) is fixed; only the short changes. Each option below uses the
+          <b>Basket method</b> — the long (<span class="pos-sh">30,000</span> BPTIX) is fixed; only the short changes. Each option below uses the
           fund's <b>real holdings</b> at a disclosure date (3/31 NPORT, or the 4/30 / 5/31 site back-solves), held
-          constant and scaled to your ~$24.8M short (net — the fund is <b>net-cash on 5/31, no leverage</b>).
+          constant and scaled to your <span class="pos-short-notl">~$5.7M</span> short (net — the fund is <b>net-cash on 5/31, no leverage</b>).
           <b>Finding:</b> the <b>4/30 and the 4/30+5/31 blend</b> baskets cut the residual swing the most
           (≈$31–33k vs your actual $49k and the stale 3/31 $66k) — because the fund's weights have <b>drifted</b>
           (esp. Tesla, diluted by inflows) and the window sits between those snapshots. The data-fit <b>Optimal</b>
@@ -90,7 +90,7 @@
         <p class="desc">
           Instead of assuming a <b>fixed</b> leverage (1.1335) and calling the short "under-hedged", flip the
           question: <b>what leverage would make the fixed short an exact hedge each day?</b> Solve
-          <code>L* = SpaceX wt + short notional ÷ (130k × BPTIX NAV)</code> daily. Read it against the assumed
+          <code>L* = SpaceX wt + short notional ÷ (shares × BPTIX NAV)</code> daily. Read it against the assumed
           1.1335 (dashed) and 1.00 (unlevered, dotted): <b>implied &lt; assumed → the fund carries more public
           beta than the short covers → under-hedged (long dominates)</b>; implied &gt; assumed → over-hedged
           (short dominates).
@@ -143,7 +143,7 @@
       <section class="card" id="drift-card">
         <h2>Hedge drift — your fixed short vs your per-share public exposure</h2>
         <p class="desc">
-          Your short is a <b>fixed share count</b> from 5/20, and you hold a <b>fixed</b> 130k BPTIX shares.
+          Your short is a <b>fixed share count</b> from 5/20, and you hold a <b>fixed</b> <span class="pos-sh">30,000</span> BPTIX shares.
           As the fund takes inflows it issues <b>new shares to new investors</b> and buys public stock with
           their cash — that does <b>not</b> add public exposure to <i>your</i> shares. Your per-share public
           exposure rises only because <b>SpaceX (carried at $3.89B, then re-marked to ~$4.99B on the 6/4

@@ -18,6 +18,7 @@ import datetime
 import statistics
 import urllib.request
 
+import config as cfg
 import nport_holdings
 import fund_snapshots
 
@@ -25,9 +26,12 @@ _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
 _UA = {"User-Agent": "Mozilla/5.0"}
 ENTRY = "2026-05-20"
 
-# Total shares (account1 + account2) from the book. Yahoo tickers (HEI/A -> HEI-A).
-# Long BPTIX; everything else short (negative).
-POSITIONS = {
+# Total shares (account1 + account2) from the book, AS STRUCK on 2026-05-20 at the
+# original 130k size. Yahoo tickers (HEI/A -> HEI-A). Long BPTIX; everything else short.
+# Do NOT edit these to resize the book — they are the historical record. Resize with
+# config.POSITION_BPTIX_SHARES; POSITIONS below is scaled from this by POSITION_SCALE,
+# which keeps every hedge RATIO identical and simply rescales the $ P&L.
+POSITIONS_ORIGINAL = {
     "BPTIX": 130000,
     "ACGL": -16369, "BIRK": -13423, "CHH": -9569, "CSGP": -27884, "FDS": -4982,
     "FIG": -4835, "GLPI": -6827, "GWRE": -6517, "H": -9022, "HEI": -483,
@@ -35,6 +39,10 @@ POSITIONS = {
     "MTN": -6923, "ONON": -11341, "RRR": -12077, "SCHW": -15428, "SHOP": -7092,
     "SPOT": -2015, "TSLA": -16836, "VRSK": -2869,
 }
+# BPTIX takes the exact configured share count; the shorts scale pro-rata (rounded to
+# whole shares) so the hedge ratio is preserved to <0.01%.
+POSITIONS = {tk: (cfg.POSITION_BPTIX_SHARES if tk == "BPTIX" else round(sh * cfg.POSITION_SCALE))
+             for tk, sh in POSITIONS_ORIGINAL.items()}
 
 
 # Manual NAV/price points for days Yahoo hasn't posted yet (mutual-fund NAV lags
@@ -77,7 +85,7 @@ def build_payload():
     # trading-day calendar = dates where BPTIX has a price (the long anchor)
     dates = sorted(d for d in px["BPTIX"] if d >= ENTRY)
     entry_px = {tk: px[tk].get(ENTRY) for tk in POSITIONS}
-    LONG_SH = POSITIONS["BPTIX"]                     # 130,000
+    LONG_SH = POSITIONS["BPTIX"]                     # config.POSITION_BPTIX_SHARES
 
     # Fund-level series (SpaceX $, net NAV, SpaceX weight) for two extra studies:
     #  (a) strip the SpaceX re-mark out of the long/total P&L (toggle on the chart);
@@ -90,7 +98,7 @@ def build_payload():
         sbx, assumed_lev = {}, None
 
     # --- alternative basket constructions (chart toggle) ----------------------
-    # The LONG (130k BPTIX) is fixed; only the SHORT changes by method:
+    # The LONG (BPTIX) is fixed; only the SHORT changes by method:
     #   ACTUAL    = your real fixed shares.
     #   CONSTANT  = sized RIGHT at entry (fund weights × your gross public exposure),
     #               then held fixed. allocation + leverage scale, no rebalance.
@@ -283,7 +291,7 @@ def build_payload():
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "entry_date": ENTRY,
             "disclaimer": ("Analysis, not investment advice. Delta-1 book entered " + ENTRY + " EOD: long "
-                           "130,000 BPTIX, short the fund's public holdings at fixed share counts (combined "
+                           f"{cfg.POSITION_BPTIX_SHARES:,} BPTIX, short the fund's public holdings at fixed share counts (combined "
                            "across 2 accounts) to isolate the private (SpaceX) exposure. P&L = shares × "
                            "(close − entry close), Yahoo daily closes. Two accounts shown as TOTAL only. "
                            "Excludes financing/borrow, dividends, and BPTIX's leverage/fees. Model, not a "

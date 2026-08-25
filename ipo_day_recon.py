@@ -28,6 +28,7 @@ import random
 
 import hedge_book
 import fund_snapshots
+import config as cfg
 from config import SpacexBaron as CFG
 
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -366,7 +367,7 @@ def build_payload():
     nc_methods = []
     try:
         hs = H["series"]
-        LONG = 130000
+        LONG = cfg.POSITION_BPTIX_SHARES
         for m, key in noise_keys.items():
             ser, fri = [], None
             for i in range(1, len(hs)):
@@ -444,7 +445,7 @@ def build_payload():
     # looks like + its hedging residual (≈0 in-sample, Friday is the only nonzero).
     best_fit = None
     try:
-        LONG = 130000
+        LONG = cfg.POSITION_BPTIX_SHARES
         fit_names = [t for t in fund_snapshots.WEIGHTS_5_31 if t != "SPY"]
         hs2 = H["series"]
         # Reconstruct each stock's daily close from hedge_book (NO network — robust on

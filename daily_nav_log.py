@@ -19,6 +19,7 @@ the user's preference). Pure stdlib; the 6/12 base closes are read from hedge_bo
 import json
 import os
 
+import config as cfg
 import fund_snapshots as fs
 
 _REPO_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -60,12 +61,24 @@ FRIDAY_SPACEX_BUY = 0.262e9
 #             ~1.13 mandate. BORROWINGS pinned two ways that agree: (a) 6/30 gross-net =
 #             SpaceX$/0.329 - net ~$1.08B; (b) an OLS of NAV returns on [SPCX ret, 6/30-basket
 #             ret] => L 1.068 over recent net ~$17.8B => ~$1.2B. Central ~$1.15B (band $1.0-1.4B).
+#   >=7/31   : 1.10 — DISCLOSED. Baron's 7/31 as-of posting states "Long Equity 110.0% of Net
+#             Assets / Cash and Cash Equivalents -10.0%", i.e. L = 1.10 exactly. This SUPERSEDES
+#             the borrowings model from 7/31 forward (the model could only drift L passively with
+#             redemptions; it could not see Baron ACTIVELY re-levering ~$1.15B -> ~$1.47B during
+#             July, which the slow-var tracker flagged on 7/21). Applied FORWARD ONLY so the
+#             pre-7/31 history — and every frozen as-of vintage — is left untouched.
+#             Ratio vs fixed-$ carry-forward is a near tie against the tracker (RMS 0.0140 vs
+#             0.0156 over 7/31-8/14); the disclosure is phrased as a RATIO, so we hold the ratio.
 BORROWINGS_USD = 1.15e9
+LEVERAGE_DISCLOSED_FROM = "2026-07-31"
+LEVERAGE_DISCLOSED_VALUE = 1.10
 def LEVERAGE_FOR(date, net_aum=None):
     if date <= "2026-06-15":
         return 0.968
     if date <= "2026-06-25":
         return 1.00
+    if date >= LEVERAGE_DISCLOSED_FROM:
+        return LEVERAGE_DISCLOSED_VALUE          # disclosed 7/31: long 110% / cash -10% of net
     if net_aum:
         return 1.0 + BORROWINGS_USD / net_aum   # drifts up as redemptions shrink net
     return 1.06                                  # fallback if net unknown
@@ -691,6 +704,84 @@ ENTRIES = [
              "(disclosed shares). BPTIX NAV 283.98 (-0.50%), AUM 16.3B. Scoring: fund_5/31 best -0.07, fund_6/30 & blend +0.11, ronb +0.55 worst; mark baskets v4 -0.18, v4.1 -0.05 (v4.1 closest today). Quiet day: SPCX -0.9%; public mixed "
              "(SPOT +2.9%, SCHW +0.9%, TSLA +0.7% up; GWRE -3.8%, BIRK -4.0%, IDXX -2.8%, FIG -3.5% down). AUM "
              "16.4B->16.3B vs NAV -0.50% => ~-$0.02B (flat). Leverage 1.070 (model) vs slow-var tracker ~1.09."},
+    {"date": "2026-08-17", "spcx": 146.23, "actual_nav": 284.23, "aum": 16.3e9,
+     "closes": {"ACGL": 97.81, "BIRK": 37.86, "CHH": 104.93, "CSGP": 31.35, "FDS": 276.76,
+                "FIG": 24.99, "GLPI": 42.25, "GWRE": 171.99, "H": 181.60, "HEI": 371.28,
+                "HEI-A": 270.60, "IDXX": 546.09, "IT": 179.19, "KNSL": 367.16, "MSCI": 550.68,
+                "MTN": 146.60, "ONON": 31.31, "RRR": 63.21, "SCHW": 110.58, "SHOP": 148.65,
+                "SPOT": 492.47, "TSLA": 339.30, "VRSK": 175.62,
+                "AMZN": 261.31, "GOOGL": 344.00, "GOOG": 341.45, "LLY": 1183.16, "MRNA": 64.46, "MORN": 206.74},
+     "note": "Mon 8/17. Closes fetched T+1 (Yahoo). SPCX +4.45% (140.00->146.23) => SpaceX ~$5.40B "
+             "(disclosed shares). BPTIX NAV 284.23 (+0.09%), AUM 16.3B. Scoring: fund_5/31 best +0.23, ronb +0.37, fund_6/30 +0.46; all methods over (SpaceX-up / public-down day). SpaceX +4.5% carried a weak public "
+             "tape (MSCI -3.2%, VRSK -3.3%, FDS -2.4%, SHOP -3.7%, BIRK -3.8%, CSGP -3.2% down) to a ~flat NAV. AUM "
+             "flat 16.3B => ~-$0.01B. FIRST DAY on the DISCLOSED leverage 1.10 (LEVERAGE_FOR now returns the 7/31 "
+             "disclosed 1.10 from 7/31 forward; pre-7/31 history and all frozen as-of vintages untouched)."},
+    {"date": "2026-08-18", "spcx": 143.34, "actual_nav": 283.92, "aum": 16.3e9,
+     "closes": {"ACGL": 98.91, "BIRK": 37.23, "CHH": 107.18, "CSGP": 31.38, "FDS": 285.41,
+                "FIG": 26.01, "GLPI": 42.08, "GWRE": 177.76, "H": 178.72, "HEI": 368.01,
+                "HEI-A": 268.78, "IDXX": 553.32, "IT": 182.07, "KNSL": 372.71, "MSCI": 562.77,
+                "MTN": 149.78, "ONON": 31.03, "RRR": 61.51, "SCHW": 111.68, "SHOP": 146.58,
+                "SPOT": 516.28, "TSLA": 336.87, "VRSK": 178.86,
+                "AMZN": 259.45, "GOOGL": 344.20, "GOOG": 341.28, "LLY": 1225.73, "MRNA": 62.96, "MORN": 208.73},
+     "note": "Tue 8/18. Closes fetched T+1 (Yahoo). SPCX -1.98% (146.23->143.34) => SpaceX ~$5.29B "
+             "(disclosed shares). BPTIX NAV 283.92 (-0.11%), AUM 16.3B. Scoring: optimal best -0.14, fund_5/31 -0.26, fund_6/30 -0.32, ronb -0.69 worst; mark baskets v4 -0.14, v4.1 +0.07. SpaceX -2.0% mostly offset by a "
+             "firmer public tape (FDS +3.1%, GWRE +3.4%, FIG +4.1%, MSCI +2.2%, IT +1.6%, SPOT +0.8% up; SHOP -1.4%, "
+             "TSLA -0.7% down) -> NAV ~flat. AUM flat 16.3B => ~+$0.02B (negligible). Leverage 1.10 (disclosed)."},
+    {"date": "2026-08-19", "spcx": 139.65, "actual_nav": 289.17, "aum": 16.6e9,
+     "closes": {"ACGL": 98.53, "BIRK": 36.13, "CHH": 109.21, "CSGP": 33.73, "FDS": 298.10,
+                "FIG": 26.79, "GLPI": 42.90, "GWRE": 181.18, "H": 183.01, "HEI": 363.42,
+                "HEI-A": 264.39, "IDXX": 562.20, "IT": 192.82, "KNSL": 379.42, "MSCI": 565.27,
+                "MTN": 153.05, "ONON": 31.26, "RRR": 61.25, "SCHW": 110.88, "SHOP": 146.58,
+                "SPOT": 533.37, "TSLA": 351.12, "VRSK": 186.45,
+                "AMZN": 265.84, "GOOGL": 344.72, "GOOG": 341.70, "LLY": 1280.34, "MRNA": 174.38, "MORN": 213.65},
+     "note": "Wed 8/19. Closes fetched T+1 (Yahoo). *** MRNA +176.9% (62.96->174.38) -- a natural "
+             "STRESS TEST of the tail rule (MRNA is a TAIL name, so v4 and v4.1 differ on it by 35%: v4 0.03968 "
+             "sh/BPTIX vs v4.1 0.02942, a $1.14/BPTIX divergence on this day = ~8x normal daily noise). *** SPCX "
+             "-2.57% (143.34->139.65) => SpaceX ~$5.16B. BPTIX NAV 289.17 (+1.85%), AUM 16.6B. STRESS-TEST RESULT (error on the DAILY MOVE): v4.1 +0.65 BEST, v3 +0.98, v4 +1.69 WORST -> buy-and-hold tail CONFIRMED under stress; v4's constant-weight tail (which ADDED MRNA because it had fallen) is the worst by 2.6x. Back-solving the actual move for the fund's real MRNA gives ~0.0225-0.0245 sh/BPTIX (tight: the $111 price move means +/-0.0014); so ALL baskets hold too much MRNA -- v4 +69%, v3 +33%, v4.1 +25% -> the fund trimmed the tail MORE than a uniform haircut (or partly exited MRNA). NAV rose "
+             "DESPITE SpaceX -2.6% because MRNA alone added ~$3.3-4.4/BPTIX; broad public also firm (FDS +4.4%, "
+             "IT +5.9%, LLY +4.5%, SPOT +3.3%, TSLA +4.2%). AUM 16.3B->16.6B vs NAV +1.85% => ~ZERO flow "
+             "(16.3*1.0185=16.60 exactly; redemptions still stopped). Leverage 1.10 (disclosed)."},
+    {"date": "2026-08-20", "spcx": 134.00, "actual_nav": 282.83, "aum": 16.2e9,
+     "closes": {"ACGL": 99.31, "BIRK": 34.55, "CHH": 109.25, "CSGP": 32.26, "FDS": 300.06,
+                "FIG": 27.31, "GLPI": 43.71, "GWRE": 181.79, "H": 179.48, "HEI": 350.58,
+                "HEI-A": 257.92, "IDXX": 545.86, "IT": 193.68, "KNSL": 381.15, "MSCI": 568.75,
+                "MTN": 150.22, "ONON": 29.90, "RRR": 61.09, "SCHW": 109.79, "SHOP": 147.18,
+                "SPOT": 533.13, "TSLA": 345.13, "VRSK": 187.68,
+                "AMZN": 260.11, "GOOGL": 340.67, "GOOG": 338.20, "LLY": 1244.40, "MRNA": 133.32, "MORN": 217.49},
+     "note": "Thu 8/20. Closes fetched T+1 (Yahoo). *** MRNA -23.5% (174.38->133.32) = a SECOND MRNA "
+             "shock, and this one is genuinely OUT-OF-SAMPLE for the v4.2 fix (v4.2's MRNA count was back-solved "
+             "from 8/19). *** SPCX -4.05% (139.65->134.00) => SpaceX ~$4.95B. BPTIX NAV 282.83 (-2.19%), AUM 16.2B. "
+             "OUT-OF-SAMPLE RESULT for the v4.2 MRNA fix -- error on the DAILY MOVE: v4.1 -0.10, v4.2 +0.14, v4 -0.60 (worst); on LEVEL: v4.2 +0.17 BEST, v4.1 +0.62, v4 +0.96. Re-solving MRNA independently from THIS day gives 0.02694 vs 8/19's 0.02355 -- they AGREE within noise (0.87 sigma; the $41 move here is ~8x less informative than 8/19's $111). Precision-weighted combined: MRNA = 0.02396 +/- 0.00126, so v4.2 (0.02355) is within 1.7% and v4.1 is +23% high. Both SpaceX and MRNA fell; partly cushioned by FDS +0.7%, KNSL +0.5%, IT +0.4%, TSLA -1.7%. "
+             "AUM 16.6B->16.2B vs NAV -2.19% => ~+$0.04B (flat-to-small-in; redemptions still stopped). Leverage "
+             "1.10 (disclosed)."},
+    {"date": "2026-08-21", "spcx": 136.97, "actual_nav": 288.60, "aum": 16.5e9,
+     "closes": {"ACGL": 99.39, "BIRK": 35.64, "CHH": 109.62, "CSGP": 32.26, "FDS": 299.91,
+                "FIG": 27.10, "GLPI": 43.55, "GWRE": 189.19, "H": 180.67, "HEI": 355.04,
+                "HEI-A": 261.00, "IDXX": 556.93, "IT": 195.90, "KNSL": 383.55, "MSCI": 563.49,
+                "MTN": 152.81, "ONON": 30.02, "RRR": 61.09, "SCHW": 112.30, "SHOP": 149.25,
+                "SPOT": 533.72, "TSLA": 362.86, "VRSK": 187.50,
+                "AMZN": 258.63, "GOOGL": 344.82, "GOOG": 341.75, "LLY": 1255.40, "MRNA": 145.13, "MORN": 215.97},
+     "note": "Fri 8/21. Closes fetched T+1 (Yahoo). SPCX +2.22% (134.00->136.97) => SpaceX ~$5.06B "
+             "(disclosed shares). BPTIX NAV 288.60 (+2.04%), AUM 16.5B. Scoring: ronb best -0.04, fund_6/30 +0.20, optimal +0.39, fund_3/31 +0.94 worst. MARK BASKETS (3rd straight MRNA event, +8.9%): LEVEL error v4.2 +0.05 BEST, v4.1 +0.57, v4 +1.04 -- a clean ordering by MRNA share count. The day's own implied MRNA is 0.03426 but essentially uninformative (|dP| only $11.81 -> sd +/-0.0127). Precision-weighted across all 3 MRNA events: MRNA = 0.02406 +/- 0.00126, so v4.2 is within 2.1% and v4.1 is +22% high. Broad risk-on: SPCX +2.2%, TSLA "
+             "+5.1%, MRNA +8.9% (third straight big MRNA day), GWRE +4.1%, SCHW +2.3%, IDXX +2.0%. AUM 16.2B->16.5B "
+             "vs NAV +2.04% => ~-$0.03B (flat; redemptions still stopped). Leverage 1.10 (disclosed)."},
+    {"date": "2026-08-24", "spcx": 135.00, "actual_nav": 287.28, "aum": 16.5e9,
+     "closes": {"ACGL": 101.14, "BIRK": 35.30, "CHH": 111.12, "CSGP": 32.84, "FDS": 305.31,
+                "FIG": 27.44, "GLPI": 43.93, "GWRE": 191.89, "H": 180.09, "HEI": 352.67,
+                "HEI-A": 259.23, "IDXX": 559.51, "IT": 202.78, "KNSL": 395.51, "MSCI": 571.36,
+                "MTN": 150.00, "ONON": 29.51, "RRR": 60.78, "SCHW": 113.65, "SHOP": 149.80,
+                "SPOT": 537.84, "TSLA": 348.95, "VRSK": 189.55,
+                "AMZN": 262.07, "GOOGL": 348.06, "GOOG": 344.59, "LLY": 1246.93, "MRNA": 138.89, "MORN": 217.50},
+     "note": "Mon 8/24. Closes fetched T+1 (Yahoo). SPCX -1.44% (136.97->135.00) => SpaceX ~$4.99B "
+             "(disclosed shares). BPTIX NAV 287.28 (-0.46%), AUM 16.5B (flat). *** ALL EIGHT daily-log baskets "
+             "UNDER-predicted (fund_6/30 -0.43 best, optimal -0.48, fund_5/31 -0.52, blend -0.64, fund_4/30 -0.75, "
+             "actual -0.91, fund_3/31 -1.02, ronb -1.08 worst) -- and the miss is now QUANTITATIVELY explained: every NPORT-snapshot basket is TSLA-OVERWEIGHT vs the disclosed 7/31 weight (fund_3/31 +74%, 4/30 +52%, 5/31 +41%, 6/30 +21%), and TSLA fell -3.83%. Regressing each basket's actual error on (TSLA excess shares x dP_TSLA) across the 7 NPORT-derived baskets gives R^2 = 0.956, slope 0.92, residual RMS 0.044 -- the stale TSLA overweight ALONE explains ~96% of the cross-basket error spread. This is the basket-drift theory finally MEASURED, not inferred, and it independently validates the 7/31 re-anchor. RONB is the informative exception: it carries the right TSLA (+2.6%) yet was the WORST basket (-1.08), so its miss is portfolio composition, not TSLA. *** MARK BASKETS (LEVEL): v4.2 +0.22 BEST, v4.1 +0.70, v4 +1.06, v3 +1.79. Forward 8/3-8/24 (n=16): v4.2 RMS 0.188 (bias +0.111, SD 0.152); v4.1 RMS 0.372 (bias +0.262, SD 0.265); v4 RMS 0.601; v3 RMS 1.562 -> v4.2 has HALVED v4.1 over the full window. On the daily MOVE all four are tight (v4 +0.02, v4.1 +0.14, v4.2 +0.18, v3 +0.27) -- no signal today. MRNA -4.30% but |dP| only $6.24, so this day's implied MRNA (0.05120, sd +/-0.024) carries just 0.3% of the precision weight; 4-event combined 0.02413 +/- 0.00126 (v4.2 within 2.4%, v4.1 +21.9% = 4.2 sigma). "
+             "Movers: IT +3.5%, KNSL +3.1%, FDS +1.8%, CSGP +1.8%, ACGL +1.8% up vs TSLA -3.8%, MRNA -4.3%, "
+             "MTN -1.8%, ONON -1.7% down. AUM 16.5B->16.5B vs NAV -0.46% => implied flow +$0.075B (the first "
+             "apparent INFLOW), but the 0.1B AUM rounding spans -0.10..+0.17B so it is NOT yet significant -- "
+             "watch for a second confirming day. RONB -0.21% x1.3 = -0.27% vs actual -0.46%. Leverage 1.10 "
+             "(disclosed). 6/30 NPORT-P still NOT filed as of 8/25 (latest Baron filing: N-PX 8/18); the Aug 20-30 "
+             "window is open."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
@@ -869,7 +960,7 @@ def _lookthrough(rows, w6):
     return {"date": r["date"], "is_estimate": r.get("actual_nav") is None, "nav": round(nav, 2),
             "aum_b": round(aum / 1e9, 2), "bptix_shares_out_m": round(N / 1e6, 2), "leverage": round(L, 4),
             "borrowings_b": round((L - 1) * aum / 1e9, 3), "borrow_per_bptix": round(borrow_pb, 2),
-            "position_shares": 130000, "holdings": holdings}
+            "position_shares": cfg.POSITION_BPTIX_SHARES, "holdings": holdings}
 
 
 # 7/31 as-of disclosure (Baron): top-10 % of GROSS (total investments), + Long Equity 110% / Cash -10%.

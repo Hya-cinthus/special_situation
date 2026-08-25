@@ -40,6 +40,12 @@ function render() {
   const m = DATA.meta;
   document.getElementById("disclaimer").textContent = m.disclaimer;
   document.getElementById("gen").textContent = "Generated " + m.generated_at;
+  // Position size is a single knob (config.POSITION_BPTIX_SHARES -> meta.long_shares).
+  // Fill every .pos-sh / .pos-short-notl in the copy so no size is hardcoded in the HTML.
+  if (m.long_shares != null)
+    document.querySelectorAll(".pos-sh").forEach((el) => { el.textContent = m.long_shares.toLocaleString(); });
+  if (m.short_notional != null)
+    document.querySelectorAll(".pos-short-notl").forEach((el) => { el.textContent = "~" + usd(m.short_notional); });
   renderKpis(); renderChart(); renderShortBreakdown(); renderLegs(); renderImpliedLev();
   const tog = document.getElementById("ex-remark-toggle");
   if (tog) tog.addEventListener("change", (e) => { EX_REMARK = e.target.checked; renderChart(); });
@@ -114,7 +120,7 @@ function renderOptimal(O) {
     `The mismatch card's "add Tesla" used the <i>stale</i> 3/31 weight; the fund's Tesla weight has since dropped (inflow dilution + relative moves), and your basket was already closer to current.</p>` +
     `<p class="dim"><b>Constant vs dynamic?</b> Don't scale with AUM. Over this window AUM grew <b>${dy.aum_growth_pct}%</b> but ` +
     `scaling the hedge by AUM made the swing <b style="color:${BAD}">worse</b> (${usd(dy.aum_scaled_swing)} vs ${usd(dy.constant_swing)} constant) — ` +
-    `because you hold a <b>fixed 130k shares</b>, so inflows buy stock for <i>new</i> investors, not you; your exposure tracks ` +
+    `because you hold a <b>fixed share count</b>, so inflows buy stock for <i>new</i> investors, not you; your exposure tracks ` +
     `NAV-per-share (+${dy.navshare_growth_pct}%), not AUM. So keep the hedge <b>~constant in share count</b>; the only real "dynamic" ` +
     `lever is updating the relative <b>weights</b> (esp. Tesla) when fresh holdings are disclosed — not chasing daily P&L (that overfits).</p>`;
   const body = O.recommended.map((r) =>

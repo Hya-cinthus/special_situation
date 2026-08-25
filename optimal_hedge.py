@@ -20,6 +20,7 @@ import json
 import os
 import datetime
 
+import config as cfg
 import hedge_book
 import nport_holdings
 
@@ -118,7 +119,7 @@ def build_payload():
     for d in dates:
         for tk in px:
             last[tk] = px[tk].get(d, last[tk])
-        longp = 130000 * (last["BPTIX"] - NAVe); rmk = hbser[d]["spacex_remark_pnl"]
+        longp = cfg.POSITION_BPTIX_SHARES * (last["BPTIX"] - NAVe); rmk = hbser[d]["spacex_remark_pnl"]
         aum_r = sbx.get(d, {}).get("total_nav_usd", NETe) / NETe
         nav_r = last["BPTIX"] / NAVe
         def nx(s):

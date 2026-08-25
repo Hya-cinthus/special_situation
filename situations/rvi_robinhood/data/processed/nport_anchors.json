@@ -70,5 +70,92 @@
     ],
     "source": "measured",
     "confidence": "high"
+  },
+  {
+    "report_date": "2026-06-30",
+    "filing_date": "2026-08-21",
+    "accession": "0000894189-26-022643",
+    "net_assets_usd": 681768890.13,
+    "total_assets_usd": 686489558.83,
+    "n_holdings": 15,
+    "top_holdings": [
+      {
+        "name": "First American Government Obligations Fund Class X",
+        "valUSD": 220087936.48,
+        "pctVal": 32.28189782
+      },
+      {
+        "name": "OpenAI Group PBC (Class A Common Stock)",
+        "valUSD": 74998783.71,
+        "pctVal": 11.0006168946
+      },
+      {
+        "name": "Mercor.io Corporation (Series C Preferred Stock)",
+        "valUSD": 53448150.0,
+        "pctVal": 7.8396287619
+      },
+      {
+        "name": "Databricks, Inc. (Series L Preferred Stock)",
+        "valUSD": 53036661.78,
+        "pctVal": 7.7792727929
+      },
+      {
+        "name": "Revolut Group Holdings Ltd (United Kingdom) (Ordinary Shares)",
+        "valUSD": 49816304.6,
+        "pctVal": 7.3069195913
+      },
+      {
+        "name": "Databricks, Inc. (Series K Preferred Stock)",
+        "valUSD": 33589865.64,
+        "pctVal": 4.9268698127
+      },
+      {
+        "name": "Airwallex (Cayman) Limited (Series G Preferred Stock)",
+        "valUSD": 32077466.97,
+        "pctVal": 4.7050353037
+      },
+      {
+        "name": "Stripe Global Holdings Inc. (Class B Common Stock)",
+        "valUSD": 29537046.0,
+        "pctVal": 4.3324132895
+      },
+      {
+        "name": "Boom Technology Inc (Series B-1 Preferred Stock)",
+        "valUSD": 26962627.98,
+        "pctVal": 3.9548046809
+      },
+      {
+        "name": "Canva, Inc. (Class A Common Stock)",
+        "valUSD": 24999928.18,
+        "pctVal": 3.6669212312
+      },
+      {
+        "name": "Oura Inc. (Series E Preferred Stock)",
+        "valUSD": 24813322.43,
+        "pctVal": 3.6395504091
+      },
+      {
+        "name": "Eleven Labs Inc. (Series D-1 Preferred Stock)",
+        "valUSD": 20000872.08,
+        "pctVal": 2.9336733268
+      },
+      {
+        "name": "Ramp Business Corporation (Series E-3 Preferred Stock)",
+        "valUSD": 19485000.0,
+        "pctVal": 2.8580066181
+      },
+      {
+        "name": "Ramp Business Corporation (Class A Common Stock)",
+        "valUSD": 13848240.0,
+        "pctVal": 2.0312220461
+      },
+      {
+        "name": "Space Exploration Technologies Corp (Class A Common Stock)",
+        "valUSD": 8543000.0,
+        "pctVal": 1.2530639229
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
   }
 ]

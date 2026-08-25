@@ -33,6 +33,33 @@ The whole stack is on **BPTIX** (the class the user holds): `NAV_TICKER = "BPTIX
 
 ---
 
+## Position size — ONE knob
+
+The whole book scales off a single constant in `config.py`:
+
+```python
+POSITION_BPTIX_SHARES_ORIGINAL = 130000   # size the 5/20 hedge book was struck at (history)
+POSITION_BPTIX_SHARES          = 30000    # <-- CURRENT size; change this and rebuild
+POSITION_SCALE = POSITION_BPTIX_SHARES / POSITION_BPTIX_SHARES_ORIGINAL
+```
+
+Everything derives from it — do **not** hardcode a share count anywhere:
+- `hedge_book.POSITIONS` = `POSITIONS_ORIGINAL x POSITION_SCALE` (BPTIX takes the exact count;
+  shorts scale pro-rata, so every hedge **ratio** is preserved and only the $ P&L rescales).
+  `POSITIONS_ORIGINAL` is the historical record of the 5/20 fills — never edit it to resize.
+- `ipo_day_recon`, `optimal_hedge`, `daily_nav_log` (look-through `position_shares`) read the constant.
+- Front-end: `hedge_book.json` `meta.long_shares` / `meta.short_notional` feed the `.pos-sh` /
+  `.pos-short-notl` spans in `hedge.html` (filled by `hedge_app.render()`); `app.js` reads
+  `lookthrough.position_shares`. No size is written into the HTML.
+- Mark-basket CSVs carry a `shares_for_<N>` column; re-run the rescale helper if N changes.
+
+**To resize:** edit `POSITION_BPTIX_SHARES`, run `py build.py`, and rescale the CSV column. History
+keeps its shape; every $ series just scales by the same factor.
+
+2026-08-20: cut 130,000 -> 30,000 (scale 0.23077), long and short together.
+
+---
+
 ## The files to edit each day  (in this order)
 
 ### 1. `daily_nav_log.py` — `ENTRIES`

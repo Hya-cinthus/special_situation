@@ -1,7 +1,7 @@
 """
 Hedge-drift analysis -> dashboard/data/hedge_drift.json
 
-Your hedge is FIXED: long 130,000 BPTIX shares + a fixed-share short basket of
+Your hedge is FIXED: long a fixed BPTIX position (config.POSITION_BPTIX_SHARES) + a fixed-share short basket of
 the fund's public holdings, both struck 2026-05-20. As the fund takes inflows and
 SpaceX stays marked flat, the hedge stops being delta-neutral. This quantifies by
 how much — and is careful to separate two very different numbers:

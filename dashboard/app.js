@@ -159,7 +159,7 @@ function drawLookthrough() {
   const d = DAILYLOG_DATA, lt = d && d.meta && d.meta.lookthrough;
   const card = document.getElementById("lookthrough-table");
   if (!lt || !card) return;
-  const POS = lt.position_shares || 130000;
+  const POS = lt.position_shares || 30000;
   const note = document.getElementById("lookthrough-note");
   if (note) note.innerHTML =
     "What ONE BPTIX share owns, look-through: shares of each underlier + a borrowing line. TWO layers — the " +

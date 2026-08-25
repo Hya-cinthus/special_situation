@@ -23,6 +23,20 @@ SEC_USER_AGENT = "special-situations-research weipeng_shao@berkeley.edu"
 # Folder the frontend reads from. build.py writes one JSON per situation here.
 DASHBOARD_DATA_DIR = "dashboard/data"
 
+# ---------------------------------------------------------------------------
+# POSITION SIZE — the single knob for "how big is our book"
+# ---------------------------------------------------------------------------
+# Every per-position number downstream (mark-basket share counts, the look-through
+# card, hedge-book legs, P&L series, dashboard copy) is derived from this. To resize
+# the whole book, change POSITION_BPTIX_SHARES and rebuild — nothing else.
+#
+# The hedge book's short legs were recorded at the ORIGINAL size, so they are scaled
+# by POSITION_SCALE (= current / original) to keep the hedge RATIO identical. History
+# is unaffected in shape: every $ P&L series just scales by the same factor.
+POSITION_BPTIX_SHARES_ORIGINAL = 130000     # size the 5/20 hedge book was struck at
+POSITION_BPTIX_SHARES = 30000               # <-- CURRENT size (2026-08-20: cut 130k -> 30k)
+POSITION_SCALE = POSITION_BPTIX_SHARES / POSITION_BPTIX_SHARES_ORIGINAL   # 0.23077
+
 # Situations the build pipeline knows about. Each maps to situations/<key>/.
 SITUATIONS = ["spacex_baron", "vcx_fundrise", "dxyz_destiny", "rvi_robinhood",
               "agix_kraneshares", "arkvx_arkventure"]
@@ -705,6 +719,51 @@ class SpacexBaron:
          "basis": ("SPCX $140.00 on 2026-08-14 (-0.91% vs 8/13 $141.29). Disclosed 3/31 share count. BPTIX NAV "
                    "283.98 (-0.50%), AUM 16.3B, ~flat flow. Quiet day: SPOT +2.9%, SCHW +0.9% up; GWRE -3.8%, "
                    "BIRK -4.0%, FIG -3.5% down. Mark baskets v4 -0.18, v4.1 -0.05."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-08-17", "spacex_value_usd": 3.89026788e9 * (146.23 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 146.23, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $146.23 on 2026-08-17 (+4.45% vs 8/14 $140.00). Disclosed 3/31 share count. BPTIX NAV "
+                   "284.23 (+0.09%), AUM 16.3B, ~flat flow. SpaceX +4.5% offset a weak public tape (MSCI -3.2%, "
+                   "VRSK -3.3%, SHOP -3.7%, BIRK -3.8%). First day on the DISCLOSED leverage 1.10 (applied from "
+                   "7/31 forward only; frozen as-of history untouched)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-08-18", "spacex_value_usd": 3.89026788e9 * (143.34 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 143.34, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $143.34 on 2026-08-18 (-1.98% vs 8/17 $146.23). Disclosed 3/31 share count. BPTIX NAV "
+                   "283.92 (-0.11%), AUM flat 16.3B (~+$0.02B). SpaceX -2.0% offset by a firmer public tape "
+                   "(FIG +4.1%, GWRE +3.4%, FDS +3.1%, MSCI +2.2%). Mark baskets v4 -0.14, v4.1 +0.07. "
+                   "Leverage 1.10 (disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-08-19", "spacex_value_usd": 3.89026788e9 * (139.65 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 139.65, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $139.65 on 2026-08-19 (-2.57% vs 8/18 $143.34). Disclosed 3/31 share count. BPTIX NAV "
+                   "289.17 (+1.85%) DESPITE SpaceX down -- MRNA +176.9% (62.96->174.38, no split, 195M shares "
+                   "traded) plus a firm tape (IT +5.9%, LLY +4.5%, FDS +4.4%, TSLA +4.2%). AUM 16.3B->16.6B = "
+                   "exactly the market move (16.3 x 1.0185) => ZERO flow. Natural stress test of the tail rule: "
+                   "v4.1 (buy-and-hold) beat v4 (constant-weight) 0.65 vs 1.69 on the daily move."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-08-20", "spacex_value_usd": 3.89026788e9 * (134.00 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 134.00, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $134.00 on 2026-08-20 (-4.05% vs 8/19 $139.65). Disclosed 3/31 share count. BPTIX NAV "
+                   "282.83 (-2.19%), AUM 16.2B (~+$0.04B, redemptions still stopped). MRNA gave back -23.5% "
+                   "(174.38->133.32) -- a second, out-of-sample MRNA shock: v4.2 best on level (+0.17 vs v4.1 "
+                   "+0.62, v4 +0.96). Leverage 1.10 (disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-08-21", "spacex_value_usd": 3.89026788e9 * (136.97 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 136.97, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $136.97 on 2026-08-21 (+2.22% vs 8/20 $134.00). Disclosed 3/31 share count. BPTIX NAV "
+                   "288.60 (+2.04%), AUM 16.5B (~flat flow). Broad risk-on: TSLA +5.1%, MRNA +8.9%, GWRE +4.1%. "
+                   "Mark baskets: v4.2 level error +0.05 (best), v4.1 +0.57, v4 +1.04. Leverage 1.10 (disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-08-24", "spacex_value_usd": 3.89026788e9 * (135.00 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 135.00, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $135.00 on 2026-08-24 (-1.44% vs 8/21 $136.97). Disclosed 3/31 share count. BPTIX NAV "
+                   "287.28 (-0.46%), AUM 16.5B flat (implied flow +$0.075B, the first apparent inflow, but inside "
+                   "the 0.1B rounding band). TSLA -3.83% was the day's big drag alongside SpaceX; IT +3.5%, "
+                   "KNSL +3.1%, FDS +1.8% offset most of it. All 8 daily-log baskets under-predicted, and "
+                   "regressing their errors on stale TSLA overweight gives R^2 0.956 -- basket drift measured "
+                   "directly. Mark baskets: v4.2 level error +0.22 (best), v4.1 +0.70, v4 +1.06, v3 +1.79. "
+                   "Leverage 1.10 (disclosed)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
