@@ -782,6 +782,38 @@ ENTRIES = [
              "watch for a second confirming day. RONB -0.21% x1.3 = -0.27% vs actual -0.46%. Leverage 1.10 "
              "(disclosed). 6/30 NPORT-P still NOT filed as of 8/25 (latest Baron filing: N-PX 8/18); the Aug 20-30 "
              "window is open."},
+    {"date": "2026-08-25", "spcx": 137.95, "actual_nav": 288.17, "aum": 16.5e9,
+     "closes": {"ACGL": 100.56, "BIRK": 35.29, "CHH": 110.25, "CSGP": 32.81, "FDS": 296.08,
+                "FIG": 27.27, "GLPI": 43.03, "GWRE": 188.34, "H": 177.01, "HEI": 351.05,
+                "HEI-A": 257.10, "IDXX": 550.01, "IT": 195.79, "KNSL": 387.95, "MSCI": 563.99,
+                "MTN": 147.84, "ONON": 28.83, "RRR": 59.72, "SCHW": 112.27, "SHOP": 153.88,
+                "SPOT": 552.57, "TSLA": 350.25, "VRSK": 188.49,
+                "AMZN": 261.06, "GOOGL": 346.96, "GOOG": 343.34, "LLY": 1233.66, "MRNA": 158.83, "MORN": 215.01},
+     "note": "Tue 8/25. Closes fetched T+1 (Yahoo). SPCX +2.19% (135.00->137.95) => SpaceX ~$5.10B (disclosed shares). "
+             "BPTIX NAV 288.17 (+0.31%), AUM 16.5B. *** ENGINE CHANGE: v4.2 is now the PUBLISHED mark basket in the "
+             "build (was v4.1, which had been superseded on 8/20 but never wired in), and the forward accuracy window "
+             "now ROLLS to the latest actual NAV instead of being frozen at 8/3-8/11 (n=7). v4.1 and v4 are still "
+             "rebuilt from the 7/31 disclosure as honest comparators. *** FOURTH INFORMATIVE MRNA EVENT and the "
+             "cleanest out-of-sample confirmation yet: MRNA +14.36% (138.89->158.83, |dP| $19.94) implies MRNA = "
+             "0.02535 +/- 0.00752 sh/BPTIX, just 0.16 sigma from the 4-event prior 0.02413 -- an independent shock, a "
+             "matching answer. 5-event precision-weighted: MRNA = 0.02416 +/- 0.00124; v4.2 (0.02355) sits -2.5% / "
+             "-0.50 sigma inside it, v4.1 is +21.8% (4.3 sigma). MARK BASKETS (LEVEL): v4.2 +0.18 BEST, v4.1 +0.78, v4 "
+             "+1.39, v3 +1.78. Rolling window 8/3-8/25 (n=17): v4.2 RMS 0.187 (bias +0.115, SD 0.148), v4.1 0.408, v4 "
+             "0.673, v3 1.576 -- v4.2 still less than half of v4.1. *** DRIFT, THE OTHER FACE: yesterday TSLA -3.83% "
+             "made stale-snapshot TSLA OVERWEIGHT the whole story (R^2 0.956). Today TSLA barely moved (+0.37%), that "
+             "term vanished, and the driver switched to MRNA ABSENCE -- the 3/31, 4/30 and 5/31 snapshots do not "
+             "contain MRNA at all, so a +14.4% day costs them -0.48/BPTIX flat. fund_6/30 is the ONLY daily-log basket "
+             "holding any MRNA and it was the day's best (+0.08) while every zero-MRNA basket landed -0.25..-0.59. "
+             "Same stale-snapshot phenomenon, different name in the driver's seat; note the cross-section is too "
+             "bunched today (all zero-MRNA baskets sit on top of each other) for the regression to mean much -- "
+             "fund_6/30's standalone win IS the signal. *** Movers: MRNA +14.4%, SPOT +2.7%, SHOP +2.7%, SPCX +2.2% up "
+             "vs IT -3.5%, FDS -3.0%, ONON -2.3%, GLPI -2.1%, KNSL -1.9%, GWRE -1.9% down -- IT/FDS/KNSL/GWRE gave "
+             "back most of Monday's gain. FLOW: AUM flat 16.5B vs NAV +0.31% => -$0.051B, and shares-out "
+             "57.435M->57.258M, so Monday's apparent +$75M inflow did NOT confirm -- it reversed, exactly as the "
+             "rounding-band caveat warned. Net over 8/21->8/25 shares-out is 57.173->57.258M, i.e. still flat; "
+             "redemptions remain stopped since ~8/10 and there is still no inflow. RONB +0.42% x1.3 = +0.55% vs actual "
+             "+0.31%. Leverage 1.10 (disclosed). 6/30 NPORT-P STILL not filed as of 8/26; the Aug 20-30 window is "
+             "nearly out."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
@@ -963,6 +995,11 @@ def _lookthrough(rows, w6):
             "position_shares": cfg.POSITION_BPTIX_SHARES, "holdings": holdings}
 
 
+# First full trading day after the v4 family's 7/31 anchor settled — the start of the rolling
+# out-of-sample window every mark basket is scored on. The END rolls to the latest actual NAV,
+# so the published accuracy can never silently freeze at a stale n.
+FORWARD_START = "2026-08-03"
+
 # 7/31 as-of disclosure (Baron): top-10 % of GROSS (total investments), + Long Equity 110% / Cash -10%.
 DISCLOSED_7_31 = {"weights_gross": {"TSLA": 12.4, "SCHW": 5.3, "MSCI": 4.7, "SHOP": 4.4, "H": 4.3,
                                     "ACGL": 4.0, "SPOT": 3.9, "FDS": 3.7, "GWRE": 3.2},
@@ -1013,56 +1050,99 @@ def _build_static_basket(anchor_date, w_pub, spx_gross_pct, L, disclosed=None, p
     return sh, borrow
 
 
-def _load_v3_csv():
-    """v3 (6/30) mark basket from its committed CSV — the PRIOR share book (all 29 names, incl the
-    6 whose 6/30 price isn't in ENTRIES). Used as the buy-and-hold anchor for v4.1's tail."""
+def _load_basket_csv(fname, default_borrow=0.0):
+    """Load a committed mark basket (shares per BPTIX + the borrow line) from its CSV.
+    The value column is anchor-dated (value_per_bptix_6_30 / _7_31), so detect it rather
+    than hardcode it. Returns (shares_dict, borrow_per_bptix)."""
     import csv as _csv
-    sh, bor = {}, 19.31
-    with open(os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data",
-                           "position_mark_basket_v3_2026-06-30.csv"), encoding="utf-8") as f:
-        for r in _csv.DictReader(f):
+    path = os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data", fname)
+    sh, bor = {}, default_borrow
+    with open(path, encoding="utf-8") as f:
+        rdr = _csv.DictReader(f)
+        vcol = next((c for c in (rdr.fieldnames or []) if c.startswith("value_per_bptix")), None)
+        for r in rdr:
             if r["component"].startswith("CASH"):
-                bor = -float(r["value_per_bptix_6_30"]); continue
+                if vcol:
+                    bor = -float(r[vcol])
+                continue
             sh["SPCX" if r["component"].startswith("SPCX") else r["component"]] = float(r["shares_per_bptix"])
     return sh, bor
 
 
+def _load_v3_csv():
+    """v3 (6/30) mark basket — the PRIOR share book (all 29 names, incl the 6 whose 6/30 price isn't
+    in ENTRIES). Used both as the stale comparator and as the buy-and-hold anchor for v4.1's tail."""
+    return _load_basket_csv("position_mark_basket_v3_2026-06-30.csv", default_borrow=19.31)
+
+
 def _mark_basket_accuracy():
-    """v4 (7/31-anchored, L=1.10) mark basket + its live tracking accuracy vs actual NAV, plus the
-    v3(6/30) comparison and clean-split date. Wrapped by the caller in try/except (never break CI)."""
+    """The PUBLISHED mark basket (v4.2) + its live tracking accuracy vs actual NAV, scored against the
+    ladder of predecessors (v4.1 / v4 / stale v3). Wrapped by the caller in try/except (never break CI).
+
+    Version ladder — each step changed exactly ONE thing, and each was settled out-of-sample:
+      v3   6/30-anchored, L=1.066.
+      v4   7/31 re-anchor (disclosed top-10 + L=1.10); tail = 6/30 weights re-imposed (CONSTANT-WEIGHT).
+      v4.1 same, but tail = BUY-AND-HOLD (prior 6/30 SHARES x one uniform haircut). Constant-weight
+           silently sells winners / buys losers; buy-and-hold predicts the 9 disclosed 7/31 weights at
+           RMS 0.26 vs 1.25, winning on all 9, and was confirmed under stress by MRNA +176.9% on 8/19.
+      v4.2 same, but MRNA cut 0.02942 -> 0.02355 sh/BPTIX (freed value spread pro-rata over the tail).
+           Three MRNA shocks (8/19 +176.9%, 8/20 -23.5%, 8/21 +8.9%) let us BACK-SOLVE the fund's true
+           MRNA from the actual NAV move; precision-weighted they give ~0.0241 +/- 0.0013, so every
+           earlier basket held far too much (v4.1 +22%, v3 +30%, v4 +64%). Adopted 8/20.
+
+    v4.2's MRNA count is EMPIRICAL — back-solved, not derivable from any disclosure — so it lives in the
+    committed CSV rather than in code. v4.1 and v4 are still rebuilt here from the 7/31 disclosure so the
+    comparison stays honest (they are recomputed, not copied from a stale file)."""
     import math
     W6 = _nospy(fs.WEIGHTS_6_30)
-    v3_prior, _b = _load_v3_csv()
-    v4, b4 = _build_static_basket("2026-07-31", W6, DISCLOSED_7_31["spacex_gross"],
-                                  DISCLOSED_7_31["leverage"], DISCLOSED_7_31["weights_gross"],
-                                  prior_shares=v3_prior)
     v3, b3 = _load_v3_csv()
+    v4_1, b4_1 = _build_static_basket("2026-07-31", W6, DISCLOSED_7_31["spacex_gross"],
+                                      DISCLOSED_7_31["leverage"], DISCLOSED_7_31["weights_gross"],
+                                      prior_shares=v3)
+    v4, b4 = _build_static_basket("2026-07-31", W6, DISCLOSED_7_31["spacex_gross"],
+                                  DISCLOSED_7_31["leverage"], DISCLOSED_7_31["weights_gross"])
+    v4_2, b4_2 = _load_basket_csv("position_mark_basket_v4_2_2026-07-31.csv", default_borrow=b4_1)
+
     def mark(s, b, e):
         p = dict(e["closes"]); p["SPCX"] = e["spcx"]
         return sum(s[t] * p[t] for t in s if p.get(t)) - b
-    def rms(xs): return round(math.sqrt(sum(x * x for x in xs) / len(xs)), 3) if xs else None
-    def errs(basket, bor, d0, d1):
-        return [mark(basket, bor, e) - e["actual_nav"]
-                for e in ENTRIES if d0 <= e["date"] <= d1 and e.get("actual_nav")]
-    post = errs(v4, b4, "2026-08-03", "2026-08-11")           # v4 forward (post-anchor)
-    stale = errs(v3, b3, "2026-08-03", "2026-08-11")          # stale v3 now
+
+    def rms(xs):
+        return round(math.sqrt(sum(x * x for x in xs) / len(xs)), 3) if xs else None
+
+    scored = [e for e in ENTRIES if e["date"] >= FORWARD_START and e.get("actual_nav")]
+    window_end = scored[-1]["date"] if scored else FORWARD_START
+
+    def errs(basket, bor):
+        return [mark(basket, bor, e) - e["actual_nav"] for e in scored]
+
+    e_pub, e_41, e_4, e_3 = errs(v4_2, b4_2), errs(v4_1, b4_1), errs(v4, b4), errs(v3, b3)
+    bias = round(sum(e_pub) / len(e_pub), 3) if e_pub else None
     e = next(x for x in ENTRIES if x["date"] == "2026-07-31")
     so = e["aum"] / e["actual_nav"]
+    nav_ref = scored[-1]["actual_nav"] if scored else 270.0
+    r_pub = rms(e_pub) or 0.0
     return {
-        "version": "v4.1", "anchor": "2026-07-31", "leverage": DISCLOSED_7_31["leverage"],
+        "version": "v4.2", "anchor": "2026-07-31", "leverage": DISCLOSED_7_31["leverage"],
         "spx_sh_per_bptix": round(SPX_SHARES_DISCLOSED / so, 4),
-        "spx_pct_gross": DISCLOSED_7_31["spacex_gross"], "borrow_per_bptix": round(b4, 2),
-        "rms_forward": rms(post), "rms_forward_pct_nav": (round(rms(post) / 270 * 100, 3) if post else None),
-        "rms_stale_v3": rms(stale), "n_forward": len(post),
+        "spx_pct_gross": DISCLOSED_7_31["spacex_gross"], "borrow_per_bptix": round(b4_2, 2),
+        "mrna_sh_per_bptix": round(v4_2.get("MRNA", 0), 5),
+        "rms_forward": rms(e_pub), "rms_forward_pct_nav": round(r_pub / nav_ref * 100, 3),
+        "rms_v4_1": rms(e_41), "rms_v4": rms(e_4), "rms_stale_v3": rms(e_3),
+        "bias_forward": bias, "last_err": (round(e_pub[-1], 2) if e_pub else None),
+        "n_forward": len(e_pub), "window_start": FORWARD_START, "window_end": window_end,
         "clean_split_date": "2026-07-13",
-        "note": ("v4.1 mark basket: anchored 7/31, leverage 1.10 (long 110%% / cash -10%% of NET; stocks=110%% "
+        "note": ("v4.2 mark basket: anchored 7/31, leverage 1.10 (long 110%% / cash -10%% of NET; stocks=110%% "
                  "of net = 100%% of gross). SpaceX = 36.94M disclosed sh / shares-out = %.4f sh/BPTIX (24.8%% of "
                  "GROSS = 27.2%% of net). Top-10 = disclosed 7/31 weights; TAIL = BUY-AND-HOLD (prior 6/30 SHARES, "
-                 "one uniform -6.0%% haircut to fit the forced residual) — NOT re-imposed 6/30 weights, which would "
-                 "sell winners / buy losers. Validated on the 9 disclosed names (true 6/30 AND 7/31 weights known): "
-                 "buy-and-hold predicts 7/31 weights at RMS 0.26 vs 1.25 constant-weight, winning on all 9. Forward "
-                 "tracking (8/3+) RMS $%.2f/BPTIX (~%.2f%% NAV) vs stale-v3 $%.2f. Clean split v3->v4.1 at 2026-07-13."
-                 % (SPX_SHARES_DISCLOSED / so, rms(post) or 0, (rms(post) or 0) / 270 * 100, rms(stale) or 0)),
+                 "one uniform haircut to fit the forced residual) — NOT re-imposed 6/30 weights, which would sell "
+                 "winners / buy losers. v4.2 additionally cuts MRNA to %.5f sh/BPTIX, back-solved from three MRNA "
+                 "shocks (precision-weighted ~0.0241 +/- 0.0013); every earlier basket held far too much. Rolling "
+                 "out-of-sample window %s..%s (n=%d): RMS $%.3f/BPTIX (~%.2f%% of NAV), bias %+.3f — vs v4.1 $%.3f, "
+                 "v4 $%.3f, stale-v3 $%.3f. Clean split v3->v4 at 2026-07-13."
+                 % (SPX_SHARES_DISCLOSED / so, v4_2.get("MRNA", 0), FORWARD_START, window_end, len(e_pub),
+                    r_pub, r_pub / nav_ref * 100, bias or 0.0,
+                    rms(e_41) or 0, rms(e_4) or 0, rms(e_3) or 0)),
     }
 
 

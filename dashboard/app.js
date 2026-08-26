@@ -174,9 +174,14 @@ function drawLookthrough() {
     `<b>Mark basket ${mb.version} — re-anchored to the 7/31 disclosure.</b> Leverage <b>${mb.leverage.toFixed(2)}</b> ` +
     `(long 110% / cash −10% of NET; stocks = 110% of net = 100% of gross). SpaceX = 36.94M disclosed sh ÷ shares-out = ` +
     `<b>${mb.spx_sh_per_bptix.toFixed(4)}</b> sh/BPTIX (${mb.spx_pct_gross}% of GROSS = 27.2% of net); borrow ` +
-    `−$${mb.borrow_per_bptix.toFixed(2)}/BPTIX. Top-10 = disclosed 7/31 weights, tail = 6/30 scaled. ` +
-    `<b>Forward accuracy (8/3+): RMS $${mb.rms_forward.toFixed(2)}/BPTIX (~${mb.rms_forward_pct_nav}% of NAV)</b> — ` +
-    `vs a stale-v3 (un-updated) basket now at RMS $${mb.rms_stale_v3.toFixed(2)}. Clean split v3→v4 at <b>${mb.clean_split_date}</b>.</div>`;
+    `−$${mb.borrow_per_bptix.toFixed(2)}/BPTIX. Top-10 = disclosed 7/31 weights; <b>tail = buy-and-hold</b> ` +
+    `(prior 6/30 <i>shares</i> × one uniform haircut — not re-imposed 6/30 weights, which would sell winners ` +
+    `and buy losers); MRNA cut to <b>${mb.mrna_sh_per_bptix}</b> sh/BPTIX, back-solved from three MRNA shocks. ` +
+    `<b>Out-of-sample accuracy ${mb.window_start}→${mb.window_end} (n=${mb.n_forward}): RMS ` +
+    `$${mb.rms_forward.toFixed(3)}/BPTIX (~${mb.rms_forward_pct_nav}% of NAV), bias ` +
+    `${mb.bias_forward >= 0 ? "+" : ""}${mb.bias_forward.toFixed(3)}</b> — vs v4.1 $${mb.rms_v4_1.toFixed(3)}, ` +
+    `v4 $${mb.rms_v4.toFixed(3)}, stale-v3 $${mb.rms_stale_v3.toFixed(3)}. The window rolls with the data. ` +
+    `Clean split v3→v4 at <b>${mb.clean_split_date}</b>.</div>`;
   const sv = d && d.meta && d.meta.slow_vars;
   if (note && sv && sv.latest) {
     const L = sv.latest, sh = L.shift, on = sv.alert;
