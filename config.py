@@ -774,6 +774,15 @@ class SpacexBaron:
                    "v4.2 wired into the build as the published mark basket; window now rolls. Mark baskets: "
                    "v4.2 level error +0.18 (best), v4.1 +0.78, v4 +1.39, v3 +1.78. Leverage 1.10 (disclosed)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-08-26", "spacex_value_usd": 3.89026788e9 * (139.63 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 139.63, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $139.63 on 2026-08-26 (+1.22% vs 8/25 $137.95). Disclosed 3/31 share count. BPTIX NAV "
+                   "287.67 (-0.17%) -- SpaceX was the only big thing up and the public book still dragged NAV "
+                   "negative (LLY -3.6%, MRNA -5.8%, SCHW -2.6%, SHOP -2.3%). AUM 16.5B, flow +$0.03B (inside the "
+                   "rounding band; still no confirmed inflow). Drift was DIFFUSE today -- per-name cross-sectional "
+                   "variance splits TSLA 45% / SHOP 23% / MRNA 16%, vs 8/24 when TSLA alone was 90%. Mark baskets: "
+                   "v4.2 level error +0.10 (best), v4.1 +0.64, v4 +1.19, v3 +1.58. Leverage 1.10 (disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

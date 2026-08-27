@@ -814,6 +814,46 @@ ENTRIES = [
              "redemptions remain stopped since ~8/10 and there is still no inflow. RONB +0.42% x1.3 = +0.55% vs actual "
              "+0.31%. Leverage 1.10 (disclosed). 6/30 NPORT-P STILL not filed as of 8/26; the Aug 20-30 window is "
              "nearly out."},
+    {"date": "2026-08-26", "spcx": 139.63, "actual_nav": 287.67, "aum": 16.5e9,
+     "closes": {"ACGL": 100.72, "BIRK": 36.18, "CHH": 109.86, "CSGP": 32.14, "FDS": 295.45,
+                "FIG": 27.03, "GLPI": 42.57, "GWRE": 191.07, "H": 177.57, "HEI": 346.15,
+                "HEI-A": 255.84, "IDXX": 553.44, "IT": 192.96, "KNSL": 387.13, "MSCI": 564.22,
+                "MTN": 148.72, "ONON": 29.23, "RRR": 59.67, "SCHW": 109.39, "SHOP": 150.29,
+                "SPOT": 550.03, "TSLA": 345.82, "VRSK": 187.87,
+                "AMZN": 260.28, "GOOGL": 342.00, "GOOG": 339.10, "LLY": 1189.41, "MRNA": 149.66, "MORN": 212.44},
+     "note": "Wed 8/26. Closes fetched T+1 (Yahoo). SPCX +1.22% (137.95->139.63) => SpaceX ~$5.16B (disclosed shares). "
+             "BPTIX NAV 287.67 (-0.17%), AUM 16.5B. A HEDGE DAY in reverse: SpaceX was the only big thing UP and the "
+             "public book still dragged NAV negative -- LLY -3.59%, MRNA -5.77%, SCHW -2.57%, SHOP -2.33%, CSGP "
+             "-2.04%, IT -1.45%, TSLA -1.26% against only BIRK +2.52%, GWRE +1.45%, ONON +1.39%. MARK BASKETS (LEVEL): "
+             "v4.2 +0.10 BEST, v4.1 +0.64, v4 +1.19, v3 +1.58. Rolling window 8/3-8/26 (n=18): v4.2 RMS 0.183 (bias "
+             "+0.114, SD 0.144), v4.1 0.424, v4 0.712, v3 1.576 -- v4.2's RMS is still grinding down (0.188 -> 0.187 "
+             "-> 0.183). Daily-log baskets ALL over-predicted today: fund_6/30 +0.18 best, fund_3/31 +0.21, actual "
+             "+0.28, fund_4/30 +0.33, blend +0.33, fund_5/31 +0.34, optimal +0.36, ronb +0.75 worst. *** DRIFT "
+             "DIAGNOSTIC -- METHOD CORRECTION. I first computed a FULL-BOOK attribution (sum over all names of "
+             "(basket_sh - v4.2_sh) x dP) against each basket's error and got R^2 = 0.998 every single day 8/4-8/26. "
+             "That is an ALGEBRAIC IDENTITY, not a finding: the daily-log prediction is prev_nav x (1 + w_spx*spx_ret "
+             "+ (L - w_spx)*basket_ret), so across baskets the ONLY term that varies IS that sum -- w_spx, L and "
+             "prev_nav are common. Re-deriving the formula proves nothing. Do NOT quote that R^2. The informative "
+             "decomposition is PER-NAME CROSS-SECTIONAL VARIANCE: for each name, the SD across baskets of (basket_sh - "
+             "v4.2_sh) x dP, as a share of the total. That is what says which single holding is driving the spread, "
+             "and it is NOT tautological. Results: 8/24 TSLA alone = 90% of the cross-basket variance (total SD "
+             "0.257/BPTIX) -- a single-name day, which is why the simple TSLA-only regression hit R^2 0.956 that day. "
+             "8/25 MRNA 58% + SHOP 18% (SD 0.159). 8/26 TSLA 45% + SHOP 23% + MRNA 16% (SD 0.120) -- a DIFFUSE day "
+             "with no dominant name, the smallest cross-basket spread of the three, and the common levels offset each "
+             "other (TSLA -0.26, MRNA +0.20, SHOP +0.16), which is exactly why every basket bunched into a narrow "
+             "+0.18..+0.36 band today. So the rule sharpens: a one-directional miss is diagnosed by running the "
+             "per-name variance split, not by assuming TSLA. *** MRNA 6th event: -5.77% (|dP| only $9.17) implies "
+             "0.01436 +/- 0.01636 sh/BPTIX, -0.60 sigma from the 5-event prior and worth just 0.6% of the precision "
+             "weight. 6-event combined: MRNA = 0.02411 +/- 0.00123; v4.2 (0.02355) sits -0.45 sigma inside, v4.1 "
+             "+22.0% (4.3 sigma) out. v4.2 BIAS WATCH: the +0.11 mean is DECAYING (first 10 days +0.138, last 8 "
+             "+0.084) -- same self-correcting pattern v4.1's +0.18 offset showed in mid-August before it went to zero, "
+             "so again do NOT hard-code a correction. FLOW: AUM flat 16.5B vs NAV -0.17% => +$0.029B, inside the "
+             "rounding band; shares-out 57.258M->57.357M. Over 8/21->8/26 shares-out went 57.173->57.357M, still "
+             "essentially flat: redemptions remain stopped since ~8/10 and there is still no confirmed inflow. RONB "
+             "+0.21% x1.3 = +0.27% vs actual -0.17% -- RONB got the SIGN wrong today and was the worst basket (+0.75); "
+             "it is unlevered (L=1.0 vs 1.10) so a broad public selloff hurts BPTIX ~1.1x harder, and RONB also holds "
+             "names we do not (IBKR/ABNB/LYV). Leverage 1.10 (disclosed). 6/30 NPORT-P still NOT filed as of the 8/27 "
+             "morning check -- today is the modal expected date (51-61d lag) and the Aug 20-30 window closes Monday."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
