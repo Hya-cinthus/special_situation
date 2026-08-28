@@ -783,6 +783,16 @@ class SpacexBaron:
                    "variance splits TSLA 45% / SHOP 23% / MRNA 16%, vs 8/24 when TSLA alone was 90%. Mark baskets: "
                    "v4.2 level error +0.10 (best), v4.1 +0.64, v4 +1.19, v3 +1.58. Leverage 1.10 (disclosed)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-08-27", "spacex_value_usd": 3.89026788e9 * (140.87 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 140.87, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $140.87 on 2026-08-27 (+0.89% vs 8/26 $139.63). Disclosed 3/31 share count. BPTIX NAV "
+                   "289.12 (+0.50%), AUM 16.5B->16.4B. FLOW is the story: -$183M with the ENTIRE rounding band "
+                   "negative (-$283M..-$83M), so the two-week redemption pause that began ~8/10 has ended; "
+                   "shares-out 57.357M->56.724M (-1.10%), the largest one-day drop since 8/11. FIG +13.3% was the "
+                   "biggest mover but only 5% of the cross-basket spread (small position); TSLA is 56% again. "
+                   "Mark baskets: v4.2 level error +0.26 (best), v4.1 +0.77, v4 +1.12, v3 +1.55. 6/30 NPORT-P "
+                   "still unfiled at day 59 of a 51-61 day historical lag. Leverage 1.10 (disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

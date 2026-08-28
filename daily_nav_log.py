@@ -854,6 +854,44 @@ ENTRIES = [
              "it is unlevered (L=1.0 vs 1.10) so a broad public selloff hurts BPTIX ~1.1x harder, and RONB also holds "
              "names we do not (IBKR/ABNB/LYV). Leverage 1.10 (disclosed). 6/30 NPORT-P still NOT filed as of the 8/27 "
              "morning check -- today is the modal expected date (51-61d lag) and the Aug 20-30 window closes Monday."},
+    {"date": "2026-08-27", "spcx": 140.87, "actual_nav": 289.12, "aum": 16.4e9,
+     "closes": {"ACGL": 98.76, "BIRK": 35.31, "CHH": 108.54, "CSGP": 31.34, "FDS": 304.47,
+                "FIG": 30.62, "GLPI": 42.31, "GWRE": 201.09, "H": 173.28, "HEI": 337.01,
+                "HEI-A": 251.01, "IDXX": 545.08, "IT": 196.60, "KNSL": 381.80, "MSCI": 569.15,
+                "MTN": 144.61, "ONON": 28.95, "RRR": 58.40, "SCHW": 108.05, "SHOP": 154.33,
+                "SPOT": 527.25, "TSLA": 354.81, "VRSK": 191.02,
+                "AMZN": 256.26, "GOOGL": 340.65, "GOOG": 337.71, "LLY": 1176.10, "MRNA": 142.77, "MORN": 218.81},
+     "note": "Thu 8/27. Closes fetched T+1 (Yahoo). SPCX +0.89% (139.63->140.87) => SpaceX ~$5.20B (disclosed shares). "
+             "BPTIX NAV 289.12 (+0.50%), AUM 16.5B->16.4B. *** THE HEADLINE IS FLOW, NOT THE MARK. Implied net flow "
+             "-$183M, and for the first time since redemptions stopped ~8/10 the ENTIRE AUM rounding band is negative "
+             "(-$283M..-$83M), so this is a REAL redemption, not a rounding artifact. Shares-out 57.357M->56.724M "
+             "(-0.634M, -1.10%) -- the largest one-day drop since 8/11 and more than 2x the biggest move of the prior "
+             "two weeks, during which every single day sat inside +/-$88M and mostly inside +/-$50M. Two-plus weeks of "
+             "'redemptions have stopped' just ended; watch whether it continues or was a single large ticket. *** MARK "
+             "BASKETS (LEVEL): v4.2 +0.26 BEST, v4.1 +0.77, v4 +1.12, v3 +1.55. Rolling 8/3-8/27 (n=19): v4.2 RMS "
+             "0.188 (bias +0.121, SD 0.144), v4.1 0.449, v4 0.739, v3 1.575. *** BIAS CALL RETRACTED. Yesterday I read "
+             "v4.2's +0.11 mean error as DECAYING (first 10 days +0.138 vs last 8 +0.084) and said not to correct it "
+             "because it was self-correcting. Today's +0.26 kills that reading: the split is first-10 +0.138, middle-5 "
+             "+0.034, last-5 +0.160, last-8 +0.129. It is a PERSISTENT ~+0.12 offset, and the middle-window dip was "
+             "what fooled me. Consequence: bias^2 is ~41% of v4.2's mean squared error, so simply de-meaning would cut "
+             "RMS from 0.188 to the SD of 0.144 (-23%). I still would NOT patch v4.2 -- the 6/30 NPORT is days away "
+             "and the right move is to rebuild v5 on the filed weights rather than bolt a constant onto a basket whose "
+             "anchor is about to be replaced. But the reason is 'a better anchor is imminent', NOT 'the bias is going "
+             "away'. *** PER-NAME cross-sectional variance split (total SD 0.219/BPTIX): TSLA 56%, SHOP 9%, MORN 6%, "
+             "FIG 5%, SPOT 5%. Note FIG ripped +13.28% -- the biggest move on the board -- and still accounts for only "
+             "5% of the cross-basket spread, because it is a small position and the baskets barely disagree on its "
+             "share count. Useful lesson: a big PRICE move is not what creates basket disagreement; (share-count "
+             "difference x dP) is. TSLA keeps dominating because it is both large and mis-weighted in the stale "
+             "snapshots. *** Daily-log baskets: fund_6/30 -0.05 best, optimal +0.05, actual +0.31, blend +0.37, ronb "
+             "-0.37, fund_5/31 +0.52 worst -- mixed signs, consistent with the diffuse split. MRNA -4.60% but |dP| "
+             "only $6.89 -> implied 0.04741 +/- 0.02177, worth 0.3% of the precision weight; 7-event combined MRNA = "
+             "0.02418 +/- 0.00123, v4.2 (0.02355) -0.51 sigma inside. Movers up: FIG +13.3%, GWRE +5.2%, FDS +3.1%, "
+             "MORN +3.0%, SHOP +2.7%, TSLA +2.6%; down: MRNA -4.6%, SPOT -4.1%, MTN -2.8%, HEI -2.6%, CSGP -2.5%, H "
+             "-2.4%. RONB +0.21% x1.3 = +0.27% vs actual +0.50% (under-called it). Leverage 1.10 (disclosed). *** "
+             "NPORT CLOCK: the 6/30/2026 NPORT-P is STILL not filed. Today is day 59 of the lag; the historical range "
+             "is 51-61 days (6/30/2025 -> 8/27/2025 = 58d; 3/31/2026 -> 5/22/2026 = 52d). Monday 8/31 would be day 62 "
+             "-- BEYOND anything we have seen -- so if it does not land Friday, the filing itself becomes an anomaly "
+             "worth noting."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
