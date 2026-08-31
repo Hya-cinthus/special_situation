@@ -1168,5 +1168,92 @@
     ],
     "source": "measured",
     "confidence": "high"
+  },
+  {
+    "report_date": "2026-06-30",
+    "filing_date": "2026-08-28",
+    "accession": "0001867090-26-000109",
+    "net_assets_usd": 776968361.92,
+    "total_assets_usd": 813141712.26,
+    "n_holdings": 62,
+    "top_holdings": [
+      {
+        "name": "SaxeCap Advisors VIII, LP",
+        "valUSD": 128169056.0,
+        "pctVal": 16.49604569268
+      },
+      {
+        "name": "AI Growth GRT, LLC",
+        "valUSD": 72479780.0,
+        "pctVal": 9.328536855849
+      },
+      {
+        "name": "Quiet OA Access LP",
+        "valUSD": 64613489.0,
+        "pctVal": 8.316102967221
+      },
+      {
+        "name": "AI Access 12, LLC",
+        "valUSD": 45459418.0,
+        "pctVal": 5.850871184466
+      },
+      {
+        "name": "JP Morgan U.S. Treasury Plus Money Market Fund, Capital Shares",
+        "valUSD": 41695512.29,
+        "pctVal": 5.366436309834
+      },
+      {
+        "name": "SP Private Investments XIII, LLC",
+        "valUSD": 33086011.0,
+        "pctVal": 4.258347266321
+      },
+      {
+        "name": "Databricks, Inc.",
+        "valUSD": 23256000.0,
+        "pctVal": 2.993172069777
+      },
+      {
+        "name": "AI-LLM, LLC",
+        "valUSD": 23105000.0,
+        "pctVal": 2.973737559004
+      },
+      {
+        "name": "8VC ANSE SPV, LP",
+        "valUSD": 21578178.0,
+        "pctVal": 2.777227369551
+      },
+      {
+        "name": "HOF Capital AP Growth, LLC",
+        "valUSD": 19548977.0,
+        "pctVal": 2.516058305346
+      },
+      {
+        "name": "FSTK FR, LP",
+        "valUSD": 19312500.0,
+        "pctVal": 2.485622445716
+      },
+      {
+        "name": "Epic Games, Inc.",
+        "valUSD": 19179610.0,
+        "pctVal": 2.468518789182
+      },
+      {
+        "name": "Ramp Business Corp.",
+        "valUSD": 17820000.0,
+        "pctVal": 2.29352968195
+      },
+      {
+        "name": "Ramp Business Corp.",
+        "valUSD": 15999960.0,
+        "pctVal": 2.059280761505
+      },
+      {
+        "name": "Fivetran, Inc.",
+        "valUSD": 15000018.0,
+        "pctVal": 1.930582857059
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
   }
 ]

@@ -362,5 +362,96 @@
     ],
     "source": "measured",
     "confidence": "high"
+  },
+  {
+    "report_date": "2026-06-30",
+    "filing_date": "2026-08-28",
+    "accession": "0002048251-26-007263",
+    "series_id": "S000085506",
+    "series_name": "KraneShares Artificial Intelligence and Technology Public and Private ETF",
+    "net_assets_usd": 807395410.39,
+    "total_assets_usd": 808165132.63,
+    "n_holdings": 62,
+    "anthropic_value_usd": 12926025.0,
+    "anthropic_pct": 1.601,
+    "top_holdings": [
+      {
+        "name": "NVIDIA CORPORATION",
+        "valUSD": 33009047.39,
+        "pctVal": 4.088337258946
+      },
+      {
+        "name": "ALPHABET INC.",
+        "valUSD": 27811248.14,
+        "pctVal": 3.444563566018
+      },
+      {
+        "name": "Astera Labs, Inc",
+        "valUSD": 25671546.96,
+        "pctVal": 3.179550766532
+      },
+      {
+        "name": "META PLATFORMS, INC.",
+        "valUSD": 25560410.33,
+        "pctVal": 3.165785933518
+      },
+      {
+        "name": "MICROSOFT CORPORATION",
+        "valUSD": 25547393.76,
+        "pctVal": 3.164173765572
+      },
+      {
+        "name": "APPLE INC.",
+        "valUSD": 23693375.52,
+        "pctVal": 2.934544241285
+      },
+      {
+        "name": "AMAZON.COM, INC.",
+        "valUSD": 22827728.52,
+        "pctVal": 2.827329487663
+      },
+      {
+        "name": "Taiwan Semiconductor Manufacturing Company Limited",
+        "valUSD": 21939007.74,
+        "pctVal": 2.717256929835
+      },
+      {
+        "name": "ADVANCED MICRO DEVICES, INC.",
+        "valUSD": 21741137.66,
+        "pctVal": 2.69274972092
+      },
+      {
+        "name": "BROADCOM INC.",
+        "valUSD": 20518246.75,
+        "pctVal": 2.541288504487
+      },
+      {
+        "name": "SNOWFLAKE INC.",
+        "valUSD": 19852781.5,
+        "pctVal": 2.458867271788
+      },
+      {
+        "name": "SK hynix Inc.",
+        "valUSD": 19471761.44,
+        "pctVal": 2.411676012697
+      },
+      {
+        "name": "SPACE EXPLORATION TECHNOLOGIES CORP.",
+        "valUSD": 19014161.93,
+        "pctVal": 2.355000001896
+      },
+      {
+        "name": "Nebius Group N.V.",
+        "valUSD": 17992199.33,
+        "pctVal": 2.228424771613
+      },
+      {
+        "name": "TESLA, INC.",
+        "valUSD": 17941954.8,
+        "pctVal": 2.22220173277
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
   }
 ]

@@ -793,6 +793,17 @@ class SpacexBaron:
                    "Mark baskets: v4.2 level error +0.26 (best), v4.1 +0.77, v4 +1.12, v3 +1.55. 6/30 NPORT-P "
                    "still unfiled at day 59 of a 51-61 day historical lag. Leverage 1.10 (disclosed)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-08-28", "spacex_value_usd": 3.89026788e9 * (141.50 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 141.50, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $141.50 on 2026-08-28 (+0.45% vs 8/27 $140.87). BPTIX NAV 289.91 (+0.27%), AUM 16.4B, "
+                   "flow -$0.045B (back inside the rounding band; Thursday's -$183M did not repeat). *** THE "
+                   "6/30/2026 NPORT-P LANDED THIS DAY and CONFIRMS the SpaceX share count at 36,938,300 -- "
+                   "UNCHANGED from 3/31, so the assumed ~$262M 6/12 Friday buy never happened and this re-mark "
+                   "series, which has always marked only the disclosed 3/31 count, was correct throughout. "
+                   "Filed leverage 1.0698 (vs our 1.066 model); cash $39M = 0.216% of net. Mark baskets: v4.2 "
+                   "level error +0.31 (best), v4.1 +0.79, v4 +1.12, v3 +1.56. See "
+                   "daily_log/2026-08-28-nport-6-30-verification.md."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

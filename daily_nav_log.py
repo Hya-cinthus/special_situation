@@ -892,6 +892,43 @@ ENTRIES = [
              "is 51-61 days (6/30/2025 -> 8/27/2025 = 58d; 3/31/2026 -> 5/22/2026 = 52d). Monday 8/31 would be day 62 "
              "-- BEYOND anything we have seen -- so if it does not land Friday, the filing itself becomes an anomaly "
              "worth noting."},
+    {"date": "2026-08-28", "spcx": 141.50, "actual_nav": 289.91, "aum": 16.4e9,
+     "closes": {"ACGL": 98.84, "BIRK": 35.65, "CHH": 108.86, "CSGP": 32.22, "FDS": 308.98,
+                "FIG": 28.82, "GLPI": 42.56, "GWRE": 205.85, "H": 172.25, "HEI": 336.53,
+                "HEI-A": 250.06, "IDXX": 554.99, "IT": 198.39, "KNSL": 380.61, "MSCI": 570.76,
+                "MTN": 141.93, "ONON": 28.85, "RRR": 56.97, "SCHW": 110.16, "SHOP": 152.90,
+                "SPOT": 547.51, "TSLA": 348.75, "VRSK": 191.77,
+                "AMZN": 266.43, "GOOGL": 346.59, "GOOG": 342.88, "LLY": 1174.61, "MRNA": 137.99, "MORN": 217.65},
+     "note": "Fri 8/28. Closes fetched T+1 (Yahoo). SPCX +0.45% (140.87->141.50) => SpaceX ~$5.23B. BPTIX NAV 289.91 "
+             "(+0.27%), AUM 16.4B flat -> flow -$0.045B, back inside the rounding band after Thursday's clear -$183M; "
+             "shares-out 56.724M->56.569M. So the 8/27 redemption did NOT repeat at scale -- one large day, then "
+             "quiet. MARK BASKETS (LEVEL): v4.2 +0.31 BEST, v4.1 +0.79, v4 +1.12, v3 +1.56. Rolling 8/3-8/28 (n=20): "
+             "v4.2 RMS 0.196 (bias +0.131, SD 0.146), v4.1 0.472, v4 0.763, v3 1.574. v4.2's positive bias keeps "
+             "building (last 5: +0.22 +0.18 +0.10 +0.26 +0.31), which further confirms Thursday's retraction -- it is "
+             "a persistent offset, not a decaying one. Movers up: AMZN +4.0%, SPOT +3.8%, GWRE +2.4%, SCHW +2.0%, IDXX "
+             "+1.8%, FDS +1.5%; down: FIG -5.9% (gave back most of Thursday's +13.3%), MRNA -3.4%, RRR -2.5%, MTN "
+             "-1.9%, TSLA -1.7%. RONB +0.42% x1.3 = +0.54% vs actual +0.27%. Leverage 1.10 (disclosed). *** THE "
+             "6/30/2026 NPORT-P LANDED (filed 2026-08-28, day 59 of the lag, inside the 51-61d historical range with "
+             "one day to spare). Full scoring in daily_log/2026-08-28-nport-6-30-verification.md. Headlines: (1) "
+             "LEVERAGE filed 1.0698 vs our v3 model 1.066 -- a 0.4% hit, and it confirms the fund levered UP to the "
+             "disclosed 1.10 during July, which the slow-variable tracker flagged on 7/21, ~3 weeks early. (2) SPACEX "
+             "36,938,300 sh, UNCHANGED from 3/31 (+0.002%). The assumed ~$262M 6/12 'Friday buy' DID NOT HAPPEN -- the "
+             "mark baskets, which always used the flat 36.94M, were right; the recalibration card's Friday-buy "
+             "estimate is FALSIFIED and needs a decision. (3) CASH $39.0M = 0.216% of net -- gone, as predicted. (4) "
+             "BASKET DRIFT CONFIRMED AND MONOTONE: TSLA public-relative weight is 30.43% (3/31), 26.56% (4/30), 24.67% "
+             "(5/31) vs the filed 20.98% -- i.e. +45%, +27%, +18% overweight, and that ordering is EXACTLY the daily "
+             "error ranking measured on 8/24. (5) BUY-AND-HOLD VINDICATED: TSLA absolute shares moved only -0.2% from "
+             "6/30 to 7/31 (6.455M -> 6.443M); per-BPTIX rose purely because redemptions shrank the share count -- "
+             "precisely the assumption v4.1/v4.2 are built on. (6) MRNA, the count we back-solved from seven price "
+             "shocks with no filing to lean on: filed 6/30 is 0.03225 sh/BPTIX vs our August solve of 0.02418 +/- "
+             "0.00123, so the fund CUT MRNA ~25% between 6/30 and mid-August. That is a real trade, and it confirms "
+             "the 8/19 call ('trimmed the tail MORE than a uniform haircut, or partly exited'). (7) Baron's website "
+             "book, which we had been using for WEIGHTS_6_30, scored well -- mean |error| 0.072pp, max 0.61pp -- its "
+             "one real mistake being GOOGL and GOOG SWAPPED. WEIGHTS_6_30 is now replaced with the filed values and "
+             "the raw book is committed to data/nport_holdings_2026-06-30.csv. (8) NO v5: I tested four baskets built "
+             "from the filed 6/30 share counts. The best (filed tail + pinned MRNA) scores RMS 0.229 vs v4.2's 0.196 "
+             "-- a 1.1-SE gap, NOT significant, and in the wrong direction. A fresher anchor (7/31) beats a more "
+             "precise but two-month-stale one, and the tail is only ~20% of gross. v4.2 stays the published basket."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

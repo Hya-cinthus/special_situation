@@ -868,5 +868,92 @@
     ],
     "source": "measured",
     "confidence": "high"
+  },
+  {
+    "report_date": "2026-06-30",
+    "filing_date": "2026-08-28",
+    "accession": "0000894189-26-024246",
+    "net_assets_usd": 1634830251.28,
+    "total_assets_usd": 1643373699.75,
+    "n_holdings": 49,
+    "top_holdings": [
+      {
+        "name": "First American Treasury Obligations, Class X, 3.58%",
+        "valUSD": 939712700.51,
+        "pctVal": 57.4807506635
+      },
+      {
+        "name": "Magnitude ANC III, LLC (economic exposure to Anthropic PBC Series B Preferred Shares)",
+        "valUSD": 235671976.08,
+        "pctVal": 14.4156848025
+      },
+      {
+        "name": "DXYZ SpaceX I LLC (economic exposure to Space Exploration Technologies Corp. Class A Common Stock)",
+        "valUSD": 115445830.5,
+        "pctVal": 7.0616402168
+      },
+      {
+        "name": "Goanna Capital 26E LLC (invested in OpenAI Group PBC Series C Preferred Stock)",
+        "valUSD": 35040868.2,
+        "pctVal": 2.1433948982
+      },
+      {
+        "name": "SP21Z Opportunities LLC (invested in OpenEvidence Inc. Common Stock)",
+        "valUSD": 34933663.05,
+        "pctVal": 2.1368373275
+      },
+      {
+        "name": "MWAM VC SpaceX-II, LLC (economic exposure to Space Exploration Technologies Corp. Class A Common Stock)",
+        "valUSD": 33280603.35,
+        "pctVal": 2.0357222607
+      },
+      {
+        "name": "Snowpoint Growth 2.5, LLC (invested in Shield AI Inc. Series F1 Preferred Stock)",
+        "valUSD": 30125568.48,
+        "pctVal": 1.8427337307
+      },
+      {
+        "name": "Snowpoint Growth 2.6, LLC (invested in Space Exploration Technologies Corp. Class A Common Stock)",
+        "valUSD": 24334735.5,
+        "pctVal": 1.4885175682
+      },
+      {
+        "name": "Revolut Group Holdings Ltd.",
+        "valUSD": 16630994.0,
+        "pctVal": 1.0172917945
+      },
+      {
+        "name": "WH Strategic Opportunities Fund V LP (invested in Chaos Industries, Inc. Series D Preferred Stock)",
+        "valUSD": 15712254.0,
+        "pctVal": 0.961093911
+      },
+      {
+        "name": "Hermeus Corporation - Series C Preferred Stock",
+        "valUSD": 14999999.5,
+        "pctVal": 0.9175264214
+      },
+      {
+        "name": "Beast Industries Co. - Series C Preferred Stock",
+        "valUSD": 14999990.28,
+        "pctVal": 0.9175258574
+      },
+      {
+        "name": "Mercury Technologies, Inc. - Series D Preferred Stock",
+        "valUSD": 14999986.91,
+        "pctVal": 0.9175256513
+      },
+      {
+        "name": "Prive Tens, LLC (invested in Tenstorrent Holdings Inc., subordinated convertible promissory note 15.00% 12/31/2026)",
+        "valUSD": 12500000.0,
+        "pctVal": 0.7646053766
+      },
+      {
+        "name": "Hexagon Master LLC - Series 1 (invested in Ferox Games B.V. Series F Preferred Stock)",
+        "valUSD": 11263273.03,
+        "pctVal": 0.6889567294
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
   }
 ]

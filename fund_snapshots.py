@@ -85,18 +85,24 @@ WEIGHTS_5_31 = {
     'HEI-A': 0.002717,
 }
 
-# Baron's website holdings as of 2026-06-30 (% of TOTAL INVESTMENTS = gross), ex-SpaceX
-# (SpaceX 32.9% of gross). Published ahead of the 6/30 NPORT-P (expected ~Aug 27). This is the
-# FRESHEST disclosed public book. NEW names vs the 3/31-5/31 book: MORN/AMZN/MRNA/GOOG/LLY/GOOGL
-# (~3.8% of gross) — the fund trimmed TSLA (14.1% gross = ~21% of public, vs 5/31's ~24.7%) and
-# added these mega/large-caps. `_nospy` renormalizes over the public names; names without a daily
-# close in ENTRIES drop out of the daily basket return (add them to the paste to close the gap).
+# FILED 6/30/2026 holdings, from the NPORT-P filed 2026-08-28 (accession 0001410368-26-088301,
+# seriesId S000000588 Baron Partners Fund). Values are a fraction of TOTAL INVESTMENTS (gross),
+# ex-SpaceX and ex-cash — the same basis the previous website-derived table used, so the `_nospy`
+# renormalization downstream is unchanged. Raw book: data/nport_holdings_2026-06-30.csv.
+# Replaced Baron's website approximation on 2026-08-31, once the filing landed. That website book
+# scored well: mean |error| 0.072pp, max 0.61pp on the public-relative basis. Its one real mistake
+# was GOOGL and GOOG swapped (site 0.149/0.597 of the public book; filed 0.759/0.148).
+# Fund level 6/30: netAssets $18.0511B, totAssets $19.3104B, leverage 1.0698,
+# cash (SSgA MMF) $39.0M = 0.216 pct of net (essentially gone).
+# SpaceX 36938300 sh = 32.68 pct of gross — UNCHANGED from 3/31,
+# which falsifies the assumed ~$262M 6/12 'Friday buy'.
 WEIGHTS_6_30 = {
-    'TSLA': 0.141, 'SCHW': 0.040, 'H': 0.040, 'MSCI': 0.039, 'SHOP': 0.037, 'ACGL': 0.033,
-    'SPOT': 0.031, 'FDS': 0.026, 'IT': 0.025, 'MTN': 0.023, 'VRSK': 0.023, 'IDXX': 0.023,
-    'CHH': 0.023, 'CSGP': 0.023, 'GWRE': 0.022, 'RRR': 0.019, 'BIRK': 0.018, 'KNSL': 0.017,
-    'ONON': 0.016, 'MORN': 0.015, 'AMZN': 0.008, 'MRNA': 0.007, 'GLPI': 0.004, 'GOOG': 0.004,
-    'FIG': 0.004, 'LLY': 0.003, 'HEI': 0.003, 'HEI-A': 0.002, 'GOOGL': 0.001,
+    "TSLA": 0.14060, "H": 0.04017, "SCHW": 0.03981, "MSCI": 0.03911, "SHOP": 0.03699,
+    "ACGL": 0.03263, "SPOT": 0.03046, "FDS": 0.02561, "IT": 0.02470, "IDXX": 0.02307,
+    "CSGP": 0.02303, "CHH": 0.02280, "VRSK": 0.02276, "MTN": 0.02258, "GWRE": 0.02238,
+    "RRR": 0.01895, "BIRK": 0.01791, "KNSL": 0.01715, "ONON": 0.01627, "MORN": 0.01529,
+    "AMZN": 0.00788, "MRNA": 0.00721, "GOOGL": 0.00509, "FIG": 0.00477, "GLPI": 0.00409,
+    "HEI": 0.00326, "LLY": 0.00314, "HEI-A": 0.00156, "GOOG": 0.00099,
 }
 
 IMPLIED_SHARES_5_31 = {
