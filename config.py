@@ -804,6 +804,18 @@ class SpacexBaron:
                    "level error +0.31 (best), v4.1 +0.79, v4 +1.12, v3 +1.56. See "
                    "daily_log/2026-08-28-nport-6-30-verification.md."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-08-31", "spacex_value_usd": 3.89026788e9 * (143.69 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 143.69, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $143.69 on 2026-08-31 (+1.55% vs 8/28 $141.50). BPTIX NAV 291.60 (+0.58%), AUM 16.5B, "
+                   "flow flat. *** CORRECTION to the 8/28 entry: the ~$262M 6/12 SpaceX buy WAS REAL. The flat "
+                   "6/30 filed share count does not disprove it -- a round trip inside the quarter is invisible "
+                   "to a quarter-end snapshot. Regressing the no-buy NAV residual on SPCX's move sizes the extra "
+                   "exposure at 0.02336 sh/BPTIX on 6/15 vs 0.02314 for a real $262M buy (1% match), running "
+                   "6.4 sigma over 6/15-6/18, 1.2 sigma over 6/22-6/25, and 0.0 sigma from 7/1: bought on the "
+                   "IPO day, held ~two weeks, exited before quarter-end. This re-mark series is unaffected -- it "
+                   "has only ever marked the flat disclosed 3/31 count, which remains correct. See "
+                   "daily_log/2026-08-31-friday-buy-correction.md."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

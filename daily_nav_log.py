@@ -929,6 +929,39 @@ ENTRIES = [
              "from the filed 6/30 share counts. The best (filed tail + pinned MRNA) scores RMS 0.229 vs v4.2's 0.196 "
              "-- a 1.1-SE gap, NOT significant, and in the wrong direction. A fresher anchor (7/31) beats a more "
              "precise but two-month-stale one, and the tail is only ~20% of gross. v4.2 stays the published basket."},
+    {"date": "2026-08-31", "spcx": 143.69, "actual_nav": 291.60, "aum": 16.5e9,
+     "closes": {"ACGL": 98.07, "BIRK": 34.91, "CHH": 103.36, "CSGP": 32.07, "FDS": 313.55,
+                "FIG": 27.49, "GLPI": 42.07, "GWRE": 204.75, "H": 166.97, "HEI": 331.15,
+                "HEI-A": 244.17, "IDXX": 556.69, "IT": 198.11, "KNSL": 373.90, "MSCI": 570.64,
+                "MTN": 136.91, "ONON": 28.50, "RRR": 56.16, "SCHW": 109.82, "SHOP": 147.37,
+                "SPOT": 543.62, "TSLA": 367.95, "VRSK": 193.78,
+                "AMZN": 259.77, "GOOGL": 339.35, "GOOG": 335.41, "LLY": 1156.73, "MRNA": 140.34, "MORN": 218.94},
+     "note": "Mon 8/31. Closes fetched T+1 (Yahoo). SPCX +1.55% (141.50->143.69) => SpaceX ~$5.31B. BPTIX NAV 291.60 "
+             "(+0.58%), AUM 16.4B->16.5B, flow +$0.004B i.e. flat. MARK BASKETS (LEVEL): v4.2 +0.08 BEST, v4.1 +0.58, "
+             "v4 +0.92, v3 +1.13. Rolling 8/3-8/31 (n=21): v4.2 RMS 0.192 (bias +0.128, SD 0.143), v4.1 0.478, v4 "
+             "0.770, v3 1.556. Daily-log: ronb +0.01 best, optimal +0.02, fund_6/30 +0.26 (now on FILED weights), "
+             "fund_3/31 +1.88 worst -- TSLA +5.5% today and the 3/31 snapshot is the most TSLA-overweight, so the "
+             "drift ordering reproduces once more. Movers up: TSLA +5.5%, FDS +1.5%, VRSK +1.1%; down: MTN -3.5%, CHH "
+             "-5.1%, RRR -1.4%, SHOP -3.6%, LLY -1.5%, H -3.1%. RONB +0.41% x1.3 = +0.54% vs actual +0.58% -- a "
+             "near-exact call. *** CORRECTION, and it matters: THE 6/12 SPACEX BUY WAS REAL. On 8/28 I read the filed "
+             "flat 6/30 share count as proof the ~$262M 'Friday buy' never happened. That was wrong -- a quarter-end "
+             "snapshot cannot constrain intra-quarter activity, and a round trip inside the quarter is invisible to "
+             "it. Holding the share count flat at the filed 36,938,300 and regressing the daily NAV residual on SPCX's "
+             "dollar move: the 6/15 residual alone implies 0.02336 sh/BPTIX of extra SpaceX, against 0.02314 for a "
+             "genuine $262M buy at the 6/12 close -- a 1% match. By segment the extra exposure runs +0.02400 (6.4 "
+             "sigma) over 6/15-6/18, +0.01425 (1.2 sigma) over 6/22-6/25, and +0.00013 (0.0 sigma) from 7/1, with July "
+             "and August controls at 0.7 and 0.5 sigma. So the fund BOUGHT ~$262M on the IPO day, held ~two weeks, and "
+             "EXITED before quarter-end. The 6/15 back-solve is also NOT fragile as I implied: across L in {0.968, "
+             "1.00, 1.0698} and b in {0, 5/31 basket, filed 6/30 basket} the implied w_spx only moves 30.38%-30.91%, "
+             "because SPCX moved +19.6% that day while the public book moved +0.13%. FRIDAY_SPACEX_BUY = $262M is "
+             "CORRECT and STAYS. What the model still lacks is the EXIT: it carries the buy forward forever, which is "
+             "why our 6/30 SpaceX weight reads 35.37% vs the filed 34.963% (+0.41pp, +1.632M shares). Stripping the "
+             "buy -- what my 8/28 reading implied -- would have made it -1.13pp, WORSE; that sign disagreement was the "
+             "clue I should have followed. Mark baskets are unaffected either way since they only ever marked the flat "
+             "disclosed count. Full record in daily_log/2026-08-31-friday-buy-correction.md. Caveat kept in the open: "
+             "the 6/26-6/30 segment shows -0.046 sh/BPTIX at a nominal -32 sigma, but LEVERAGE_FOR steps 1.00 -> ~1.06 "
+             "exactly on 6/26, so that window is contaminated by our own assumption and is NOT used as the exit "
+             "evidence. Leverage 1.10 (disclosed)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
