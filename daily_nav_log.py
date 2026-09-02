@@ -962,6 +962,34 @@ ENTRIES = [
              "the 6/26-6/30 segment shows -0.046 sh/BPTIX at a nominal -32 sigma, but LEVERAGE_FOR steps 1.00 -> ~1.06 "
              "exactly on 6/26, so that window is contaminated by our own assumption and is NOT used as the exit "
              "evidence. Leverage 1.10 (disclosed)."},
+    {"date": "2026-09-01", "spcx": 142.23, "actual_nav": 285.94, "aum": 16.2e9,
+     "closes": {"ACGL": 98.61, "BIRK": 34.25, "CHH": 98.12, "CSGP": 31.98, "FDS": 305.44,
+                "FIG": 27.20, "GLPI": 41.80, "GWRE": 201.09, "H": 162.55, "HEI": 325.15,
+                "HEI-A": 242.00, "IDXX": 545.16, "IT": 189.93, "KNSL": 372.51, "MSCI": 563.09,
+                "MTN": 132.39, "ONON": 27.73, "RRR": 56.10, "SCHW": 108.28, "SHOP": 139.82,
+                "SPOT": 544.15, "TSLA": 356.09, "VRSK": 194.35,
+                "AMZN": 254.92, "GOOGL": 335.02, "GOOG": 332.03, "LLY": 1160.00, "MRNA": 154.27, "MORN": 209.86},
+     "note": "Tue 9/1. Closes fetched T+1 (Yahoo). SPCX -1.02% (143.69->142.23) => SpaceX ~$5.25B. BPTIX NAV 285.94 "
+             "(-1.94%), AUM 16.5B->16.2B. *** THE AUM DROP IS NOT A REDEMPTION -- it is almost entirely the market. "
+             "NAV -1.94% on 16.5B lands at 16.180B by itself, so the implied flow is +$0.020B and the rounding band "
+             "(-$0.079B..+$0.119B) STRADDLES ZERO. Shares-out actually ticked UP 56.584M->56.655M. Worth stating "
+             "plainly because a 16.5->16.2 print looks alarming and isn't: since the one clear -$183M day on 8/27 "
+             "there has been no further redemption. *** A broad down day with one violent exception: SHOP -5.1%, CHH "
+             "-5.1%, MORN -4.2%, IT -4.1%, MTN -3.3%, TSLA -3.2%, HEI -1.8%, ONON -2.7%; only SPOT +0.1%, LLY +0.3%, "
+             "VRSK +0.3% held up -- and MRNA +9.9%. MARK BASKETS (LEVEL): v4.2 +0.17 BEST, v4.1 +0.76, v4 +1.30, v3 "
+             "+1.42. Rolling 8/3-9/1 (n=22): v4.2 RMS 0.192 (bias +0.131, SD 0.140), v4.1 0.494, v4 0.802, v3 1.550. "
+             "Daily-log: fund_6/30 +0.02 BEST -- the second win in two days since it was switched to the FILED 6/30 "
+             "weights, which is the cleanest evidence yet that replacing Baron's website approximation with the filing "
+             "was worth doing. optimal -0.12, fund_4/30 -0.26, blend -0.30, ronb -0.31, actual -0.39. *** MRNA, 9th "
+             "observation: +9.93% (|dP| $13.93) implies 0.01638 +/- 0.01077 sh/BPTIX, worth 1.3% of the precision "
+             "weight. Nine-event combined: 0.02410 +/- 0.00122 -- essentially unmoved from the 7-event 0.02418, and "
+             "v4.2 (0.02355) still sits -0.45 sigma inside. Note the standing comparison to the filing: 6/30 filed "
+             "MRNA was 0.03225 sh/BPTIX, so the fund remains ~25% BELOW its 6/30 book two months on. The July-August "
+             "cut was permanent, not a temporary trim -- which is what justifies keeping v4.2's pinned MRNA rather "
+             "than reverting toward the filed 6/30 level. *** Per-name cross-sectional variance (total SD 0.330/BPTIX, "
+             "the widest since 8/24): TSLA 63%, SHOP 14%, MRNA 7%, MORN 5%, CHH 4% -- TSLA back in the driver's seat "
+             "on a -3.2% day, same signature as 8/24. RONB -1.86% x1.3 = -2.42% vs actual -1.94% (over-called the "
+             "fall). Leverage 1.10 (disclosed)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

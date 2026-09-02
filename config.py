@@ -816,6 +816,15 @@ class SpacexBaron:
                    "has only ever marked the flat disclosed 3/31 count, which remains correct. See "
                    "daily_log/2026-08-31-friday-buy-correction.md."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-01", "spacex_value_usd": 3.89026788e9 * (142.23 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 142.23, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $142.23 on 2026-09-01 (-1.02% vs 8/31 $143.69). Disclosed 3/31 share count. BPTIX NAV "
+                   "285.94 (-1.94%) on a broad public selloff (SHOP -5.1%, CHH -5.1%, MORN -4.2%, IT -4.1%, "
+                   "TSLA -3.2%), MRNA +9.9% the lone exception. AUM 16.5B->16.2B but that is the MARKET, not a "
+                   "redemption: implied flow +$0.020B with the rounding band straddling zero, and shares-out "
+                   "rose 56.584M->56.655M. Mark baskets: v4.2 level error +0.17 (best), v4.1 +0.76, v4 +1.30, "
+                   "v3 +1.42. Leverage 1.10 (disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
