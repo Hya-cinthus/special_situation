@@ -990,6 +990,62 @@ ENTRIES = [
              "the widest since 8/24): TSLA 63%, SHOP 14%, MRNA 7%, MORN 5%, CHH 4% -- TSLA back in the driver's seat "
              "on a -3.2% day, same signature as 8/24. RONB -1.86% x1.3 = -2.42% vs actual -1.94% (over-called the "
              "fall). Leverage 1.10 (disclosed)."},
+    {"date": "2026-09-02", "spcx": 140.71, "actual_nav": 284.94, "aum": None,
+     "closes": {"ACGL": 98.21, "BIRK": 33.79, "CHH": 100.40, "CSGP": 31.26, "FDS": 306.07,
+                "FIG": 25.73, "GLPI": 42.34, "GWRE": 192.76, "H": 165.02, "HEI": 322.90,
+                "HEI-A": 239.83, "IDXX": 538.99, "IT": 186.75, "KNSL": 376.78, "MSCI": 560.63,
+                "MTN": 136.30, "ONON": 27.80, "RRR": 56.84, "SCHW": 108.24, "SHOP": 141.87,
+                "SPOT": 559.36, "TSLA": 357.01, "VRSK": 188.16,
+                "AMZN": 254.98, "GOOGL": 337.12, "GOOG": 333.78, "LLY": 1160.08, "MRNA": 150.81, "MORN": 209.80},
+     "note": "Wed 9/2. Closes fetched T+1 (Yahoo). SPCX -1.07% (142.23->140.71) => SpaceX ~$5.20B. BPTIX NAV 284.94 "
+             "(-0.35%). AUM NOT CAPTURED for this day (the user supplies one AUM per report and gave 9/4); the model "
+             "carries shares-out forward, which is the right treatment since shares-out only moves on FLOWS, not with "
+             "the market. A quiet, mildly negative tape: FIG -5.4%, GWRE -4.1%, IT -1.7%, IDXX -1.1%, CSGP -2.3% down; "
+             "SPOT +2.8%, MTN +3.0%, CHH +2.3%, KNSL +1.1% up. MARK BASKETS (LEVEL): v4.2 +0.04 BEST, v4.1 +0.61, v4 "
+             "+1.15, v3 +1.29. Daily-log: blend -0.01 best, fund_6/30 +0.07, fund_5/31 -0.12, ronb +0.53 worst. "
+             "Leverage 1.10 (disclosed)."},
+    {"date": "2026-09-03", "spcx": 149.74, "actual_nav": 295.97, "aum": None,
+     "closes": {"ACGL": 99.83, "BIRK": 33.95, "CHH": 99.40, "CSGP": 31.68, "FDS": 312.96,
+                "FIG": 25.22, "GLPI": 42.36, "GWRE": 202.86, "H": 165.39, "HEI": 325.70,
+                "HEI-A": 239.26, "IDXX": 529.29, "IT": 195.46, "KNSL": 382.98, "MSCI": 574.65,
+                "MTN": 136.06, "ONON": 28.36, "RRR": 57.09, "SCHW": 110.38, "SHOP": 145.88,
+                "SPOT": 560.11, "TSLA": 376.37, "VRSK": 190.60,
+                "AMZN": 258.90, "GOOGL": 342.48, "GOOG": 339.08, "LLY": 1159.60, "MRNA": 148.87, "MORN": 215.76},
+     "note": "Thu 9/3. Closes fetched T+1 (Yahoo). *** SPCX +6.42% (140.71->149.74) => SpaceX ~$5.53B, the biggest "
+             "SpaceX day since the MRNA week. BPTIX NAV 295.97 (+3.87%). AUM not captured (see 9/2). Broad rally on "
+             "top of it: TSLA +5.4%, GWRE +5.2%, MSCI +2.5%, SCHW +2.0%, FDS +2.3%, IT +4.7%. MARK BASKETS (LEVEL): "
+             "v4.2 -0.19, v4.1 +0.36, v3 +0.60, v4 +0.82 -- note v4.2 went NEGATIVE for the first time in the window. "
+             "Back-solving SpaceX from this day's $9.03 move gives 0.65694 sh/BPTIX (sd +/-0.01661) vs v4.2's 0.63131, "
+             "i.e. v4.2 is -3.9% / -1.54 sigma low. NOT significant on its own, but the sign is consistent with a big "
+             "SPCX up-day producing a NEGATIVE v4.2 error, and it is worth watching: unlike MRNA this is a number we "
+             "KNOW from the filing (36,938,300 sh), so a persistent shortfall would point at shares-out or leverage, "
+             "not at the SpaceX count. Daily-log: fund_6/30 +0.05 BEST (its third win in four sessions on the FILED "
+             "weights), optimal -0.09, ronb -0.39, fund_3/31 +0.93 worst. Leverage 1.10 (disclosed)."},
+    {"date": "2026-09-04", "spcx": 147.95, "actual_nav": 287.40, "aum": 16.2e9,
+     "closes": {"ACGL": 98.10, "BIRK": 34.00, "CHH": 100.62, "CSGP": 30.91, "FDS": 301.96,
+                "FIG": 24.12, "GLPI": 41.92, "GWRE": 162.42, "H": 165.85, "HEI": 325.48,
+                "HEI-A": 240.18, "IDXX": 535.38, "IT": 186.42, "KNSL": 373.17, "MSCI": 573.01,
+                "MTN": 134.96, "ONON": 27.99, "RRR": 57.15, "SCHW": 109.29, "SHOP": 145.09,
+                "SPOT": 542.43, "TSLA": 354.08, "VRSK": 185.79,
+                "AMZN": 258.51, "GOOGL": 338.46, "GOOG": 335.31, "LLY": 1149.36, "MRNA": 145.55, "MORN": 209.40},
+     "note": "Fri 9/4. Closes fetched T+1 (Yahoo). SPCX -1.20% (149.74->147.95) => SpaceX ~$5.46B. BPTIX NAV 287.40 "
+             "(-2.90%), AUM 16.2B (flat vs 9/1). *** GWRE CRASHED -19.93% (202.86->162.42, dP -$40.44) -- verified NOT "
+             "a split via Yahoo events (adjclose == close, no split/div in 3mo), volume 4.70M vs a 1.1-2.1M norm, "
+             "gapped through 168.89/157.05. This is the second most informative single-name shock we have had after "
+             "MRNA's $111 move on 8/19, and it is a BETTER test: GWRE is one of the DISCLOSED 7/31 top-10 (3.2% of "
+             "gross), so it checks a number we derived from a disclosure, whereas MRNA had no disclosure at all. "
+             "RESULT: implied GWRE = 0.05955 sh/BPTIX (sd +/-0.00371) vs v4.2's 0.05820 -- only -2.3%, -0.36 sigma. "
+             "CONFIRMED. So v4.2 now checks out on both routes: the disclosure-derived leg (GWRE, -0.36 sigma) and the "
+             "pure back-solve leg (MRNA, -0.45 sigma across 9 events). *** TSLA -5.92% dominated the cross-section: "
+             "per-name variance TSLA 87%, GWRE 9%, MORN 1%, total cross-basket SD 0.514/BPTIX, the widest in the "
+             "window. MARK BASKETS (LEVEL): v4.2 -0.14, v4.1 +0.40, v3 +0.88, v4 +0.92. Rolling 8/3-9/4 (n=25): v4.2 "
+             "RMS 0.186 (bias +0.104, SD 0.154), v4.1 0.492, v4 0.825, v3 1.492. NOTE the bias is finally moving: "
+             "+0.131 -> +0.104 after two negative days (-0.19, -0.14). Too early to call it decay -- I made exactly "
+             "that mistake on 8/26 and had to retract it on 8/27 -- so this is logged, not acted on. Daily-log: "
+             "fund_3/31 -0.02 best, actual +0.08, blend +0.23, fund_6/30 +0.91, ronb +2.16 WORST (RONB carries little "
+             "or no GWRE, so the crash barely touched it). FLOW 9/1->9/4: AUM 16.2B flat while NAV rose +0.51% over "
+             "the three sessions => implied -$0.083B with the band (-$0.183B..+$0.018B) straddling zero; shares-out "
+             "56.655M->56.367M. No redemption signal since the single -$183M day on 8/27. Leverage 1.10 (disclosed)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

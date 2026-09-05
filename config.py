@@ -825,6 +825,30 @@ class SpacexBaron:
                    "rose 56.584M->56.655M. Mark baskets: v4.2 level error +0.17 (best), v4.1 +0.76, v4 +1.30, "
                    "v3 +1.42. Leverage 1.10 (disclosed)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-02", "spacex_value_usd": 3.89026788e9 * (140.71 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 140.71, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $140.71 on 2026-09-02 (-1.07% vs 9/1). Disclosed 3/31 share count. BPTIX NAV 284.94 "
+                   "(-0.35%) on a quiet, mildly negative tape (FIG -5.4%, GWRE -4.1%, CSGP -2.3%; SPOT +2.8%, "
+                   "MTN +3.0%). AUM not captured this day. Mark baskets: v4.2 +0.04 (best)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-03", "spacex_value_usd": 3.89026788e9 * (149.74 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 149.74, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $149.74 on 2026-09-03 (+6.42% vs 9/2) => SpaceX ~$5.53B, the biggest SpaceX day since "
+                   "the MRNA week. Disclosed 3/31 share count. BPTIX NAV 295.97 (+3.87%) with a broad rally on "
+                   "top (TSLA +5.4%, IT +4.7%, GWRE +5.2%). AUM not captured. Mark baskets: v4.2 -0.19, its "
+                   "first negative of the window."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-04", "spacex_value_usd": 3.89026788e9 * (147.95 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 147.95, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $147.95 on 2026-09-04 (-1.20% vs 9/3). Disclosed 3/31 share count. BPTIX NAV 287.40 "
+                   "(-2.90%), AUM 16.2B flat vs 9/1 (3-day implied flow -$0.083B, band straddles zero). *** GWRE "
+                   "crashed -19.93% (dP -$40.44), verified not a split -- the second most informative single-name "
+                   "shock after MRNA's 8/19, and a better test because GWRE is a DISCLOSED 7/31 top-10 name. "
+                   "Implied GWRE 0.05955 sh/BPTIX vs v4.2's 0.05820: -2.3%, -0.36 sigma, CONFIRMED. v4.2 now "
+                   "validates on both the disclosure-derived leg (GWRE) and the pure back-solve leg (MRNA). "
+                   "TSLA -5.9% drove 87% of the cross-basket variance. Mark baskets: v4.2 -0.14, v4.1 +0.40, "
+                   "v3 +0.88, v4 +0.92. Leverage 1.10 (disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
