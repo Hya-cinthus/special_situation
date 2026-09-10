@@ -171,17 +171,22 @@ function drawLookthrough() {
   if (note && mb) note.innerHTML +=
     `<div style="margin-top:10px;padding:8px 12px;border:1px solid ${GRID};border-left:3px solid ${SPX};` +
     `border-radius:6px;background:var(--panel-2);font-size:.8rem;color:${TEXT}">` +
-    `<b>Mark basket ${mb.version} — re-anchored to the 7/31 disclosure.</b> Leverage <b>${mb.leverage.toFixed(2)}</b> ` +
-    `(long 110% / cash −10% of NET; stocks = 110% of net = 100% of gross). SpaceX = 36.94M disclosed sh ÷ shares-out = ` +
-    `<b>${mb.spx_sh_per_bptix.toFixed(4)}</b> sh/BPTIX (${mb.spx_pct_gross}% of GROSS = 27.2% of net); borrow ` +
-    `−$${mb.borrow_per_bptix.toFixed(2)}/BPTIX. Top-10 = disclosed 7/31 weights; <b>tail = buy-and-hold</b> ` +
-    `(prior 6/30 <i>shares</i> × one uniform haircut — not re-imposed 6/30 weights, which would sell winners ` +
-    `and buy losers); MRNA cut to <b>${mb.mrna_sh_per_bptix}</b> sh/BPTIX, back-solved from three MRNA shocks. ` +
-    `<b>Out-of-sample accuracy ${mb.window_start}→${mb.window_end} (n=${mb.n_forward}): RMS ` +
+    `<b>Mark basket ${mb.version} — re-anchored to the ${mb.anchor} disclosure.</b> Leverage ` +
+    `<b>${mb.leverage.toFixed(3)}</b> (long equity 109.2% / cash −9.2% of NET). SpaceX = the <b>filed</b> ` +
+    `36,938,300 sh ÷ shares-out = <b>${mb.spx_sh_per_bptix.toFixed(4)}</b> sh/BPTIX, which lands at 29.46% of ` +
+    `gross against a disclosed <b>${mb.spx_pct_gross}%</b> — an independent confirmation the share count is ` +
+    `still unchanged (3/31, 6/30 and 8/31); borrow −$${mb.borrow_per_bptix.toFixed(2)}/BPTIX. Top-9 = disclosed ` +
+    `${mb.anchor} weights (same nine names as 7/31, only reordered); <b>tail = buy-and-hold</b> off v4.2's ` +
+    `share book with one uniform −5.49% haircut — not re-imposed weights, which would sell winners and buy ` +
+    `losers. MRNA carries <b>${mb.mrna_sh_per_bptix}</b> sh/BPTIX. ` +
+    `<b>Out-of-sample since the anchor, ${mb.window_start}→${mb.window_end} (n=${mb.n_forward}): RMS ` +
     `$${mb.rms_forward.toFixed(3)}/BPTIX (~${mb.rms_forward_pct_nav}% of NAV), bias ` +
-    `${mb.bias_forward >= 0 ? "+" : ""}${mb.bias_forward.toFixed(3)}</b> — vs v4.1 $${mb.rms_v4_1.toFixed(3)}, ` +
-    `v4 $${mb.rms_v4.toFixed(3)}, stale-v3 $${mb.rms_stale_v3.toFixed(3)}. The window rolls with the data. ` +
-    `Clean split v3→v4 at <b>${mb.clean_split_date}</b>.</div>`;
+    `${mb.bias_forward >= 0 ? "+" : ""}${mb.bias_forward.toFixed(3)}</b> — versus v4.2 at ` +
+    `$${mb.rms_prev_same_window.toFixed(3)} on the same days. Over the full ${mb.full_window_start}→` +
+    `${mb.window_end} window (n=${mb.n_full}): v5 $${mb.rms_full_v5.toFixed(3)}, v4.2 ` +
+    `$${mb.rms_v4_2.toFixed(3)}, v4.1 $${mb.rms_v4_1.toFixed(3)}, v4 $${mb.rms_v4.toFixed(3)}, stale-v3 ` +
+    `$${mb.rms_stale_v3.toFixed(3)} — v4.2 leads there only because most of that window is <i>its</i> anchor ` +
+    `period; the crossover to v5 lands <b>2026-08-27</b>.</div>`;
   const sv = d && d.meta && d.meta.slow_vars;
   if (note && sv && sv.latest) {
     const L = sv.latest, sh = L.shift, on = sv.alert;

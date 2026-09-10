@@ -77,6 +77,8 @@ def LEVERAGE_FOR(date, net_aum=None):
         return 0.968
     if date <= "2026-06-25":
         return 1.00
+    if date >= "2026-08-31":
+        return 1.092                             # disclosed 8/31: long 109.2% / cash -9.2% of net
     if date >= LEVERAGE_DISCLOSED_FROM:
         return LEVERAGE_DISCLOSED_VALUE          # disclosed 7/31: long 110% / cash -10% of net
     if net_aum:
@@ -1329,6 +1331,16 @@ def _lookthrough(rows, w6):
 # so the published accuracy can never silently freeze at a stale n.
 FORWARD_START = "2026-08-03"
 
+# 8/31 as-of disclosure (Baron): top-10 % of GROSS, + Long Equity 109.2% / Cash -9.2% of NET.
+# Same nine public names as 7/31 (only the ordering moved), so the tail name list is unchanged.
+# Cross-check that validates the whole block: the FILED 36,938,300 SpaceX shares / shares-out at
+# 8/31 comes to 29.46% of gross against the disclosed 29.4% — i.e. the share count is STILL
+# unchanged, now confirmed at 3/31, 6/30 and 8/31.
+DISCLOSED_8_31 = {"weights_gross": {"TSLA": 13.2, "SHOP": 4.9, "SCHW": 4.8, "MSCI": 4.2, "GWRE": 3.8,
+                                    "SPOT": 3.8, "FDS": 3.8, "H": 3.7, "ACGL": 3.4},
+                  "spacex_gross": 29.4, "leverage": 1.092, "anchor": "2026-08-31",
+                  "nav": 291.60, "aum": 16.5e9, "spcx": 143.69}
+
 # 7/31 as-of disclosure (Baron): top-10 % of GROSS (total investments), + Long Equity 110% / Cash -10%.
 DISCLOSED_7_31 = {"weights_gross": {"TSLA": 12.4, "SCHW": 5.3, "MSCI": 4.7, "SHOP": 4.4, "H": 4.3,
                                     "ACGL": 4.0, "SPOT": 3.9, "FDS": 3.7, "GWRE": 3.2},
@@ -1405,23 +1417,32 @@ def _load_v3_csv():
 
 
 def _mark_basket_accuracy():
-    """The PUBLISHED mark basket (v4.2) + its live tracking accuracy vs actual NAV, scored against the
-    ladder of predecessors (v4.1 / v4 / stale v3). Wrapped by the caller in try/except (never break CI).
+    """The PUBLISHED mark basket (v5) + its live tracking accuracy vs actual NAV, scored against the
+    ladder of predecessors. Wrapped by the caller in try/except (never break CI).
 
-    Version ladder — each step changed exactly ONE thing, and each was settled out-of-sample:
+    Version ladder — each step changed exactly ONE thing, each settled out-of-sample:
       v3   6/30-anchored, L=1.066.
       v4   7/31 re-anchor (disclosed top-10 + L=1.10); tail = 6/30 weights re-imposed (CONSTANT-WEIGHT).
-      v4.1 same, but tail = BUY-AND-HOLD (prior 6/30 SHARES x one uniform haircut). Constant-weight
-           silently sells winners / buys losers; buy-and-hold predicts the 9 disclosed 7/31 weights at
-           RMS 0.26 vs 1.25, winning on all 9, and was confirmed under stress by MRNA +176.9% on 8/19.
-      v4.2 same, but MRNA cut 0.02942 -> 0.02355 sh/BPTIX (freed value spread pro-rata over the tail).
-           Three MRNA shocks (8/19 +176.9%, 8/20 -23.5%, 8/21 +8.9%) let us BACK-SOLVE the fund's true
-           MRNA from the actual NAV move; precision-weighted they give ~0.0241 +/- 0.0013, so every
-           earlier basket held far too much (v4.1 +22%, v3 +30%, v4 +64%). Adopted 8/20.
+      v4.1 same, but tail = BUY-AND-HOLD (prior SHARES x one uniform haircut). Constant-weight silently
+           sells winners / buys losers; buy-and-hold predicts the 9 disclosed 7/31 weights at RMS 0.26
+           vs 1.25, winning on all 9, and was confirmed under stress by MRNA +176.9% on 8/19.
+      v4.2 same, but MRNA cut to 0.02355 sh/BPTIX, back-solved from repeated MRNA shocks (precision-
+           weighted ~0.0241 +/- 0.0012 over 9 events). Adopted 8/20.
+      v5   8/31 re-anchor on Baron's 8/31 top-10 (L=1.092: long equity 109.2% / cash -9.2% of net),
+           tail = buy-and-hold off v4.2's share book with a uniform -5.49% haircut. Adopted 2026-09-10.
+           The nine disclosed public names are IDENTICAL to 7/31 (only the ordering moved), so the tail
+           name list did not change. Validating cross-check: the FILED 36,938,300 SpaceX shares divided
+           by 8/31 shares-out is 29.46% of gross against a disclosed 29.4% — the share count is still
+           unchanged, now confirmed at 3/31, 6/30 AND 8/31.
 
-    v4.2's MRNA count is EMPIRICAL — back-solved, not derivable from any disclosure — so it lives in the
-    committed CSV rather than in code. v4.1 and v4 are still rebuilt here from the 7/31 disclosure so the
-    comparison stays honest (they are recomputed, not copied from a stale file)."""
+    Backtest that justified the swap (7/31 -> 9/9, level error):
+        Aug 1st half   v4.2 RMS 0.207   v5 0.552     <- v4.2's own anchor period, it wins
+        Aug 2nd half   v4.2 RMS 0.167   v5 0.207
+        September      v4.2 RMS 0.213   v5 0.066     <- v5 wins by 3.2x
+    That is exactly the crossover a monthly re-anchor should produce, and it flips on 8/27.
+    Like-for-like on the first 6 sessions after each basket's OWN anchor: v4.2 RMS 0.257 (bias +0.196),
+    v5 RMS 0.066 (bias -0.044) — v5's out-of-sample start is ~4x cleaner. n=6, so treat as provisional
+    until a couple more weeks are in."""
     import math
     W6 = _nospy(fs.WEIGHTS_6_30)
     v3, b3 = _load_v3_csv()
@@ -1431,6 +1452,7 @@ def _mark_basket_accuracy():
     v4, b4 = _build_static_basket("2026-07-31", W6, DISCLOSED_7_31["spacex_gross"],
                                   DISCLOSED_7_31["leverage"], DISCLOSED_7_31["weights_gross"])
     v4_2, b4_2 = _load_basket_csv("position_mark_basket_v4_2_2026-07-31.csv", default_borrow=b4_1)
+    v5, b5 = _load_basket_csv("position_mark_basket_v5_2026-08-31.csv", default_borrow=0.0)
 
     def mark(s, b, e):
         p = dict(e["closes"]); p["SPCX"] = e["spcx"]
@@ -1442,36 +1464,48 @@ def _mark_basket_accuracy():
     scored = [e for e in ENTRIES if e["date"] >= FORWARD_START and e.get("actual_nav")]
     window_end = scored[-1]["date"] if scored else FORWARD_START
 
-    def errs(basket, bor):
-        return [mark(basket, bor, e) - e["actual_nav"] for e in scored]
+    def errs(basket, bor, rows=None):
+        return [mark(basket, bor, e) - e["actual_nav"] for e in (rows if rows is not None else scored)]
 
-    e_pub, e_41, e_4, e_3 = errs(v4_2, b4_2), errs(v4_1, b4_1), errs(v4, b4), errs(v3, b3)
-    bias = round(sum(e_pub) / len(e_pub), 3) if e_pub else None
-    e = next(x for x in ENTRIES if x["date"] == "2026-07-31")
-    so = e["aum"] / e["actual_nav"]
+    # v5's OWN out-of-sample window: strictly after its 8/31 anchor
+    oos = [e for e in scored if e["date"] > DISCLOSED_8_31["anchor"]]
+    e_pub, e_42, e_41, e_4, e_3 = (errs(v5, b5), errs(v4_2, b4_2), errs(v4_1, b4_1),
+                                   errs(v4, b4), errs(v3, b3))
+    e_oos, e_oos_42 = errs(v5, b5, oos), errs(v4_2, b4_2, oos)
+    bias = round(sum(e_oos) / len(e_oos), 3) if e_oos else None
     nav_ref = scored[-1]["actual_nav"] if scored else 270.0
-    r_pub = rms(e_pub) or 0.0
+    r_oos = rms(e_oos) or 0.0
     return {
-        "version": "v4.2", "anchor": "2026-07-31", "leverage": DISCLOSED_7_31["leverage"],
-        "spx_sh_per_bptix": round(SPX_SHARES_DISCLOSED / so, 4),
-        "spx_pct_gross": DISCLOSED_7_31["spacex_gross"], "borrow_per_bptix": round(b4_2, 2),
-        "mrna_sh_per_bptix": round(v4_2.get("MRNA", 0), 5),
-        "rms_forward": rms(e_pub), "rms_forward_pct_nav": round(r_pub / nav_ref * 100, 3),
-        "rms_v4_1": rms(e_41), "rms_v4": rms(e_4), "rms_stale_v3": rms(e_3),
-        "bias_forward": bias, "last_err": (round(e_pub[-1], 2) if e_pub else None),
-        "n_forward": len(e_pub), "window_start": FORWARD_START, "window_end": window_end,
-        "clean_split_date": "2026-07-13",
-        "note": ("v4.2 mark basket: anchored 7/31, leverage 1.10 (long 110%% / cash -10%% of NET; stocks=110%% "
-                 "of net = 100%% of gross). SpaceX = 36.94M disclosed sh / shares-out = %.4f sh/BPTIX (24.8%% of "
-                 "GROSS = 27.2%% of net). Top-10 = disclosed 7/31 weights; TAIL = BUY-AND-HOLD (prior 6/30 SHARES, "
-                 "one uniform haircut to fit the forced residual) — NOT re-imposed 6/30 weights, which would sell "
-                 "winners / buy losers. v4.2 additionally cuts MRNA to %.5f sh/BPTIX, back-solved from three MRNA "
-                 "shocks (precision-weighted ~0.0241 +/- 0.0013); every earlier basket held far too much. Rolling "
-                 "out-of-sample window %s..%s (n=%d): RMS $%.3f/BPTIX (~%.2f%% of NAV), bias %+.3f — vs v4.1 $%.3f, "
-                 "v4 $%.3f, stale-v3 $%.3f. Clean split v3->v4 at 2026-07-13."
-                 % (SPX_SHARES_DISCLOSED / so, v4_2.get("MRNA", 0), FORWARD_START, window_end, len(e_pub),
-                    r_pub, r_pub / nav_ref * 100, bias or 0.0,
-                    rms(e_41) or 0, rms(e_4) or 0, rms(e_3) or 0)),
+        "version": "v5", "anchor": DISCLOSED_8_31["anchor"], "leverage": DISCLOSED_8_31["leverage"],
+        "spx_sh_per_bptix": round(v5.get("SPCX", 0), 4),
+        "spx_pct_gross": DISCLOSED_8_31["spacex_gross"], "borrow_per_bptix": round(b5, 2),
+        "mrna_sh_per_bptix": round(v5.get("MRNA", 0), 5),
+        # headline = the out-of-sample window (after the anchor), which is what the basket is FOR
+        "rms_forward": rms(e_oos), "rms_forward_pct_nav": round(r_oos / nav_ref * 100, 3),
+        "bias_forward": bias, "last_err": (round(e_oos[-1], 2) if e_oos else None),
+        "n_forward": len(e_oos),
+        "window_start": (oos[0]["date"] if oos else DISCLOSED_8_31["anchor"]), "window_end": window_end,
+        "rms_prev_same_window": rms(e_oos_42),         # v4.2 over v5's out-of-sample window
+        # full comparison window, all versions on the same days
+        "full_window_start": FORWARD_START, "n_full": len(e_pub),
+        "rms_full_v5": rms(e_pub), "rms_v4_2": rms(e_42), "rms_v4_1": rms(e_41),
+        "rms_v4": rms(e_4), "rms_stale_v3": rms(e_3),
+        "clean_split_date": "2026-08-31",
+        "note": ("v5 mark basket: anchored 8/31 on Baron's disclosed top-10, leverage 1.092 (long equity "
+                 "109.2%% / cash -9.2%% of NET). SpaceX = the FILED 36,938,300 sh / shares-out = %.4f "
+                 "sh/BPTIX, which comes to 29.46%% of gross against a disclosed 29.4%% — an independent "
+                 "confirmation that the share count is STILL unchanged (3/31, 6/30 and now 8/31). Top-9 = "
+                 "disclosed 8/31 weights (same nine names as 7/31, only reordered); TAIL = BUY-AND-HOLD off "
+                 "v4.2's share book with one uniform -5.49%% haircut to fit the forced residual — NOT "
+                 "re-imposed weights, which would sell winners / buy losers. Out-of-sample since the anchor "
+                 "%s..%s (n=%d): RMS $%.3f/BPTIX (~%.2f%% of NAV), bias %+.3f — versus v4.2 at $%.3f on the "
+                 "SAME days. Over the full %s..%s window all versions score: v5 $%.3f, v4.2 $%.3f, v4.1 "
+                 "$%.3f, v4 $%.3f, stale-v3 $%.3f (v4.2 wins there because most of that window is ITS "
+                 "anchor period — the crossover to v5 lands 8/27)."
+                 % (v5.get("SPCX", 0), (oos[0]["date"] if oos else "-"), window_end, len(e_oos),
+                    r_oos, r_oos / nav_ref * 100, bias or 0.0, rms(e_oos_42) or 0,
+                    FORWARD_START, window_end, rms(e_pub) or 0, rms(e_42) or 0, rms(e_41) or 0,
+                    rms(e_4) or 0, rms(e_3) or 0)),
     }
 
 
