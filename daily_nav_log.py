@@ -1087,7 +1087,7 @@ ENTRIES = [
              "is the tightest validation of any holding we have, and it is a DISCLOSURE-derived one. RONB -0.04% x1.3 "
              "= -0.05% vs actual -0.52% -- badly under-called the fall, its worst miss in weeks (RONB is light on the "
              "names that got hit). Leverage 1.10 (disclosed)."},
-    {"date": "2026-09-09", "spcx": 147.55, "actual_nav": 279.04, "aum": None,
+    {"date": "2026-09-09", "spcx": 147.55, "actual_nav": 279.04, "aum": 15.8e9,
      "closes": {"ACGL": 96.12, "BIRK": 31.56, "CHH": 99.61, "CSGP": 29.58, "FDS": 279.17,
                 "FIG": 22.01, "GLPI": 41.50, "GWRE": 142.24, "H": 158.24, "HEI": 312.32,
                 "HEI-A": 232.48, "IDXX": 515.15, "IT": 169.69, "KNSL": 359.60, "MSCI": 554.54,
@@ -1133,7 +1133,16 @@ ENTRIES = [
              "remains NONE. *** Daily-log: fund_6/30 +0.04 BEST again (the FILED weights, now winning most days), "
              "fund_5/31 +0.13, optimal +0.27, blend +0.28, ronb +0.37, fund_4/30 +0.41, actual +0.50, fund_3/31 +0.62 "
              "worst. Spread only 0.58 today because TSLA barely moved -- consistent with TSLA being the drift channel. "
-             "Leverage 1.10 (disclosed)."},
+             "Leverage 1.10 (disclosed). *** UPDATE 9/10, when the AUM landed: 15.8B (user-reported). That "
+             "RESOLVES the stale-mark issue described above, exactly as the mechanism predicted -- 9/9 now has an "
+             "AUM ROW, so the re-mark attaches and the SpaceX weight drops from the distorted 36.08% to 34.50%. "
+             "(Yesterday I projected 34.69% off a CARRIED 15.7131B; the reported 15.8B is 0.55% higher, which puts "
+             "it at 34.50% -- mechanism right, level one rounding step off.) FLOW: market-only would have put AUM "
+             "at 15.7131B against a reported 15.8B => +$0.087B, and shares-out ROSE 56.3114M -> 56.6227M (+0.311M, "
+             "+0.55%). The band runs -$0.012B..+$0.186B: positive across almost its entire range but NOT cleanly "
+             "clear of zero. This is the strongest inflow signal since redemptions stopped ~8/10 -- stronger than "
+             "8/24, whose +$75M reversed the next day and proved to be rounding. Flagged, NOT concluded; a "
+             "confirming day makes it real."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
