@@ -849,6 +849,27 @@ class SpacexBaron:
                    "TSLA -5.9% drove 87% of the cross-basket variance. Mark baskets: v4.2 -0.14, v4.1 +0.40, "
                    "v3 +0.88, v4 +0.92. Leverage 1.10 (disclosed)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-08", "spacex_value_usd": 3.89026788e9 * (153.47 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 153.47, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $153.47 on 2026-09-08 (+3.73% vs 9/4 $147.95) => SpaceX ~$5.67B. Disclosed 3/31 share "
+                   "count. BPTIX NAV 285.91 (-0.52%) -- a hedge day in reverse: SpaceX and TSLA were the only "
+                   "things up while the public book was hosed (GWRE -7.8%, SHOP -7.6%, IT -7.4%, VRSK -5.5%). "
+                   "AUM 16.2B->16.1B, flow -$0.016B with the band straddling zero. TSLA drift gave its cleanest "
+                   "reading yet: every daily-log basket over-predicted, and error vs TSLA weight regresses at "
+                   "R^2 0.906 across the 7 NPORT-derived baskets, with the FILED-weight basket least wrong. "
+                   "Mark baskets: v4.2 -0.34, v4.1 +0.18, v3 +0.38, v4 +0.74. Leverage 1.10 (disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-09", "spacex_value_usd": 3.89026788e9 * (147.55 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 147.55, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $147.55 on 2026-09-09 (-3.86% vs 9/8 $153.47) => SpaceX ~$5.45B. Disclosed 3/31 share "
+                   "count. BPTIX NAV 279.04 (-2.40%) on a second straight public-book washout (SHOP -5.5%, "
+                   "GWRE -5.0%, FDS -3.4%, MRNA -3.4%); TSLA stopped falling (-0.10%). AUM not captured. Entered "
+                   "same evening to resync this series with the NAV series -- building after the close with the "
+                   "day unentered had frozen the SpaceX numerator at 9/8 and printed a 36.08% weight against a "
+                   "true 34.69%. Mark baskets: v4.2 -0.27, v4.1 +0.23, v3 +0.63, v4 +0.74. GWRE's third shock in "
+                   "four sessions puts the precision-weighted implied count at 0.05829 vs v4.2's 0.05820 -- "
+                   "-0.02 sigma, the tightest validation in the book. Leverage 1.10 (disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------

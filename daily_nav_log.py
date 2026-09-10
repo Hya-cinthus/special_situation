@@ -1046,6 +1046,94 @@ ENTRIES = [
              "or no GWRE, so the crash barely touched it). FLOW 9/1->9/4: AUM 16.2B flat while NAV rose +0.51% over "
              "the three sessions => implied -$0.083B with the band (-$0.183B..+$0.018B) straddling zero; shares-out "
              "56.655M->56.367M. No redemption signal since the single -$183M day on 8/27. Leverage 1.10 (disclosed)."},
+    {"date": "2026-09-08", "spcx": 153.47, "actual_nav": 285.91, "aum": 16.1e9,
+     "closes": {"ACGL": 95.71, "BIRK": 32.62, "CHH": 100.01, "CSGP": 30.34, "FDS": 289.00,
+                "FIG": 22.75, "GLPI": 41.62, "GWRE": 149.71, "H": 161.11, "HEI": 316.10,
+                "HEI-A": 235.04, "IDXX": 520.21, "IT": 172.59, "KNSL": 367.29, "MSCI": 551.39,
+                "MTN": 132.99, "ONON": 27.27, "RRR": 56.12, "SCHW": 106.87, "SHOP": 134.10,
+                "SPOT": 528.64, "TSLA": 368.16, "VRSK": 175.49,
+                "AMZN": 256.97, "GOOGL": 338.36, "GOOG": 335.38, "LLY": 1123.91, "MRNA": 140.33, "MORN": 200.53},
+     "note": "Tue 9/8 (Mon 9/7 was Labor Day, market closed). Closes fetched T+1 (Yahoo). SPCX +3.73% (147.95->153.47) "
+             "=> SpaceX ~$5.67B. BPTIX NAV 285.91 (-0.52%), AUM 16.2B->16.1B. A HEDGE DAY in reverse and an extreme "
+             "one: SpaceX and TSLA were the ONLY things up (SPCX +3.7%, TSLA +4.0%) while the rest of the public book "
+             "was hosed -- GWRE -7.8% (a second crash three sessions after -19.9%), SHOP -7.6%, IT -7.4%, FIG -5.7%, "
+             "VRSK -5.5%, FDS -4.3%, MORN -4.2%, BIRK -4.1%, MSCI -3.8%, MRNA -3.6%, IDXX -2.8%, ACGL -2.4%, LLY "
+             "-2.2%. FLOW: point -$0.016B with the band (-$0.116B..+$0.084B) straddling zero; shares-out "
+             "56.367M->56.311M. Still no redemption signal since the single -$183M day on 8/27. *** TSLA DRIFT, THE "
+             "MOST DRAMATIC READING YET. Every daily-log basket OVER-predicted, by +1.10 to +2.69, because TSLA was "
+             "the lone big gainer and every NPORT snapshot is TSLA-overweight. Regressing each basket's error on its "
+             "TSLA weight across the 7 NPORT-derived baskets: r = 0.952, R^2 = 0.906, slope +0.165 per pp of TSLA "
+             "weight. Ordering: fund_3/31 (30.43% TSLA) +2.69 worst, actual (28.35%) +2.43, fund_4/30 (26.56%) +2.08, "
+             "blend (25.65%) +1.71, fund_5/31 (24.67%) +1.31, optimal (20.46%) +1.18, fund_6/30 (20.98%, the FILED "
+             "weights) +1.10 BEST. The filed truth is 20.98%, so the basket sitting ON the truth was the least wrong "
+             "-- the cleanest confirmation of the drift theory so far, and another payoff from swapping in the filed "
+             "weights. Per-name variance: TSLA 59%, SHOP 21%, MORN 4%, IT 4% (total SD 0.383/BPTIX). *** MARK BASKETS "
+             "(LEVEL): v4.2 -0.34, v4.1 +0.18, v3 +0.38, v4 +0.74. Rolling 8/3-9/8 (n=26): v4.2 RMS 0.194 (bias "
+             "+0.086, SD 0.174), v4.1 0.483, v4 0.821, v3 1.464. v4.2 has now printed THREE straight negatives (-0.19, "
+             "-0.14, -0.34) and the bias has fallen +0.131 -> +0.104 -> +0.086. Read it precisely: RMS did NOT improve "
+             "(0.186 -> 0.194) because SD ROSE 0.140 -> 0.174. The bias is not vanishing, it is CONVERTING INTO NOISE. "
+             "Not calling it decay -- that is the exact error I made on 8/26 and retracted on 8/27. *** SPACEX "
+             "BACK-SOLVE IS NOW SIGNIFICANT, and the diagnosis matters. Two independent SPCX up-days: 9/3 implies "
+             "0.65694 (sd +/-0.01661), 9/8 implies 0.66820 (sd +/-0.02717); combined 0.66000 +/- 0.01417 vs v4.2's "
+             "0.63131 -- low by 4.3%, -2.02 sigma. But this is NOT a SpaceX share-count problem: 36,938,300 is a FILED "
+             "number we have verified to the share. Back out what else could give it -- if the count is right, the "
+             "implied shares-out is 55.967M against the 56.311M we carry from AUM/NAV, i.e. the back-solve wants AUM "
+             "16.002B versus the reported 16.1B. That is a 0.6% gap sitting essentially on the edge of Morningstar's "
+             "0.1B rounding band. So the honest read is AUM/shares-out PRECISION, not a wrong SpaceX count, and the "
+             "correct action is NONE -- do not touch a filed number to chase a rounding artifact. Re-check if the gap "
+             "persists once several more AUM prints are in. *** GWRE, second shock in three sessions: this day's |dP| "
+             "is only $12.71 so it implies 0.04218 (sd +/-0.01180), pulling the other way at +1.36 sigma. "
+             "Precision-weighted with the 9/4 crash: 0.05799 +/- 0.00354 vs v4.2's 0.05820 -- +0.4%, 0.06 sigma. That "
+             "is the tightest validation of any holding we have, and it is a DISCLOSURE-derived one. RONB -0.04% x1.3 "
+             "= -0.05% vs actual -0.52% -- badly under-called the fall, its worst miss in weeks (RONB is light on the "
+             "names that got hit). Leverage 1.10 (disclosed)."},
+    {"date": "2026-09-09", "spcx": 147.55, "actual_nav": 279.04, "aum": None,
+     "closes": {"ACGL": 96.12, "BIRK": 31.56, "CHH": 99.61, "CSGP": 29.58, "FDS": 279.17,
+                "FIG": 22.01, "GLPI": 41.50, "GWRE": 142.24, "H": 158.24, "HEI": 312.32,
+                "HEI-A": 232.48, "IDXX": 515.15, "IT": 169.69, "KNSL": 359.60, "MSCI": 554.54,
+                "MTN": 130.33, "ONON": 26.84, "RRR": 55.02, "SCHW": 106.54, "SHOP": 126.79,
+                "SPOT": 523.00, "TSLA": 367.81, "VRSK": 177.99,
+                "AMZN": 252.40, "GOOGL": 330.65, "GOOG": 328.38, "LLY": 1124.21, "MRNA": 135.61, "MORN": 198.09},
+     "note": "Wed 9/9. Closes fetched same evening (Yahoo, market closed). SPCX -3.86% (153.47->147.55) => SpaceX "
+             "~$5.45B. BPTIX NAV 279.04 (-2.40%). AUM NOT CAPTURED (the user reports T+1 and had given 9/8); the model "
+             "carries shares-out forward. Second straight day of the public book being hosed: SHOP -5.5%, GWRE -5.0%, "
+             "FDS -3.4%, MRNA -3.4%, FIG -3.3%, BIRK -3.3%, MTN -2.0%, IT -1.7%, MORN -1.2%; TSLA STOPPED (-0.10%) and "
+             "VRSK +1.4%, ACGL +0.4% actually rose. *** ENTERED THIS DAY TO FIX A REAL DISTORTION, and the mechanism "
+             "is worth recording because it will recur. I ran build.py on the evening of 9/9 with the log only through "
+             "9/8. Yahoo already had 9/9's BPTIX NAV (279.04) and SPCX close, so the NAV/AUM series extended to 9/9 -- "
+             "but config.SPACEX_REMARKS stopped at 9/8, so the SpaceX numerator stayed frozen at the 9/8 mark of "
+             "$5.6688B (SPCX 153.47) while the denominator fell to the 9/9 AUM of $15.7131B. The main card printed a "
+             "SpaceX weight of 36.08%. The correct figure is 36,938,300 x 147.55 / 15.7131B = 34.69% -- the print was "
+             "1.4pp too HIGH, purely from the two sides being as-of different days. I first assumed entering 9/9 "
+             "(closes + NAV, aum=None) would resync them. IT DOES NOT -- I checked, and the real mechanism is "
+             "narrower: morningstar_log.resolve_aum_datapoints() attaches spacex_value_usd by looping over the ROWS "
+             "OF morningstar_aum_log.jsonl and stamping each with the latest SPACEX_REMARKS entry on/before that "
+             "date. A day with NO AUM ROW gets no re-mark at all, and reconstruct then holds the SpaceX value flat "
+             "from the last marked day. So adding the day to ENTRIES and to SPACEX_REMARKS is NOT enough -- 9/9 "
+             "stays at 36.08%% until it has an AUM row, which arrives with tomorrow's user report. This is a "
+             "pre-existing structural limitation, not something today introduced: interior aum=None days (9/2, 9/3) "
+             "carry a stale mark too, but nothing downstream reads them, so it only distorts the HEADLINE when the "
+             "unmarked day is the LAST one. The tell is main last_data_day running AHEAD of the last date in the "
+             "AUM log. Day to day it is harmless and self-corrects. I did NOT invent an AUM row to force it -- that "
+             "file is the record of user-reported Morningstar prints and has to stay clean. Corrected note in "
+             "DAILY_UPDATE_PROTOCOL.md. *** MARK BASKETS (LEVEL): v4.2 -0.27, v4.1 +0.23, "
+             "v3 +0.63, v4 +0.74. Rolling 8/3-9/9 (n=27): v4.2 RMS 0.197 (bias +0.073, SD 0.183), v4.1 0.476, v4 "
+             "0.819, v3 1.442. v4.2 has now printed FOUR straight negatives (-0.19, -0.14, -0.34, -0.27) and the bias "
+             "has walked +0.131 -> +0.104 -> +0.086 -> +0.073. Same caution as 9/8: RMS is NOT improving (0.186 -> "
+             "0.194 -> 0.197) because SD keeps rising (0.140 -> 0.174 -> 0.183). The bias is turning into noise, not "
+             "going away. Still not calling it decay. *** GWRE, THIRD SHOCK IN FOUR SESSIONS (202.86 -> 142.24, -29.9% "
+             "cumulative): this day implies 0.06801 (sd +/-0.02008). Precision-weighted across all three -- dP -40.44, "
+             "-12.71, -7.47 -- gives 0.05829 +/- 0.00348 against v4.2's 0.05820: -0.1%, -0.02 SIGMA. That is the "
+             "tightest validation of any holding in the book, on a DISCLOSURE-derived share count, from three "
+             "independent shocks. *** SPACEX BACK-SOLVE, sign check: 9/9 was a DOWN day and implies 0.64368 (sd "
+             "+/-0.02534), only -0.49 sigma, versus -1.54 and -1.36 on the two UP days. Three-event combined 0.65611 "
+             "+/- 0.01237 = -2.01 sigma. Note the ASYMMETRY: a pure share-count shortfall would bite equally on up and "
+             "down days, and it does not. That further supports the 9/8 diagnosis that this is AUM/shares-out "
+             "precision rather than a wrong SpaceX count -- which is a FILED number verified to the share. Action "
+             "remains NONE. *** Daily-log: fund_6/30 +0.04 BEST again (the FILED weights, now winning most days), "
+             "fund_5/31 +0.13, optimal +0.27, blend +0.28, ronb +0.37, fund_4/30 +0.41, actual +0.50, fund_3/31 +0.62 "
+             "worst. Spread only 0.58 today because TSLA barely moved -- consistent with TSLA being the drift channel. "
+             "Leverage 1.10 (disclosed)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

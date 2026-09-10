@@ -155,6 +155,26 @@ py -c "import json;d=json.load(open('dashboard/data/spacex_baron.json'));print('
 py -c "import json;d=json.load(open('dashboard/data/ipo_day_recon.json'));print('IPO card still:',d['meta']['date'])   # MUST stay 2026-06-12"
 py -c "import json;d=json.load(open('dashboard/data/recalibration.json'));print('recalib vintage days:',len(d['vintage_ledger']))"
 ```
+> **⚠️ The SpaceX re-mark only lands on days that have an AUM-log row (found 2026-09-09).**
+> `morningstar_log.resolve_aum_datapoints()` attaches `spacex_value_usd` by looping over the rows of
+> `morningstar_aum_log.jsonl` and stamping each with the latest `SPACEX_REMARKS` entry on/before that
+> date. A day with **no AUM row gets no re-mark**, and `reconstruct` then holds the SpaceX value FLAT
+> from the previous marked day (`spacex_value_t = held flat from last filing; steps at each
+> filing/mark`). Adding the day to `daily_nav_log.ENTRIES` and to `SPACEX_REMARKS` is *not* enough.
+>
+> It only distorts the headline when the unmarked day is the LAST one, because then the KPI divides a
+> **stale SpaceX numerator** by a **current AUM denominator**. Hit on 2026-09-09: built after the close
+> with 9/9 un-entered, the card printed **36.08%** against a true **34.69%** — 1.4pp high, roughly that
+> day's −3.9% SPCX move. Entering 9/9's closes/NAV and its `SPACEX_REMARKS` line did NOT fix it; the
+> weight only corrects once 9/9 has an AUM row.
+>
+> **The tell:** `main last_data_day` runs AHEAD of the last date in `morningstar_aum_log.jsonl`.
+> **Day-to-day:** harmless — the next day's AUM lands and the weight self-corrects. Interior days with
+> `aum=None` (e.g. 9/2–9/3) carry a stale mark too, but nothing downstream reads them.
+> **If you need the headline right before the AUM arrives:** build before the close, or accept that the
+> KPI is as-of the last AUM row. Do NOT invent an AUM row to force it — that file is the record of
+> user-reported Morningstar prints and must stay clean.
+
 Checklist: main `last_data_day` == T · SpaceX weight moved · IPO card still 2026-06-12 ·
 daily_nav_log + recalibration show T · vintage froze the new day.
 
