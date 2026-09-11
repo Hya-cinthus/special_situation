@@ -1145,6 +1145,36 @@ ENTRIES = [
              "clear of zero. This is the strongest inflow signal since redemptions stopped ~8/10 -- stronger than "
              "8/24, whose +$75M reversed the next day and proved to be rounding. Flagged, NOT concluded; a "
              "confirming day makes it real."},
+    {"date": "2026-09-10", "spcx": 148.18, "actual_nav": 277.96, "aum": 15782010255,
+     "closes": {"ACGL": 96.20, "BIRK": 30.69, "CHH": 98.23, "CSGP": 29.49, "FDS": 262.93,
+                "FIG": 22.14, "GLPI": 40.98, "GWRE": 140.09, "H": 161.39, "HEI": 312.49,
+                "HEI-A": 232.34, "IDXX": 506.53, "IT": 170.62, "KNSL": 362.70, "MSCI": 547.60,
+                "MTN": 133.33, "ONON": 26.85, "RRR": 54.69, "SCHW": 107.33, "SHOP": 126.60,
+                "SPOT": 521.73, "TSLA": 363.56, "VRSK": 175.86,
+                "AMZN": 251.89, "GOOGL": 332.60, "GOOG": 330.39, "LLY": 1123.00, "MRNA": 136.62, "MORN": 193.15},
+     "note": "Thu 9/10. Closes fetched T+1 (Yahoo). SPCX +0.43% (147.55->148.18) => SpaceX ~$5.47B. BPTIX NAV 277.96 "
+             "(-0.39%). *** AUM IS NOW EXACT: $15,782,010,255, scraped from Morningstar's quote page rather than taken "
+             "as the rounded '15.8B'. The page embeds fundSize:{value:15782010255} alongside the rendered '15.8B', and "
+             "its nav field (277.96) matches Yahoo's BPTIX close exactly, confirming the page is as-of 9/10. New "
+             "module situations/spacex_baron/ingest/morningstar_quote.py; robots.txt checked -- /funds/ is NOT "
+             "disallowed (only /api*, /search, /login and friends are), and this is a LOCAL step, deliberately kept "
+             "out of build.py so the CI rebuild stays network-free apart from Yahoo/EDGAR. Rounding was hiding "
+             "$17,989,745 on this single day. *** FLOW: market-only would put AUM at 15.7388B against the exact "
+             "15.7820B => +$0.043B, shares-out 56.6227M->56.7780M. But 9/9 is still a ROUNDED 15.8B, so its +/-0.05B "
+             "alone gives a band of -$0.007B..+$0.093B -- still straddling zero. One exact endpoint is not enough. "
+             "From TOMORROW, with two exact prints, the flow band collapses from the +/-$100M we have lived with all "
+             "along to essentially nothing, and every 'is this a real redemption or rounding?' question we have argued "
+             "over since 8/24 becomes decidable. *** MARK BASKETS (LEVEL): v5 +0.03 BEST, v4.2 -0.19, v4.1 +0.32, v3 "
+             "+0.75, v4 +0.83. Since the 8/27 crossover (n=10): v5 RMS 0.059 vs v4.2 0.219, with v5 closer on 9 of 10 "
+             "days. v5's last six errors are -0.07 -0.05 -0.10 -0.05 -0.06 +0.03, i.e. pinned inside +/-0.10 for six "
+             "straight sessions. *** FDS fell -5.82% (279.17->262.93, dP -$16.24), a DISCLOSED 8/31 top-9 name. "
+             "Implied 0.04450 sh/BPTIX (sd +/-0.00924) vs v5's 0.03859: -13.3% but only -0.64 sigma, so consistent, "
+             "not a signal. A single $16 move is ~2.5x less informative than GWRE's $40 crash; worth logging, not "
+             "acting on. Movers: FDS -5.8%, BIRK -2.8%, MORN -2.5%, IDXX -1.7%, GWRE -1.5%, CHH -1.4%, TSLA -1.2% "
+             "down; H +2.0%, KNSL +0.9%, MRNA +0.7%, IT +0.5%, SPCX +0.4% up. Daily-log: fund_3/31 +0.02 best, ronb "
+             "+0.05, fund_5/31 +0.10, blend +0.12, actual +0.14, fund_4/30 +0.14, optimal +0.24, fund_6/30 +0.25 -- a "
+             "tight 0.23 spread because TSLA barely moved. RONB -0.38% x1.3 = -0.50% vs actual -0.39%. Leverage 1.092 "
+             "(8/31 disclosed)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

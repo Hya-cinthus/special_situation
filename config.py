@@ -870,6 +870,15 @@ class SpacexBaron:
                    "four sessions puts the precision-weighted implied count at 0.05829 vs v4.2's 0.05820 -- "
                    "-0.02 sigma, the tightest validation in the book. Leverage 1.10 (disclosed)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-10", "spacex_value_usd": 3.89026788e9 * (148.18 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 148.18, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $148.18 on 2026-09-10 (+0.43% vs 9/9 $147.55). Disclosed 3/31 share count. BPTIX "
+                   "NAV 277.96 (-0.39%). AUM is EXACT for the first time -- $15,782,010,255 scraped from "
+                   "Morningstar's quote page (its embedded fundSize field) instead of the rounded 15.8B; the "
+                   "page's NAV 277.96 matches Yahoo, confirming the as-of day. FDS -5.8% was the big mover. "
+                   "Mark baskets: v5 +0.03 (best), v4.2 -0.19, v4.1 +0.32, v3 +0.75, v4 +0.83. Since the 8/27 "
+                   "crossover v5 RMS 0.059 vs v4.2 0.219. Leverage 1.092 (8/31 disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
