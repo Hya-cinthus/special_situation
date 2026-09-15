@@ -1175,6 +1175,48 @@ ENTRIES = [
              "+0.05, fund_5/31 +0.10, blend +0.12, actual +0.14, fund_4/30 +0.14, optimal +0.24, fund_6/30 +0.25 -- a "
              "tight 0.23 spread because TSLA barely moved. RONB -0.38% x1.3 = -0.50% vs actual -0.39%. Leverage 1.092 "
              "(8/31 disclosed)."},
+    {"date": "2026-09-11", "spcx": 151.21, "actual_nav": 281.85, "aum": None,
+     "closes": {"ACGL": 96.09, "BIRK": 31.13, "CHH": 96.77, "CSGP": 30.46, "FDS": 259.71,
+                "FIG": 23.20, "GLPI": 40.24, "GWRE": 140.92, "H": 163.07, "HEI": 316.00,
+                "HEI-A": 235.25, "IDXX": 504.70, "IT": 179.59, "KNSL": 360.01, "MSCI": 554.61,
+                "MTN": 140.09, "ONON": 27.41, "RRR": 55.90, "SCHW": 107.25, "SHOP": 128.79,
+                "SPOT": 525.75, "TSLA": 365.44, "VRSK": 176.20,
+                "AMZN": 256.78, "GOOGL": 338.50, "GOOG": 335.45, "LLY": 1115.70, "MRNA": 143.97, "MORN": 191.02},
+     "note": "Fri 9/11. Closes fetched late (see below). SPCX +2.04% (148.18->151.21) => SpaceX ~$5.59B. BPTIX NAV "
+             "281.85 (+1.40%). *** AUM NOT CAPTURED, AND IT IS NOW PERMANENTLY LOST. The morningstar_quote scraper "
+             "built on 9/10 was never wired to any scheduler -- it is referenced nowhere outside its own module, and "
+             "neither pages.yml nor rebuild-data.yml calls it. It only runs when this session is invoked, and it was "
+             "not invoked on 9/11 or 9/14. Morningstar's quote page carries only the CURRENT value, so unlike prices "
+             "there is no way to go back for it. This day therefore has aum=None and the model carries shares-out "
+             "forward. A capture gap is not recoverable; that is the whole lesson. *** A strong tape: IT +5.3%, MRNA "
+             "+5.4%, FIG +4.8%, SHOP +1.7%, MTN +5.1%, SPCX +2.0%; MORN -1.1%, FDS -1.2%, IDXX -0.4% the only "
+             "laggards. MARK BASKETS (LEVEL): v4.2 -0.05 BEST, v5 +0.18, v4.1 +0.49, v3 +0.89, v4 +1.03. Leverage "
+             "1.092 (8/31 disclosed)."},
+    {"date": "2026-09-14", "spcx": 148.15, "actual_nav": 283.73, "aum": 15953630838,
+     "closes": {"ACGL": 97.95, "BIRK": 30.66, "CHH": 96.54, "CSGP": 31.52, "FDS": 276.93,
+                "FIG": 23.91, "GLPI": 41.05, "GWRE": 153.00, "H": 163.71, "HEI": 303.75,
+                "HEI-A": 227.73, "IDXX": 509.56, "IT": 197.07, "KNSL": 363.89, "MSCI": 553.65,
+                "MTN": 140.51, "ONON": 27.47, "RRR": 54.75, "SCHW": 107.31, "SHOP": 133.89,
+                "SPOT": 556.31, "TSLA": 358.97, "VRSK": 187.03,
+                "AMZN": 253.54, "GOOGL": 349.39, "GOOG": 345.71, "LLY": 1138.28, "MRNA": 146.69, "MORN": 201.64},
+     "note": "Mon 9/14. SPCX -2.02% (151.21->148.15) => SpaceX ~$5.47B. BPTIX NAV 283.73 (+0.67%), AUM $15,953,630,838 "
+             "EXACT (scraped 9/15 morning; the page's NAV 283.73 matches Yahoo, confirming the as-of day). *** FIRST "
+             "NET FLOW COMPUTED FROM TWO EXACT ENDPOINTS. 9/10 $15,782,010,255 -> 9/14 $15,953,630,838 with NAV "
+             "+2.0758%: market alone would have produced $16,109,619,261, so the net flow is -$155,988,423 with NO "
+             "rounding band at all. For contrast, the same two days read as rounded prints ('15.8B' and '16.0B') give "
+             "a band of -$229.0M..-$26.9M -- both ends negative, so the DIRECTION was always decidable, but the "
+             "magnitude spanned a factor of 8.5. That uncertainty is now gone. Shares-out 56.7780M->56.2282M "
+             "(-0.5498M). Context: the last unambiguous redemption was -$183M on 8/27; this is the second, -$156M "
+             "across the two sessions 9/11+9/14. *** A violent rotation INTO the beaten-down public book: IT +9.7%, "
+             "GWRE +8.6%, FDS +6.6%, VRSK +6.1%, SPOT +5.8%, MORN +5.6%, SHOP +4.0%, GOOGL +3.2% -- while SPCX -2.0% "
+             "and HEI -3.9%, HEI-A -3.2% fell. GWRE has now retraced most of the -19.9% crash (162.42 -> 140.09 -> "
+             "153.00). MARK BASKETS (LEVEL): v4.2 +0.27, v5 +0.34, v4.1 +0.82, v3 +1.38, v4 +1.23 -- v4.2 edges v5 on "
+             "a day both over-predicted. *** WATCH ON v5: its last five errors run -0.05, -0.06, +0.03, +0.18, +0.34 "
+             "-- monotonically rising, and 9/14 is its worst since the anchor. That is the shape a basket makes when "
+             "it starts to drift, and it arrives right as the public book rips 6-10% in a single session. Two sessions "
+             "is not a verdict and I am NOT re-anchoring on it -- the 8/26 mistake was calling a trend off exactly "
+             "this much evidence. Logged and watched; if it persists through the week it argues the tail haircut is "
+             "stale. Leverage 1.092 (8/31 disclosed)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

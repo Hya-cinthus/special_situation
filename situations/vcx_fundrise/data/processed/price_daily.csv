@@ -120,4 +120,9 @@ date,price
 2026-09-08,38.12
 2026-09-09,37.59
 2026-09-10,33.5
+<<<<<<< HEAD
 2026-09-11,34.5299
+=======
+2026-09-11,33.5
+2026-09-14,32.34
+>>>>>>> bcc8be1 (Daily NAV log 9/11-9/14: first exact-endpoint flow (-$156M); 9/11 AUM lost to an unscheduled scraper)

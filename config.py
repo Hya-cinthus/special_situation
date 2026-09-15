@@ -879,6 +879,21 @@ class SpacexBaron:
                    "Mark baskets: v5 +0.03 (best), v4.2 -0.19, v4.1 +0.32, v3 +0.75, v4 +0.83. Since the 8/27 "
                    "crossover v5 RMS 0.059 vs v4.2 0.219. Leverage 1.092 (8/31 disclosed)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-11", "spacex_value_usd": 3.89026788e9 * (151.21 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 151.21, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $151.21 on 2026-09-11 (+2.04% vs 9/10). Disclosed 3/31 share count. BPTIX NAV 281.85 "
+                   "(+1.40%) on a strong tape (IT +5.3%, MRNA +5.4%, MTN +5.1%, FIG +4.8%). AUM NOT captured "
+                   "and permanently lost -- the Morningstar scraper was never scheduled and the page carries "
+                   "only the current value. Mark baskets: v4.2 -0.05 (best), v5 +0.18."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-14", "spacex_value_usd": 3.89026788e9 * (148.15 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 148.15, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $148.15 on 2026-09-14 (-2.02% vs 9/11). Disclosed 3/31 share count. BPTIX NAV 283.73 "
+                   "(+0.67%) on a violent rotation INTO the public book (IT +9.7%, GWRE +8.6%, FDS +6.6%, "
+                   "VRSK +6.1%, SPOT +5.8%) while SpaceX fell. AUM $15,953,630,838 EXACT -- first net flow "
+                   "from two exact endpoints: -$155,988,423 over 9/10->9/14, with no rounding band. Mark "
+                   "baskets: v4.2 +0.27, v5 +0.34. Leverage 1.092 (8/31 disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
