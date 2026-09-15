@@ -31,6 +31,8 @@ Usage
 """
 
 import json
+import os
+import time
 import re
 import sys
 import urllib.request
@@ -91,8 +93,75 @@ def fetch(timeout=30):
     return out
 
 
+_RAW = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                    "data", "morningstar_quote_raw.jsonl")
+
+
+def _yahoo_bptix(days=8):
+    """{date: close} for BPTIX, used to resolve which day the quote page is as-of."""
+    u = ("https://query1.finance.yahoo.com/v8/finance/chart/BPTIX?range=1mo&interval=1d")
+    req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"})
+    j = json.loads(urllib.request.urlopen(req, timeout=30).read())
+    r = j["chart"]["result"][0]
+    go = r["meta"].get("gmtoffset", 0)
+    out = {}
+    for ts, c in zip(r["timestamp"], r["indicators"]["quote"][0]["close"]):
+        if c is not None:
+            out[time.strftime("%Y-%m-%d", time.gmtime(ts + go))] = round(float(c), 4)
+    return dict(sorted(out.items())[-days:])
+
+
+def resolve_as_of(q, navs=None):
+    """Match the page's NAV against Yahoo's BPTIX closes to date the scrape. The page shows the
+    latest STRUCK NAV, so this is what tells us which trading day the AUM belongs to. Returns
+    (date, how) — how is 'nav-match' when unambiguous, else None with a reason."""
+    nav = q.get("nav_per_share")
+    if nav is None:
+        return None, "no nav on the page"
+    navs = navs if navs is not None else _yahoo_bptix()
+    hits = [d for d, c in navs.items() if abs(c - nav) < 0.005]
+    if len(hits) == 1:
+        return hits[0], "nav-match"
+    if not hits:
+        return None, "page NAV %.2f matches no recent BPTIX close %s" % (nav, list(navs.items())[-3:])
+    return hits[-1], "ambiguous (NAV repeats on %s); took the latest" % hits
+
+
+def append_raw(q, as_of, how, path=_RAW):
+    """Append one capture, keyed on as_of. Idempotent: a date already present is not re-written."""
+    seen = set()
+    if os.path.exists(path):
+        for line in open(path, encoding="utf-8"):
+            line = line.strip()
+            if line:
+                seen.add(json.loads(line).get("as_of_date_iso"))
+    if as_of in seen:
+        return False
+    rec = {"as_of_date_iso": as_of, "ticker": "BPTIX",
+           "total_assets_usd": q["total_assets_usd"], "total_assets_raw": q["total_assets_raw"],
+           "nav_per_share": q["nav_per_share"], "as_of_method": how,
+           "captured_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "source_url": URL}
+    with open(path, "a", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    return True
+
+
 def main(argv):
     q = fetch()
+    if "--append" in argv:
+        # scheduled mode: FAIL LOUDLY. A silent miss is unrecoverable — the page keeps no history.
+        if not q["ok"]:
+            print("FAILED:", q["error"], file=sys.stderr)
+            return 1
+        as_of, how = resolve_as_of(q)
+        if not as_of:
+            print("FAILED to date the scrape: %s" % how, file=sys.stderr)
+            return 1
+        wrote = append_raw(q, as_of, how)
+        print("%s %s  $%s  NAV %s  (%s)"
+              % ("APPENDED" if wrote else "already had", as_of,
+                 format(q["total_assets_usd"], ","), q["nav_per_share"], how))
+        return 0
     if "--json" in argv:
         print(json.dumps(q, indent=1))
         return 0 if q["ok"] else 1
