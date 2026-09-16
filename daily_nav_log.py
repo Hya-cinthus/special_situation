@@ -1217,6 +1217,31 @@ ENTRIES = [
              "is not a verdict and I am NOT re-anchoring on it -- the 8/26 mistake was calling a trend off exactly "
              "this much evidence. Logged and watched; if it persists through the week it argues the tail haircut is "
              "stale. Leverage 1.092 (8/31 disclosed)."},
+    {"date": "2026-09-15", "spcx": 143.49, "actual_nav": 278.66, "aum": 15664319296,
+     "closes": {"ACGL": 97.04, "BIRK": 30.01, "CHH": 97.42, "CSGP": 31.56, "FDS": 277.09,
+                "FIG": 23.88, "GLPI": 40.62, "GWRE": 148.88, "H": 160.19, "HEI": 296.85,
+                "HEI-A": 222.45, "IDXX": 510.73, "IT": 195.62, "KNSL": 369.20, "MSCI": 544.60,
+                "MTN": 138.07, "ONON": 26.76, "RRR": 53.81, "SCHW": 107.79, "SHOP": 129.86,
+                "SPOT": 558.26, "TSLA": 356.58, "VRSK": 180.08,
+                "AMZN": 248.42, "GOOGL": 344.98, "GOOG": 341.43, "LLY": 1136.11, "MRNA": 143.77, "MORN": 201.73},
+     "note": "Tue 9/15. SPCX -3.15% (148.15->143.49) => SpaceX ~$5.30B. BPTIX NAV 278.66 (-1.79%). AUM $15,664,319,296 "
+             "EXACT -- and this one was captured by the SCHEDULED job, not by hand: the morningstar-aum workflow's "
+             "first automatic run (9/16 16:45 UTC, 4.6h behind its 12:10 cron, which is normal best-effort GitHub "
+             "Actions slippage) appended it with as_of resolved by nav-match (page NAV 278.66 = Yahoo's 9/15 close). 1 "
+             "of 1 scheduled runs succeeded. *** FLOW, second consecutive exact-endpoint reading: 9/14 $15,953,630,838 "
+             "-> 9/15 $15,664,319,296 with NAV -1.7869%; market alone gives $15,668,553,799, so the net flow is "
+             "-$4,234,503 -- effectively ZERO, no band. Shares-out 56.2282M->56.2130M. Put next to yesterday's -$156M "
+             "this is exactly the resolution the rounded prints could never give: a real redemption on one day, "
+             "nothing the next, and we can tell them apart to the dollar. *** Broad selloff with SpaceX leading down: "
+             "VRSK -3.7%, SHOP -3.0%, GWRE -2.7%, ONON -2.6%, HEI -2.3%, HEI-A -2.3%, H -2.2%, BIRK -2.1%, AMZN -2.0%, "
+             "MRNA -2.0%, MSCI -1.6%; KNSL +1.5% and IDXX +0.2% the only greens. MARK BASKETS (LEVEL): v5 +0.28, v4.2 "
+             "+0.31, v4.1 +0.84, v4 +1.21, v3 +1.56 -- v5 back ahead of v4.2 by a hair. On v5's drift watch: the last "
+             "five run -0.06, +0.03, +0.18, +0.34, +0.28 -- the climb stopped and eased off +0.34, so the "
+             "monotone-rise pattern flagged yesterday did NOT extend. Still sitting at +0.28 rather than the +/-0.10 "
+             "of its first week, so not cleared either; the honest read is 'elevated but no longer trending'. Not "
+             "re-anchoring. Daily-log: optimal -0.01 best, actual +0.03, fund_4/30 -0.05, fund_3/31 +0.09, blend "
+             "-0.11, fund_5/31 -0.19, fund_6/30 -0.21, ronb -0.62 worst. RONB -2.08% x1.3 = -2.70% vs actual -1.79% "
+             "(over-called the fall). Leverage 1.092 (8/31 disclosed)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",

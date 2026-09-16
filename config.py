@@ -894,6 +894,14 @@ class SpacexBaron:
                    "from two exact endpoints: -$155,988,423 over 9/10->9/14, with no rounding band. Mark "
                    "baskets: v4.2 +0.27, v5 +0.34. Leverage 1.092 (8/31 disclosed)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-15", "spacex_value_usd": 3.89026788e9 * (143.49 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 143.49, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $143.49 on 2026-09-15 (-3.15% vs 9/14). Disclosed 3/31 share count. BPTIX NAV 278.66 "
+                   "(-1.79%) on a broad selloff (VRSK -3.7%, SHOP -3.0%, GWRE -2.7%). AUM $15,664,319,296 EXACT, "
+                   "the first figure captured by the scheduled workflow rather than by hand. Net flow 9/14->9/15 "
+                   "from two exact endpoints: -$4.2M, effectively zero. Mark baskets: v5 +0.28, v4.2 +0.31. "
+                   "Leverage 1.092 (8/31 disclosed)."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
