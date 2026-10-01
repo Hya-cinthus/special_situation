@@ -111,10 +111,29 @@ def _yahoo_bptix(days=8):
     return dict(sorted(out.items())[-days:])
 
 
+PROVISIONAL = "provisional: page ahead of Yahoo"
+
+
+def _next_weekday(d):
+    import datetime as _dt
+    x = _dt.date.fromisoformat(d) + _dt.timedelta(days=1)
+    while x.weekday() >= 5:
+        x += _dt.timedelta(days=1)
+    return x.isoformat()
+
+
 def resolve_as_of(q, navs=None):
-    """Match the page's NAV against Yahoo's BPTIX closes to date the scrape. The page shows the
-    latest STRUCK NAV, so this is what tells us which trading day the AUM belongs to. Returns
-    (date, how) — how is 'nav-match' when unambiguous, else None with a reason."""
+    """Date the scrape by matching the page's NAV against Yahoo's BPTIX closes.
+
+    Lesson from 2026-09-23: Morningstar is FASTER than Yahoo for a mutual-fund NAV. That day
+    the page showed 285.39 — the true 9/22 NAV — while Yahoo had not yet posted 9/22, so a
+    strict "must match Yahoo" rule rejected a perfectly good capture and 9/22's exact AUM was
+    lost for good. So a miss no longer fails: if the page NAV is not any recent Yahoo close,
+    the page is ahead of Yahoo, and the capture is dated to the next weekday after Yahoo's
+    latest close and marked PROVISIONAL. `reconcile()` upgrades it to nav-match once Yahoo
+    catches up (and corrects the date if that weekday turns out to have been a holiday).
+
+    Returns (date, how)."""
     nav = q.get("nav_per_share")
     if nav is None:
         return None, "no nav on the page"
@@ -122,9 +141,47 @@ def resolve_as_of(q, navs=None):
     hits = [d for d, c in navs.items() if abs(c - nav) < 0.005]
     if len(hits) == 1:
         return hits[0], "nav-match"
-    if not hits:
-        return None, "page NAV %.2f matches no recent BPTIX close %s" % (nav, list(navs.items())[-3:])
-    return hits[-1], "ambiguous (NAV repeats on %s); took the latest" % hits
+    if hits:
+        return hits[-1], "ambiguous (NAV repeats on %s); took the latest" % hits
+    if not navs:
+        return None, "no Yahoo closes to date against"
+    return _next_weekday(max(navs)), PROVISIONAL
+
+
+def reconcile(navs=None, path=None):
+    """Upgrade PROVISIONAL rows to nav-match once Yahoo has posted their NAV. Rewrites the file
+    only if something changed; a provisional row whose NAV duplicates an already-confirmed row
+    is dropped. Returns a list of human-readable changes."""
+    path = path or _RAW
+    if not os.path.exists(path):
+        return []
+    rows = [json.loads(l) for l in open(path, encoding="utf-8") if l.strip()]
+    if not any(r.get("as_of_method") == PROVISIONAL for r in rows):
+        return []
+    navs = navs if navs is not None else _yahoo_bptix(days=30)
+    confirmed = {r["as_of_date_iso"] for r in rows if r.get("as_of_method") != PROVISIONAL}
+    out, changes = [], []
+    for r in rows:
+        if r.get("as_of_method") == PROVISIONAL:
+            hits = [d for d, c in navs.items() if abs(c - r["nav_per_share"]) < 0.005]
+            if len(hits) == 1:
+                d = hits[0]
+                if d in confirmed:
+                    changes.append("dropped provisional %s (duplicate of confirmed %s)" % (r["as_of_date_iso"], d))
+                    continue
+                if d != r["as_of_date_iso"]:
+                    changes.append("re-dated provisional %s -> %s (nav-match)" % (r["as_of_date_iso"], d))
+                else:
+                    changes.append("confirmed %s (nav-match)" % d)
+                r = dict(r, as_of_date_iso=d, as_of_method="nav-match (reconciled)")
+                confirmed.add(d)
+        out.append(r)
+    if changes:
+        out.sort(key=lambda r: r["as_of_date_iso"])
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            for r in out:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    return changes
 
 
 def append_raw(q, as_of, how, path=_RAW):
@@ -147,13 +204,21 @@ def append_raw(q, as_of, how, path=_RAW):
 
 
 def main(argv):
-    q = fetch()
     if "--append" in argv:
-        # scheduled mode: FAIL LOUDLY. A silent miss is unrecoverable — the page keeps no history.
+        # scheduled mode. Order matters: (1) settle any provisional rows from earlier runs,
+        # (2) SAVE today's capture, dating it as best we can. Never discard a good scrape —
+        # the page keeps no history, so a value not written now is gone.
+        navs = _yahoo_bptix(days=30)
+        for c in reconcile(navs):
+            print("RECONCILE", c)
+        q = fetch()
+        # print the raw number FIRST, so even if anything below fails the run log keeps it
+        print("SCRAPED  fundSize=%s  nav=%s  raw=%s"
+              % (q.get("total_assets_usd"), q.get("nav_per_share"), q.get("total_assets_raw")))
         if not q["ok"]:
             print("FAILED:", q["error"], file=sys.stderr)
             return 1
-        as_of, how = resolve_as_of(q)
+        as_of, how = resolve_as_of(q, navs)
         if not as_of:
             print("FAILED to date the scrape: %s" % how, file=sys.stderr)
             return 1
@@ -162,6 +227,7 @@ def main(argv):
               % ("APPENDED" if wrote else "already had", as_of,
                  format(q["total_assets_usd"], ","), q["nav_per_share"], how))
         return 0
+    q = fetch()
     if "--json" in argv:
         print(json.dumps(q, indent=1))
         return 0 if q["ok"] else 1
