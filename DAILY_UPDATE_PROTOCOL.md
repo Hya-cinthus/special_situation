@@ -192,6 +192,34 @@ rate-limit on CI and ship blank sections).
 
 ---
 
+## Fund distributions (ex-dates) — handle them or every basket breaks
+
+BPTIX pays distributions: **$4.169 on 2025-12-16**, **$1.888 on 2026-09-22** (Yahoo events,
+`events=div`). Yahoo's `close` is the UNADJUSTED NAV, so on an ex-date it drops by the payout,
+while every static per-BPTIX mark basket does not. Unhandled, a basket reads ~payout/BPTIX wrong
+from the ex-date on (v5 looked +1.8 off for all of late Sept until this was found).
+
+- **Mark baskets:** multiply holdings AND borrow by Yahoo's adjclose ratio (2026-09-22: **0.993391**)
+  for a basket anchored before the ex-date, on and after it. Exact when the payout is reinvested.
+- **Daily NAV log:** on the ex-date the prediction must subtract the payout (or apply the ratio),
+  otherwise the day scores as a ~-0.66% miss.
+- **Flow:** shares-out jumps on the reinvestment (56.06M -> 56.51M around 9/22) — that is not a
+  subscription; don't read it as one.
+- Check for one whenever every basket shifts by the same amount on the same day.
+
+## Baron's own site: full holdings + leverage, ahead of NPORT
+
+`baroncapitalgroup.com/product-detail/baron-partners-fund-bptix` (robots.txt `Allow: /`) links:
+- **quarterly full-holdings CSV** (`BPTIX-HOLDINGS-YYYYMMDD-0.csv`) — every issuer. Header says
+  "% Net Assets" but the values are **% of total investments** (they sum to 100.0 and match the
+  fact sheet's top-10 column).
+- **fact sheet PDF** — top-10 % of total investments, **Long Equity % of Net / Cash** (= leverage),
+  issuer count.
+- **holdings PDF** (dated, e.g. as of 10/9) — every issuer as **% of net assets** + the
+  "Liabilities Less Cash" line.
+Two full-book snapshots with no trading between them are two rounded measurements of one book:
+pool them (inverse variance) — see `daily_log/2026-10-20-basket-v6.md`.
+
 ## RONB cross-reference (extra daily data point)
 
 `ronb_crossref.py` uses **RONB (Baron First Principles ETF)** — Baron's daily-transparent ETF run
