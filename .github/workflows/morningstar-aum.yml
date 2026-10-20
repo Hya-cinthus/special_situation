@@ -36,6 +36,9 @@ concurrency:
 jobs:
   capture:
     runs-on: ubuntu-latest
+    # a scrape is ~15s; the 2026-10-05 run hung 15 minutes on the runner and missed the
+    # day. Fail fast so the alert fires while a same-day re-run can still save it.
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 

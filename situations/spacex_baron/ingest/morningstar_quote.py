@@ -73,14 +73,32 @@ def fetch(timeout=30):
     t = _html(timeout)
     out = {"url": URL, "ticker": "BPTIX"}
 
-    m = re.search(r"\bfundSize:\{value:(\d+)", t)
-    out["total_assets_usd"] = int(m.group(1)) if m else None
+    # fundSize: do NOT assume `value` is the object's first key. Through 2026-10-08 the payload
+    # was `fundSize:{value:15782010255,...}`; on 10/09 Morningstar reordered it to
+    # `fundSize:{field:"fundSize",...,value:16288563667}` and the old anchored regex silently
+    # stopped matching for 8 straight sessions. Take the only long integer `value:` inside the
+    # object instead — the nested `value:a` / `value:"Surveyed"` entries are never numeric.
+    out["total_assets_usd"] = None
+    m = re.search(r"\bfundSize:\{", t)
+    if m:
+        window = t[m.end():m.end() + 1500]
+        nxt = re.search(r"\},[A-Za-z_]+:\{field:", window)       # stop at the next dataPoint
+        if nxt:
+            window = window[:nxt.start()]
+        v = re.search(r"\bvalue:(\d{8,})\b", window)
+        out["total_assets_usd"] = int(v.group(1)) if v else None
 
     m = re.search(r"\bnav:\{value:([\d.]+)", t)
     out["nav_per_share"] = float(m.group(1)) if m else None
+    # since 10/09 the realtime NAV also carries an explicit as-of timestamp
+    m = re.search(r"\bnav:\{value:[\d.]+,properties:\{date:\{value:\"(\d{4}-\d{2}-\d{2})", t)
+    out["nav_date"] = m.group(1) if m else None
 
     rows = _rendered_rows(t)
-    out["total_assets_raw"] = rows.get("Total Assets")
+    # the rendered "Total Assets" label also disappeared in the 10/09 redesign; fall back to
+    # formatting the exact figure the way the page used to display it
+    out["total_assets_raw"] = rows.get("Total Assets") or (
+        "%.1fB" % (out["total_assets_usd"] / 1e9) if out["total_assets_usd"] else None)
     out["nav_row"] = rows.get("NAV / 1-Day Return")
     out["expense_ratio"] = rows.get("Expense Ratio")
     out["turnover"] = rows.get("Turnover")
