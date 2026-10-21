@@ -153,8 +153,8 @@ function renderDailyLog(d) {
 }
 
 /* ---- Fund look-through per BPTIX share = the mark basket (current best): shares of each
- * underlier + a borrowing line, from the 6/30 weights (slow layer) x daily AUM/NAV/leverage
- * (fast layer). Plus the daily state (leverage/borrowings/AUM/redemption) history. ---- */
+ * underlier + a borrowing line, from the latest full-book weights (slow layer: Baron's 10/9
+ * holdings) x daily AUM/NAV/leverage (fast layer). Plus the daily state history. ---- */
 function drawLookthrough() {
   const d = DAILYLOG_DATA, lt = d && d.meta && d.meta.lookthrough;
   const card = document.getElementById("lookthrough-table");
@@ -163,30 +163,41 @@ function drawLookthrough() {
   const note = document.getElementById("lookthrough-note");
   if (note) note.innerHTML =
     "What ONE BPTIX share owns, look-through: shares of each underlier + a borrowing line. TWO layers — the " +
-    "<b>holdings weights</b> update only at a disclosure (now 6/30, next ~9/30), while the <b>per-BPTIX share counts, " +
+    "<b>holdings weights</b> update only at a disclosure (now Baron's full " + (lt.weights_as_of || "10/9") +
+    " book; next the 9/30 NPORT ~late Nov), while the <b>per-BPTIX share counts, " +
     "leverage &amp; borrowing</b> drift DAILY off AUM/NAV (redemptions shrink the fund, so leverage edges up). Mark = " +
-    "Σ(shares × live price) − borrow; × " + POS.toLocaleString() + " for the position. Highest-confidence single basket " +
-    "(6/30 weights + borrowings-leverage) — the mark object, separate from the multi-basket experiment below.";
+    "Σ(shares × live price) − borrow; × " + POS.toLocaleString() + " for the position. The mark object, separate " +
+    "from the multi-basket experiment below.";
   const mb = d && d.meta && d.meta.mark_basket;
-  if (note && mb) note.innerHTML +=
-    `<div style="margin-top:10px;padding:8px 12px;border:1px solid ${GRID};border-left:3px solid ${SPX};` +
-    `border-radius:6px;background:var(--panel-2);font-size:.8rem;color:${TEXT}">` +
-    `<b>Mark basket ${mb.version} — re-anchored to the ${mb.anchor} disclosure.</b> Leverage ` +
-    `<b>${mb.leverage.toFixed(3)}</b> (long equity 109.2% / cash −9.2% of NET). SpaceX = the <b>filed</b> ` +
-    `36,938,300 sh ÷ shares-out = <b>${mb.spx_sh_per_bptix.toFixed(4)}</b> sh/BPTIX, which lands at 29.46% of ` +
-    `gross against a disclosed <b>${mb.spx_pct_gross}%</b> — an independent confirmation the share count is ` +
-    `still unchanged (3/31, 6/30 and 8/31); borrow −$${mb.borrow_per_bptix.toFixed(2)}/BPTIX. Top-9 = disclosed ` +
-    `${mb.anchor} weights (same nine names as 7/31, only reordered); <b>tail = buy-and-hold</b> off v4.2's ` +
-    `share book with one uniform −5.49% haircut — not re-imposed weights, which would sell winners and buy ` +
-    `losers. MRNA carries <b>${mb.mrna_sh_per_bptix}</b> sh/BPTIX. ` +
-    `<b>Out-of-sample since the anchor, ${mb.window_start}→${mb.window_end} (n=${mb.n_forward}): RMS ` +
-    `$${mb.rms_forward.toFixed(3)}/BPTIX (~${mb.rms_forward_pct_nav}% of NAV), bias ` +
-    `${mb.bias_forward >= 0 ? "+" : ""}${mb.bias_forward.toFixed(3)}</b> — versus v4.2 at ` +
-    `$${mb.rms_prev_same_window.toFixed(3)} on the same days. Over the full ${mb.full_window_start}→` +
-    `${mb.window_end} window (n=${mb.n_full}): v5 $${mb.rms_full_v5.toFixed(3)}, v4.2 ` +
-    `$${mb.rms_v4_2.toFixed(3)}, v4.1 $${mb.rms_v4_1.toFixed(3)}, v4 $${mb.rms_v4.toFixed(3)}, stale-v3 ` +
-    `$${mb.rms_stale_v3.toFixed(3)} — v4.2 leads there only because most of that window is <i>its</i> anchor ` +
-    `period; the crossover to v5 lands <b>2026-08-27</b>.</div>`;
+  const f3 = (x) => (x == null ? "—" : "$" + x.toFixed(3));
+  const sg = (x) => (x == null ? "—" : (x >= 0 ? "+" : "") + x.toFixed(2));
+  if (note && mb && mb.rms_forward != null) {
+    const segRows = (mb.segments || []).map((s) =>
+      `<tr><td>${s.label}</td><td style="text-align:right">${s.n}</td>` +
+      `<td style="text-align:right;${s.rms_v5 <= s.rms_v6 ? "font-weight:700" : ""}">${f3(s.rms_v5)}</td>` +
+      `<td style="text-align:right;${s.rms_v6 < s.rms_v5 ? "font-weight:700" : ""}">${f3(s.rms_v6)}</td></tr>`).join("");
+    const recent = (mb.recent_errors || []).map((r) => sg(r.err_v6)).join(", ");
+    note.innerHTML +=
+      `<div style="margin-top:10px;padding:8px 12px;border:1px solid ${GRID};border-left:3px solid ${SPX};` +
+      `border-radius:6px;background:var(--panel-2);font-size:.8rem;color:${TEXT}">` +
+      `<b>Mark basket ${mb.version} — re-anchored to Baron's ${mb.anchor} full book.</b> For the first time every ` +
+      `holding's weight is disclosed, not just the top 10: all <b>${mb.n_names}</b> public lines plus SpaceX, from the 9/30 quarterly ` +
+      `holdings and the 10/9 holdings, pooled (no trading between them, so they are two rounded readings of one ` +
+      `book). No tail estimate is left. <b>Exited:</b> ${(mb.exited || []).join(", ")}. Leverage ` +
+      `<b>${mb.leverage.toFixed(3)}</b> (liabilities less cash −8.9% of net). SpaceX = the <b>filed</b> 36,938,300 sh ÷ ` +
+      `shares-out = <b>${mb.spx_sh_per_bptix.toFixed(4)}</b> sh/BPTIX (${mb.spx_pct_net}% of net); the count is ` +
+      `unchanged at 3/31, 6/30, 8/31 and 9/30. Borrow −$${mb.borrow_per_bptix.toFixed(2)}/BPTIX. ` +
+      `Scores are <b>distribution-adjusted</b> (9/22 ex-date, $1.888): Yahoo's NAV is unadjusted, and unhandled ` +
+      `the payout made every older basket read ~+1.8/BPTIX high. ` +
+      `<b>Out-of-sample since the anchor, ${mb.window_start}→${mb.window_end} (n=${mb.n_forward}): RMS ` +
+      `$${mb.rms_forward.toFixed(3)}/BPTIX (~${mb.rms_forward_pct_nav}% of NAV), bias ` +
+      `${sg(mb.bias_forward)}</b> — versus ${mb.prev_version} at ${f3(mb.rms_prev_same_window)} on the same days. ` +
+      `Daily errors: ${recent}.` +
+      `<table style="margin-top:6px;font-size:.78rem;border-collapse:collapse"><tr><th style="text-align:left">window ` +
+      `(RMS $/BPTIX)</th><th>n</th><th>v5</th><th>v6</th></tr>${segRows}</table>` +
+      `<span class="dim">The crossover a periodic re-anchor should produce: v5 wins on its own turf, v6 from late ` +
+      `September on.</span></div>`;
+  }
   const sv = d && d.meta && d.meta.slow_vars;
   if (note && sv && sv.latest) {
     const L = sv.latest, sh = L.shift, on = sv.alert;
@@ -503,7 +514,7 @@ function drawBasketDrift() {
     `<th title="held-fixed NAV vs actual = cumulative drift of never re-marking">cum drift</th></tr>`;
   const body = trows.slice().reverse().map((t) => {
     const r = t.r, p = t.p;
-    const bf = r.backfilled ? ` <span class="dim" title="backfilled from contemporaneous records (git + Morningstar log + hedge-book closes)">·bf</span>` : "";
+    const bf = r.backfilled ? ` <span class="dim" title="backfilled after the fact from recorded inputs (closes, NAV, captured AUM) — not a real-time vintage">·bf</span>` : "";
     if (!p) return `<tr><td><b>${r.date}</b>${bf}</td><td colspan="6" class="dim">— (${lbl[m]} not in this frozen day)</td></tr>`;
     const err = r.errors && r.errors[m] != null ? r.errors[m] : null;
     const errC = err != null ? `<span style="color:${Math.abs(err) < 0.5 ? GOOD : Math.abs(err) < 1.5 ? MUTED : WARN}">${err >= 0 ? "+" : ""}${err}</span>` : "—";

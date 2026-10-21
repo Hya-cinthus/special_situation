@@ -1678,5 +1678,117 @@
     ],
     "source": "measured",
     "confidence": "high"
+  },
+  {
+    "report_date": "2026-07-31",
+    "filing_date": "2026-09-18",
+    "accession": "0000940400-26-036464",
+    "net_assets_usd": 1184177830.74,
+    "total_assets_usd": 1187160773.88,
+    "n_holdings": 126,
+    "tracked_value_usd": {
+      "SpaceX": 100094866.8,
+      "OpenAI": 71028518.15,
+      "Anthropic": 49614780.24
+    },
+    "tracked_pct": {
+      "SpaceX": 8.4527,
+      "OpenAI": 5.9981,
+      "Anthropic": 4.1898
+    },
+    "top_holdings": [
+      {
+        "name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+        "valUSD": 100094866.8,
+        "pctVal": 8.452688794
+      },
+      {
+        "name": "Stripe Global Holdings Inc",
+        "valUSD": 53412305.86,
+        "pctVal": 4.510497027851
+      },
+      {
+        "name": "Anthropic, Inc.",
+        "valUSD": 49614780.24,
+        "pctVal": 4.189808232518
+      },
+      {
+        "name": "OpenAI Group PBC, Series C",
+        "valUSD": 49303474.64,
+        "pctVal": 4.163519478251
+      },
+      {
+        "name": "Goldman Sachs Trust",
+        "valUSD": 34559708.07,
+        "pctVal": 2.918455925526
+      },
+      {
+        "name": "Ayar Labs, Inc.",
+        "valUSD": 33498010.0,
+        "pctVal": 2.828798946444
+      },
+      {
+        "name": "Figure AI Inc.",
+        "valUSD": 30255360.0,
+        "pctVal": 2.554967608293
+      },
+      {
+        "name": "Preferred Stock, Series B-1",
+        "valUSD": 29999996.18,
+        "pctVal": 2.533402956991
+      },
+      {
+        "name": "WAYVE TECHNOLOGIES, LTD",
+        "valUSD": 29999884.72,
+        "pctVal": 2.533393544553
+      },
+      {
+        "name": "TENSTORRENT HOLDINGS INC",
+        "valUSD": 27720350.0,
+        "pctVal": 2.340894186701
+      },
+      {
+        "name": "Crusoe Inc.",
+        "valUSD": 26925717.0,
+        "pctVal": 2.273789991759
+      },
+      {
+        "name": "K2 Space Corporation, Series D-1",
+        "valUSD": 24691269.14,
+        "pctVal": 2.085098073873
+      },
+      {
+        "name": "FREENOME INC",
+        "valUSD": 22515094.65,
+        "pctVal": 1.90132715421
+      },
+      {
+        "name": "Cellares inc.",
+        "valUSD": 20921117.84,
+        "pctVal": 1.766720951609
+      },
+      {
+        "name": "Wonder Series D Preferred",
+        "valUSD": 19971764.81,
+        "pctVal": 1.686551148953
+      },
+      {
+        "name": "Kalshi Inc.",
+        "valUSD": 18294855.47,
+        "pctVal": 1.544941561569
+      },
+      {
+        "name": "Neuralink Corp.",
+        "valUSD": 18206727.12,
+        "pctVal": 1.537499406539
+      },
+      {
+        "name": "Hydra Host, Inc.",
+        "valUSD": 17511477.24,
+        "pctVal": 1.478787795668
+      }
+    ],
+    "source": "measured",
+    "confidence": "high"
   }
 ]

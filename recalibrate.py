@@ -172,7 +172,9 @@ def build_payload():
                "actual_nav": actual}
 
         if actual:
-            navret = actual / prev["nav"] - 1
+            # TOTAL return: on an ex-date the unadjusted NAV drops by the payout, which is neither
+            # SpaceX nor the basket (and a reinvested payout is not a flow)
+            navret = (actual + dl._dist_usd(e["date"])) / prev["nav"] - 1
             # back-solve w_spx that explains the actual NAV, per basket -> band
             def solve(rb):
                 return (navret - rb) / (spx_ret - rb)

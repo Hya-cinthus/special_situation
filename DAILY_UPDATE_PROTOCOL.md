@@ -11,8 +11,12 @@ Interpreter on this machine is **`py`** (Python 3.14), NOT `python`.
 
 ## What the user provides  (workflow changed 2026-07-13)
 
-- **The user now provides ONLY the Morningstar Total Assets (AUM)** for day T — one number per day
-  (e.g. "7/13 AUM 17.0B"), except in unusual situations.
+- **Since 2026-09-15 the user provides nothing.** The AUM is captured EXACT every weekday morning by
+  `.github/workflows/morningstar-aum.yml` into `data/morningstar_quote_raw.jsonl`; transcribe each day's
+  capture into `morningstar_aum_log.jsonl` (step 2) and `ENTRIES[...]["aum"]`. A day missing from the
+  capture log is lost for good — never invent it. **Each session: `gh issue list` first** (a failed
+  capture opens an issue; an unattended markup change lost 10/08–10/16). (Before 9/15 the user reported
+  the rounded Morningstar AUM, e.g. "7/13 AUM 17.0B".)
 - **Everything else I fetch myself, T+1** (the next day), from Yahoo's chart API:
   - the **29 public-holding closes** + the **SPCX** close (for the as-of NAV estimate), and
   - the **BPTIX actual NAV** (day-T close from Yahoo — no longer needs a user-reported stop-gap).
@@ -199,9 +203,13 @@ BPTIX pays distributions: **$4.169 on 2025-12-16**, **$1.888 on 2026-09-22** (Ya
 while every static per-BPTIX mark basket does not. Unhandled, a basket reads ~payout/BPTIX wrong
 from the ex-date on (v5 looked +1.8 off for all of late Sept until this was found).
 
+- **The one edit:** add the ex-date to `DISTRIBUTIONS` in `daily_nav_log.py` (`usd` + Yahoo's adjclose
+  ratio). Everything below reads it: the day's prediction, the no-flow AUM carry + flow, the
+  recalibration's NAV return, the slow-var leverage fit, and the mark-basket scoring. A new mark basket
+  also needs its anchor in `BASKET_ANCHORS`, so the scaling knows which side of an ex-date it sits on.
 - **Mark baskets:** multiply holdings AND borrow by Yahoo's adjclose ratio (2026-09-22: **0.993391**)
   for a basket anchored before the ex-date, on and after it. Exact when the payout is reinvested.
-- **Daily NAV log:** on the ex-date the prediction must subtract the payout (or apply the ratio),
+- **Daily NAV log:** on the ex-date the prediction subtracts the payout (done via `DISTRIBUTIONS`),
   otherwise the day scores as a ~-0.66% miss.
 - **Flow:** shares-out jumps on the reinvestment (56.06M -> 56.51M around 9/22) — that is not a
   subscription; don't read it as one.

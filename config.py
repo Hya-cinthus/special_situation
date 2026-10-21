@@ -902,6 +902,126 @@ class SpacexBaron:
                    "from two exact endpoints: -$4.2M, effectively zero. Mark baskets: v5 +0.28, v4.2 +0.31. "
                    "Leverage 1.092 (8/31 disclosed)."),
          "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-16", "spacex_value_usd": 3.89026788e9 * (150.88 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 150.88, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $150.88 on 2026-09-16 (+5.15% vs 9/15). Disclosed 3/31 share count. BPTIX NAV 282.53 "
+                   "(+1.39%). AUM $15,864,721,353 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-17", "spacex_value_usd": 3.89026788e9 * (154.81 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 154.81, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $154.81 on 2026-09-17 (+2.60% vs 9/16). Disclosed 3/31 share count. BPTIX NAV 284.91 "
+                   "(+0.84%). AUM $15,984,936,391 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-18", "spacex_value_usd": 3.89026788e9 * (152.71 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 152.71, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $152.71 on 2026-09-18 (-1.36% vs 9/17). Disclosed 3/31 share count. BPTIX NAV 282.67 "
+                   "(-0.79%). AUM $15,853,833,664 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-21", "spacex_value_usd": 3.89026788e9 * (151.85 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 151.85, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $151.85 on 2026-09-21 (-0.56% vs 9/18). Disclosed 3/31 share count. BPTIX NAV 285.67 "
+                   "(+1.06%). AUM $16,013,263,242 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-22", "spacex_value_usd": 3.89026788e9 * (154.72 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 154.72, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $154.72 on 2026-09-22 (+1.89% vs 9/21). Disclosed 3/31 share count. BPTIX NAV 285.39 "
+                   "(+0.56%, ex $1.888 distribution). AUM not captured (lost). Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-23", "spacex_value_usd": 3.89026788e9 * (148.36 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 148.36, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $148.36 on 2026-09-23 (-4.11% vs 9/22). Disclosed 3/31 share count. BPTIX NAV 281.53 "
+                   "(-1.35%). AUM $15,909,843,392 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-24", "spacex_value_usd": 3.89026788e9 * (148.03 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 148.03, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $148.03 on 2026-09-24 (-0.22% vs 9/23). Disclosed 3/31 share count. BPTIX NAV 281.01 "
+                   "(-0.18%). AUM $15,875,722,995 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-25", "spacex_value_usd": 3.89026788e9 * (148.68 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 148.68, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $148.68 on 2026-09-25 (+0.44% vs 9/24). Disclosed 3/31 share count. BPTIX NAV 280.48 "
+                   "(-0.19%). AUM $15,779,971,594 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-28", "spacex_value_usd": 3.89026788e9 * (145.47 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 145.47, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $145.47 on 2026-09-28 (-2.16% vs 9/25). Disclosed 3/31 share count. BPTIX NAV 275.79 "
+                   "(-1.67%). AUM $15,507,702,746 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-29", "spacex_value_usd": 3.89026788e9 * (149.24 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 149.24, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $149.24 on 2026-09-29 (+2.59% vs 9/28). Disclosed 3/31 share count. BPTIX NAV 277.71 "
+                   "(+0.70%). AUM $15,611,512,795 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-09-30", "spacex_value_usd": 3.89026788e9 * (150.86 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 150.86, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $150.86 on 2026-09-30 (+1.09% vs 9/29). Disclosed 3/31 share count. BPTIX NAV 278.02 "
+                   "(+0.11%). AUM $15,618,951,279 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-01", "spacex_value_usd": 3.89026788e9 * (148.07 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 148.07, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $148.07 on 2026-10-01 (-1.85% vs 9/30). Disclosed 3/31 share count. BPTIX NAV 278.61 "
+                   "(+0.21%). AUM $15,645,707,060 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-02", "spacex_value_usd": 3.89026788e9 * (158.96 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 158.96, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $158.96 on 2026-10-02 (+7.35% vs 10/1). Disclosed 3/31 share count. BPTIX NAV 285.68 "
+                   "(+2.54%). AUM not captured (lost). Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-05", "spacex_value_usd": 3.89026788e9 * (171.09 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 171.09, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $171.09 on 2026-10-05 (+7.63% vs 10/2). Disclosed 3/31 share count. BPTIX NAV 298.12 "
+                   "(+4.35%). AUM $16,778,029,720 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-06", "spacex_value_usd": 3.89026788e9 * (171.92 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 171.92, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $171.92 on 2026-10-06 (+0.49% vs 10/5). Disclosed 3/31 share count. BPTIX NAV 299.94 "
+                   "(+0.61%). AUM $16,866,943,142 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-07", "spacex_value_usd": 3.89026788e9 * (167.60 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 167.60, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $167.60 on 2026-10-07 (-2.51% vs 10/6). Disclosed 3/31 share count. BPTIX NAV 297.19 "
+                   "(-0.92%). AUM $16,645,745,650 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-08", "spacex_value_usd": 3.89026788e9 * (160.57 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 160.57, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $160.57 on 2026-10-08 (-4.19% vs 10/7). Disclosed 3/31 share count. BPTIX NAV 295.35 "
+                   "(-0.62%). AUM not captured (lost). Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-09", "spacex_value_usd": 3.89026788e9 * (162.57 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 162.57, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $162.57 on 2026-10-09 (+1.25% vs 10/8). Disclosed 3/31 share count. BPTIX NAV 299.45 "
+                   "(+1.39%). AUM not captured (lost). Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-12", "spacex_value_usd": 3.89026788e9 * (163.42 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 163.42, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $163.42 on 2026-10-12 (+0.52% vs 10/9). Disclosed 3/31 share count. BPTIX NAV 300.44 "
+                   "(+0.33%). AUM not captured (lost). Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-13", "spacex_value_usd": 3.89026788e9 * (156.54 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 156.54, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $156.54 on 2026-10-13 (-4.21% vs 10/12). Disclosed 3/31 share count. BPTIX NAV 295.80 "
+                   "(-1.54%). AUM not captured (lost). Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-14", "spacex_value_usd": 3.89026788e9 * (152.16 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 152.16, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $152.16 on 2026-10-14 (-2.80% vs 10/13). Disclosed 3/31 share count. BPTIX NAV 291.68 "
+                   "(-1.39%). AUM not captured (lost). Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-15", "spacex_value_usd": 3.89026788e9 * (148.62 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 148.62, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $148.62 on 2026-10-15 (-2.33% vs 10/14). Disclosed 3/31 share count. BPTIX NAV 294.12 "
+                   "(+0.84%). AUM not captured (lost). Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-16", "spacex_value_usd": 3.89026788e9 * (146.03 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 146.03, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $146.03 on 2026-10-16 (-1.74% vs 10/15). Disclosed 3/31 share count. BPTIX NAV 289.31 "
+                   "(-1.64%). AUM not captured (lost). Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
+        {"date": "2026-10-19", "spacex_value_usd": 3.89026788e9 * (147.96 / 105.32),
+         "per_share_old_split_adj": 105.32, "per_share_new": 147.96, "valuation_post_money_usd": 1.77e12,
+         "basis": ("SPCX $147.96 on 2026-10-19 (+1.32% vs 10/16). Disclosed 3/31 share count. BPTIX NAV 292.05 "
+                   "(+0.95%). AUM $16,288,563,667 exact. Backfilled 10/20."),
+         "source_url": "https://finance.yahoo.com/quote/SPCX", "confidence": "high"},
     ]
 
     # --- Key dated events (annotated on the timeline) ----------------------
