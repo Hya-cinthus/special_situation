@@ -67,11 +67,88 @@ def _rendered_rows(t):
     return out
 
 
+def _nuxt_points(t):
+    """(fundSize, fundSize_date, nav, nav_date) from the page's __NUXT_DATA__ payload, or Nones.
+
+    Since ~2026-11-05 the page ships its data as a Nuxt/devalue payload: ONE flat JSON array in
+    which every object's values are INDICES into that array. The old `fundSize:{value:...}`
+    JS-literal text is gone, so the regexes below matched nothing for six straight sessions.
+    Shape (indices elided):
+        {"nav": i, "percentNetChange": j}          i -> {"value": 297.7, "properties": {"date": ...}}
+        {"fundSize": k, "adjustedExpenseRatio": ...} k -> {"field": "fundSize", "value": 16438828202,
+                                                          "properties": {"asOfDate": {"value": "2026-11-12"}}}
+    Resolved by following the indices, never by position, and fail-closed: a field found under
+    more than one distinct value is treated as not found."""
+    m = re.search(r'<script[^>]*id="__NUXT_DATA__"[^>]*>(.*?)</script>', t, re.S)
+    if not m:
+        return None, None, None, None
+    try:
+        arr = json.loads(m.group(1))
+    except ValueError:
+        return None, None, None, None
+    if not isinstance(arr, list):
+        return None, None, None, None
+
+    def res(i, depth=0):
+        if depth > 8 or not isinstance(i, int) or not 0 <= i < len(arr):
+            return None
+        v = arr[i]
+        if isinstance(v, dict):
+            return {k: res(x, depth + 1) for k, x in v.items()}
+        if isinstance(v, list):
+            # devalue wrappers: ["Reactive", i], ["ShallowRef", i], ...
+            if len(v) == 2 and isinstance(v[0], str):
+                return res(v[1], depth + 1)
+            return [res(x, depth + 1) for x in v]
+        return v
+
+    def one(key, sibling):
+        hits = []
+        for d in arr:
+            if isinstance(d, dict) and key in d and sibling in d:
+                hits.append(res(d[key]))
+        vals = {json.dumps(h, sort_keys=True) for h in hits if isinstance(h, dict)}
+        return hits[0] if len(vals) == 1 else None
+
+    fs = one("fundSize", "adjustedExpenseRatio")
+    nv = one("nav", "percentNetChange")
+    size = fs.get("value") if fs and fs.get("field") == "fundSize" else None
+    size = int(size) if isinstance(size, (int, float)) and size > 1e8 else None
+    size_date = (((fs or {}).get("properties") or {}).get("asOfDate") or {}).get("value")
+    nav = nv.get("value") if nv else None
+    nav = float(nav) if isinstance(nav, (int, float)) and nav > 0 else None
+    nav_date = (((nv or {}).get("properties") or {}).get("date") or {}).get("value")
+    return size, size_date, nav, (nav_date[:10] if isinstance(nav_date, str) else None)
+
+
 def fetch(timeout=30):
     """Return the parsed quote. `total_assets_usd` is EXACT; `total_assets_raw` is what the
     page displays (the rounded string the manual workflow used)."""
-    t = _html(timeout)
+    return parse(_html(timeout))
+
+
+def parse(t):
     out = {"url": URL, "ticker": "BPTIX"}
+
+    size, size_date, nav, nav_date = _nuxt_points(t)
+    if size is not None and nav is not None:
+        rows = _rendered_rows(t)
+        out.update(total_assets_usd=size, nav_per_share=nav, nav_date=nav_date,
+                   total_assets_date=size_date, parser="nuxt-payload",
+                   # the rendered label is now "Fund Size" (was "Total Assets"); same Surveyed
+                   # fund-level figure, continuous with the old series
+                   total_assets_raw=(rows.get("Fund Size") or rows.get("Total Assets")
+                                     or "%.1fB" % (size / 1e9)).lstrip("$"),
+                   nav_row=rows.get("NAV / 1-Day Return"),
+                   expense_ratio=rows.get("Net Expense Ratio") or rows.get("Expense Ratio"),
+                   turnover=rows.get("Turnover"), ok=True)
+        # the two figures must describe the same day, or the AUM/NAV division is meaningless
+        if size_date and nav_date and size_date != nav_date:
+            out["ok"] = False
+            out["error"] = ("fundSize as-of %s but NAV as-of %s — not the same day, refusing"
+                            % (size_date, nav_date))
+        return out
+    out["parser"] = "legacy-regex"
 
     # fundSize: do NOT assume `value` is the object's first key. Through 2026-10-08 the payload
     # was `fundSize:{value:15782010255,...}`; on 10/09 Morningstar reordered it to
@@ -215,6 +292,8 @@ def append_raw(q, as_of, how, path=_RAW):
     rec = {"as_of_date_iso": as_of, "ticker": "BPTIX",
            "total_assets_usd": q["total_assets_usd"], "total_assets_raw": q["total_assets_raw"],
            "nav_per_share": q["nav_per_share"], "as_of_method": how,
+           # the payload's own as-of for the AUM figure (nuxt parser only); a cross-check on `how`
+           "page_as_of": q.get("total_assets_date"), "parser": q.get("parser"),
            "captured_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "source_url": URL}
     with open(path, "a", encoding="utf-8", newline="\n") as f:
         f.write(json.dumps(rec, ensure_ascii=False) + "\n")
