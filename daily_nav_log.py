@@ -1676,6 +1676,307 @@ ENTRIES = [
              "Daily-log: fund_6/30 +0.10 best, fund_3/31 +0.69 worst. RONB +0.54% x1.3 = +0.70% vs actual +0.95%. "
              "Leverage 1.092 as known at the time (8/31 disclosed); the revised view uses 1.096 from 9/30 and 1.089 "
              "from 10/9 (Baron's site, found 10/20)."},
+    {"date": "2026-10-20", "spcx": 147.79, "actual_nav": 297.17, "aum": 16547802235, "backfilled": True,
+     "closes": {"ACGL": 101.29, "BIRK": 32.78, "CHH": 113.46, "CSGP": 33.05, "FDS": 312.27,
+                "FIG": 22.71, "GLPI": 39.14, "GWRE": 183.58, "H": 176.15, "HEI": 305.21,
+                "HEI-A": 231.17, "IDXX": 557.93, "IT": 219.64, "KNSL": 371.99, "MSCI": 591.69,
+                "MTN": 151.41, "ONON": 35.42, "RRR": 50.28, "SCHW": 90.89, "SHOP": 173.48,
+                "SPOT": 526.08, "TSLA": 373.71, "VRSK": 190.87,
+                "AMZN": 262.63, "GOOGL": 340.28, "GOOG": 336.40, "LLY": 1283.66, "MRNA": 242.08, "MORN": 211.76},
+     "note": "Tue 10/20. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX -0.11% (147.96->147.79) => SpaceX ~$5.46B. BPTIX NAV 297.17 (+1.75%). AUM "
+             "$16,547,802,235 EXACT. FLOW -$26.3M; shares-out 55.7732M->55.6846M. *** First session with v6 as the "
+             "LIVE basket (adopted 10/20). AUM captured by the scheduled job. Movers: down HEI-A -1.0%; up GWRE +7.1%, "
+             "MRNA +6.7%, IT +5.7%, MSCI +5.0%, CSGP +3.9%. MARK BASKET v6 (live; out-of-sample, "
+             "distribution-adjusted): +0.15 raw; the expense-ratio accrual since 10/9 is +0.15 (1.65%/yr, "
+             "~$0.0135/BPTIX/day) => +0.00 net of fees. Daily-log: fund_5/31 -0.35 best, ronb -1.40 worst. RONB +1.56% "
+             "x1.3 = +2.03% vs actual +1.75%. Leverage 1.089 (10/9 disclosed)."},
+    {"date": "2026-10-21", "spcx": 159.31, "actual_nav": 306.65, "aum": 17066114548, "backfilled": True,
+     "closes": {"ACGL": 100.28, "BIRK": 32.32, "CHH": 113.66, "CSGP": 32.90, "FDS": 319.91,
+                "FIG": 22.98, "GLPI": 38.35, "GWRE": 181.90, "H": 178.61, "HEI": 298.31,
+                "HEI-A": 226.12, "IDXX": 553.48, "IT": 219.57, "KNSL": 376.70, "MSCI": 604.46,
+                "MTN": 147.01, "ONON": 34.22, "RRR": 49.26, "SCHW": 91.64, "SHOP": 174.29,
+                "SPOT": 525.34, "TSLA": 386.47, "VRSK": 192.34,
+                "AMZN": 262.37, "GOOGL": 334.76, "GOOG": 330.95, "LLY": 1270.75, "MRNA": 245.81, "MORN": 213.79},
+     "note": "Wed 10/21. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX +7.79% (147.79->159.31) => SpaceX ~$5.88B. BPTIX NAV 306.65 (+3.19%). AUM "
+             "$17,066,114,548 EXACT. FLOW -$9.6M; shares-out 55.6846M->55.6534M. *** Big SpaceX up-day: SPCX +7.79%. "
+             "Movers: down ONON -3.4%, MTN -2.9%, HEI -2.3%, HEI-A -2.2%, RRR -2.0%; up TSLA +3.4%, FDS +2.4%, MSCI "
+             "+2.2%, MRNA +1.5%, H +1.4%. MARK BASKET v6 (live; out-of-sample, distribution-adjusted): +0.11 raw; the "
+             "expense-ratio accrual since 10/9 is +0.17 (1.65%/yr, ~$0.0135/BPTIX/day) => -0.06 net of fees. "
+             "Daily-log: ronb +0.00 best, fund_3/31 +0.92 worst. RONB +3.44% x1.3 = +4.48% vs actual +3.19%. Leverage "
+             "1.089 (10/9 disclosed)."},
+    {"date": "2026-10-22", "spcx": 144.75, "actual_nav": 299.27, "aum": 16650646099, "backfilled": True,
+     "closes": {"ACGL": 102.69, "BIRK": 33.68, "CHH": 111.98, "CSGP": 35.45, "FDS": 335.45,
+                "FIG": 24.10, "GLPI": 40.02, "GWRE": 189.64, "H": 176.96, "HEI": 300.02,
+                "HEI-A": 228.60, "IDXX": 566.76, "IT": 234.44, "KNSL": 390.64, "MSCI": 620.24,
+                "MTN": 148.23, "ONON": 34.00, "RRR": 50.43, "SCHW": 91.44, "SHOP": 168.81,
+                "SPOT": 583.66, "TSLA": 374.58, "VRSK": 203.33,
+                "AMZN": 250.38, "GOOGL": 324.22, "GOOG": 320.76, "LLY": 1306.69, "MRNA": 202.63, "MORN": 223.33},
+     "note": "Thu 10/22. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX -9.14% (159.31->144.75) => SpaceX ~$5.35B. BPTIX NAV 299.27 (-2.41%). AUM "
+             "$16,650,646,099 EXACT. FLOW -$4.7M; shares-out 55.6534M->55.6375M. *** SPCX -9.14%, reversing 10/21 and "
+             "then some. Movers: down MRNA -17.6%, SHOP -3.1%, TSLA -3.1%, CHH -1.5%; up SPOT +11.1%, CSGP +7.8%, IT "
+             "+6.8%, VRSK +5.7%, FDS +4.9%. MARK BASKET v6 (live; out-of-sample, distribution-adjusted): +0.21 raw; "
+             "the expense-ratio accrual since 10/9 is +0.18 (1.65%/yr, ~$0.0135/BPTIX/day) => +0.03 net of fees. "
+             "Daily-log: fund_4/30 -0.02 best, optimal -0.73 worst. RONB -3.09% x1.3 = -4.02% vs actual -2.41%. "
+             "Leverage 1.089 (10/9 disclosed)."},
+    {"date": "2026-10-23", "spcx": 147.49, "actual_nav": 297.92, "aum": 16565251294, "backfilled": True,
+     "closes": {"ACGL": 101.69, "BIRK": 32.57, "CHH": 108.48, "CSGP": 33.92, "FDS": 331.32,
+                "FIG": 24.64, "GLPI": 39.55, "GWRE": 189.00, "H": 172.58, "HEI": 297.36,
+                "HEI-A": 226.75, "IDXX": 560.38, "IT": 230.28, "KNSL": 364.49, "MSCI": 615.62,
+                "MTN": 146.57, "ONON": 32.51, "RRR": 49.61, "SCHW": 90.58, "SHOP": 168.68,
+                "SPOT": 584.22, "TSLA": 372.22, "VRSK": 195.88,
+                "AMZN": 248.00, "GOOGL": 320.21, "GOOG": 317.28, "LLY": 1273.46, "MRNA": 200.10, "MORN": 224.89},
+     "note": "Fri 10/23. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX +1.89% (144.75->147.49) => SpaceX ~$5.45B. BPTIX NAV 297.92 (-0.45%). AUM "
+             "$16,565,251,294 EXACT. FLOW -$10.3M; shares-out 55.6375M->55.6030M. Movers: down KNSL -6.7%, ONON -4.4%, "
+             "CSGP -4.3%, VRSK -3.7%, BIRK -3.3%. MARK BASKET v6 (live; out-of-sample, distribution-adjusted): +0.21 "
+             "raw; the expense-ratio accrual since 10/9 is +0.19 (1.65%/yr, ~$0.0135/BPTIX/day) => +0.02 net of fees. "
+             "Daily-log: fund_5/31 -0.01 best, fund_3/31 +0.22 worst. RONB -0.16% x1.3 = -0.21% vs actual -0.45%. "
+             "Leverage 1.089 (10/9 disclosed)."},
+    {"date": "2026-10-26", "spcx": 146.90, "actual_nav": 299.40, "aum": 16639270316, "backfilled": True,
+     "closes": {"ACGL": 102.34, "BIRK": 32.61, "CHH": 108.95, "CSGP": 33.70, "FDS": 323.39,
+                "FIG": 23.52, "GLPI": 39.39, "GWRE": 183.96, "H": 171.96, "HEI": 309.71,
+                "HEI-A": 234.12, "IDXX": 570.21, "IT": 231.03, "KNSL": 369.88, "MSCI": 617.67,
+                "MTN": 149.40, "ONON": 33.17, "RRR": 50.26, "SCHW": 89.73, "SHOP": 168.18,
+                "SPOT": 572.36, "TSLA": 391.62, "VRSK": 196.19,
+                "AMZN": 249.09, "GOOGL": 316.80, "GOOG": 314.19, "LLY": 1279.14, "MRNA": 198.85, "MORN": 225.29},
+     "note": "Mon 10/26. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX -0.40% (147.49->146.90) => SpaceX ~$5.43B. BPTIX NAV 299.40 (+0.50%). AUM "
+             "$16,639,270,316 EXACT. FLOW -$8.3M; shares-out 55.6030M->55.5754M. Movers: down GWRE -2.7%, FDS -2.4%, "
+             "SPOT -2.0%; up TSLA +5.2%, HEI +4.2%, HEI-A +3.3%, ONON +2.0%, MTN +1.9%. MARK BASKET v6 (live; "
+             "out-of-sample, distribution-adjusted): +0.22 raw; the expense-ratio accrual since 10/9 is +0.23 "
+             "(1.65%/yr, ~$0.0135/BPTIX/day) => -0.01 net of fees. Daily-log: fund_6/30 +0.39 best, optimal +1.72 "
+             "worst. RONB +0.49% x1.3 = +0.63% vs actual +0.50%. Leverage 1.089 (10/9 disclosed)."},
+    {"date": "2026-10-27", "spcx": 148.58, "actual_nav": 298.16, "aum": 16562265127, "backfilled": True,
+     "closes": {"ACGL": 100.34, "BIRK": 32.26, "CHH": 109.19, "CSGP": 32.01, "FDS": 309.54,
+                "FIG": 22.98, "GLPI": 38.81, "GWRE": 169.15, "H": 172.97, "HEI": 308.83,
+                "HEI-A": 234.52, "IDXX": 561.25, "IT": 220.93, "KNSL": 360.66, "MSCI": 601.75,
+                "MTN": 151.46, "ONON": 32.17, "RRR": 49.76, "SCHW": 89.30, "SHOP": 165.81,
+                "SPOT": 555.45, "TSLA": 407.46, "VRSK": 187.73,
+                "AMZN": 253.10, "GOOGL": 320.58, "GOOG": 316.83, "LLY": 1281.91, "MRNA": 207.97, "MORN": 215.78},
+     "note": "Tue 10/27. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX +1.14% (146.90->148.58) => SpaceX ~$5.49B. BPTIX NAV 298.16 (-0.41%). AUM "
+             "$16,562,265,127 EXACT. FLOW -$8.1M; shares-out 55.5754M->55.5482M. Movers: down GWRE -8.1%, CSGP -5.0%, "
+             "IT -4.4%, VRSK -4.3%, FDS -4.3%; up MRNA +4.6%, TSLA +4.0%, MTN +1.4%. MARK BASKET v6 (live; "
+             "out-of-sample, distribution-adjusted): +0.19 raw; the expense-ratio accrual since 10/9 is +0.24 "
+             "(1.65%/yr, ~$0.0135/BPTIX/day) => -0.05 net of fees. Daily-log: fund_5/31 +0.65 best, optimal +1.99 "
+             "worst. RONB -0.04% x1.3 = -0.05% vs actual -0.41%. Leverage 1.089 (10/9 disclosed)."},
+    {"date": "2026-10-28", "spcx": 145.23, "actual_nav": 294.82, "aum": 16360966868, "backfilled": True,
+     "closes": {"ACGL": 102.50, "BIRK": 31.59, "CHH": 110.02, "CSGP": 27.54, "FDS": 312.68,
+                "FIG": 23.21, "GLPI": 38.45, "GWRE": 166.92, "H": 173.35, "HEI": 310.82,
+                "HEI-A": 232.84, "IDXX": 562.91, "IT": 219.16, "KNSL": 358.42, "MSCI": 604.94,
+                "MTN": 151.95, "ONON": 31.94, "RRR": 48.42, "SCHW": 88.76, "SHOP": 168.22,
+                "SPOT": 538.40, "TSLA": 404.22, "VRSK": 189.80,
+                "AMZN": 254.60, "GOOGL": 324.89, "GOOG": 321.89, "LLY": 1288.30, "MRNA": 214.16, "MORN": 214.86},
+     "note": "Wed 10/28. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX -2.25% (148.58->145.23) => SpaceX ~$5.36B. BPTIX NAV 294.82 (-1.12%). AUM "
+             "$16,360,966,868 EXACT. FLOW -$15.8M; shares-out 55.5482M->55.4948M. Movers: down CSGP -14.0%, SPOT "
+             "-3.1%, RRR -2.7%, BIRK -2.1%, GWRE -1.3%; up MRNA +3.0%, ACGL +2.2%, SHOP +1.5%, VRSK +1.1%, FDS +1.0%. "
+             "MARK BASKET v6 (live; out-of-sample, distribution-adjusted): +0.19 raw; the expense-ratio accrual since "
+             "10/9 is +0.25 (1.65%/yr, ~$0.0135/BPTIX/day) => -0.07 net of fees. Daily-log: ronb +0.29 best, fund_5/31 "
+             "-0.74 worst. RONB -1.09% x1.3 = -1.41% vs actual -1.12%. Leverage 1.089 (10/9 disclosed)."},
+    {"date": "2026-10-29", "spcx": 143.89, "actual_nav": 297.29, "aum": 16492912449, "backfilled": True,
+     "closes": {"ACGL": 103.94, "BIRK": 33.39, "CHH": 112.97, "CSGP": 28.14, "FDS": 320.04,
+                "FIG": 22.32, "GLPI": 39.49, "GWRE": 160.07, "H": 184.30, "HEI": 326.35,
+                "HEI-A": 245.00, "IDXX": 575.98, "IT": 225.06, "KNSL": 362.94, "MSCI": 618.55,
+                "MTN": 154.53, "ONON": 32.80, "RRR": 49.20, "SCHW": 89.47, "SHOP": 166.89,
+                "SPOT": 557.24, "TSLA": 403.30, "VRSK": 190.71,
+                "AMZN": 243.79, "GOOGL": 283.82, "GOOG": 282.32, "LLY": 1373.70, "MRNA": 222.76, "MORN": 222.54},
+     "note": "Thu 10/29. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX -0.92% (145.23->143.89) => SpaceX ~$5.31B. BPTIX NAV 297.29 (+0.84%). AUM "
+             "$16,492,912,449 EXACT. FLOW -$5.1M; shares-out 55.4948M->55.4775M. Movers: down GWRE -4.1%; up H +6.3%, "
+             "BIRK +5.7%, HEI-A +5.2%, HEI +5.0%, MRNA +4.0%. MARK BASKET v6 (live; out-of-sample, "
+             "distribution-adjusted): +0.23 raw; the expense-ratio accrual since 10/9 is +0.27 (1.65%/yr, "
+             "~$0.0135/BPTIX/day) => -0.04 net of fees. Daily-log: fund_4/30 -0.22 best, ronb +0.76 worst. RONB +0.81% "
+             "x1.3 = +1.06% vs actual +0.84%. Leverage 1.089 (10/9 disclosed)."},
+    {"date": "2026-10-30", "spcx": 134.72, "actual_nav": 291.39, "aum": 16162458373, "backfilled": True,
+     "closes": {"ACGL": 106.36, "BIRK": 33.43, "CHH": 111.16, "CSGP": 30.17, "FDS": 329.57,
+                "FIG": 21.65, "GLPI": 38.98, "GWRE": 162.59, "H": 180.57, "HEI": 321.36,
+                "HEI-A": 238.72, "IDXX": 551.21, "IT": 228.79, "KNSL": 365.71, "MSCI": 623.38,
+                "MTN": 151.83, "ONON": 33.78, "RRR": 49.15, "SCHW": 88.05, "SHOP": 157.49,
+                "SPOT": 593.44, "TSLA": 399.81, "VRSK": 196.30,
+                "AMZN": 240.35, "GOOGL": 279.84, "GOOG": 278.22, "LLY": 1417.54, "MRNA": 221.72, "MORN": 226.19},
+     "note": "Fri 10/30. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX -6.37% (143.89->134.72) => SpaceX ~$4.98B. BPTIX NAV 291.39 (-1.98%). AUM "
+             "$16,162,458,373 EXACT. FLOW -$3.1M; shares-out 55.4775M->55.4668M. *** Month-end. SPCX -6.37%. Movers: "
+             "down SHOP -5.6%, IDXX -4.3%, HEI-A -2.6%, H -2.0%, MTN -1.7%; up CSGP +7.2%, SPOT +6.5%, ONON +3.0%, FDS "
+             "+3.0%, VRSK +2.9%. MARK BASKET v6 (live; out-of-sample, distribution-adjusted): +0.31 raw; the "
+             "expense-ratio accrual since 10/9 is +0.28 (1.65%/yr, ~$0.0135/BPTIX/day) => +0.03 net of fees. "
+             "Daily-log: fund_5/31 -0.07 best, ronb -0.90 worst. RONB -2.91% x1.3 = -3.78% vs actual -1.98%. Leverage "
+             "1.089 (10/9 disclosed)."},
+    {"date": "2026-11-02", "spcx": 136.37, "actual_nav": 298.93, "aum": 16576627324, "backfilled": True,
+     "closes": {"ACGL": 109.31, "BIRK": 35.54, "CHH": 118.61, "CSGP": 31.82, "FDS": 343.74,
+                "FIG": 22.20, "GLPI": 39.34, "GWRE": 162.43, "H": 185.96, "HEI": 337.59,
+                "HEI-A": 251.58, "IDXX": 671.64, "IT": 235.26, "KNSL": 379.61, "MSCI": 637.21,
+                "MTN": 154.82, "ONON": 35.52, "RRR": 51.54, "SCHW": 88.71, "SHOP": 156.22,
+                "SPOT": 594.04, "TSLA": 403.82, "VRSK": 201.50,
+                "AMZN": 245.63, "GOOGL": 278.99, "GOOG": 278.04, "LLY": 1410.99, "MRNA": 220.83, "MORN": 238.73},
+     "note": "Mon 11/2. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX +1.22% (134.72->136.37) => SpaceX ~$5.04B. BPTIX NAV 298.93 (+2.59%). AUM "
+             "$16,576,627,324 EXACT. FLOW -$4.1M; shares-out 55.4668M->55.4532M. *** Baron's holdings AS OF 11/2 "
+             "(holdings PDF on their site, found 11/13): the same 24 issuers, none added or dropped; SpaceX 30.4% of "
+             "net -> 36.95M +/-0.06M shares at today's exact AUM = the FILED 36,938,300 (no SpaceX sold); liabilities "
+             "less cash -9.1% (L 1.091 vs 1.089 at 10/9). The strike is the 11/2 CLOSE (chi2/n 6.7 at 11/2 prices vs "
+             "23 at 10/30's). This is the v7 anchor. Movers: up IDXX +21.8%, CHH +6.7%, BIRK +6.3%, MORN +5.5%, CSGP "
+             "+5.5%. MARK BASKET v6 (live; out-of-sample, distribution-adjusted): +0.41 raw; the expense-ratio accrual "
+             "since 10/9 is +0.32 (1.65%/yr, ~$0.0135/BPTIX/day) => +0.09 net of fees. Daily-log: optimal +0.14 best, "
+             "ronb +0.85 worst. RONB +2.33% x1.3 = +3.03% vs actual +2.59%. Leverage 1.089 as known at the time (10/9 "
+             "disclosed); the revised view uses 1.091 from 11/2 (Baron's 11/2 holdings, found 11/13)."},
+    {"date": "2026-11-03", "spcx": 141.31, "actual_nav": 298.19, "aum": 16527119349, "backfilled": True,
+     "closes": {"ACGL": 107.79, "BIRK": 35.53, "CHH": 118.94, "CSGP": 31.32, "FDS": 332.59,
+                "FIG": 21.03, "GLPI": 39.17, "GWRE": 161.04, "H": 185.44, "HEI": 337.72,
+                "HEI-A": 250.38, "IDXX": 672.04, "IT": 204.22, "KNSL": 383.55, "MSCI": 639.78,
+                "MTN": 153.36, "ONON": 36.50, "RRR": 51.39, "SCHW": 89.28, "SHOP": 142.57,
+                "SPOT": 600.09, "TSLA": 398.50, "VRSK": 197.00,
+                "AMZN": 250.69, "GOOGL": 280.03, "GOOG": 278.27, "LLY": 1409.38, "MRNA": 228.44, "MORN": 236.71},
+     "note": "Tue 11/3. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX +3.62% (136.37->141.31) => SpaceX ~$5.22B. BPTIX NAV 298.19 (-0.25%). AUM "
+             "$16,527,119,349 EXACT. FLOW -$8.5M; shares-out 55.4532M->55.4248M. Movers: down IT -13.2%, SHOP -8.7%, "
+             "FDS -3.2%, VRSK -2.2%, CSGP -1.6%; up MRNA +3.4%, ONON +2.8%, KNSL +1.0%, SPOT +1.0%. MARK BASKET v6 "
+             "(live; out-of-sample, distribution-adjusted): +0.40 raw; the expense-ratio accrual since 10/9 is +0.34 "
+             "(1.65%/yr, ~$0.0135/BPTIX/day) => +0.07 net of fees. Daily-log: fund_5/31 +0.27 best, ronb +2.10 worst. "
+             "RONB +0.69% x1.3 = +0.90% vs actual -0.25%. Leverage 1.089 as known at the time (10/9 disclosed); the "
+             "revised view uses 1.091 from 11/2 (Baron's 11/2 holdings, found 11/13)."},
+    {"date": "2026-11-04", "spcx": 135.92, "actual_nav": 300.28, "aum": 16660782180, "backfilled": True,
+     "closes": {"ACGL": 110.68, "BIRK": 37.27, "CHH": 120.33, "CSGP": 32.58, "FDS": 342.19,
+                "FIG": 22.13, "GLPI": 39.83, "GWRE": 170.62, "H": 190.18, "HEI": 337.67,
+                "HEI-A": 249.70, "IDXX": 698.55, "IT": 207.19, "KNSL": 391.73, "MSCI": 674.30,
+                "MTN": 161.08, "ONON": 38.62, "RRR": 48.66, "SCHW": 93.37, "SHOP": 153.03,
+                "SPOT": 627.66, "TSLA": 385.19, "VRSK": 197.85,
+                "AMZN": 266.03, "GOOGL": 288.93, "GOOG": 287.30, "LLY": 1417.99, "MRNA": 258.38, "MORN": 244.25},
+     "note": "Wed 11/4. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX -3.81% (141.31->135.92) => SpaceX ~$5.02B. BPTIX NAV 300.28 (+0.70%). AUM "
+             "$16,660,782,180 EXACT. FLOW +$17.8M; shares-out 55.4248M->55.4842M. *** The only net INFLOW session in "
+             "the window. Movers: down RRR -5.3%, TSLA -3.3%; up MRNA +13.1%, SHOP +7.3%, GWRE +5.9%, ONON +5.8%, MSCI "
+             "+5.4%. MARK BASKET v6 (live; out-of-sample, distribution-adjusted): +0.49 raw; the expense-ratio accrual "
+             "since 10/9 is +0.35 (1.65%/yr, ~$0.0135/BPTIX/day) => +0.14 net of fees. Daily-log: fund_6/30 -0.89 "
+             "best, optimal -3.15 worst. RONB -0.16% x1.3 = -0.21% vs actual +0.70%. Leverage 1.089 as known at the "
+             "time (10/9 disclosed); the revised view uses 1.091 from 11/2 (Baron's 11/2 holdings, found 11/13)."},
+    {"date": "2026-11-05", "spcx": 123.62, "actual_nav": 283.39, "aum": None, "backfilled": True,
+     "closes": {"ACGL": 110.57, "BIRK": 37.10, "CHH": 117.84, "CSGP": 32.05, "FDS": 340.47,
+                "FIG": 18.44, "GLPI": 39.44, "GWRE": 167.35, "H": 183.78, "HEI": 327.33,
+                "HEI-A": 244.26, "IDXX": 670.71, "IT": 198.07, "KNSL": 396.80, "MSCI": 655.91,
+                "MTN": 158.54, "ONON": 37.54, "RRR": 47.96, "SCHW": 92.58, "SHOP": 143.75,
+                "SPOT": 614.41, "TSLA": 343.69, "VRSK": 211.47,
+                "AMZN": 260.21, "GOOGL": 282.57, "GOOG": 281.74, "LLY": 1364.73, "MRNA": 241.46, "MORN": 247.17},
+     "note": "Thu 11/5. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX -9.05% (135.92->123.62) => SpaceX ~$4.57B. BPTIX NAV 283.39 (-5.62%). *** "
+             "AUM NOT CAPTURED, permanently lost (the page keeps no history; no Wayback snapshot exists): Morningstar "
+             "moved the quote page to a __NUXT_DATA__ payload ~11/05 and the parser failed closed. Issues #9-#14 "
+             "opened but unattended until 11/13; fixed in 2bff91c. Shares-out carried. *** Largest NAV drop of the "
+             "window: SPCX -9.05%, NAV -5.62%. A SpaceX-down day exposes the static basket's SpaceX SHORTFALL: "
+             "redemptions since 10/9 raised the true SpaceX per BPTIX ~0.8% above v6's 0.6613 (fund-level SpaceX "
+             "fixed, shares-out down), so v6 fell less than the NAV. Movers: down TSLA -10.8%, MRNA -6.5%, SHOP -6.1%, "
+             "IT -4.4%, IDXX -4.0%; up VRSK +6.9%, KNSL +1.3%, MORN +1.2%. MARK BASKET v6 (live; out-of-sample, "
+             "distribution-adjusted): +0.62 raw; the expense-ratio accrual since 10/9 is +0.35 (1.65%/yr, "
+             "~$0.0135/BPTIX/day) => +0.27 net of fees. Daily-log: ronb +0.42 best, optimal -2.74 worst. RONB -5.95% "
+             "x1.3 = -7.73% vs actual -5.62%. Leverage 1.089 as known at the time (10/9 disclosed); the revised view "
+             "uses 1.091 from 11/2 (Baron's 11/2 holdings, found 11/13)."},
+    {"date": "2026-11-06", "spcx": 134.27, "actual_nav": 290.19, "aum": None, "backfilled": True,
+     "closes": {"ACGL": 107.28, "BIRK": 37.32, "CHH": 118.91, "CSGP": 30.55, "FDS": 327.89,
+                "FIG": 18.81, "GLPI": 38.89, "GWRE": 161.41, "H": 184.32, "HEI": 332.65,
+                "HEI-A": 250.28, "IDXX": 676.04, "IT": 190.10, "KNSL": 383.73, "MSCI": 641.01,
+                "MTN": 158.59, "ONON": 37.36, "RRR": 48.22, "SCHW": 91.49, "SHOP": 148.91,
+                "SPOT": 603.01, "TSLA": 358.22, "VRSK": 204.59,
+                "AMZN": 259.30, "GOOGL": 284.78, "GOOG": 283.93, "LLY": 1354.00, "MRNA": 254.19, "MORN": 244.15},
+     "note": "Fri 11/6. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX +8.62% (123.62->134.27) => SpaceX ~$4.96B. BPTIX NAV 290.19 (+2.40%). *** "
+             "AUM NOT CAPTURED, permanently lost (the page keeps no history; no Wayback snapshot exists): Morningstar "
+             "moved the quote page to a __NUXT_DATA__ payload ~11/05 and the parser failed closed. Issues #9-#14 "
+             "opened but unattended until 11/13; fixed in 2bff91c. Shares-out carried. Movers: down CSGP -4.7%, IT "
+             "-4.0%, FDS -3.7%, GWRE -3.5%, KNSL -3.3%; up MRNA +5.3%, TSLA +4.2%, SHOP +3.6%, HEI-A +2.5%, HEI +1.6%. "
+             "MARK BASKET v6 (live; out-of-sample, distribution-adjusted): +0.49 raw; the expense-ratio accrual since "
+             "10/9 is +0.37 (1.65%/yr, ~$0.0135/BPTIX/day) => +0.12 net of fees. Daily-log: fund_6/30 +0.68 best, "
+             "optimal +1.46 worst. RONB +3.40% x1.3 = +4.42% vs actual +2.40%. Leverage 1.089 as known at the time "
+             "(10/9 disclosed); the revised view uses 1.091 from 11/2 (Baron's 11/2 holdings, found 11/13)."},
+    {"date": "2026-11-09", "spcx": 142.07, "actual_nav": 300.00, "aum": None, "backfilled": True,
+     "closes": {"ACGL": 108.12, "BIRK": 38.72, "CHH": 119.50, "CSGP": 31.24, "FDS": 326.72,
+                "FIG": 19.40, "GLPI": 39.44, "GWRE": 160.84, "H": 185.70, "HEI": 342.71,
+                "HEI-A": 255.51, "IDXX": 706.65, "IT": 191.02, "KNSL": 386.07, "MSCI": 646.45,
+                "MTN": 159.89, "ONON": 37.53, "RRR": 49.85, "SCHW": 92.73, "SHOP": 152.06,
+                "SPOT": 609.10, "TSLA": 378.05, "VRSK": 200.60,
+                "AMZN": 266.93, "GOOGL": 288.15, "GOOG": 286.01, "LLY": 1411.95, "MRNA": 269.00, "MORN": 246.15},
+     "note": "Mon 11/9. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX +5.81% (134.27->142.07) => SpaceX ~$5.25B. BPTIX NAV 300.00 (+3.38%). *** "
+             "AUM NOT CAPTURED, permanently lost (the page keeps no history; no Wayback snapshot exists): Morningstar "
+             "moved the quote page to a __NUXT_DATA__ payload ~11/05 and the parser failed closed. Issues #9-#14 "
+             "opened but unattended until 11/13; fixed in 2bff91c. Shares-out carried. Movers: down VRSK -2.0%; up "
+             "MRNA +5.8%, TSLA +5.5%, IDXX +4.5%, BIRK +3.8%, RRR +3.4%. MARK BASKET v6 (live; out-of-sample, "
+             "distribution-adjusted): +0.46 raw; the expense-ratio accrual since 10/9 is +0.42 (1.65%/yr, "
+             "~$0.0135/BPTIX/day) => +0.04 net of fees. Daily-log: ronb +0.26 best, optimal +1.28 worst. RONB +4.04% "
+             "x1.3 = +5.25% vs actual +3.38%. Leverage 1.089 as known at the time (10/9 disclosed); the revised view "
+             "uses 1.091 from 11/2 (Baron's 11/2 holdings, found 11/13)."},
+    {"date": "2026-11-10", "spcx": 143.09, "actual_nav": 299.40, "aum": None, "backfilled": True,
+     "closes": {"ACGL": 109.14, "BIRK": 37.27, "CHH": 120.23, "CSGP": 30.33, "FDS": 325.98,
+                "FIG": 18.63, "GLPI": 39.24, "GWRE": 155.48, "H": 191.55, "HEI": 345.09,
+                "HEI-A": 256.60, "IDXX": 696.64, "IT": 188.92, "KNSL": 397.72, "MSCI": 656.86,
+                "MTN": 156.51, "ONON": 34.70, "RRR": 49.46, "SCHW": 93.03, "SHOP": 146.61,
+                "SPOT": 606.22, "TSLA": 379.78, "VRSK": 204.02,
+                "AMZN": 270.87, "GOOGL": 287.38, "GOOG": 284.92, "LLY": 1432.29, "MRNA": 250.83, "MORN": 246.47},
+     "note": "Tue 11/10. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX +0.72% (142.07->143.09) => SpaceX ~$5.29B. BPTIX NAV 299.40 (-0.20%). *** "
+             "AUM NOT CAPTURED, permanently lost (the page keeps no history; no Wayback snapshot exists): Morningstar "
+             "moved the quote page to a __NUXT_DATA__ payload ~11/05 and the parser failed closed. Issues #9-#14 "
+             "opened but unattended until 11/13; fixed in 2bff91c. Shares-out carried. Movers: down ONON -7.5%, MRNA "
+             "-6.8%, BIRK -3.7%, SHOP -3.6%, GWRE -3.3%; up H +3.2%, KNSL +3.0%, VRSK +1.7%, MSCI +1.6%. MARK BASKET "
+             "v6 (live; out-of-sample, distribution-adjusted): +0.46 raw; the expense-ratio accrual since 10/9 is "
+             "+0.43 (1.65%/yr, ~$0.0135/BPTIX/day) => +0.03 net of fees. Daily-log: fund_5/31 +0.42 best, fund_3/31 "
+             "+1.10 worst. RONB +0.28% x1.3 = +0.36% vs actual -0.20%. Leverage 1.089 as known at the time (10/9 "
+             "disclosed); the revised view uses 1.091 from 11/2 (Baron's 11/2 holdings, found 11/13)."},
+    {"date": "2026-11-11", "spcx": 139.75, "actual_nav": 299.44, "aum": None, "backfilled": True,
+     "closes": {"ACGL": 109.17, "BIRK": 36.61, "CHH": 120.01, "CSGP": 30.27, "FDS": 334.88,
+                "FIG": 18.97, "GLPI": 39.27, "GWRE": 158.16, "H": 190.18, "HEI": 349.35,
+                "HEI-A": 260.82, "IDXX": 702.59, "IT": 193.00, "KNSL": 392.79, "MSCI": 661.53,
+                "MTN": 154.43, "ONON": 34.71, "RRR": 50.18, "SCHW": 92.78, "SHOP": 149.26,
+                "SPOT": 609.12, "TSLA": 390.84, "VRSK": 205.98,
+                "AMZN": 266.17, "GOOGL": 293.45, "GOOG": 290.63, "LLY": 1437.29, "MRNA": 248.69, "MORN": 248.65},
+     "note": "Wed 11/11. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX -2.33% (143.09->139.75) => SpaceX ~$5.16B. BPTIX NAV 299.44 (+0.01%). *** "
+             "AUM NOT CAPTURED, permanently lost (the page keeps no history; no Wayback snapshot exists): Morningstar "
+             "moved the quote page to a __NUXT_DATA__ payload ~11/05 and the parser failed closed. Issues #9-#14 "
+             "opened but unattended until 11/13; fixed in 2bff91c. Shares-out carried. Movers: down BIRK -1.8%, MTN "
+             "-1.3%, KNSL -1.2%; up TSLA +2.9%, FDS +2.7%, IT +2.2%, SHOP +1.8%, GWRE +1.7%. MARK BASKET v6 (live; "
+             "out-of-sample, distribution-adjusted): +0.49 raw; the expense-ratio accrual since 10/9 is +0.45 "
+             "(1.65%/yr, ~$0.0135/BPTIX/day) => +0.04 net of fees. Daily-log: fund_5/31 +0.18 best, optimal +0.48 "
+             "worst. RONB +0.08% x1.3 = +0.10% vs actual +0.01%. Leverage 1.089 as known at the time (10/9 disclosed); "
+             "the revised view uses 1.091 from 11/2 (Baron's 11/2 holdings, found 11/13)."},
+    {"date": "2026-11-12", "spcx": 139.94, "actual_nav": 297.70, "aum": 16438828202, "backfilled": True,
+     "closes": {"ACGL": 109.24, "BIRK": 35.70, "CHH": 118.28, "CSGP": 30.10, "FDS": 331.71,
+                "FIG": 18.92, "GLPI": 39.10, "GWRE": 160.01, "H": 187.21, "HEI": 339.51,
+                "HEI-A": 254.19, "IDXX": 698.02, "IT": 190.84, "KNSL": 389.84, "MSCI": 651.51,
+                "MTN": 151.17, "ONON": 33.07, "RRR": 49.19, "SCHW": 91.72, "SHOP": 146.78,
+                "SPOT": 598.51, "TSLA": 397.45, "VRSK": 206.32,
+                "AMZN": 267.44, "GOOGL": 298.70, "GOOG": 295.35, "LLY": 1427.28, "MRNA": 231.35, "MORN": 246.08},
+     "note": "Thu 11/12. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX +0.14% (139.75->139.94) => SpaceX ~$5.17B. BPTIX NAV 297.70 (-0.58%). AUM "
+             "$16,438,828,202 EXACT. FLOW across the 6 sessions since the last exact print: -$78.8M; shares-out "
+             "55.4842M->55.2194M. *** AUM BACK: captured by hand on 11/13 right after the parser fix (2bff91c). "
+             "Movers: down MRNA -7.0%, ONON -4.7%, HEI -2.8%, HEI-A -2.5%, BIRK -2.5%; up TSLA +1.7%, GWRE +1.2%. MARK "
+             "BASKET v6 (live; out-of-sample, distribution-adjusted): +0.49 raw; the expense-ratio accrual since 10/9 "
+             "is +0.46 (1.65%/yr, ~$0.0135/BPTIX/day) => +0.03 net of fees. Daily-log: ronb -0.04 best, optimal +1.34 "
+             "worst. RONB -0.60% x1.3 = -0.78% vs actual -0.58%. Leverage 1.089 as known at the time (10/9 disclosed); "
+             "the revised view uses 1.091 from 11/2 (Baron's 11/2 holdings, found 11/13)."},
+    {"date": "2026-11-13", "spcx": 139.11, "actual_nav": 297.53, "aum": 16426391664, "backfilled": True,
+     "ex_divs": {"MSCI": 2.05, "SCHW": 0.32, "LLY": 1.73},
+     "closes": {"ACGL": 109.61, "BIRK": 36.30, "CHH": 118.78, "CSGP": 30.96, "FDS": 332.69,
+                "FIG": 19.45, "GLPI": 39.34, "GWRE": 158.22, "H": 187.70, "HEI": 340.18,
+                "HEI-A": 253.26, "IDXX": 704.23, "IT": 192.15, "KNSL": 395.89, "MSCI": 658.17,
+                "MTN": 152.61, "ONON": 33.63, "RRR": 48.86, "SCHW": 92.98, "SHOP": 147.09,
+                "SPOT": 612.63, "TSLA": 390.22, "VRSK": 207.82,
+                "AMZN": 266.66, "GOOGL": 295.77, "GOOG": 292.52, "LLY": 1443.50, "MRNA": 223.37, "MORN": 246.26},
+     "note": "Fri 11/13. BACKFILLED 2026-11-14 (closes + NAV from Yahoo, AUM from the Morningstar capture log; built "
+             "from day-T closes only). SPCX -0.59% (139.94->139.11) => SpaceX ~$5.14B. BPTIX NAV 297.53 (-0.06%). AUM "
+             "$16,426,391,664 EXACT. FLOW -$3.0M; shares-out 55.2194M->55.2092M. *** Ex-dividend today: MSCI $2.05, "
+             "SCHW $0.32 (LLY $1.73, no longer held). The fund books the receivable, so a static basket marks "
+             "~$0.09/BPTIX LOW from today (v6: MSCI 0.0237 x 2.05 + SCHW 0.1331 x 0.32). Recorded in this entry's "
+             "ex_divs. AUM captured BY HAND on Sat 11/14 (the scheduled job runs Mon-Fri). Movers: down MRNA -3.4%, "
+             "TSLA -1.8%, GWRE -1.1%; up CSGP +2.9%, SPOT +2.4%, ONON +1.7%, BIRK +1.7%, KNSL +1.6%. MARK BASKET v6 "
+             "(live; out-of-sample, distribution-adjusted): +0.45 raw; the expense-ratio accrual since 10/9 is +0.47 "
+             "(1.65%/yr, ~$0.0135/BPTIX/day) => -0.02 net of fees. Daily-log: ronb -0.02 best, optimal -0.51 worst. "
+             "RONB -0.16% x1.3 = -0.21% vs actual -0.06%. Leverage 1.089 as known at the time (10/9 disclosed); the "
+             "revised view uses 1.091 from 11/2 (Baron's 11/2 holdings, found 11/13)."},
 ]
 
 METHOD_LABELS = {"actual": "actual hedge", "fund_3_31": "fund 3/31", "fund_4_30": "fund 4/30",
