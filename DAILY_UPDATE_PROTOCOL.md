@@ -15,7 +15,11 @@ Interpreter on this machine is **`py`** (Python 3.14), NOT `python`.
   `.github/workflows/morningstar-aum.yml` into `data/morningstar_quote_raw.jsonl`; transcribe each day's
   capture into `morningstar_aum_log.jsonl` (step 2) and `ENTRIES[...]["aum"]`. A day missing from the
   capture log is lost for good — never invent it. **Each session: `gh issue list` first** (a failed
-  capture opens an issue; an unattended markup change lost 10/08–10/16). (Before 9/15 the user reported
+  capture opens an issue; unattended markup changes lost 10/08–10/16 and again 11/05–11/11, when the
+  page moved to a `__NUXT_DATA__` payload). On a failure: fetch the page, fix the parser, capture by
+  hand the SAME day (`py -m situations.spacex_baron.ingest.morningstar_quote --append`), then
+  `gh workflow run morningstar-aum.yml` to prove CI parses it. The job runs Mon–Fri only, so a Friday
+  NAV is captured Monday morning (or by hand over the weekend). (Before 9/15 the user reported
   the rounded Morningstar AUM, e.g. "7/13 AUM 17.0B".)
 - **Everything else I fetch myself, T+1** (the next day), from Yahoo's chart API:
   - the **29 public-holding closes** + the **SPCX** close (for the as-of NAV estimate), and
@@ -71,8 +75,12 @@ Append (or, next morning, complete) one dict for day T:
 ```python
 {"date":"YYYY-MM-DD","spcx":<SPCX close>,"actual_nav":<BPTIX NAV or None>,
  "aum":<Morningstar Total Assets or None>,
- "closes":{... 23 tickers ...}}   # Yahoo tickers; HEI/A -> HEI-A; SPY intentionally dropped
+ "ex_divs":{"MSCI":2.05},          # ONLY on a day a name goes ex-dividend (Yahoo events=div)
+ "closes":{... 29 tickers ...}}   # Yahoo tickers; HEI/A -> HEI-A; SPY intentionally dropped
 ```
+**`ex_divs` (since 11/14):** fetch the closes with `&events=div` and record any ex-date among the
+held names, $ per share. The mark basket's carry subtracts shares x $ from the borrow — the fund
+books the receivable, while a static basket only sees the price drop (11/13 MSCI + SCHW ≈ $0.09/BPTIX).
 Drives the **Daily NAV estimate** card (which has an **As-of / Revised toggle**: each day's
 estimate is auto-frozen to `daily_nav_vintage.jsonl` the first build, so revising an
 assumption never erases what we estimated that day). `recalibrate.py` also reads this and
@@ -215,6 +223,18 @@ from the ex-date on (v5 looked +1.8 off for all of late Sept until this was foun
   subscription; don't read it as one.
 - Check for one whenever every basket shifts by the same amount on the same day.
 
+## Mark-basket CARRY — why a static basket "drifts" (found 10/20, built in 11/14)
+
+A static per-BPTIX basket cannot see three things; `_mark_basket_accuracy` takes all three out
+of the "net" score and the look-through card shows the basket carried to today (= the copy-over):
+1. **Expenses 1.65%/yr** (`EXPENSE_RATIO`, 9/30 fact sheet) ≈ $0.0135/BPTIX per calendar day. Re-check
+   the figure on each new fact sheet; the 0.61% interest part moves with leverage and rates.
+2. **Dividends** on held names — `ex_divs` above.
+3. **Redemptions** — fund-level SpaceX and borrowings fixed, shares-out falls, so SpaceX/BPTIX rises and
+   the public names are sold pro-rata (`_roll_basket`; per 1% of shares-out: SpaceX/borrow +1%, public
+   −0.27%). Needs the exact AUM prints — another reason a lost capture day matters.
+**Before calling anything basket drift, subtract these first.** v6 10/12–11/13: raw RMS 0.31 → 0.05 net.
+
 ## Baron's own site: full holdings + leverage, ahead of NPORT
 
 `baroncapitalgroup.com/product-detail/baron-partners-fund-bptix` (robots.txt `Allow: /`) links:
@@ -226,7 +246,12 @@ from the ex-date on (v5 looked +1.8 off for all of late Sept until this was foun
 - **holdings PDF** (dated, e.g. as of 10/9) — every issuer as **% of net assets** + the
   "Liabilities Less Cash" line.
 Two full-book snapshots with no trading between them are two rounded measurements of one book:
-pool them (inverse variance) — see `daily_log/2026-10-20-basket-v6.md`.
+pool them (inverse variance) — see `daily_log/2026-10-20-basket-v6.md`. **Test first:** roll the old
+book forward (redemptions) and z-test each name against the new reading; if clearly more than ~5% of
+names are past 2σ the fund traded, and the new reading stands alone (11/2: 6 of 24 → v7 unpooled, see
+`daily_log/2026-11-14-basket-v7.md`). Also check WHICH close a posting is struck at (11/2's holdings
+were the 11/2 close; χ²/n 6.7 vs 23 at the prior close). Look for a new holdings PDF every session:
+`curl` the product page and grep `holdings-as-of`.
 
 ## RONB cross-reference (extra daily data point)
 

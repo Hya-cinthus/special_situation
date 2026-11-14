@@ -161,42 +161,58 @@ function drawLookthrough() {
   if (!lt || !card) return;
   const POS = lt.position_shares || 30000;
   const note = document.getElementById("lookthrough-note");
+  const fromBook = lt.source === "mark_basket";
   if (note) note.innerHTML =
-    "What ONE BPTIX share owns, look-through: shares of each underlier + a borrowing line. TWO layers — the " +
-    "<b>holdings weights</b> update only at a disclosure (now Baron's full " + (lt.weights_as_of || "10/9") +
-    " book; next the 9/30 NPORT ~late Nov), while the <b>per-BPTIX share counts, " +
-    "leverage &amp; borrowing</b> drift DAILY off AUM/NAV (redemptions shrink the fund, so leverage edges up). Mark = " +
-    "Σ(shares × live price) − borrow; × " + POS.toLocaleString() + " for the position. The mark object, separate " +
-    "from the multi-basket experiment below.";
+    "What ONE BPTIX share owns, look-through: shares of each underlier + a borrowing line. " +
+    (fromBook
+      ? "This IS the published mark basket carried to today: Baron's full " + (lt.weights_as_of || "11/2") +
+        " book, <b>rolled through the redemptions since</b> (SpaceX per BPTIX rises as shares-out falls; the cash " +
+        "paid out comes off the public names), with the borrow line <b>net of the fee accrual</b> ($" +
+        (lt.fee_accrued != null ? lt.fee_accrued.toFixed(2) : "—") + " so far) and <b>the dividends received</b> ($" +
+        (lt.dividends_received != null ? lt.dividends_received.toFixed(2) : "—") + "). Mark = Σ(shares × price) − borrow = $" +
+        (lt.mark != null ? lt.mark.toFixed(2) : "—") + " vs NAV $" + lt.nav.toFixed(2) + ". × " + POS.toLocaleString() +
+        " = the copy-over for the position."
+      : "The <b>holdings weights</b> update only at a disclosure (now Baron's full " + (lt.weights_as_of || "11/2") +
+        " book), while the <b>per-BPTIX share counts, leverage &amp; borrowing</b> drift DAILY off AUM/NAV. Mark = " +
+        "Σ(shares × live price) − borrow; × " + POS.toLocaleString() + " for the position.");
   const mb = d && d.meta && d.meta.mark_basket;
   const f3 = (x) => (x == null ? "—" : "$" + x.toFixed(3));
-  const sg = (x) => (x == null ? "—" : (x >= 0 ? "+" : "") + x.toFixed(2));
+  const sg = (x) => (x == null ? "—" : Math.abs(x) < 0.005 ? "+0.00" : (x >= 0 ? "+" : "") + x.toFixed(2));
   if (note && mb && mb.rms_forward != null) {
+    const b = (x, y) => (x != null && y != null && x <= y ? "font-weight:700" : "");
     const segRows = (mb.segments || []).map((s) =>
       `<tr><td>${s.label}</td><td style="text-align:right">${s.n}</td>` +
-      `<td style="text-align:right;${s.rms_v5 <= s.rms_v6 ? "font-weight:700" : ""}">${f3(s.rms_v5)}</td>` +
-      `<td style="text-align:right;${s.rms_v6 < s.rms_v5 ? "font-weight:700" : ""}">${f3(s.rms_v6)}</td></tr>`).join("");
-    const recent = (mb.recent_errors || []).map((r) => sg(r.err_v6)).join(", ");
+      `<td style="text-align:right;${b(s.rms_prev, s.rms_cur)}">${f3(s.rms_prev)}</td>` +
+      `<td style="text-align:right;${b(s.rms_cur, s.rms_prev)}">${f3(s.rms_cur)}</td>` +
+      `<td style="text-align:right;${b(s.rms_prev_adj, s.rms_cur_adj)}">${f3(s.rms_prev_adj)}</td>` +
+      `<td style="text-align:right;${b(s.rms_cur_adj, s.rms_prev_adj)}">${f3(s.rms_cur_adj)}</td></tr>`).join("");
+    const recent = (mb.recent_errors || []).map((r) => `${r.date.slice(5)} ${sg(r.err)} / ${sg(r.err_adj)}`).join(" · ");
+    const td = mb.today || {};
+    const n4 = (x) => (x != null ? x.toFixed(4) : "—");
     note.innerHTML +=
       `<div style="margin-top:10px;padding:8px 12px;border:1px solid ${GRID};border-left:3px solid ${SPX};` +
       `border-radius:6px;background:var(--panel-2);font-size:.8rem;color:${TEXT}">` +
-      `<b>Mark basket ${mb.version} — re-anchored to Baron's ${mb.anchor} full book.</b> For the first time every ` +
-      `holding's weight is disclosed, not just the top 10: all <b>${mb.n_names}</b> public lines plus SpaceX, from the 9/30 quarterly ` +
-      `holdings and the 10/9 holdings, pooled (no trading between them, so they are two rounded readings of one ` +
-      `book). No tail estimate is left. <b>Exited:</b> ${(mb.exited || []).join(", ")}. Leverage ` +
-      `<b>${mb.leverage.toFixed(3)}</b> (liabilities less cash −8.9% of net). SpaceX = the <b>filed</b> 36,938,300 sh ÷ ` +
-      `shares-out = <b>${mb.spx_sh_per_bptix.toFixed(4)}</b> sh/BPTIX (${mb.spx_pct_net}% of net); the count is ` +
-      `unchanged at 3/31, 6/30, 8/31 and 9/30. Borrow −$${mb.borrow_per_bptix.toFixed(2)}/BPTIX. ` +
-      `Scores are <b>distribution-adjusted</b> (9/22 ex-date, $1.888): Yahoo's NAV is unadjusted, and unhandled ` +
-      `the payout made every older basket read ~+1.8/BPTIX high. ` +
-      `<b>Out-of-sample since the anchor, ${mb.window_start}→${mb.window_end} (n=${mb.n_forward}): RMS ` +
-      `$${mb.rms_forward.toFixed(3)}/BPTIX (~${mb.rms_forward_pct_nav}% of NAV), bias ` +
-      `${sg(mb.bias_forward)}</b> — versus ${mb.prev_version} at ${f3(mb.rms_prev_same_window)} on the same days. ` +
-      `Daily errors: ${recent}.` +
+      `<b>Mark basket ${mb.version} — re-anchored to Baron's ${mb.anchor} full book.</b> All <b>${mb.n_names}</b> ` +
+      `public lines plus SpaceX, as % of net; the same issuers as 10/9. Read alone, not pooled with ${mb.prev_version}: ` +
+      `<b>${(mb.traded || []).join(", ")}</b> were traded since 10/9 (past 2σ of rounding), so the older book is no ` +
+      `longer a second reading of this one. Leverage <b>${mb.leverage.toFixed(3)}</b> (liabilities less cash −9.1%). ` +
+      `SpaceX = the <b>filed</b> 36,938,300 sh ÷ the exact shares-out = <b>${mb.spx_sh_per_bptix.toFixed(4)}</b> ` +
+      `sh/BPTIX (30.39% vs ${mb.spx_pct_net}% disclosed — no SpaceX sold). Borrow −$${mb.borrow_per_bptix.toFixed(2)}/BPTIX at the anchor.` +
+      `<div style="margin-top:6px"><b>Carry</b> — what a static basket cannot see, now taken out of the score: ` +
+      `<b>fees</b> ${(mb.expense_ratio * 100).toFixed(2)}%/yr (≈$${n4(td.fee_per_day)}/BPTIX per calendar day, ` +
+      `$${td.fee_accrued != null ? td.fee_accrued.toFixed(2) : "—"} so far), <b>dividends</b> received ` +
+      `($${td.dividends_received != null ? td.dividends_received.toFixed(2) : "—"}), and the <b>redemption roll</b> ` +
+      `(SpaceX/BPTIX ${n4(td.spx_sh_anchor)} → ${n4(td.spx_sh_today)}; public lines ×${n4(td.public_scale)}).</div>` +
+      `<div style="margin-top:6px"><b>Out-of-sample since the anchor, ${mb.window_start}→${mb.window_end} (n=${mb.n_forward}): ` +
+      `net of carry RMS $${mb.rms_forward.toFixed(3)}/BPTIX, bias ${sg(mb.bias_forward)}</b>; raw RMS ${f3(mb.rms_forward_raw)}, ` +
+      `bias ${sg(mb.bias_forward_raw)} — versus ${mb.prev_version} at ${f3(mb.rms_prev_same_window)} net / ` +
+      `${f3(mb.rms_prev_same_window_raw)} raw on the same days. Daily (raw / net): ${recent}.</div>` +
       `<table style="margin-top:6px;font-size:.78rem;border-collapse:collapse"><tr><th style="text-align:left">window ` +
-      `(RMS $/BPTIX)</th><th>n</th><th>v5</th><th>v6</th></tr>${segRows}</table>` +
-      `<span class="dim">The crossover a periodic re-anchor should produce: v5 wins on its own turf, v6 from late ` +
-      `September on.</span></div>`;
+      `(RMS $/BPTIX)</th><th>n</th><th>${mb.prev_version} raw</th><th>${mb.version} raw</th><th>${mb.prev_version} net</th>` +
+      `<th>${mb.version} net</th></tr>${segRows}</table>` +
+      `<span class="dim">The crossover a periodic re-anchor should produce: ${mb.prev_version} wins on its own turf, ` +
+      `${mb.version} after its anchor. Raw = what a static hedge experiences (the fee drag is a real cost of holding ` +
+      `the fund, not a hedge error); net = whether the basket's composition is right.</span></div>`;
   }
   const sv = d && d.meta && d.meta.slow_vars;
   if (note && sv && sv.latest) {
@@ -216,7 +232,8 @@ function drawLookthrough() {
       `the two drivers of basket drift that <i>don't</i> need a disclosure. ` +
       `<b>SpaceX/BPTIX ${L.spx_sh_per_bptix != null ? L.spx_sh_per_bptix.toFixed(4) : "—"}</b> (exact: 36.94M ÷ AUM/NAV). ` +
       `<b>Leverage ${L.L_est_adj != null ? L.L_est_adj.toFixed(3) : L.L_est.toFixed(3)}</b> ` +
-      `(fit w/ w_spx pinned, calibrated −${sv.bias_vs_disclosed} vs the 7/31 disclosed 1.10) vs model <b>${L.L_model.toFixed(3)}</b>. ` +
+      `(fit w/ w_spx pinned and the public leg = the latest disclosed book; calibrated −${sv.bias_vs_disclosed} vs the ` +
+      `${Object.keys(sv.disclosed || {}).length} disclosed checkpoints) vs model <b>${L.L_model.toFixed(3)}</b>. ` +
       (sh != null ? `Shift vs own trailing baseline <b>${sh >= 0 ? "+" : ""}${sh.toFixed(3)}</b> for <b>${L.alert_streak}</b> straight days. ` : "") +
       `<span style="color:${MUTED}">Shift is bias-immune, so it fires BEFORE a disclosure exists — it flagged July's 1.07→1.10 re-levering on 7/21, ~3 weeks early.</span>` +
       `<div style="margin-top:6px">${bars} <span style="color:${MUTED};font-size:.7rem">L (calibrated), last ${spark.length} obs: ${lo.toFixed(3)}–${hi.toFixed(3)}</span></div></div>`;
@@ -241,10 +258,11 @@ function drawLookthrough() {
       : (h.usd_per_bptix != null ? (h.usd_per_bptix < 0 ? "−$" : "$") + Math.abs(Math.round(h.usd_per_bptix * POS)).toLocaleString() : "0");
     const col = isSpx ? SPX : isBorrow ? (h.pct_nav < 0 ? BAD : GOOD) : TEXT;
     return `<tr><td style="color:${col};font-weight:${isSpx || isBorrow ? 700 : 400}">${h.ticker}</td><td>${sh}</td>` +
-      `<td>${sh130}</td><td>${h.price != null ? "$" + h.price : "—"}</td><td>${h.pct_nav.toFixed(2)}%</td></tr>`;
+      `<td>${sh130}</td>` + (fromBook ? `<td class="dim">${h.sh_anchor != null ? h.sh_anchor.toFixed(h.sh_anchor >= 0.1 ? 4 : 6) : "—"}</td>` : "") +
+      `<td>${h.price != null ? "$" + h.price : "—"}</td><td>${h.pct_nav.toFixed(2)}%</td></tr>`;
   }).join("");
-  card.innerHTML = `<div style="font-size:.85rem;color:${TEXT};margin-bottom:6px"><b>Look-through</b> — per BPTIX share, as of ${lt.date}${lt.is_estimate ? " (est.)" : ""}</div>` +
-    `<table class="data"><tr><th>holding</th><th>sh / BPTIX</th><th>× ${POS / 1000}k</th><th>price</th><th>% NAV</th></tr><tbody>${body}</tbody></table>`;
+  card.innerHTML = `<div style="font-size:.85rem;color:${TEXT};margin-bottom:6px"><b>Look-through</b> — per BPTIX share, as of ${lt.date}${lt.is_estimate ? " (est.)" : ""}${fromBook && mb ? " · " + mb.version + " carried to today" : ""}</div>` +
+    `<table class="data"><tr><th>holding</th><th>sh / BPTIX</th><th>× ${POS / 1000}k</th>${fromBook ? "<th>@ anchor</th>" : ""}<th>price</th><th>% NAV</th></tr><tbody>${body}</tbody></table>`;
   const hist = document.getElementById("lookthrough-history");
   if (hist) {
     const hr = (d.rows || []).filter((r) => r.aum_used_b != null).slice(-12);
@@ -261,9 +279,10 @@ function drawLookthrough() {
   }
   const src = document.getElementById("lookthrough-src");
   if (src) src.innerHTML =
-    `<span class="dim">Borrowings ≈ (leverage−1)×AUM ~$1.15B and ~constant; leverage = 1 + borrowings/net drifts UP as ` +
-    `redemptions shrink net. SpaceX shares/BPTIX = disclosed 3/31 count ÷ BPTIX shares out (rises as the fund shrinks). ` +
-    `Holdings weights are the 6/30 disclosure — next update is the ~9/30 book. Estimate, not the fund's record.</span>`;
+    `<span class="dim">Borrowings stay ~constant in $ while redemptions shrink net, so leverage drifts UP between ` +
+    `disclosures. SpaceX shares/BPTIX = the filed 36,938,300 ÷ BPTIX shares out (rises as the fund shrinks). Holdings ` +
+    `are Baron's 11/2 full book; next: the 9/30 NPORT-P (exact share counts, ~late Nov) and Baron's next holdings ` +
+    `posting. Estimate, not the fund's record.</span>`;
 }
 /* SpaceX shares behind one BPTIX share = fund SpaceX shares / BPTIX shares out
  * (shares × NAV / AUM, end-of-day so a big SPCX move doesn't distort it).

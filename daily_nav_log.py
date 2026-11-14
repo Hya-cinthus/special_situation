@@ -77,6 +77,8 @@ def LEVERAGE_FOR(date, net_aum=None):
         return 0.968
     if date <= "2026-06-25":
         return 1.00
+    if date >= "2026-11-02":
+        return 1.091                             # disclosed 11/2: liabilities less cash -9.1% of net (found 11/13)
     if date >= "2026-10-09":
         return 1.089                             # disclosed 10/9: liabilities less cash -8.9% of net
     if date >= "2026-09-30":
@@ -2126,18 +2128,45 @@ SPX_SHARES_DISCLOSED = 3.89026788e9 / 105.32   # 3/31 NPORT SpaceX share count (
 
 
 def _latest_book_weights():
-    """Public weights of the latest FULL disclosed book (v6: Baron's 10/9 holdings pooled with 9/30),
+    """Public weights of the latest FULL disclosed book (v7: Baron's 11/2 holdings),
     as relative values at the anchor. Empty on failure -> the caller falls back to 6/30."""
     import csv as _csv
     try:
         path = os.path.join(_REPO_ROOT, "situations", "spacex_baron", "data",
-                            "position_mark_basket_v6_2026-10-09.csv")
-        w = {r["component"]: float(r["value_per_bptix_10_09"]) for r in _csv.DictReader(open(path, encoding="utf-8"))
+                            "position_mark_basket_v7_2026-11-02.csv")
+        w = {r["component"]: float(r["value_per_bptix_11_02"]) for r in _csv.DictReader(open(path, encoding="utf-8"))
              if not r["component"].startswith(("SPCX", "CASH"))}
         s = sum(w.values())
         return {t: v / s for t, v in w.items()}
     except Exception:
         return {}
+
+
+def _lookthrough_from_book(rows, today, weights_as_of):
+    """The look-through AS the published mark basket carried to today (`_mark_basket_accuracy()["today"]`):
+    the anchor book rolled through the redemptions since, with the borrow line net of the fee accrual and the
+    dividends received. This is the copy-over: hedge = these shares x position size."""
+    r = next((x for x in rows if x["date"] == today["date"]), rows[-1])
+    nav = today["nav"]
+    N = (r.get("bptix_shares_out_m") or 0) * 1e6
+    aum = (r.get("aum_used_b") or 0) * 1e9
+    holdings, gross = [], 0.0
+    for h in today["holdings"]:
+        v = h["sh_per_bptix"] * h["price"]
+        gross += v
+        holdings.append({"ticker": "SpaceX (SPCX)" if h["ticker"] == "SPCX" else h["ticker"],
+                         "sh_per_bptix": h["sh_per_bptix"], "sh_anchor": h["sh_anchor"], "price": h["price"],
+                         "pct_nav": round(v / nav * 100, 2)})
+    bor = today["borrow_today"]
+    holdings.append({"ticker": "Cash (borrow)", "sh_per_bptix": None, "price": None, "usd_per_bptix": round(-bor, 2),
+                     "pct_nav": round(-bor / nav * 100, 2)})
+    return {"date": today["date"], "is_estimate": False, "nav": round(nav, 2),
+            "aum_b": round(aum / 1e9, 2), "bptix_shares_out_m": round(N / 1e6, 2),
+            "leverage": round(gross / nav, 4), "borrowings_b": round(bor * N / 1e9, 3),
+            "borrow_per_bptix": round(bor, 2), "position_shares": cfg.POSITION_BPTIX_SHARES,
+            "weights_as_of": weights_as_of, "source": "mark_basket", "mark": today["mark"], "mark_err": today["err"],
+            "fee_accrued": today["fee_accrued"], "dividends_received": today["dividends_received"],
+            "holdings": holdings}
 
 
 def _lookthrough(rows, w6, weights_as_of="6/30"):
@@ -2276,14 +2305,92 @@ DISCLOSED_10_09 = {"spacex_net": 35.9, "spacex_gross_9_30": 32.6, "leverage": 1.
                    "anchor": "2026-10-09", "nav": 299.45, "spcx": 162.57,
                    "exited": ["AMZN", "GOOGL", "GOOG", "LLY", "FIG"]}
 
+# 11/2 holdings (Baron's site, holdings PDF, % of NET; found 11/13). The same 24 issuers as 10/9, none added or
+# dropped. SpaceX 30.4% -> 36.95M +/-0.06M shares at the exact 11/2 AUM = the filed count (no SpaceX sold);
+# liabilities less cash -9.1%. Strike = the 11/2 CLOSE (chi2/n 6.7 at 11/2 prices vs 23 at 10/30's). Unlike
+# 9/30 -> 10/9, the fund DID trade: 6 of 24 names sit past 2 sigma from v6 rolled forward (TSLA, SCHW, IDXX,
+# ONON, CSGP, GLPI; ~1.1 expected) and the rest are over-dispersed too, so the old book is not a second reading
+# of this one and is NOT pooled in: v7 is the 11/2 reading alone. Build record: daily_log/2026-11-14-basket-v7.md.
+DISCLOSED_11_02 = {"spacex_net": 30.4, "leverage": 1.091, "anchor": "2026-11-02", "nav": 298.93, "spcx": 136.37,
+                   "aum": 16576627324, "traded": ["TSLA", "SCHW", "IDXX", "ONON", "CSGP", "GLPI"]}
+
 # Each published basket and the date its share book is struck at — the reference for the
 # distribution scaling (_dist_factor), which has to know which side of an ex-date a basket sits on.
 BASKET_ANCHORS = {"v3": "2026-06-30", "v4": "2026-07-31", "v4.1": "2026-07-31", "v4.2": "2026-07-31",
-                  "v5": "2026-08-31", "v6": "2026-10-09"}
+                  "v5": "2026-08-31", "v6": "2026-10-09", "v7": "2026-11-02"}
+
+# CARRY — what a STATIC per-BPTIX basket cannot see. All three were found in v6's out-of-sample errors and
+# confirmed on 10/12-11/13 (24 sessions) and against the 11/2 holdings:
+#   1. EXPENSES. The NAV is struck net of the daily fee + interest accrual; a basket's borrow line is not.
+#      9/30 fact sheet: 1.65% (1.04% operating + 0.61% interest expense, as of 4/30/2026). v6's raw error
+#      rose ~$0.0135/BPTIX per calendar day, exactly this. Accrued as ER/365 x NAV_anchor per CALENDAR day.
+#   2. DIVIDENDS on held stocks. The fund books the receivable on the ex-date; the basket marks only the price
+#      drop. Recorded per day in ENTRIES[...]["ex_divs"] (Yahoo events=div); shares x $ comes off the borrow.
+#   3. REDEMPTIONS. Fund-level SpaceX and borrowings stay fixed while shares-out falls, so SpaceX per BPTIX
+#      RISES; the cash paid out comes from selling the PUBLIC names pro-rata. Confirmed by the 11/2 holdings:
+#      SpaceX 30.39% predicted vs 30.4% disclosed (static v6: 30.17%). Funding redemptions with extra borrowing
+#      instead fits worse (fee-adjusted RMS 0.066 vs 0.045 on 10/12-11/12).
+# v6 out of sample (10/12-11/13): raw RMS 0.31 -> net of 1+2: 0.07 -> net of 1+2+3: 0.05 $/BPTIX.
+EXPENSE_RATIO = 0.0165
+
+
+def _shares_out_eff():
+    """({date: BPTIX shares-out}, {date: cumulative distribution adj}) — shares-out on the days with an exact
+    AUM print ONLY (the roll carries it over gaps itself; carrying it here would leak a pre-anchor print past
+    a basket's anchor), with distribution reinvestment taken out (x the adj_factor), so a payout is not read
+    as a flow."""
+    so, cum, adj = {}, {}, 1.0
+    for e in ENTRIES:
+        adj *= DISTRIBUTIONS.get(e["date"], {}).get("adj_factor", 1.0)
+        cum[e["date"]] = adj
+        if e.get("aum") and e.get("actual_nav"):
+            so[e["date"]] = e["aum"] / e["actual_nav"] * adj
+    return so, cum
+
+
+def _roll_basket(s, b, anchor, date, so_cum=None):
+    """A basket's per-BPTIX book carried from `anchor` to `date` through the redemptions in between (CARRY
+    item 3): every line x f = so_prev/so (fund-level SpaceX and borrowings fixed), then the cash paid out
+    (NAV x (f-1)) comes off the public names pro-rata. Returns (shares, borrow)."""
+    so_eff, cum = so_cum or _shares_out_eff()
+    s, b = dict(s), float(b)
+    if not s.get("SPCX") or date <= anchor:
+        return s, b
+    so_prev = (SPX_SHARES_DISCLOSED / s["SPCX"]) * cum.get(anchor, 1.0)   # the basket's own anchor shares-out
+    prev = None
+    for e in ENTRIES:
+        d = e["date"]
+        if d <= anchor:
+            prev = e
+            continue
+        if d > date:
+            break
+        so = so_eff.get(d, so_prev)
+        f = so_prev / so
+        if prev is not None and abs(f - 1) > 1e-12 and prev.get("actual_nav"):
+            P = dict(prev["closes"]); P["SPCX"] = prev["spcx"]
+            s = {t: x * f for t, x in s.items()}
+            b *= f
+            pub = sum(x * P[t] for t, x in s.items() if t != "SPCX" and P.get(t))
+            if pub > 0:
+                k = 1 - prev["actual_nav"] * (f - 1) / pub
+                s = {t: (x if t == "SPCX" else x * k) for t, x in s.items()}
+        so_prev, prev = so, e
+    return s, b
+
+
+def _carry(s, frm, to, nav_ref):
+    """$/BPTIX accrued between two dates (frm < to): the expense accrual minus the dividends the fund received
+    on shares `s` (CARRY items 1 and 2). Subtract it from a basket's mark at `to` (anchored at `frm`)."""
+    import datetime as _dt
+    days = (_dt.date.fromisoformat(to) - _dt.date.fromisoformat(frm)).days
+    div = sum(s.get(t, 0.0) * a for e in ENTRIES if frm < e["date"] <= to
+              for t, a in (e.get("ex_divs") or {}).items())
+    return EXPENSE_RATIO / 365.0 * nav_ref * days - div
 
 
 def _mark_basket_accuracy():
-    """The PUBLISHED mark basket (v6) + its live tracking accuracy vs actual NAV, scored against the
+    """The PUBLISHED mark basket (v7) + its live tracking accuracy vs actual NAV, scored against the
     ladder of predecessors. Wrapped by the caller in try/except (never break CI).
 
     Version ladder — each step changed exactly ONE thing, each settled out-of-sample:
@@ -2292,19 +2399,18 @@ def _mark_basket_accuracy():
       v4.1 same, but tail = BUY-AND-HOLD (prior SHARES x one uniform haircut).
       v4.2 same, but MRNA cut to 0.02355 sh/BPTIX, back-solved from repeated MRNA shocks. Adopted 8/20.
       v5   8/31 re-anchor on Baron's 8/31 top-10 (L=1.092), tail = buy-and-hold off v4.2. Adopted 9/10.
-      v6   10/9 re-anchor on the FULL book (L=1.089): every one of the 24 issuers from Baron's 9/30
-           quarterly CSV and 10/9 holdings PDF, pooled by inverse variance (two rounded readings of one
-           unchanged book). No tail estimate left — this is the first basket with no haircut in it.
-           Drops AMZN/GOOGL/GOOG/LLY/FIG (exited). Adopted 2026-10-20.
+      v6   10/9 re-anchor on the FULL book (L=1.089): the 9/30 quarterly CSV and 10/9 holdings PDF pooled by
+           inverse variance (no trading between them). Drops AMZN/GOOGL/GOOG/LLY/FIG. Adopted 10/20.
+      v7   11/2 re-anchor on the 11/2 FULL book (L=1.091), the 11/2 reading alone (6 names traded since 10/9,
+           so no pooling). Adopted 11/14. Scored RAW and net of CARRY (fees, dividends, redemptions).
 
     Every mark is DISTRIBUTION-ADJUSTED (_dist_factor): unadjusted, the 9/22 $1.888 payout made every
     pre-9/22 basket read ~+1.8/BPTIX high from 9/22 on, which looked like drift and was not.
 
-    Backtest that justified the swap (RMS $/BPTIX, distribution-adjusted):
-        early Sep (v5's home)   v5 0.150   v6 0.385
-        late Sep                v5 0.155   v6 0.134
-        9/30-10/9               v5 0.217   v6 0.052
-        10/12-10/19 (pure OOS)  v5 0.148   v6 0.081
+    Backtest that justified the swap (RMS $/BPTIX; adjusted = net of fees + dividends + redemption roll):
+                                   raw v6   raw v7    adj v6   adj v7
+        10/12-10/30 (v6's home)     0.169    0.229     0.038    0.068
+        11/3-11/13 (v7 OOS, n=9)    0.488    0.071     0.054    0.032
     The crossover a periodic re-anchor should produce. `segments` re-scores those windows live."""
     import math
     W6 = _nospy(fs.WEIGHTS_6_30)
@@ -2317,16 +2423,40 @@ def _mark_basket_accuracy():
     v4_2, b4_2 = _load_basket_csv("position_mark_basket_v4_2_2026-07-31.csv", default_borrow=b4_1)
     v5, b5 = _load_basket_csv("position_mark_basket_v5_2026-08-31.csv", default_borrow=0.0)
     v6, b6 = _load_basket_csv("position_mark_basket_v6_2026-10-09.csv", default_borrow=0.0)
-    B = {"v6": (v6, b6), "v5": (v5, b5), "v4.2": (v4_2, b4_2), "v4.1": (v4_1, b4_1), "v4": (v4, b4),
-         "v3": (v3, b3)}
+    v7, b7 = _load_basket_csv("position_mark_basket_v7_2026-11-02.csv", default_borrow=0.0)
+    B = {"v7": (v7, b7), "v6": (v6, b6), "v5": (v5, b5), "v4.2": (v4_2, b4_2), "v4.1": (v4_1, b4_1),
+         "v4": (v4, b4), "v3": (v3, b3)}
+    CUR, PREV = "v7", "v6"
+    so_cum = _shares_out_eff()
+    by_date = {e["date"]: e for e in ENTRIES}
+    nav_at = {n: (by_date.get(a) or {}).get("actual_nav") for n, a in BASKET_ANCHORS.items()}
+
+    def prices(e):
+        p = dict(e["closes"]); p["SPCX"] = e["spcx"]
+        return p
 
     def mark(name, e):
         s, b = B[name]
-        p = dict(e["closes"]); p["SPCX"] = e["spcx"]
+        p = prices(e)
         return (sum(s[t] * p[t] for t in s if p.get(t)) - b) * _dist_factor(BASKET_ANCHORS[name], e["date"])
+
+    def mark_adj(name, e):
+        """net of CARRY: rolled through the redemptions since the anchor, less the fee accrual, plus the
+        dividends received. Before its anchor a basket gets the fee/dividend carry only (no backward roll)."""
+        a, d = BASKET_ANCHORS[name], e["date"]
+        s, b = B[name]
+        if d <= a:
+            return mark(name, e) + _carry(s, d, a, nav_at[name] or e["actual_nav"])
+        rs, rb = _roll_basket(s, b, a, d, so_cum)
+        p = prices(e)
+        return ((sum(rs[t] * p[t] for t in rs if p.get(t)) - rb - _carry(rs, a, d, nav_at[name]))
+                * _dist_factor(a, d))
 
     def rms(xs):
         return round(math.sqrt(sum(x * x for x in xs) / len(xs)), 3) if xs else None
+
+    def mean(xs):
+        return round(sum(xs) / len(xs), 3) if xs else None
 
     scored = [e for e in ENTRIES if e["date"] >= FORWARD_START and e.get("actual_nav")]
     window_end = scored[-1]["date"] if scored else FORWARD_START
@@ -2334,52 +2464,82 @@ def _mark_basket_accuracy():
     def errs(name, rows=None):
         return [mark(name, e) - e["actual_nav"] for e in (rows if rows is not None else scored)]
 
-    # v6's OWN out-of-sample window: strictly after its 10/9 anchor
-    oos = [e for e in scored if e["date"] > DISCLOSED_10_09["anchor"]]
-    e_oos, e_oos_prev = errs("v6", oos), errs("v5", oos)
-    bias = round(sum(e_oos) / len(e_oos), 3) if e_oos else None
+    def errs_adj(name, rows):
+        return [mark_adj(name, e) - e["actual_nav"] for e in rows]
+
+    # v7's OWN out-of-sample window: strictly after its 11/2 anchor
+    anchor = DISCLOSED_11_02["anchor"]
+    oos = [e for e in scored if e["date"] > anchor]
+    e_raw, e_adj = errs(CUR, oos), errs_adj(CUR, oos)
+    p_raw, p_adj = errs(PREV, oos), errs_adj(PREV, oos)
     nav_ref = scored[-1]["actual_nav"] if scored else 270.0
-    r_oos = rms(e_oos) or 0.0
     full = {n: rms(errs(n)) for n in B}
 
-    # the crossover, re-scored every build: v5 should win on its own turf, v6 after
-    seg_defs = [("early Sep (v5's home)", "2026-09-01", "2026-09-15"),
-                ("late Sep", "2026-09-16", "2026-09-29"),
-                ("9/30-10/9 (v6's anchors)", "2026-09-30", "2026-10-09"),
-                ("after 10/9 (v6 out-of-sample)", "2026-10-12", "9999-12-31")]
+    # the crossover, re-scored every build: v6 should win on its own turf, v7 after 11/2
+    seg_defs = [("10/12-10/30 (v6's home)", "2026-10-12", "2026-10-30"),
+                ("after 11/2 (v7 out-of-sample)", "2026-11-03", "9999-12-31")]
     segments = []
     for lbl, lo, hi in seg_defs:
         rows = [e for e in scored if lo <= e["date"] <= hi]
         if rows:
             segments.append({"label": lbl, "start": rows[0]["date"], "end": rows[-1]["date"], "n": len(rows),
-                             "rms_v5": rms(errs("v5", rows)), "rms_v6": rms(errs("v6", rows))})
-    recent = [{"date": e["date"], "err_v6": round(x, 3)} for e, x in zip(oos, e_oos)][-10:]
+                             "rms_prev": rms(errs(PREV, rows)), "rms_cur": rms(errs(CUR, rows)),
+                             "rms_prev_adj": rms(errs_adj(PREV, rows)), "rms_cur_adj": rms(errs_adj(CUR, rows))})
+    recent = [{"date": e["date"], "err": round(x, 3), "err_adj": round(y, 3)}
+              for e, x, y in zip(oos, e_raw, e_adj)][-10:]
+
+    # TODAY's book = the copy-over: v7 rolled through the redemptions since 11/2, borrow + carry
+    today = None
+    if scored:
+        e = scored[-1]
+        rs, rb = _roll_basket(v7, b7, anchor, e["date"], so_cum)
+        fee = EXPENSE_RATIO / 365.0 * nav_at[CUR] * (
+            __import__("datetime").date.fromisoformat(e["date"]) - __import__("datetime").date.fromisoformat(anchor)).days
+        div = fee - _carry(rs, anchor, e["date"], nav_at[CUR])
+        borrow_today = rb + fee - div
+        p = prices(e)
+        hold = [{"ticker": t, "sh_per_bptix": round(x, 6), "sh_anchor": round(v7[t], 6),
+                 "shares_for_position": round(x * cfg.POSITION_BPTIX_SHARES, 1), "price": p.get(t),
+                 "pct_nav": round(x * p[t] / e["actual_nav"] * 100, 3)}
+                for t, x in sorted(rs.items(), key=lambda kv: -kv[1] * p.get(kv[0], 0))]
+        mk = sum(x * p[t] for t, x in rs.items()) - borrow_today
+        today = {"date": e["date"], "nav": e["actual_nav"], "holdings": hold,
+                 "borrow_anchor": round(b7, 3), "borrow_rolled": round(rb, 3), "fee_accrued": round(fee, 3),
+                 "dividends_received": round(div, 3), "borrow_today": round(borrow_today, 3),
+                 "fee_per_day": round(EXPENSE_RATIO / 365.0 * nav_at[CUR], 5),
+                 "spx_sh_anchor": round(v7["SPCX"], 6), "spx_sh_today": round(rs["SPCX"], 6),
+                 "public_scale": round(rs["TSLA"] / v7["TSLA"], 5) if v7.get("TSLA") else None,
+                 "mark": round(mk, 2), "err": round(mk - e["actual_nav"], 3),
+                 "position_shares": cfg.POSITION_BPTIX_SHARES}
     return {
-        "version": "v6", "prev_version": "v5", "anchor": DISCLOSED_10_09["anchor"],
-        "leverage": DISCLOSED_10_09["leverage"],
-        "spx_sh_per_bptix": round(v6.get("SPCX", 0), 4),
-        "spx_pct_net": DISCLOSED_10_09["spacex_net"], "spx_pct_gross_9_30": DISCLOSED_10_09["spacex_gross_9_30"],
-        "borrow_per_bptix": round(b6, 2), "n_names": len(v6) - 1,
-        "exited": DISCLOSED_10_09["exited"],
-        "mrna_sh_per_bptix": round(v6.get("MRNA", 0), 5),
+        "version": CUR, "prev_version": PREV, "anchor": anchor,
+        "leverage": DISCLOSED_11_02["leverage"],
+        "spx_sh_per_bptix": round(v7.get("SPCX", 0), 4),
+        "spx_pct_net": DISCLOSED_11_02["spacex_net"],
+        "borrow_per_bptix": round(b7, 2), "n_names": len(v7) - 1,
+        "traded": DISCLOSED_11_02["traded"], "exited": DISCLOSED_10_09["exited"],
+        "expense_ratio": EXPENSE_RATIO,
         "distributions": {d: x["usd"] for d, x in DISTRIBUTIONS.items() if d >= FORWARD_START},
-        # headline = the out-of-sample window (after the anchor), which is what the basket is FOR
-        "rms_forward": rms(e_oos), "rms_forward_pct_nav": round(r_oos / nav_ref * 100, 3),
-        "bias_forward": bias, "last_err": (round(e_oos[-1], 2) if e_oos else None),
-        "n_forward": len(e_oos), "recent_errors": recent,
-        "window_start": (oos[0]["date"] if oos else DISCLOSED_10_09["anchor"]), "window_end": window_end,
-        "rms_prev_same_window": rms(e_oos_prev),        # v5 over v6's out-of-sample window
-        # full comparison window, all versions on the same days
+        # headline = the out-of-sample window (after the anchor), NET OF CARRY — what the basket is FOR;
+        # the raw numbers are what a static hedge actually experiences
+        "rms_forward": rms(e_adj), "bias_forward": mean(e_adj),
+        "rms_forward_raw": rms(e_raw), "bias_forward_raw": mean(e_raw),
+        "rms_forward_pct_nav": round((rms(e_adj) or 0.0) / nav_ref * 100, 3),
+        "last_err": (round(e_adj[-1], 2) if e_adj else None), "last_err_raw": (round(e_raw[-1], 2) if e_raw else None),
+        "n_forward": len(e_adj), "recent_errors": recent,
+        "window_start": (oos[0]["date"] if oos else anchor), "window_end": window_end,
+        "rms_prev_same_window": rms(p_adj), "rms_prev_same_window_raw": rms(p_raw),
         "full_window_start": FORWARD_START, "n_full": len(scored),
-        "rms_full": full, "segments": segments,
-        "clean_split_date": DISCLOSED_10_09["anchor"],
-        "note": ("v6 mark basket: anchored 10/9 on Baron's FULL book (all 24 issuers from the 9/30 quarterly "
-                 "holdings + the 10/9 holdings, pooled), leverage 1.089. SpaceX = the FILED 36,938,300 sh / "
-                 "shares-out = %.4f sh/BPTIX. AMZN, GOOGL, GOOG, LLY and FIG exited. Distribution-adjusted "
-                 "(9/22 $1.888). Out-of-sample since the anchor %s..%s (n=%d): RMS $%.3f/BPTIX (~%.2f%% of "
-                 "NAV), bias %+.3f -- versus v5 at $%.3f on the SAME days."
-                 % (v6.get("SPCX", 0), (oos[0]["date"] if oos else "-"), window_end, len(e_oos),
-                    r_oos, r_oos / nav_ref * 100, bias or 0.0, rms(e_oos_prev) or 0)),
+        "rms_full": full, "segments": segments, "today": today,
+        "clean_split_date": anchor,
+        "note": ("v7 mark basket: anchored 11/2 on Baron's FULL 11/2 book (24 issuers, %% of net), leverage 1.091. "
+                 "SpaceX = the FILED 36,938,300 sh / the exact 11/2 shares-out = %.4f sh/BPTIX (30.39%% vs 30.4%% "
+                 "disclosed). Out-of-sample %s..%s (n=%d), net of carry (fees 1.65%%/yr, dividends, redemption "
+                 "roll): RMS $%.3f/BPTIX, bias %+.3f; raw RMS $%.3f, bias %+.3f -- versus v6 at $%.3f adjusted / "
+                 "$%.3f raw on the SAME days."
+                 % (v7.get("SPCX", 0), (oos[0]["date"] if oos else "-"), window_end, len(e_adj),
+                    rms(e_adj) or 0, mean(e_adj) or 0, rms(e_raw) or 0, mean(e_raw) or 0,
+                    rms(p_adj) or 0, rms(p_raw) or 0)),
     }
 
 
@@ -2387,10 +2547,12 @@ def _mark_basket_accuracy():
 # Baron's as-of postings: 7/31 long 110% / cash -10%; 8/31 109.2 / -9.2; 9/30 fact sheet 109.6 / -9.6;
 # 10/9 holdings, liabilities less cash -8.9%. The 9/30 and 10/9 values (found 10/20) were added after
 # the 9/16-10/19 backfill was frozen, so the as-of vintage for those days keeps 1.092.
-LEVERAGE_DISCLOSED = {"2026-07-31": 1.10, "2026-08-31": 1.092, "2026-09-30": 1.096, "2026-10-09": 1.089}
+# 11/2 holdings (-9.1%, found 11/13) were likewise added after the 10/20-11/13 backfill froze at 1.089.
+LEVERAGE_DISCLOSED = {"2026-07-31": 1.10, "2026-08-31": 1.092, "2026-09-30": 1.096, "2026-10-09": 1.089,
+                      "2026-11-02": 1.091}
 
 
-def _slow_vars(w_pub, window=15, alert_gap=0.02, alert_days=3):
+def _slow_vars(w_pub, window=15, alert_gap=0.02, alert_days=3, books=None):
     """Track the two SLOW variables that drive basket drift but DON'T need a disclosure:
 
       1. SpaceX per BPTIX  = 36.94M disclosed shares / (AUM/NAV)  -> EXACT, daily.
@@ -2420,8 +2582,15 @@ def _slow_vars(w_pub, window=15, alert_gap=0.02, alert_days=3):
             continue
         navr = (c["actual_nav"] + _dist_usd(c["date"])) / p["actual_nav"] - 1   # total return
         sr = c["spcx"] / p["spcx"] - 1
+        # public weights entering the day: the latest disclosed BOOK in force (its share counts x the prior
+        # close, i.e. buy-and-hold between disclosures), else the fixed 6/30 weights. With 6/30 weights alone
+        # (AMZN/GOOGL/LLY... long since sold) the fit's bias drifted by ~0.05 over Oct-Nov and fired a false
+        # "leverage shift" while the disclosed L barely moved (1.089 at 10/9 -> 1.091 at 11/2).
+        bk = next((s for a, s in reversed(books or []) if p["date"] >= a), None)
+        W = ({t: x * p["closes"][t] for t, x in bk.items() if t != "SPCX" and p["closes"].get(t)}
+             if bk else w_pub)
         num = den = 0.0
-        for t, w in w_pub.items():
+        for t, w in W.items():
             a, b = p["closes"].get(t), c["closes"].get(t)
             if a and b and w:
                 num += w * (b / a - 1); den += w
@@ -2511,15 +2680,28 @@ def build_payload():
     compositions = {m: sorted([{"ticker": t, "weight_pct": round(w * 100, 2)}
                                for t, w in WS[m].items() if w], key=lambda x: -x["weight_pct"])
                     for m in methods}
-    # slow layer = the latest FULL disclosed book (10/9); falls back to the 6/30 NPORT weights
-    wb = _latest_book_weights()
-    lookthrough = (_lookthrough(rows, wb, "10/9") if wb else _lookthrough(rows, WS.get("fund_6_30", {})))
     try:
         mark_basket = _mark_basket_accuracy()
     except Exception:
         mark_basket = None
+    # look-through = the published mark basket carried to today (rolled + carry); if that fails, the old
+    # constant-weight view off the latest full book (11/2), then the 6/30 NPORT weights
+    lookthrough = None
+    if mark_basket and mark_basket.get("today"):
+        try:
+            lookthrough = _lookthrough_from_book(rows, mark_basket["today"], "11/2")
+        except Exception:
+            lookthrough = None
+    if lookthrough is None:
+        wb = _latest_book_weights()
+        lookthrough = (_lookthrough(rows, wb, "11/2") if wb else _lookthrough(rows, WS.get("fund_6_30", {})))
     try:
-        slow_vars = _slow_vars(WS.get("fund_6_30", {}))
+        books = [(a, _load_basket_csv(f, 0.0)[0]) for a, f in (
+            ("2026-07-31", "position_mark_basket_v4_2_2026-07-31.csv"),
+            ("2026-08-31", "position_mark_basket_v5_2026-08-31.csv"),
+            ("2026-10-09", "position_mark_basket_v6_2026-10-09.csv"),
+            ("2026-11-02", "position_mark_basket_v7_2026-11-02.csv"))]
+        slow_vars = _slow_vars(WS.get("fund_6_30", {}), books=books)
     except Exception:
         slow_vars = None
     return {
@@ -2535,7 +2717,7 @@ def build_payload():
             # 6/5 base closes + base leverage -> the composition "difference" view sizes a
             # held-fixed (never-adjusted-since-6/5) basket and compares it to today's target.
             "base_closes": _base_closes(H), "base_leverage": LEVERAGE_FOR(BASE["date"]),
-            "friday_spacex_buy_usd": FRIDAY_SPACEX_BUY, "leverage_schedule": "0.968 thru 6/15, 1.00 (6/16-6/25), 1 + $1.15B/net (6/26-7/30), then disclosed: 1.10 (7/31), 1.092 (8/31), 1.096 (9/30), 1.089 (10/9)",
+            "friday_spacex_buy_usd": FRIDAY_SPACEX_BUY, "leverage_schedule": "0.968 thru 6/15, 1.00 (6/16-6/25), 1 + $1.15B/net (6/26-7/30), then disclosed: 1.10 (7/31), 1.092 (8/31), 1.096 (9/30), 1.089 (10/9), 1.091 (11/2)",
             "note": ("Each day's predicted BPTIX NAV under every basket weighting we've tested, vs the actual — now "
                      "walked back through the IPO week (6/8 onward). NAV_t = NAV_{t-1} x (1 + w_spx x SPCX_return + "
                      "(LEVERAGE - w_spx) x basket_return); SpaceX marked to live SPCX once public, held flat at the "
